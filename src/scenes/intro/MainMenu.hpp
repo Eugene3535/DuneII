@@ -3,12 +3,12 @@
 
 #include "scenes/SceneNode.hpp"
 
-class TitleScreen:
+class MainMenu:
     public SceneNode
 {
 public:
-    TitleScreen(SceneNode* root) noexcept;
-    ~TitleScreen();
+    MainMenu(SceneNode* root) noexcept;
+    ~MainMenu();
 
     bool load()           noexcept override;
     void update(float dt) noexcept override;

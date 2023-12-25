@@ -13,6 +13,15 @@ class SceneNode:
     private sf::NonCopyable
 {
 public:
+    enum State: std::size_t
+    {
+        MAIN_MENU = 0ULL,
+        BATTLE,
+        MISSION_COMPLETED,
+        GAME_OVER
+    };
+
+public:
     SceneNode(SceneNode* root) noexcept;
     virtual ~SceneNode();
 
@@ -28,16 +37,15 @@ public:
     
     void removeScene(const SceneNode* node) noexcept;
 
-    const std::string& title() const noexcept;
-  
+    State state() const noexcept;
     bool isDone() const noexcept;
-
-protected:
-    std::string m_title;
 
 protected:   
     SceneNode* m_root;
     std::vector<std::unique_ptr<SceneNode>> m_scenes;
+
+protected:
+    State m_state;
 
 protected:
     bool m_isDone;

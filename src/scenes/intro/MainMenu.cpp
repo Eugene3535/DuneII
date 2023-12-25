@@ -1,18 +1,18 @@
 #include "utils/Resources.hpp"
-#include "scenes/BattleField.hpp"
-#include "scenes/TitleScreen.hpp"
+#include "scenes/battle/BattleField.hpp"
+#include "scenes/intro/MainMenu.hpp"
 
-TitleScreen::TitleScreen(SceneNode* root) noexcept:
+MainMenu::MainMenu(SceneNode* root) noexcept:
     SceneNode(root)
 {
-    m_title = "Title screen";
+    m_state = SceneNode::State::MAIN_MENU;
 }
 
-TitleScreen::~TitleScreen()
+MainMenu::~MainMenu()
 {
 }
 
-bool TitleScreen::load() noexcept
+bool MainMenu::load() noexcept
 {
     sf::Texture* texture = GetTexture("red");
 
@@ -34,7 +34,7 @@ bool TitleScreen::load() noexcept
     return true;
 }
 
-void TitleScreen::update(float dt) noexcept
+void MainMenu::update(float dt) noexcept
 {
     if(m_isDone)
         return;
@@ -66,7 +66,7 @@ void TitleScreen::update(float dt) noexcept
     change_color(m_buttons[2], point);
 }
 
-void TitleScreen::draw(sf::RenderTarget& target, sf::RenderStates states) const
+void MainMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     if(m_isDone)
         return;

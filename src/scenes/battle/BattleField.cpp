@@ -1,11 +1,11 @@
 #include "utils/Resources.hpp"
 #include "game/Game.hpp"
-#include "scenes/BattleField.hpp"
+#include "scenes/battle/BattleField.hpp"
 
 BattleField::BattleField(SceneNode* root) noexcept:
     SceneNode(root)
 {
-    m_title = "Battle field";
+    m_state = SceneNode::State::BATTLE;
 }
 
 BattleField::~BattleField()

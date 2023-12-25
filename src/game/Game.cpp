@@ -1,14 +1,13 @@
 #include "utils/Defines.hpp"
 #include "utils/Resources.hpp"
 
-#include "scenes/TitleScreen.hpp"
-#include "scenes/BattleField.hpp"
+#include "scenes/intro/MainMenu.hpp"
+#include "scenes/battle/BattleField.hpp"
 
 #include "game/Game.hpp"
 
 Game::Game(SceneNode* root) noexcept:
-    SceneNode(nullptr),
-    m_state(Game::State::TITLE_SCREEN)
+    SceneNode(nullptr)
 {
 }
 
@@ -21,7 +20,7 @@ bool Game::load() noexcept
     m_window = std::make_unique<sf::RenderWindow>(sf::VideoMode(800, 600), "Dune: The Battle For Arrakis");
     m_window->setFramerateLimit(60U);
 
-    m_currentScene = pushScene<TitleScreen>();
+    m_currentScene = pushScene<MainMenu>();
 
     if(!m_currentScene->load())
     {

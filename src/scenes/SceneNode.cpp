@@ -5,18 +5,13 @@
 
 SceneNode::SceneNode(SceneNode* root) noexcept:
     m_root(root),
+    m_state(SceneNode::State::MAIN_MENU),
     m_isDone(false)
 {
-    m_title = "Base scene";
 }
 
 SceneNode::~SceneNode()
 {
-}
-
-const std::string& SceneNode::title() const noexcept
-{
-    return m_title;
 }
 
 sf::Vector2i SceneNode::getCursorPosition() const noexcept
@@ -41,6 +36,11 @@ void SceneNode::removeScene(const SceneNode* node) noexcept
             return;
         }
     }
+}
+
+SceneNode::State SceneNode::state() const noexcept
+{
+    return m_state;
 }
 
 bool SceneNode::isDone() const noexcept

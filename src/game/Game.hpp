@@ -7,15 +7,6 @@ class Game final:
 	public SceneNode
 {
 public:
-    enum State: std::size_t
-    {
-        TITLE_SCREEN = 0ULL,
-        BATTLE_ZONE,
-        MISSION_COMPLETED,
-        GAME_OVER
-    };
-
-public:
     Game(SceneNode* root) noexcept;
     ~Game();
 
@@ -29,9 +20,6 @@ private:
 
 public:
     std::unique_ptr<sf::RenderWindow> m_window;
-
-public:
-    State m_state;
     
     SceneNode* m_currentScene;
 };
