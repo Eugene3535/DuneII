@@ -39,7 +39,7 @@ void MainMenu::update(float dt) noexcept
     if(m_isDone)
         return;
 
-    sf::Vector2f point(m_root->getCursorPosition());
+    sf::Vector2f point(getCursorPosition());
 
     auto change_color = [this](sf::Sprite& sprite, const sf::Vector2f& point)
     {
@@ -49,8 +49,7 @@ void MainMenu::update(float dt) noexcept
 
             if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
             {
-                m_isDone = true;
-                m_root->pushScene<BattleField>();
+                m_isDone = setScene<BattleField>();
 
                 return;
             }

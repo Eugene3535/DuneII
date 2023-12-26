@@ -23,12 +23,8 @@ bool Game::load() noexcept
     m_currentScene = pushScene<MainMenu>();
 
     if(!m_currentScene->load())
-    {
-        CHECK_EXPR(false);
-
         return false;
-    }
-
+    
     return true;
 }
 
@@ -46,7 +42,7 @@ void Game::update(float dt) noexcept
             if (event.type == sf::Event::Closed || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
             {
                 m_window->close();
-                m_isDone = true;
+                disable();
 
                 return;
             }
@@ -56,13 +52,12 @@ void Game::update(float dt) noexcept
 
         if(m_currentScene->isDone())
         {
-            if(auto* nextScene = m_scenes.back().get())
+            if(m_nextScene)
             {
-                if(nextScene->load())
-                {
-                    m_currentScene = nextScene;
-                    m_currentScene->update(0);
-                }
+                m_currentScene = m_nextScene;
+                m_currentScene->enable();
+                m_currentScene->update(0);
+                m_nextScene = nullptr;
             }
         }
 

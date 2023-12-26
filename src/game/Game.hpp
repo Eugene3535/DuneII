@@ -18,10 +18,8 @@ public:
 private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
-public:
+private:
     std::unique_ptr<sf::RenderWindow> m_window;
-    
-    SceneNode* m_currentScene;
 };
 
 

@@ -4,8 +4,9 @@
 #include "scenes/SceneNode.hpp"
 
 SceneNode::SceneNode(SceneNode* root) noexcept:
-    m_root(root),
-    m_state(SceneNode::State::MAIN_MENU),
+    m_rootScene(root),
+    m_nextScene(nullptr),
+    m_currentScene(nullptr),
     m_isDone(false)
 {
 }
@@ -16,10 +17,30 @@ SceneNode::~SceneNode()
 
 sf::Vector2i SceneNode::getCursorPosition() const noexcept
 {
-    if(m_root)
-        return m_root->getCursorPosition();
+    if(m_rootScene)
+        return m_rootScene->getCursorPosition();
 
     return sf::Vector2i(0, 0);
+}
+
+SceneNode::State SceneNode::state() const noexcept
+{
+    return m_state;
+}
+
+void SceneNode::enable() noexcept
+{
+    m_isDone = false;
+}
+
+void SceneNode::disable() noexcept
+{
+    m_isDone = true;
+}
+
+bool SceneNode::isDone() const noexcept
+{
+    return m_isDone;
 }
 
 void SceneNode::removeScene(const SceneNode* node) noexcept
@@ -36,14 +57,4 @@ void SceneNode::removeScene(const SceneNode* node) noexcept
             return;
         }
     }
-}
-
-SceneNode::State SceneNode::state() const noexcept
-{
-    return m_state;
-}
-
-bool SceneNode::isDone() const noexcept
-{
-    return m_isDone;
 }

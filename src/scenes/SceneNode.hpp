@@ -29,19 +29,26 @@ public:
     virtual void update(float dt) noexcept = 0;
     virtual sf::Vector2i getCursorPosition() const noexcept;
 
-    template<class T>
-    T* pushScene() noexcept
-    {
-        return dynamic_cast<T*>(m_scenes.emplace_back(std::make_unique<T>(this)).get());
-    }
-    
-    void removeScene(const SceneNode* node) noexcept;
-
+public:
     State state() const noexcept;
+
+    void enable()  noexcept;
+    void disable() noexcept;
     bool isDone() const noexcept;
 
 protected:   
-    SceneNode* m_root;
+    template<class T>
+    T* pushScene() noexcept;
+
+    template<class T>
+    bool setScene() noexcept;
+    
+    void removeScene(const SceneNode* node) noexcept;
+
+protected:   
+    SceneNode* m_rootScene;
+    SceneNode* m_nextScene;
+    SceneNode* m_currentScene;
     std::vector<std::unique_ptr<SceneNode>> m_scenes;
 
 protected:
@@ -50,5 +57,7 @@ protected:
 protected:
     bool m_isDone;
 };
+
+#include "scenes/SceneNode.inl"
 
 #endif // !SCENE_NODE_HPP
