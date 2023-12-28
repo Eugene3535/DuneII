@@ -10,9 +10,27 @@ bool SceneNode::setScene() noexcept
     for(const auto& scene : m_scenes)
         if(auto found = dynamic_cast<T*>(scene.get()); found != nullptr)
         {
-            m_nextScene = found;
+            if(found->isLoaded())
+            {
+                m_nextScene = found;
 
-            return true;
+                return true;
+            }
+            else
+            {
+                if(found->load())
+                {
+                    m_nextScene = found;
+
+                    return true;
+                }
+                else
+                {
+                    removeScene(found);
+
+                    return false;
+                }
+            }
         }
 
     if(m_rootScene)

@@ -7,6 +7,7 @@ SceneNode::SceneNode(SceneNode* root) noexcept:
     m_rootScene(root),
     m_nextScene(nullptr),
     m_currentScene(nullptr),
+    m_isLoaded(false),
     m_isDone(false)
 {
 }
@@ -38,6 +39,11 @@ void SceneNode::disable() noexcept
     m_isDone = true;
 }
 
+bool SceneNode::isLoaded() const noexcept
+{
+    return m_isLoaded;
+}
+
 bool SceneNode::isDone() const noexcept
 {
     return m_isDone;
@@ -57,4 +63,40 @@ void SceneNode::removeScene(const SceneNode* node) noexcept
             return;
         }
     }
+}
+
+void SceneNode::switchScene() noexcept
+{
+    if(m_nextScene)
+    {
+        m_currentScene = m_nextScene;
+        m_currentScene->enable();
+        m_currentScene->update(0);
+        m_nextScene = nullptr;
+    }
+}
+
+void SceneNode::setSpriteSize(sf::Sprite& sprite, int width, int height)
+{
+    const auto& rect = sprite.getTextureRect();
+
+	if (rect.width && rect.height)
+	{
+		float dx = width / std::abs(rect.width);
+		float dy = height / std::abs(rect.height);
+		sprite.setScale(dx, dy);
+	}
+}
+
+void SceneNode::setSpriteSize(sf::Sprite& sprite, const sf::Vector2i& size)
+{
+	setSpriteSize(sprite, size.x, size.y);
+}
+
+sf::Vector2i SceneNode::getSpriteSize(const sf::Sprite& sprite)
+{
+	const auto& rect  = sprite.getTextureRect();
+	const auto& scale = sprite.getScale();
+
+	return { static_cast<int>(rect.width * scale.x), static_cast<int>(rect.height * scale.y) };
 }

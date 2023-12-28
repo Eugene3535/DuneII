@@ -21,12 +21,13 @@ bool BattleField::load() noexcept
 
     if(!texture)
         return false;
-
     
     auto size = texture->getSize();
     m_player.setTexture(*texture);
     m_player.setColor(sf::Color::Red);
     m_player.setOrigin(size.x >> 1, size.y >> 1);
+
+    m_isLoaded = true;
 
     return true;
 }

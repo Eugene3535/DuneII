@@ -31,6 +31,8 @@ bool MainMenu::load() noexcept
     m_buttons[1].setScale(6, 2);
     m_buttons[2].setScale(6, 2);
 
+    m_isLoaded = true;
+
     return true;
 }
 

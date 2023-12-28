@@ -3,12 +3,7 @@
 int main()
 {
     if(Game game(nullptr); game.load())
-    {
-        while (!game.isDone())
-        {
-            game.update(0);
-        } 
-    }  
+        return game.run(); 
 
-    return 0;
+    return -1;
 }

@@ -18,6 +18,7 @@ public:
         MAIN_MENU = 0ULL,
         BATTLE,
         MISSION_COMPLETED,
+        MISSION_FAILED,
         GAME_OVER
     };
 
@@ -34,7 +35,8 @@ public:
 
     void enable()  noexcept;
     void disable() noexcept;
-    bool isDone() const noexcept;
+    bool isLoaded() const noexcept;
+    bool isDone()   const noexcept;
 
 protected:   
     template<class T>
@@ -44,6 +46,16 @@ protected:
     bool setScene() noexcept;
     
     void removeScene(const SceneNode* node) noexcept;
+    void switchScene() noexcept;
+
+protected:
+    void         setSpriteSize(sf::Sprite& sprite, int width, int height);
+    void         setSpriteSize(sf::Sprite& sprite, const sf::Vector2i& size);
+    sf::Vector2i getSpriteSize(const sf::Sprite& sprite);
+
+protected:
+    sf::View      m_viewport;
+    sf::FloatRect m_visibleArea;
 
 protected:   
     SceneNode* m_rootScene;
@@ -55,6 +67,7 @@ protected:
     State m_state;
 
 protected:
+    bool m_isLoaded;
     bool m_isDone;
 };
 
