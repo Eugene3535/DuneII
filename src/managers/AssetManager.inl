@@ -146,7 +146,7 @@ T* AssetManager::tryLoadFromFile(const std::string& filename, std::unordered_map
 //  sf::Music case               
 		if constexpr (std::is_same<T, sf::Music>::value)
 		{
-			if (const std::string filepath = FileProvider::getPathToFile(filename); !iterator->second.openFromFile(filepath))
+			if (const std::string filepath = FileProvider::getPathToFile(filename).generic_string(); !iterator->second.openFromFile(filepath))
 			{
 				container.erase(iterator);
 
@@ -164,8 +164,9 @@ T* AssetManager::tryLoadFromFile(const std::string& filename, std::unordered_map
 			}
 		}
 //  sf::Image, sf::Texture, sf::Font etc...                     
-		else if (const std::string filepath = FileProvider::getPathToFile(filename); !iterator->second.loadFromFile(filepath))
+		else if (const std::string filepath = FileProvider::getPathToFile(filename).generic_string(); !iterator->second.loadFromFile(filepath))
 		{
+			auto t = filepath;
 			container.erase(iterator);
 
 			return nullptr;

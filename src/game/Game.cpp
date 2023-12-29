@@ -62,7 +62,9 @@ void Game::update(float dt) noexcept
     m_currentScene->update(dt);
 
     if(m_currentScene->isDone())
-        switchScene(); 
+        switchScene();
+
+    m_window->setView(m_viewport);
 
     m_window->clear();
     m_window->draw(*this);

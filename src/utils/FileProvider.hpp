@@ -2,10 +2,11 @@
 #define FILE_UTILS_HPP
 
 #include <string>
+#include <filesystem>
 
 struct FileProvider
 {
-    static std::string getPathToFile(const std::string& filename);
+    static std::filesystem::path getPathToFile(const std::string& fName);
 };
 
 #endif

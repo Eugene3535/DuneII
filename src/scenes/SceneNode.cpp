@@ -3,6 +3,9 @@
 #include "game/Game.hpp"
 #include "scenes/SceneNode.hpp"
 
+sf::View SceneNode::m_viewport;
+sf::FloatRect SceneNode::m_visibleArea;
+
 SceneNode::SceneNode(SceneNode* root) noexcept:
     m_rootScene(root),
     m_nextScene(nullptr),

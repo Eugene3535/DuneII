@@ -54,8 +54,8 @@ protected:
     sf::Vector2i getSpriteSize(const sf::Sprite& sprite);
 
 protected:
-    sf::View      m_viewport;
-    sf::FloatRect m_visibleArea;
+    static sf::View      m_viewport;
+    static sf::FloatRect m_visibleArea;
 
 protected:   
     SceneNode* m_rootScene;

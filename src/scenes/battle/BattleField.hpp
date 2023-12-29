@@ -1,6 +1,7 @@
 #ifndef BATTLE_FIELD_HPP
 #define BATTLE_FIELD_HPP
 
+#include "scenes/battle/TileMap.hpp"
 #include "scenes/SceneNode.hpp"
 
 class BattleField:
@@ -17,7 +18,7 @@ private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 private:
-    sf::Sprite m_player;
+    TileMap m_tilemap;
 };
 
 #endif // !BATTLE_FIELD_HPP

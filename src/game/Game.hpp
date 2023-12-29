@@ -1,6 +1,7 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
+#include "managers/AssetManager.hpp"
 #include "scenes/SceneNode.hpp"
 
 class Game final:
@@ -24,6 +25,9 @@ private:
 
 private:
     std::unique_ptr<sf::RenderWindow> m_window;
+
+private:
+    AssetManager a;
 };
 
 
