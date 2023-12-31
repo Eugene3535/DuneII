@@ -1,4 +1,4 @@
-#include "utils/Resources.hpp"
+#include "managers/AssetManager.hpp"
 #include "scenes/battle/BattleField.hpp"
 #include "scenes/intro/MainMenu.hpp"
 
@@ -14,26 +14,30 @@ MainMenu::~MainMenu()
 
 bool MainMenu::load() noexcept
 {
-    sf::Texture* texture = GetTexture("red");
+    auto font = AssetManager::get<sf::Font>("AvanteNrBook.ttf");
 
-    if(!texture)
+    if(!font)
         return false;
 
-    m_buttons[0].setTexture(*texture);
-    m_buttons[1].setTexture(*texture);
-    m_buttons[2].setTexture(*texture);
+    m_menuItems[0].setFont(*font);
+    m_menuItems[1].setFont(*font);
+    m_menuItems[2].setFont(*font);
 
-    m_buttons[0].setPosition(250, 100);
-    m_buttons[1].setPosition(250, 250);
-    m_buttons[2].setPosition(250, 400);
+    const std::string textStart("Начать новую игру");
+    const std::string textOptions("Настройки");
+    const std::string textTutorial("Обучение");
 
-    m_buttons[0].setScale(6, 2);
-    m_buttons[1].setScale(6, 2);
-    m_buttons[2].setScale(6, 2);
+    m_menuItems[0].setString(sf::String::fromUtf8(textStart.begin(), textStart.end()));
+    m_menuItems[1].setString(sf::String::fromUtf8(textOptions.begin(), textOptions.end()));
+    m_menuItems[2].setString(sf::String::fromUtf8(textTutorial.begin(), textTutorial.end()));
+
+    m_menuItems[0].setPosition(250, 100);
+    m_menuItems[1].setPosition(250, 250);
+    m_menuItems[2].setPosition(250, 400);
 
     m_isLoaded = true;
 
-    return true;
+    return m_isLoaded;
 }
 
 void MainMenu::update(float dt) noexcept
@@ -43,11 +47,11 @@ void MainMenu::update(float dt) noexcept
 
     sf::Vector2f point(getCursorPosition());
 
-    auto change_color = [this](sf::Sprite& sprite, const sf::Vector2f& point)
+    auto change_color = [this](sf::Text& text, const sf::Vector2f& point)
     {
-        if(sprite.getGlobalBounds().contains(point))
+        if(text.getGlobalBounds().contains(point))
         {
-            sprite.setColor(sf::Color::Blue);
+            text.setColor(sf::Color::Blue);
 
             if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
             {
@@ -58,13 +62,13 @@ void MainMenu::update(float dt) noexcept
         }
         else
         {
-            sprite.setColor(sf::Color::Red);
+            text.setColor(sf::Color::Red);
         }
     };
 
-    change_color(m_buttons[0], point);
-    change_color(m_buttons[1], point);
-    change_color(m_buttons[2], point);
+    change_color(m_menuItems[0], point);
+    change_color(m_menuItems[1], point);
+    change_color(m_menuItems[2], point);
 }
 
 void MainMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const
@@ -72,7 +76,7 @@ void MainMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const
     if(m_isDone)
         return;
         
-    target.draw(m_buttons[0]);
-    target.draw(m_buttons[1]);
-    target.draw(m_buttons[2]);
+    target.draw(m_menuItems[0]);
+    target.draw(m_menuItems[1]);
+    target.draw(m_menuItems[2]);
 }

@@ -1,5 +1,4 @@
 #include "utils/Defines.hpp"
-#include "utils/Resources.hpp"
 
 #include "scenes/intro/MainMenu.hpp"
 #include "scenes/battle/BattleField.hpp"
