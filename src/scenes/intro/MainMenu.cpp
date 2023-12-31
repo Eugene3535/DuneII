@@ -15,9 +15,12 @@ MainMenu::~MainMenu()
 bool MainMenu::load() noexcept
 {
     auto font = AssetManager::get<sf::Font>("AvanteNrBook.ttf");
+    auto texture = AssetManager::get<sf::Texture>("Dune.png");
 
-    if(!font)
+    if(!(font && texture))
         return false;
+
+    m_planet.setTexture(*texture);
 
     m_menuItems[0].setFont(*font);
     m_menuItems[1].setFont(*font);
@@ -31,9 +34,13 @@ bool MainMenu::load() noexcept
     m_menuItems[1].setString(sf::String::fromUtf8(textOptions.begin(), textOptions.end()));
     m_menuItems[2].setString(sf::String::fromUtf8(textTutorial.begin(), textTutorial.end()));
 
-    m_menuItems[0].setPosition(250, 100);
-    m_menuItems[1].setPosition(250, 250);
-    m_menuItems[2].setPosition(250, 400);
+    m_menuItems[0].setPosition(550, 400);
+    m_menuItems[1].setPosition(550, 450);
+    m_menuItems[2].setPosition(550, 500);
+
+    m_menuItems[0].setScale(0.5f, 0.5f);
+    m_menuItems[1].setScale(0.5f, 0.5f);
+    m_menuItems[2].setScale(0.5f, 0.5f);
 
     m_isLoaded = true;
 
@@ -76,6 +83,7 @@ void MainMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const
     if(m_isDone)
         return;
         
+    target.draw(m_planet);
     target.draw(m_menuItems[0]);
     target.draw(m_menuItems[1]);
     target.draw(m_menuItems[2]);

@@ -17,8 +17,7 @@ private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 private:
-    sf::Sprite m_buttons[3];
-
+    sf::Sprite m_planet;
     sf::Text m_menuItems[3];
 };
 
