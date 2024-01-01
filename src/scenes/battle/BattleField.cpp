@@ -38,6 +38,10 @@ void BattleField::update(float dt) noexcept
     {
         if(m_isDone = setScene<MainMenu>())
         {
+            m_visibleArea.left = 0.0f;
+            m_visibleArea.top = 0.0f;
+            m_viewport.reset(m_visibleArea);
+            
             removeScene(this);
             
             return;

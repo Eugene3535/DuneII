@@ -37,7 +37,9 @@ void Game::update(float dt) noexcept
     {
         if (event.type == sf::Event::Resized)
         {
-            m_visibleArea = sf::FloatRect(0.f, 0.f, event.size.width, event.size.height);
+            const auto& center = m_viewport.getCenter();
+            const auto& size = m_viewport.getSize();
+            m_visibleArea = sf::FloatRect(center.x - size.x * 0.5f, center.y - size.y * 0.5f, event.size.width, event.size.height);
             m_viewport.reset(m_visibleArea);
         }
 
