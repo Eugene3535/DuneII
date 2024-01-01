@@ -86,7 +86,8 @@ void MainMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     if(m_isDone)
         return;
-        
+
+    target.setView(m_viewport);     
     target.draw(m_planet);
     target.draw(m_menuItems[0]);
     target.draw(m_menuItems[1]);

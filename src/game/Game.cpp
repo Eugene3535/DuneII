@@ -55,8 +55,6 @@ void Game::update(float dt) noexcept
     if(m_currentScene->isDone())
         switchScene();
 
-    m_window->setView(m_viewport);
-
     m_window->clear();
     m_window->draw(*this);
     m_window->display();

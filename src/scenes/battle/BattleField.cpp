@@ -50,6 +50,8 @@ void BattleField::draw(sf::RenderTarget& target, sf::RenderStates states) const
     if(m_isDone)
         return;
 
+    target.setView(m_viewport);     
+
     for (auto& layer : m_tilemap.m_layers)
     {
         target.draw(layer.vertexBuffer, layer.texture);
