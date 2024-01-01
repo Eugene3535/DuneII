@@ -49,28 +49,37 @@ void MainMenu::update(float dt) noexcept
 
     sf::Vector2f point(getCursorPosition());
 
-    auto change_color = [this](sf::Text& text, const sf::Vector2f& point)
+    auto isButtonPressed = [](sf::Text& text, const sf::Vector2f& point) noexcept
     {
         if(text.getGlobalBounds().contains(point))
         {
             text.setColor(sf::Color::Red);
 
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
-            {
-                m_isDone = setScene<BattleField>();
-
-                return;
-            }
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Left))       
+                return true;   
         }
-        else
-        {
+        else   
             text.setColor(sf::Color::White);
-        }
+        
+        return false;
     };
 
-    change_color(m_menuItems[0], point);
-    change_color(m_menuItems[1], point);
-    change_color(m_menuItems[2], point);
+    if(isButtonPressed(m_menuItems[0], point))
+    {
+        m_isDone = setScene<BattleField>();
+
+        return;
+    }
+
+    if(isButtonPressed(m_menuItems[1], point))
+    {
+        return;
+    }
+
+    if(isButtonPressed(m_menuItems[2], point))
+    {
+        return;
+    }
 }
 
 void MainMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const

@@ -17,7 +17,7 @@ private:
 
 private:
     sf::Sprite m_planet;
-    sf::Text m_menuItems[3];
+    sf::Text   m_menuItems[3];
 };
 
 #endif // !TITLE_SCREEN_HPP

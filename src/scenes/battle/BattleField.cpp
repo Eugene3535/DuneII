@@ -1,5 +1,6 @@
 #include "utils/FileProvider.hpp"
 #include "game/Game.hpp"
+#include "scenes/intro/MainMenu.hpp"
 #include "scenes/battle/BattleField.hpp"
 
 BattleField::BattleField(SceneNode* root) noexcept:
@@ -31,6 +32,17 @@ void BattleField::update(float dt) noexcept
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
         m_viewport.move(0, 10);
+
+
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::X))
+    {
+        if(m_isDone = setScene<MainMenu>())
+        {
+            removeScene(this);
+            
+            return;
+        }
+    }
 }
 
 void BattleField::draw(sf::RenderTarget& target, sf::RenderStates states) const
