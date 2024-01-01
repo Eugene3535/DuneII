@@ -10,7 +10,6 @@ public:
     MainMenu(SceneNode* root) noexcept;
     ~MainMenu();
 
-    bool load()           noexcept override;
     void update(float dt) noexcept override;
 
 private:

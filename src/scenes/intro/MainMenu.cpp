@@ -6,19 +6,12 @@ MainMenu::MainMenu(SceneNode* root) noexcept:
     SceneNode(root)
 {
     m_state = SceneNode::State::MAIN_MENU;
-}
 
-MainMenu::~MainMenu()
-{
-}
-
-bool MainMenu::load() noexcept
-{
     auto font = AssetManager::get<sf::Font>("AvanteNrBook.ttf");
     auto texture = AssetManager::get<sf::Texture>("Dune.png");
 
     if(!(font && texture))
-        return false;
+        return;
 
     m_planet.setTexture(*texture);
 
@@ -43,8 +36,10 @@ bool MainMenu::load() noexcept
     m_menuItems[2].setScale(0.5f, 0.5f);
 
     m_isLoaded = true;
+}
 
-    return m_isLoaded;
+MainMenu::~MainMenu()
+{
 }
 
 void MainMenu::update(float dt) noexcept
@@ -58,7 +53,7 @@ void MainMenu::update(float dt) noexcept
     {
         if(text.getGlobalBounds().contains(point))
         {
-            text.setColor(sf::Color::Blue);
+            text.setColor(sf::Color::Red);
 
             if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
             {
@@ -69,7 +64,7 @@ void MainMenu::update(float dt) noexcept
         }
         else
         {
-            text.setColor(sf::Color::Red);
+            text.setColor(sf::Color::White);
         }
     };
 

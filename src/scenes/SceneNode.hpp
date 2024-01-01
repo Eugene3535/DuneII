@@ -26,7 +26,6 @@ public:
     SceneNode(SceneNode* root) noexcept;
     virtual ~SceneNode();
 
-    virtual bool load()           noexcept = 0;
     virtual void update(float dt) noexcept = 0;
     virtual sf::Vector2i getCursorPosition() const noexcept;
 

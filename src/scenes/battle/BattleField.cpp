@@ -6,25 +6,13 @@ BattleField::BattleField(SceneNode* root) noexcept:
     SceneNode(root)
 {
     m_state = SceneNode::State::BATTLE;
+
+    if(m_tilemap.loadFromFile(FileProvider::getPathToFile("Atreides8.tmx")))
+        m_isLoaded = true;
 }
 
 BattleField::~BattleField()
 {
-}
-
-bool BattleField::load() noexcept
-{
-    if(m_isDone)
-        return false;
-
-    if(m_tilemap.loadFromFile(FileProvider::getPathToFile("Atreides8.tmx")))
-    {
-        m_isLoaded = true;
-
-        return m_isLoaded;
-    }
-
-    return false;
 }
 
 void BattleField::update(float dt) noexcept

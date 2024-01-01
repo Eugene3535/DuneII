@@ -11,7 +11,6 @@ public:
     BattleField(SceneNode* root) noexcept;
     ~BattleField();
 
-    bool load()           noexcept override;
     void update(float dt) noexcept override;
 
 private:

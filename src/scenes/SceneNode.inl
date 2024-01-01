@@ -18,25 +18,16 @@ bool SceneNode::setScene() noexcept
             }
             else
             {
-                if(found->load())
-                {
-                    m_nextScene = found;
+                removeScene(found);
 
-                    return true;
-                }
-                else
-                {
-                    removeScene(found);
-
-                    return false;
-                }
+                return false;         
             }
         }
 
     if(m_rootScene)
         return m_rootScene->setScene<T>();
 
-    if(auto newScene = pushScene<T>(); newScene->load())
+    if(auto newScene = pushScene<T>(); newScene->isLoaded())
     {
         m_nextScene = newScene;
 

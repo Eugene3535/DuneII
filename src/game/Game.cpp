@@ -9,16 +9,6 @@ Game::Game(SceneNode* root) noexcept:
     SceneNode(nullptr)
 {
     m_visibleArea = sf::FloatRect(0.f, 0.f, 800.0f, 600.0f);
-}
-
-Game::~Game()
-{
-}
-
-bool Game::load() noexcept
-{
-    if(m_isDone)
-        return false;
 
     unsigned width  = static_cast<unsigned>(m_visibleArea.width);
     unsigned height = static_cast<unsigned>(m_visibleArea.height);
@@ -27,14 +17,16 @@ bool Game::load() noexcept
     m_window->setFramerateLimit(60U);
     m_viewport.reset(m_visibleArea);
 
-    if( ! setScene<MainMenu>() )
-        return false;
+    if( m_isLoaded = setScene<MainMenu>(); ! isLoaded() )
+        return;
 
     switchScene();
 
     m_clock.restart();
+}
 
-    return true;
+Game::~Game()
+{
 }
 
 void Game::update(float dt) noexcept
