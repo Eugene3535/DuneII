@@ -6,6 +6,10 @@
 sf::View SceneNode::m_viewport;
 sf::FloatRect SceneNode::m_visibleArea;
 
+SceneNode::State SceneNode::m_state;
+SceneNode::Dynasty SceneNode::m_dynasty;
+int SceneNode::m_missionNum;
+
 SceneNode::SceneNode(SceneNode* root) noexcept:
     m_rootScene(root),
     m_nextScene(nullptr),
@@ -77,6 +81,26 @@ void SceneNode::switchScene() noexcept
         m_currentScene->update(0);
         m_nextScene = nullptr;
     }
+}
+
+std::string SceneNode::getMissionFileName() const noexcept
+{
+    if(m_missionNum < 1U || m_missionNum > 8U)
+        return std::string();
+
+    switch (m_dynasty)
+    {
+    case SceneNode::Dynasty::ATREIDES:
+        return "Atreides" + std::to_string(m_missionNum) + ".tmx";
+
+    case SceneNode::Dynasty::ORDOS:
+        return "Ordos" + std::to_string(m_missionNum) + ".tmx";
+
+    case SceneNode::Dynasty::HARKONNEN:
+        return "Harkonnen" + std::to_string(m_missionNum) + ".tmx";
+    }
+
+    return std::string();
 }
 
 void SceneNode::setSpriteSize(sf::Sprite& sprite, int width, int height)

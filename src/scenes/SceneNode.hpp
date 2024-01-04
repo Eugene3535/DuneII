@@ -13,13 +13,20 @@ class SceneNode:
     private sf::NonCopyable
 {
 public:
-    enum State: std::size_t
+    enum State: unsigned
     {
-        MAIN_MENU = 0ULL,
+        MAIN_MENU = 0U,
         BATTLE,
         MISSION_COMPLETED,
         MISSION_FAILED,
         GAME_OVER
+    };
+
+    enum Dynasty: unsigned
+    {
+        ATREIDES = 1U,
+        ORDOS,
+        HARKONNEN
     };
 
 public:
@@ -48,6 +55,9 @@ protected:
     void switchScene() noexcept;
 
 protected:
+    std::string getMissionFileName() const noexcept;
+
+protected: // utils
     void         setSpriteSize(sf::Sprite& sprite, int width, int height);
     void         setSpriteSize(sf::Sprite& sprite, const sf::Vector2i& size);
     sf::Vector2i getSpriteSize(const sf::Sprite& sprite);
@@ -63,9 +73,12 @@ protected:
     std::vector<std::unique_ptr<SceneNode>> m_scenes;
 
 protected:
-    State m_state;
+    static State   m_state;
+    static Dynasty m_dynasty;
+    static int     m_missionNum;
 
 protected:
+
     bool m_isLoaded;
     bool m_isDone;
 };

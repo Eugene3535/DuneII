@@ -7,8 +7,11 @@ BattleField::BattleField(SceneNode* root) noexcept:
     SceneNode(root)
 {
     m_state = SceneNode::State::BATTLE;
+    m_dynasty = SceneNode::Dynasty::ATREIDES;
+    m_missionNum = 8;
+    std::string mission = getMissionFileName();
 
-    if(m_tilemap.loadFromFile(FileProvider::getPathToFile("Atreides8.tmx")))
+    if(m_tilemap.loadFromFile(FileProvider::getPathToFile(mission)))
         m_isLoaded = true;
 }
 
