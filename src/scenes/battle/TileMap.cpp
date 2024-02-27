@@ -31,7 +31,7 @@ bool TileMap::loadFromFile(const std::filesystem::path& fPath) noexcept
 	const auto mapNode = pDocument->first_node("map");
 
 	if (!mapNode)
-		return nullptr;
+		return false;
 
 	return ( loadLayers(mapNode) && loadObjects(mapNode) );
 }

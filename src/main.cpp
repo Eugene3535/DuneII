@@ -2,8 +2,5 @@
 
 int main()
 {
-    if(Game game(nullptr); game.isLoaded())
-        return game.run(); 
-
-    return -1;
+    return Game().run(); 
 }

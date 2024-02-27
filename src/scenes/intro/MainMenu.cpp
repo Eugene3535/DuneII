@@ -1,53 +1,70 @@
 #include "managers/AssetManager.hpp"
-#include "scenes/battle/BattleField.hpp"
+#include "states/GameState.hpp"
 #include "scenes/intro/MainMenu.hpp"
 
-MainMenu::MainMenu(SceneNode* root) noexcept:
-    SceneNode(root)
+MainMenu::MainMenu() noexcept
 {
-    m_state = SceneNode::State::MAIN_MENU;
 
-    auto font = AssetManager::get<sf::Font>("AvanteNrBook.ttf");
-    auto texture = AssetManager::get<sf::Texture>("Dune.png");
-
-    if(!(font && texture))
-        return;
-
-    m_planet.setTexture(*texture);
-
-    m_menuItems[0].setFont(*font);
-    m_menuItems[1].setFont(*font);
-    m_menuItems[2].setFont(*font);
-
-    const std::string textStart("Начать новую игру");
-    const std::string textOptions("Настройки");
-    const std::string textTutorial("Обучение");
-
-    m_menuItems[0].setString(sf::String::fromUtf8(textStart.begin(), textStart.end()));
-    m_menuItems[1].setString(sf::String::fromUtf8(textOptions.begin(), textOptions.end()));
-    m_menuItems[2].setString(sf::String::fromUtf8(textTutorial.begin(), textTutorial.end()));
-
-    m_menuItems[0].setPosition(550, 400);
-    m_menuItems[1].setPosition(550, 450);
-    m_menuItems[2].setPosition(550, 500);
-
-    m_menuItems[0].setScale(0.5f, 0.5f);
-    m_menuItems[1].setScale(0.5f, 0.5f);
-    m_menuItems[2].setScale(0.5f, 0.5f);
-
-    m_isLoaded = true;
 }
 
 MainMenu::~MainMenu()
 {
 }
 
-void MainMenu::update(float dt) noexcept
+bool MainMenu::load(const std::string& info) noexcept
 {
-    if(m_isDone)
+    if(m_isLoaded)
+        return true;
+        
+    auto font = AssetManager::get<sf::Font>("AvanteNrBook.ttf");
+    auto texture = AssetManager::get<sf::Texture>("Dune.png");
+
+    if(!(font && texture))
+        return false;
+
+    m_planet.setTexture(*texture);
+
+    m_startGame.setFont(*font);
+    m_settings.setFont(*font);
+    m_tutorial.setFont(*font);
+
+    const std::string textStart("Начать новую игру");
+    const std::string textSettings("Настройки");
+    const std::string textTutorial("Обучение");
+
+    m_startGame.setString(sf::String::fromUtf8(textStart.begin(), textStart.end()));
+    m_settings.setString(sf::String::fromUtf8(textSettings.begin(), textSettings.end()));
+    m_tutorial.setString(sf::String::fromUtf8(textTutorial.begin(), textTutorial.end()));
+
+    m_startGame.setPosition(550, 400);
+    m_settings.setPosition(550, 450);
+    m_tutorial.setPosition(550, 500);
+
+    m_startGame.setScale(0.5f, 0.5f);
+    m_settings.setScale(0.5f, 0.5f);
+    m_tutorial.setScale(0.5f, 0.5f);
+
+    m_isLoaded = true;
+
+    return true;
+}
+
+void MainMenu::open() noexcept
+{
+
+}
+
+void MainMenu::close() noexcept
+{
+
+}
+
+void MainMenu::update(sf::Time dt) noexcept
+{
+    if(GameState::A_SCENE_NEEDS_TO_BE_CHANGED)
         return;
 
-    sf::Vector2f point(getCursorPosition());
+    sf::Vector2f point(m_cursorPosition);
 
     auto isButtonPressed = [](sf::Text& text, const sf::Vector2f& point) noexcept
     {
@@ -64,19 +81,20 @@ void MainMenu::update(float dt) noexcept
         return false;
     };
 
-    if(isButtonPressed(m_menuItems[0], point))
+    if(isButtonPressed(m_startGame, point))
     {
-        m_isDone = setScene<BattleField>();
+        GameState::A_SCENE_NEEDS_TO_BE_CHANGED = true;
+        GameState::next_scene = GameState::BATTLE;
 
         return;
     }
 
-    if(isButtonPressed(m_menuItems[1], point))
+    if(isButtonPressed(m_settings, point))
     {
         return;
     }
 
-    if(isButtonPressed(m_menuItems[2], point))
+    if(isButtonPressed(m_tutorial, point))
     {
         return;
     }
@@ -84,12 +102,8 @@ void MainMenu::update(float dt) noexcept
 
 void MainMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    if(m_isDone)
-        return;
-
-    target.setView(m_viewport);     
     target.draw(m_planet);
-    target.draw(m_menuItems[0]);
-    target.draw(m_menuItems[1]);
-    target.draw(m_menuItems[2]);
+    target.draw(m_startGame);
+    target.draw(m_settings);
+    target.draw(m_tutorial);
 }

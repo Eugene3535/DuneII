@@ -2,16 +2,19 @@
 #define BATTLE_FIELD_HPP
 
 #include "scenes/battle/TileMap.hpp"
-#include "scenes/SceneNode.hpp"
+#include "scenes/Scene.hpp"
 
 class BattleField:
-    public SceneNode
+    public Scene
 {
 public:
-    BattleField(SceneNode* root) noexcept;
+    BattleField() noexcept;
     ~BattleField();
 
-    void update(float dt) noexcept override;
+    bool load(const std::string& info) noexcept override;
+    void open()                        noexcept override;
+    void close()                       noexcept override;
+    void update(sf::Time dt)           noexcept override;
 
 private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;

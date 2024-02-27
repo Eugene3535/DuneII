@@ -33,7 +33,7 @@ T* AssetManager::create(const std::string& filename) noexcept
 			if (auto it = m_instance->m_musics.find(filename); it != m_instance->m_musics.end())
 				return &it->second;
 
-			return m_instance->tryLoatryCreatedFromFile<sf::Music>(filename, m_instance->m_musics);
+			return m_instance->tryCreate<sf::Music>(filename, m_instance->m_musics);
 		}
 //  Shaders    
 		else if constexpr (std::is_same<T, sf::Shader>::value)
