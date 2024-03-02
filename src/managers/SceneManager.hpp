@@ -12,20 +12,33 @@ public:
     SceneManager() noexcept;
 
     template<class T>
-    static T* push() noexcept;
+    T* push(class Game* game) noexcept
+    {
+        if(auto scene = get<T>(); scene != nullptr)
+            return scene;
+
+        auto& sceneRef = m_scenes.emplace_back(std::make_unique<T>(game));
+
+        return dynamic_cast<T*>(sceneRef.get());
+    }
 
     template<class T>
-    static T* get() noexcept;
+    T* get() noexcept
+    {
+        if(m_scenes.empty())
+            return nullptr;
 
-    static void pop(const class Scene* scene) noexcept;
+        for(const auto& scene : m_scenes)
+            if(auto raw_ptr = dynamic_cast<T*>(scene.get()); raw_ptr != nullptr)
+                return raw_ptr;
+
+        return nullptr;
+    }
+
+    void pop(const class Scene* scene) noexcept;
 
 private:
     std::vector<std::unique_ptr<class Scene>> m_scenes;
-
-private:
-    static SceneManager* m_instance;
 };
-
-#include "managers/SceneManager.inl"
 
 #endif // !SCENE_MANAGER_HPP

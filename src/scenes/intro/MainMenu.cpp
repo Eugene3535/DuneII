@@ -1,8 +1,8 @@
-#include "managers/AssetManager.hpp"
-#include "states/GameState.hpp"
+#include "game/Game.hpp"
 #include "scenes/intro/MainMenu.hpp"
 
-MainMenu::MainMenu() noexcept
+MainMenu::MainMenu(Game* game) noexcept:
+    Scene(game)
 {
 
 }
@@ -49,26 +49,16 @@ bool MainMenu::load(const std::string& info) noexcept
     return true;
 }
 
-void MainMenu::open() noexcept
-{
-
-}
-
-void MainMenu::close() noexcept
-{
-
-}
-
 void MainMenu::update(sf::Time dt) noexcept
 {
-    if(GameState::A_SCENE_NEEDS_TO_BE_CHANGED)
+    if(m_game->a_scene_needs_to_be_changed)
         return;
 
-    sf::Vector2f point(m_cursorPosition);
+    sf::Vector2f mouse_pos { sf::Mouse::getPosition(*m_game->window) };
 
-    auto isButtonPressed = [](sf::Text& text, const sf::Vector2f& point) noexcept
+    auto isButtonPressed = [](sf::Text& text, const sf::Vector2f& mouse_pos) noexcept
     {
-        if(text.getGlobalBounds().contains(point))
+        if(text.getGlobalBounds().contains(mouse_pos))
         {
             text.setColor(sf::Color::Red);
 
@@ -81,20 +71,20 @@ void MainMenu::update(sf::Time dt) noexcept
         return false;
     };
 
-    if(isButtonPressed(m_startGame, point))
+    if(isButtonPressed(m_startGame, mouse_pos))
     {
-        GameState::A_SCENE_NEEDS_TO_BE_CHANGED = true;
-        GameState::next_scene = GameState::BATTLE;
+        m_game->a_scene_needs_to_be_changed = true;
+        m_game->next_scene = Game::GameScene::MISSION;
 
         return;
     }
 
-    if(isButtonPressed(m_settings, point))
+    if(isButtonPressed(m_settings, mouse_pos))
     {
         return;
     }
 
-    if(isButtonPressed(m_tutorial, point))
+    if(isButtonPressed(m_tutorial, mouse_pos))
     {
         return;
     }

@@ -7,12 +7,10 @@ class MainMenu:
     public Scene
 {
 public:
-    MainMenu() noexcept;
+    MainMenu(class Game* game) noexcept;
     ~MainMenu();
 
     bool load(const std::string& info) noexcept override;
-    void open()                        noexcept override;
-    void close()                       noexcept override;
     void update(sf::Time dt)           noexcept override;
 
 private:

@@ -1,19 +1,19 @@
 #include "utils/FileProvider.hpp"
 #include "game/Game.hpp"
-#include "states/GameState.hpp"
-#include "scenes/battle/BattleField.hpp"
+#include "scenes/mission/Mission.hpp"
 
-BattleField::BattleField() noexcept
+Mission::Mission(Game* game) noexcept:
+    Scene(game)
 {
 
 }
 
-BattleField::~BattleField()
+Mission::~Mission()
 {
 }
 
 // TODO : add unload tilemap functional
-bool BattleField::load(const std::string& info) noexcept
+bool Mission::load(const std::string& info) noexcept
 {
     if(m_isLoaded)
         return true;
@@ -23,38 +23,30 @@ bool BattleField::load(const std::string& info) noexcept
     return m_isLoaded;
 }
 
-void BattleField::open() noexcept
+void Mission::update(sf::Time dt) noexcept
 {
+    auto& viewport = m_game->viewport;
 
-}
-
-void BattleField::close() noexcept
-{
-
-}
-
-void BattleField::update(sf::Time dt) noexcept
-{
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-        m_viewport.move(-10, 0);
+        viewport.move(-10, 0);
     
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-        m_viewport.move(10, 0);
+        viewport.move(10, 0);
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-        m_viewport.move(0, -10);
+        viewport.move(0, -10);
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-        m_viewport.move(0, 10);
+        viewport.move(0, 10);
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::X))
     {
-        GameState::A_SCENE_NEEDS_TO_BE_CHANGED = true;
-        GameState::next_scene = GameState::MAIN_MENU;
+        m_game->a_scene_needs_to_be_changed = true;
+        m_game->next_scene = Game::GameScene::MAIN_MENU;
     }
 }
 
-void BattleField::draw(sf::RenderTarget& target, sf::RenderStates states) const
+void Mission::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     for (auto& layer : m_tilemap.m_layers)
     {

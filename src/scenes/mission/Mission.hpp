@@ -1,19 +1,17 @@
 #ifndef BATTLE_FIELD_HPP
 #define BATTLE_FIELD_HPP
 
-#include "scenes/battle/TileMap.hpp"
+#include "scenes/mission/TileMap.hpp"
 #include "scenes/Scene.hpp"
 
-class BattleField:
+class Mission:
     public Scene
 {
 public:
-    BattleField() noexcept;
-    ~BattleField();
+    Mission(class Game* game) noexcept;
+    ~Mission();
 
     bool load(const std::string& info) noexcept override;
-    void open()                        noexcept override;
-    void close()                       noexcept override;
     void update(sf::Time dt)           noexcept override;
 
 private:
