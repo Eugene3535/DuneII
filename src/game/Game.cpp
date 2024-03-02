@@ -62,6 +62,7 @@ std::int32_t Game::run() noexcept
     a_scene_needs_to_be_changed = false;
 
     viewport.reset(visible_area);
+    
 
     while (window->isOpen())
     {
@@ -71,12 +72,13 @@ std::int32_t Game::run() noexcept
 
         while (window->pollEvent(event))
         {
-
             if (event.type == sf::Event::Resized)
             {
                 const auto& center = viewport.getCenter();
-                const auto& size = viewport.getSize();
-                visible_area = sf::FloatRect(center.x - size.x * 0.5f, center.y - size.y * 0.5f, event.size.width, event.size.height);
+
+                float x = center.x - event.size.width * 0.5f;
+                float y = center.y - event.size.height * 0.5f;
+                visible_area = sf::FloatRect(x, y, event.size.width, event.size.height);
                 viewport.reset(visible_area);
             }
 
@@ -92,10 +94,10 @@ std::int32_t Game::run() noexcept
 
         if(a_scene_needs_to_be_changed)
         {
-            m_fade_effect.prepare();
-            std::thread t(&ScreenBlackoutEffect::apply, &m_fade_effect);
+            m_fade_effect.prepare(viewport.getCenter(), window->getSize());
             constexpr auto delay = std::chrono::milliseconds(1000 / 60);
-
+            std::thread t(&ScreenBlackoutEffect::apply, &m_fade_effect);
+            
             while(!m_fade_effect.isOver())
             {     
                 window->clear();
@@ -112,6 +114,9 @@ std::int32_t Game::run() noexcept
             case GameScene::MAIN_MENU:
             {
                 current_scene = main_menu;
+                const auto& size = viewport.getSize();
+                visible_area = { 0, 0, size.x, size.y };
+                viewport.reset(visible_area);
                 break;
             }
 

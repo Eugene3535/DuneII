@@ -6,21 +6,19 @@
 ScreenBlackoutEffect::ScreenBlackoutEffect() noexcept:
     m_is_over(true)
 {
-    prepare();
+    auto video_mode = sf::VideoMode::getDesktopMode();
+    prepare({ 0.0f, 0.0f }, { video_mode.width, video_mode.height });
 }
 
 ScreenBlackoutEffect::~ScreenBlackoutEffect()
 {
 }
 
-void ScreenBlackoutEffect::prepare() noexcept
+void ScreenBlackoutEffect::prepare(const sf::Vector2f& view_center, const sf::Vector2u& window_size) noexcept
 {
-    auto video_mode = sf::VideoMode::getDesktopMode();
-    m_blackout_shape.setSize(sf::Vector2f(video_mode.width, video_mode.height));
-
-    sf::Color blackout(0, 0, 0, 0);
-    m_blackout_shape.setFillColor(blackout);
-
+    m_blackout_shape.setPosition(view_center.x - (window_size.x >> 1), view_center.y - (window_size.y >> 1));
+    m_blackout_shape.setSize(sf::Vector2f(window_size.x, window_size.y));
+    m_blackout_shape.setFillColor(sf::Color(0, 0, 0, 0));
     m_is_over = false;
 }
 
@@ -49,5 +47,5 @@ bool ScreenBlackoutEffect::isOver() const noexcept
 
 void ScreenBlackoutEffect::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    target.draw(m_blackout_shape, states);
+    target.draw(m_blackout_shape, states); 
 }

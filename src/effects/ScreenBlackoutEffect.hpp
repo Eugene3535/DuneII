@@ -14,7 +14,7 @@ public:
     ScreenBlackoutEffect() noexcept;
     ~ScreenBlackoutEffect();
 
-    void prepare() noexcept;
+    void prepare(const sf::Vector2f& view_center, const sf::Vector2u& window_size) noexcept;
     void apply() noexcept;
 
     bool isOver() const noexcept;
