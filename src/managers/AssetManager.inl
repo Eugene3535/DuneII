@@ -166,7 +166,6 @@ T* AssetManager::tryLoadFromFile(const std::string& filename, std::unordered_map
 //  sf::Image, sf::Texture, sf::Font etc...                     
 		else if (const std::string filepath = FileProvider::getPathToFile(filename).generic_string(); !iterator->second.loadFromFile(filepath))
 		{
-			auto t = filepath;
 			container.erase(iterator);
 
 			return nullptr;

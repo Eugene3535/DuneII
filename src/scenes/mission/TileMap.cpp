@@ -132,10 +132,10 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* mapNode) noexcept
 
 		if (!vertices.empty())
 		{
-			layer->vertexBuffer.create(vertices.size());
-			layer->vertexBuffer.update(vertices.data());
 			layer->vertexBuffer.setUsage(sf::VertexBuffer::Static);
 			layer->vertexBuffer.setPrimitiveType(sf::Triangles);
+			layer->vertexBuffer.create(vertices.size());
+			layer->vertexBuffer.update(vertices.data());
 		}
 	}
 
