@@ -28,16 +28,18 @@ void Mission::update(sf::Time dt) noexcept
     auto& viewport = m_game->viewport;
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-        viewport.move(-10, 0);
+        m_view_position.x -= 10;
     
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-        viewport.move(10, 0);
+        m_view_position.x += 10;
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-        viewport.move(0, -10);
+        m_view_position.y -= 10;
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-        viewport.move(0, 10);
+        m_view_position.y += 10;
+
+    viewport.setCenter(m_view_position + (viewport.getSize() * 0.5f));
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::X))
     {

@@ -19,6 +19,8 @@ private:
 
 private:
     TileMap m_tilemap;
+
+    sf::Vector2f m_view_position;
 };
 
 #endif // !BATTLE_FIELD_HPP
