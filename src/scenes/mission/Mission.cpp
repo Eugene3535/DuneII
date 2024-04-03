@@ -28,8 +28,6 @@ void Mission::update(sf::Time dt) noexcept
     if(!m_isLoaded)
         return;
 
-    auto& viewport = m_game->viewport;
-
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::A))
         m_view_position.x -= 10;
     
@@ -42,13 +40,14 @@ void Mission::update(sf::Time dt) noexcept
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
         m_view_position.y += 10;
 
+    auto& viewport  = m_game->viewport;
+    auto view_size  = viewport.getSize();
     auto map_width  = m_tilemap.m_mapSize.x * m_tilemap.m_tileSize.x;
     auto map_height = m_tilemap.m_mapSize.y * m_tilemap.m_tileSize.y;
-    auto view_size  = viewport.getSize();
-
+    
     if(m_view_position.x < 0) m_view_position.x = 0;
     if(m_view_position.y < 0) m_view_position.y = 0;
-    if(m_view_position.x + view_size.x > map_width) m_view_position.x = map_width - view_size.x;
+    if(m_view_position.x + view_size.x > map_width)  m_view_position.x = map_width - view_size.x;
     if(m_view_position.y + view_size.y > map_height) m_view_position.y = map_height - view_size.y;
 
     viewport.setCenter(m_view_position + (view_size * 0.5f));

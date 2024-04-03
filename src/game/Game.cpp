@@ -88,11 +88,6 @@ std::int32_t Game::run() noexcept
 
                 return 0;
             }
-
-            if(event.type == sf::Event::KeyPressed)
-            {
-                event.key.code;
-            }
         }
 
         current_scene->update(dt);
