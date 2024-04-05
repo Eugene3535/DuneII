@@ -2,13 +2,13 @@
 #define GAME_HPP
 
 #include <cstdint>
+#include <vector>
 #include <memory>
 
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 
 #include "managers/AssetManager.hpp"
-#include "managers/SceneManager.hpp"
 
 #include "effects/ScreenBlackoutEffect.hpp"
 
@@ -32,6 +32,16 @@ public:
 
     std::int32_t run() noexcept;
 
+private:
+    void load_next_scene() noexcept;
+
+private: // scenes
+    class Scene* current_scene;
+    class MainMenu* main_menu;
+    class Mission* mission; 
+
+    std::vector<std::unique_ptr<class Scene>> m_scenes;
+
 public:
     std::unique_ptr<sf::RenderWindow> window;
     sf::View      viewport;
@@ -40,7 +50,6 @@ public:
 
 public:
     AssetManager assets;
-    SceneManager scenes;
 
 private:
     ScreenBlackoutEffect m_fade_effect;

@@ -5,7 +5,11 @@
 
 #include "game/Game.hpp"
 
-Game::Game() noexcept
+Game::Game() noexcept:
+    current_scene(nullptr),
+    main_menu(nullptr),
+    mission(nullptr)
+
 {
     next_scene = NONE;
     a_scene_needs_to_be_changed = false;
@@ -51,9 +55,8 @@ std::int32_t Game::run() noexcept
     window = std::make_unique<sf::RenderWindow>(sf::VideoMode(width, height), "Dune: The Battle For Arrakis");
     window->setFramerateLimit(60U);
 
-    Scene* current_scene = nullptr;
-    auto main_menu = scenes.push<MainMenu>(this);
-    auto mission = scenes.push<Mission>(this); 
+    main_menu = dynamic_cast<MainMenu*>(m_scenes.emplace_back(std::make_unique<MainMenu>(this)).get());
+    mission   = dynamic_cast<Mission*>(m_scenes.emplace_back(std::make_unique<Mission>(this)).get()); 
 
     if(!main_menu->load(std::string()))
         return -1;
@@ -63,7 +66,6 @@ std::int32_t Game::run() noexcept
 
     viewport.reset(visible_area);
     
-
     while (window->isOpen())
     {
         sf::Event event;
@@ -94,45 +96,7 @@ std::int32_t Game::run() noexcept
 
         if(a_scene_needs_to_be_changed)
         {
-            m_fade_effect.prepare(viewport.getCenter(), window->getSize());
-            constexpr auto delay = std::chrono::milliseconds(1000 / 60);
-            std::thread t(&ScreenBlackoutEffect::apply, &m_fade_effect);
-            
-            while(!m_fade_effect.isOver())
-            {     
-                window->clear();
-                window->draw(*current_scene);
-                window->draw(m_fade_effect);
-                window->display();
-                std::this_thread::sleep_for(std::chrono::milliseconds(delay));
-            }
-
-            t.join();
-            
-            switch (next_scene)
-            {
-            case GameScene::MAIN_MENU:
-            {
-                current_scene = main_menu;
-                const auto& size = viewport.getSize();
-                visible_area = { 0, 0, size.x, size.y };
-                viewport.reset(visible_area);
-                break;
-            }
-
-            case GameScene::MISSION:
-            {
-                mission->load("Atreides-8.tmx");
-                current_scene = mission;
-                break;
-            }
-    
-            default:
-                break;
-            }
-
-            a_scene_needs_to_be_changed = false;
-            next_scene = GameScene::NONE;
+           load_next_scene();
         }
 
         window->setView(viewport);
@@ -142,4 +106,47 @@ std::int32_t Game::run() noexcept
     }
     
     return 0;
+}
+
+void Game::load_next_scene() noexcept
+{
+    m_fade_effect.prepare(viewport.getCenter(), window->getSize());
+    constexpr auto delay = std::chrono::milliseconds(1000 / 60);
+    std::thread t(&ScreenBlackoutEffect::apply, &m_fade_effect);
+    
+    while(!m_fade_effect.isOver())
+    {     
+        window->clear();
+        window->draw(*current_scene);
+        window->draw(m_fade_effect);
+        window->display();
+        std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+    }
+
+    t.join();
+    
+    switch (next_scene)
+    {
+    case GameScene::MAIN_MENU:
+    {
+        current_scene = main_menu;
+        const auto& size = viewport.getSize();
+        visible_area = { 0, 0, size.x, size.y };
+        viewport.reset(visible_area);
+        break;
+    }
+
+    case GameScene::MISSION:
+    {
+        mission->load("Atreides-8.tmx");
+        current_scene = mission;
+        break;
+    }
+
+    default:
+        break;
+    }
+
+    a_scene_needs_to_be_changed = false;
+    next_scene = GameScene::NONE;
 }
