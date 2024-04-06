@@ -2,6 +2,7 @@
 
 TileAnimator::TileAnimator() noexcept:
 	m_frames(nullptr),
+	m_current_frame(nullptr),
 	m_vertices(nullptr),
 	m_delay(0),
 	m_timer(0)
@@ -18,7 +19,10 @@ void TileAnimator::set_frames(const std::vector<sf::IntRect>& frames) noexcept
 	m_frames = &frames;
 
 	if(m_vertices)
-		set_texture_rect(frames[0]);
+	{
+		m_current_frame = frames.data();
+		set_texture_rect(m_current_frame);
+	}
 }
 
 void TileAnimator::set_delay(std::int32_t milliseconds) noexcept
@@ -84,15 +88,35 @@ sf::Vector2f TileAnimator::get_size() const noexcept
 	return sf::Vector2f();
 }
 
-void TileAnimator::set_texture_rect(const sf::IntRect& rectangle) noexcept
+void TileAnimator::update(std::int32_t milliseconds) noexcept
 {
-	m_vertices[0].texCoords = sf::Vector2f(rectangle.left, rectangle.top);
-	m_vertices[1].texCoords = sf::Vector2f(rectangle.left + rectangle.width, rectangle.top);
-	m_vertices[2].texCoords = sf::Vector2f(rectangle.left + rectangle.width, rectangle.top + rectangle.height);
+#ifdef DEBUG
+	if(!(m_vertices && m_frames)) return;
+#endif
 
-	m_vertices[3].texCoords = sf::Vector2f(rectangle.left, rectangle.top);
-	m_vertices[4].texCoords = sf::Vector2f(rectangle.left + rectangle.width, rectangle.top + rectangle.height);
-	m_vertices[5].texCoords = sf::Vector2f(rectangle.left, rectangle.top + rectangle.height);
+	m_timer += milliseconds;
+
+	if (m_timer > m_delay)
+	{
+		m_timer = 0;
+		++m_current_frame;
+
+		if (const sf::IntRect* frames_data = m_frames->data(); m_current_frame == (frames_data + m_frames->size() - 1))
+			m_current_frame = frames_data;
+
+		set_texture_rect(m_current_frame);
+	}
+}
+
+void TileAnimator::set_texture_rect(const sf::IntRect* rectangle) noexcept
+{
+	m_vertices[0].texCoords = sf::Vector2f(rectangle->left,  rectangle->top);
+	m_vertices[1].texCoords = sf::Vector2f(rectangle->left + rectangle->width, rectangle->top);
+	m_vertices[2].texCoords = sf::Vector2f(rectangle->left + rectangle->width, rectangle->top + rectangle->height);
+	
+	m_vertices[3].texCoords = sf::Vector2f(rectangle->left,  rectangle->top);
+	m_vertices[4].texCoords = sf::Vector2f(rectangle->left + rectangle->width, rectangle->top + rectangle->height);
+	m_vertices[5].texCoords = sf::Vector2f(rectangle->left,  rectangle->top + rectangle->height);
 
 	set_position(m_vertices[0].position);
 }

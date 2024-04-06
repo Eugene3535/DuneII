@@ -23,10 +23,11 @@ public:
 	void update(std::int32_t milliseconds) noexcept;
 
 private:
-	void set_texture_rect(const sf::IntRect& rectangle) noexcept;
+	void set_texture_rect(const sf::IntRect* rectangle) noexcept;
 
 private:
 	const std::vector<sf::IntRect>* m_frames;
+	const sf::IntRect* m_current_frame;
 	sf::Vertex*  m_vertices;
 	std::int32_t m_delay;
 	std::int32_t m_timer;
