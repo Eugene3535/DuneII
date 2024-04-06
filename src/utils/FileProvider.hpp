@@ -6,7 +6,7 @@
 
 struct FileProvider
 {
-    static std::filesystem::path getPathToFile(const std::string& fName);
+    std::filesystem::path find_path_to_file(const std::string& name) noexcept;
 };
 
 #endif

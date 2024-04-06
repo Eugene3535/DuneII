@@ -8,7 +8,7 @@
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 
-#include "managers/AssetManager.hpp"
+#include "loaders/Assets.hpp"
 
 #include "effects/ScreenBlackoutEffect.hpp"
 
@@ -49,7 +49,7 @@ public:
     sf::Clock clock;
 
 public:
-    AssetManager assets;
+    Assets assets;
 
 private:
     ScreenBlackoutEffect m_fade_effect;

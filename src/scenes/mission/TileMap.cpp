@@ -5,7 +5,7 @@
 #include "rapidxml_utils.hpp"
 
 #include "utils/FileProvider.hpp"
-#include "managers/AssetManager.hpp"
+#include "loaders/Assets.hpp"
 #include "scenes/mission/TileMap.hpp"
 
 bool TileMap::loadFromFile(const std::filesystem::path& fPath) noexcept
@@ -206,7 +206,7 @@ std::vector<TileMap::TilesetData> TileMap::parseTilesets(const rapidxml::xml_nod
 		if (std::size_t last_slash_pos = texName.find_last_of('/'); last_slash_pos != std::string::npos)
 			texName.erase(0, last_slash_pos + 1);
 
-		sf::Texture* tileset = AssetManager::get<sf::Texture>(texName);
+		sf::Texture* tileset = Assets::instance()->get_texture(texName);
 
 		if (tileset == nullptr)
 			continue;

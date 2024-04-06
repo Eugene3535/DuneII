@@ -18,7 +18,7 @@ bool Mission::load(const std::string& info) noexcept
     if(m_isLoaded)
         return true;
 
-    m_isLoaded = m_tilemap.loadFromFile(FileProvider::getPathToFile(info));
+    m_isLoaded = m_tilemap.loadFromFile(FileProvider().find_path_to_file(info));
 
     return m_isLoaded;
 }

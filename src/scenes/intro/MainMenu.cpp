@@ -16,8 +16,8 @@ bool MainMenu::load(const std::string& info) noexcept
     if(m_isLoaded)
         return true;
         
-    auto font = AssetManager::get<sf::Font>("AvanteNrBook.ttf");
-    auto texture = AssetManager::get<sf::Texture>("Dune.png");
+    auto font = Assets::instance()->get_font("AvanteNrBook.ttf");
+    auto texture = Assets::instance()->get_texture("Dune.png");
 
     if(!(font && texture))
         return false;
