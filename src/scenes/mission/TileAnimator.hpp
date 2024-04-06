@@ -15,6 +15,7 @@ public:
 	void set_position(const sf::Vector2f& position)         noexcept;
 	void set_color(const sf::Color& color)                  noexcept;
 	
+	sf::Vertex*                     get_vertices() const noexcept;
 	const std::vector<sf::IntRect>* get_frames()   const noexcept;
 	sf::Vector2f                    get_position() const noexcept;
 	sf::Color                       get_color()    const noexcept;

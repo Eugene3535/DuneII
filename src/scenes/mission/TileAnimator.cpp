@@ -59,6 +59,11 @@ void TileAnimator::set_color(const sf::Color& color) noexcept
 	}
 }
 
+sf::Vertex* TileAnimator::get_vertices() const noexcept
+{
+	return m_vertices;
+}
+
 const std::vector<sf::IntRect>* TileAnimator::get_frames() const noexcept
 {
 	return m_frames;
@@ -113,7 +118,7 @@ void TileAnimator::set_texture_rect(const sf::IntRect* rectangle) noexcept
 	m_vertices[0].texCoords = sf::Vector2f(rectangle->left,  rectangle->top);
 	m_vertices[1].texCoords = sf::Vector2f(rectangle->left + rectangle->width, rectangle->top);
 	m_vertices[2].texCoords = sf::Vector2f(rectangle->left + rectangle->width, rectangle->top + rectangle->height);
-	
+
 	m_vertices[3].texCoords = sf::Vector2f(rectangle->left,  rectangle->top);
 	m_vertices[4].texCoords = sf::Vector2f(rectangle->left + rectangle->width, rectangle->top + rectangle->height);
 	m_vertices[5].texCoords = sf::Vector2f(rectangle->left,  rectangle->top + rectangle->height);
