@@ -13,7 +13,8 @@ bool TileMap::loadFromFile(const std::filesystem::path& fPath) noexcept
 //  Make sure it hasn't been downloaded before
 	m_layers.clear();
 	m_objects.clear();
-	m_collisionMask.clear();
+	m_buildings.clear();
+	m_collision_mask.clear();
 	m_title.clear();
 
 	if (fPath.empty())
@@ -28,22 +29,23 @@ bool TileMap::loadFromFile(const std::filesystem::path& fPath) noexcept
 	rapidxml::file<char> xmlFile(fPath.string().c_str());
 	pDocument->parse<0>(xmlFile.data());
 
-	const auto mapNode = pDocument->first_node("map");
+	const auto map_node = pDocument->first_node("map");
 
-	if (!mapNode)
+	if (!map_node)
 		return false;
 
-	return ( loadLayers(mapNode) && loadObjects(mapNode) );
+	return ( loadLayers(map_node) && loadObjects(map_node) );
 }
 
-bool TileMap::loadLayers(const rapidxml::xml_node<char>* mapNode) noexcept
+bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 {
-	std::vector<TilesetData> tilesets = parseTilesets(mapNode);
+	std::vector<TilesetData> tilesets; 
+	parse_tilesets(map_node, tilesets);
 
-	auto pMapW  = mapNode->first_attribute("width");
-	auto pMapH  = mapNode->first_attribute("height");
-	auto pTileW = mapNode->first_attribute("tilewidth");
-	auto pTileH = mapNode->first_attribute("tileheight");
+	auto pMapW  = map_node->first_attribute("width");
+	auto pMapH  = map_node->first_attribute("height");
+	auto pTileW = map_node->first_attribute("tilewidth");
+	auto pTileH = map_node->first_attribute("tileheight");
 
 	const std::int32_t map_width   = pMapW  ? std::atoi(pMapW->value())  : 0;
 	const std::int32_t map_height  = pMapH  ? std::atoi(pMapH->value())  : 0;
@@ -56,7 +58,7 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* mapNode) noexcept
 	m_mapSize  = { map_width,  map_height };
 	m_tileSize = { tile_width, tile_height };
 
-	for (auto layerNode = mapNode->first_node("layer");
+	for (auto layerNode = map_node->first_node("layer");
 		      layerNode != nullptr;
 		      layerNode = layerNode->next_sibling("layer"))
 	{
@@ -71,7 +73,8 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* mapNode) noexcept
 		if (!dataNode)
 			continue;
 
-		std::vector<std::int32_t> parsed_layer = parseCSVstring(dataNode);
+		std::vector<std::int32_t> parsed_layer; 
+		parse_csv_data(dataNode, parsed_layer);
 
 		if (parsed_layer.empty())
 			continue;
@@ -142,9 +145,9 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* mapNode) noexcept
 	return ( ! m_layers.empty() );
 }
 
-bool TileMap::loadObjects(const rapidxml::xml_node<char>* mapNode) noexcept
+bool TileMap::loadObjects(const rapidxml::xml_node<char>* map_node) noexcept
 {
-	for (auto objectGroupNode = mapNode->first_node("objectgroup");
+	for (auto objectGroupNode = map_node->first_node("objectgroup");
 		      objectGroupNode != nullptr;
 		      objectGroupNode = objectGroupNode->next_sibling("objectgroup"))
 	{
@@ -187,26 +190,24 @@ bool TileMap::loadObjects(const rapidxml::xml_node<char>* mapNode) noexcept
 	return !m_objects.empty();
 }
 
-std::vector<TileMap::TilesetData> TileMap::parseTilesets(const rapidxml::xml_node<char>* mapNode) noexcept
+void TileMap::parse_tilesets(const rapidxml::xml_node<char>* map_node, std::vector<TileMap::TilesetData>& tilesets) noexcept
 {
-	std::vector<TileMap::TilesetData> tilesets;
-
-	for (auto tilesetNode = mapNode->first_node("tileset");
+	for (auto tilesetNode = map_node->first_node("tileset");
 			  tilesetNode != nullptr;
 			  tilesetNode = tilesetNode->next_sibling("tileset"))
 	{
 		auto image = tilesetNode->first_node("image");
 		auto source = image->first_attribute("source");
 
-		std::string texName = source ? source->value() : std::string();
+		std::string tex_name = source ? source->value() : std::string();
 
-		if (texName.empty())
+		if (tex_name.empty())
 			continue;
 
-		if (std::size_t last_slash_pos = texName.find_last_of('/'); last_slash_pos != std::string::npos)
-			texName.erase(0, last_slash_pos + 1);
+		if (std::size_t last_slash_pos = tex_name.find_last_of('/'); last_slash_pos != std::string::npos)
+			tex_name.erase(0, last_slash_pos + 1);
 
-		sf::Texture* tileset = Assets::instance()->get_texture(texName);
+		sf::Texture* tileset = Assets::instance()->get_texture(tex_name);
 
 		if (tileset == nullptr)
 			continue;
@@ -223,25 +224,41 @@ std::vector<TileMap::TilesetData> TileMap::parseTilesets(const rapidxml::xml_nod
 		ts.rows      = (tileCount || !columns) ? 0 : ts.tileCount / ts.columns;
 		ts.firstGID  = firstGID ? std::atoi(firstGID->value()) : 0;
 	}
-
-	return tilesets;
 }
 
-std::vector<std::int32_t> TileMap::parseCSVstring(const rapidxml::xml_node<char>* dataNode) noexcept
+void TileMap::parse_csv_data(const rapidxml::xml_node<char>* data_node, std::vector<std::int32_t>& parsed_layer) noexcept
 {
-	std::string data(dataNode->value());
+	std::string data(data_node->value());
 	std::replace(data.begin(), data.end(), ',', ' ');
-
-	std::vector<std::int32_t> parsed_layer;
 
 	std::stringstream sstream(data);
 	{
 		std::int32_t tile_num = 0;
 
-		while (sstream >> tile_num)
+		while(sstream >> tile_num)
 			parsed_layer.push_back(tile_num);
 	}
+}
 
-	return parsed_layer;
+void TileMap::parse_buildings(const rapidxml::xml_node<char>* layer_node) noexcept
+{
+	std::vector<std::int32_t> parsed_layer; 
+	parse_csv_data(layer_node, parsed_layer);
 
+	if ( parsed_layer.empty() )
+		return;
+
+	std::int32_t map_width  = m_mapSize.x;
+	std::int32_t map_height = m_mapSize.y;
+
+	for (std::int32_t y = 0; y < map_height; ++y)
+		for (std::int32_t x = 0; x < map_width; ++x)
+		{
+			std::int32_t tile_id = parsed_layer[y * map_width + x];
+
+			if(tile_id)
+			{
+				
+			}
+		}
 }
