@@ -7,7 +7,7 @@ class MainMenu:
     public Scene
 {
 public:
-    MainMenu(class Game* game) noexcept;
+    MainMenu(struct Game& game) noexcept;
     ~MainMenu();
 
     bool load(const std::string& info) noexcept override;

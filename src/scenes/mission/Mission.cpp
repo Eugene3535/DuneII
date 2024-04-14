@@ -2,7 +2,7 @@
 #include "game/Game.hpp"
 #include "scenes/mission/Mission.hpp"
 
-Mission::Mission(Game* game) noexcept:
+Mission::Mission(Game& game) noexcept:
     Scene(game)
 {
 
@@ -40,7 +40,7 @@ void Mission::update(sf::Time dt) noexcept
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
         m_view_position.y += 10;
 
-    auto& viewport  = m_game->viewport;
+    auto& viewport  = m_game.viewport;
     auto view_size  = viewport.getSize();
     auto map_width  = m_tilemap.m_mapSize.x * m_tilemap.m_tileSize.x;
     auto map_height = m_tilemap.m_mapSize.y * m_tilemap.m_tileSize.y;
@@ -54,8 +54,8 @@ void Mission::update(sf::Time dt) noexcept
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::X))
     {
-        m_game->sceneNeedToBeChanged = true;
-        m_game->next_scene = Game::GameScene::MAIN_MENU;
+        m_game.sceneNeedToBeChanged = true;
+        m_game.next_scene = Game::GameScene::MAIN_MENU;
     }
 }
 

@@ -28,8 +28,8 @@ int main()
     window.create(sf::VideoMode(width, height), "Dune: The Battle For Arrakis");
     window.setFramerateLimit(60U);
 
-    auto main_menu = std::make_unique<MainMenu>(&game);
-    auto mission =  std::make_unique<Mission>(&game); 
+    auto main_menu = std::make_unique<MainMenu>(game);
+    auto mission =  std::make_unique<Mission>(game); 
 
     if(!main_menu->load(std::string()))
         return -1;
@@ -85,24 +85,24 @@ int main()
             
             switch (game.next_scene)
             {
-            case Game::GameScene::MAIN_MENU:
-            {
-                current_scene = main_menu.get();
-                const auto& size = viewport.getSize();
-                visible_area = { 0, 0, size.x, size.y };
-                viewport.reset(visible_area);
-                break;
-            }
+                case Game::GameScene::MAIN_MENU:
+                {
+                    current_scene = main_menu.get();
+                    const auto& size = viewport.getSize();
+                    visible_area = { 0, 0, size.x, size.y };
+                    viewport.reset(visible_area);
+                    break;
+                }
 
-            case Game::GameScene::MISSION:
-            {
-                mission->load("Atreides-8.tmx");
-                current_scene = mission.get();
-                break;
-            }
+                case Game::GameScene::MISSION:
+                {
+                    mission->load("Atreides-8.tmx");
+                    current_scene = mission.get();
+                    break;
+                }
 
-            default:
-                break;
+                default:
+                    break;
             }
 
             game.sceneNeedToBeChanged = false;

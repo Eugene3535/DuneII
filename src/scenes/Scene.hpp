@@ -12,7 +12,7 @@ class Scene:
     private sf::NonCopyable
 {
 public:
-	Scene(class Game* game) noexcept;
+	Scene(struct Game& game) noexcept;
 	virtual ~Scene();
     
     virtual bool load(const std::string& info) noexcept;
@@ -21,7 +21,7 @@ public:
     bool isLoaded() const noexcept;
 
 protected:
-    class Game* m_game;
+    struct Game& m_game;
 
 protected:
     bool m_isLoaded;

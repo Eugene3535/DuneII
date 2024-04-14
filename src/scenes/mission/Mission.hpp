@@ -8,7 +8,7 @@ class Mission:
     public Scene
 {
 public:
-    Mission(class Game* game) noexcept;
+    Mission(struct Game& game) noexcept;
     ~Mission();
 
     bool load(const std::string& info) noexcept override;

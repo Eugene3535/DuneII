@@ -1,7 +1,7 @@
 #include "game/Game.hpp"
 #include "scenes/intro/MainMenu.hpp"
 
-MainMenu::MainMenu(Game* game) noexcept:
+MainMenu::MainMenu(Game& game) noexcept:
     Scene(game)
 {
 
@@ -56,10 +56,10 @@ bool MainMenu::load(const std::string& info) noexcept
 
 void MainMenu::update(sf::Time dt) noexcept
 {
-    if(m_game->sceneNeedToBeChanged)
+    if(m_game.sceneNeedToBeChanged)
         return;
 
-    sf::Vector2f mouse_pos { sf::Mouse::getPosition(m_game->window) };
+    sf::Vector2f mouse_pos { sf::Mouse::getPosition(m_game.window) };
 
     auto isButtonPressed = [](sf::Text& text, const sf::Vector2f& mouse_pos) noexcept
     {
@@ -78,8 +78,8 @@ void MainMenu::update(sf::Time dt) noexcept
 
     if(isButtonPressed(m_startGame, mouse_pos))
     {
-        m_game->sceneNeedToBeChanged = true;
-        m_game->next_scene = Game::GameScene::MISSION;
+        m_game.sceneNeedToBeChanged = true;
+        m_game.next_scene = Game::GameScene::MISSION;
 
         return;
     }

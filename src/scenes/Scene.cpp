@@ -1,7 +1,7 @@
 #include "game/Game.hpp"
 #include "scenes/Scene.hpp"
 
-Scene::Scene(Game* game) noexcept:
+Scene::Scene(Game& game) noexcept:
     m_game(game),
     m_isLoaded(false)
 {
