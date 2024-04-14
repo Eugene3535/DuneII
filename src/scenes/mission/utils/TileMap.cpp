@@ -6,7 +6,7 @@
 
 #include "utils/FileProvider.hpp"
 #include "loaders/Assets.hpp"
-#include "scenes/mission/TileMap.hpp"
+#include "scenes/mission/utils/TileMap.hpp"
 
 bool TileMap::loadFromFile(const std::filesystem::path& fPath) noexcept
 {

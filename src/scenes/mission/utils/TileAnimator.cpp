@@ -1,4 +1,4 @@
-#include "TileAnimator.hpp"
+#include "scenes/mission/utils/TileAnimator.hpp"
 
 TileAnimator::TileAnimator() noexcept:
 	m_frames(nullptr),

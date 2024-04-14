@@ -15,38 +15,43 @@ bool MainMenu::load(const std::string& info) noexcept
 {
     if(m_isLoaded)
         return true;
+
+    if(auto assets = Assets::instance(); assets != nullptr)
+    {
+        auto font = assets->get_font("AvanteNrBook.ttf");
+        auto texture = assets->get_texture("Dune.png");
+
+        if(!(font && texture))
+            return false;
+
+        m_planet.setTexture(*texture);
+
+        m_startGame.setFont(*font);
+        m_settings.setFont(*font);
+        m_tutorial.setFont(*font);
+
+        const std::string textStart("Начать новую игру");
+        const std::string textSettings("Настройки");
+        const std::string textTutorial("Обучение");
+
+        m_startGame.setString(sf::String::fromUtf8(textStart.begin(), textStart.end()));
+        m_settings.setString(sf::String::fromUtf8(textSettings.begin(), textSettings.end()));
+        m_tutorial.setString(sf::String::fromUtf8(textTutorial.begin(), textTutorial.end()));
+
+        m_startGame.setPosition(550, 400);
+        m_settings.setPosition(550, 450);
+        m_tutorial.setPosition(550, 500);
+
+        m_startGame.setScale(0.5f, 0.5f);
+        m_settings.setScale(0.5f, 0.5f);
+        m_tutorial.setScale(0.5f, 0.5f);
+
+        m_isLoaded = true;
+
+        return true;
+    }
         
-    auto font = Assets::instance()->get_font("AvanteNrBook.ttf");
-    auto texture = Assets::instance()->get_texture("Dune.png");
-
-    if(!(font && texture))
-        return false;
-
-    m_planet.setTexture(*texture);
-
-    m_startGame.setFont(*font);
-    m_settings.setFont(*font);
-    m_tutorial.setFont(*font);
-
-    const std::string textStart("Начать новую игру");
-    const std::string textSettings("Настройки");
-    const std::string textTutorial("Обучение");
-
-    m_startGame.setString(sf::String::fromUtf8(textStart.begin(), textStart.end()));
-    m_settings.setString(sf::String::fromUtf8(textSettings.begin(), textSettings.end()));
-    m_tutorial.setString(sf::String::fromUtf8(textTutorial.begin(), textTutorial.end()));
-
-    m_startGame.setPosition(550, 400);
-    m_settings.setPosition(550, 450);
-    m_tutorial.setPosition(550, 500);
-
-    m_startGame.setScale(0.5f, 0.5f);
-    m_settings.setScale(0.5f, 0.5f);
-    m_tutorial.setScale(0.5f, 0.5f);
-
-    m_isLoaded = true;
-
-    return true;
+    return false;
 }
 
 void MainMenu::update(sf::Time dt) noexcept

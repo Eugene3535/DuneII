@@ -1,7 +1,7 @@
 #ifndef BATTLE_FIELD_HPP
 #define BATTLE_FIELD_HPP
 
-#include "scenes/mission/TileMap.hpp"
+#include "scenes/mission/utils/TileMap.hpp"
 #include "scenes/Scene.hpp"
 
 class Mission:
