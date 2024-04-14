@@ -15,8 +15,8 @@ public:
 	Scene(class Game* game) noexcept;
 	virtual ~Scene();
     
-    virtual bool load(const std::string& info) noexcept = 0;
-    virtual void update(sf::Time dt)           noexcept = 0;
+    virtual bool load(const std::string& info) noexcept;
+    virtual void update(sf::Time dt)           noexcept;
 
     bool isLoaded() const noexcept;
 

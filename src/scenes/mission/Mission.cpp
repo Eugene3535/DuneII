@@ -54,7 +54,7 @@ void Mission::update(sf::Time dt) noexcept
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::X))
     {
-        m_game->a_scene_needs_to_be_changed = true;
+        m_game->sceneNeedToBeChanged = true;
         m_game->next_scene = Game::GameScene::MAIN_MENU;
     }
 }
