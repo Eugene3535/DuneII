@@ -18,7 +18,7 @@ bool Mission::load(const std::string& info) noexcept
     if(m_isLoaded)
         return true;
 
-    m_isLoaded = m_tilemap.loadFromFile(FileProvider().find_path_to_file(info));
+    m_isLoaded = m_tilemap.loadFromFile(FileProvider().findPathToFile(info));
 
     return m_isLoaded;
 }
@@ -42,8 +42,8 @@ void Mission::update(sf::Time dt) noexcept
 
     auto& viewport  = m_game.viewport;
     auto view_size  = viewport.getSize();
-    auto map_width  = m_tilemap.m_mapSize.x * m_tilemap.m_tileSize.x;
-    auto map_height = m_tilemap.m_mapSize.y * m_tilemap.m_tileSize.y;
+    auto map_width  = m_tilemap.mapSize.x * m_tilemap.tileSize.x;
+    auto map_height = m_tilemap.mapSize.y * m_tilemap.tileSize.y;
     
     if(m_view_position.x < 0) m_view_position.x = 0;
     if(m_view_position.y < 0) m_view_position.y = 0;
@@ -61,7 +61,7 @@ void Mission::update(sf::Time dt) noexcept
 
 void Mission::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    for (auto& layer : m_tilemap.m_layers)
+    for (auto& layer : m_tilemap.layers)
     {
         target.draw(layer.vertexBuffer, layer.texture);
     }

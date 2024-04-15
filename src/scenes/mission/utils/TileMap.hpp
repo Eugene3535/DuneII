@@ -47,25 +47,26 @@ public:
 	};
 
 public:
-	bool loadFromFile(const std::filesystem::path& fPath) noexcept;
+	bool loadFromFile(const std::filesystem::path& file_path) noexcept;
+	void reset() noexcept;
 
 private:
-	bool loadLayers(const rapidxml::xml_node<char>* map_node)  noexcept;
-	bool loadObjects(const rapidxml::xml_node<char>* map_node) noexcept;
+	bool loadLayers(const rapidxml::xml_node<>* map_node)  noexcept;
+	bool loadObjects(const rapidxml::xml_node<>* map_node) noexcept;
 
 private:
-	void parse_tilesets(const rapidxml::xml_node<char>* map_node, std::vector<TilesetData>& tilesets) noexcept;
-	void parse_csv_data(const rapidxml::xml_node<char>* map_node, std::vector<std::int32_t>& parsed_layer) noexcept;
-	void parse_buildings(const rapidxml::xml_node<char>* layer_node) noexcept;
+	void parseTilesets(const rapidxml::xml_node<char>* map_node, std::vector<TilesetData>& tilesets) noexcept;
+	void parseCSVdata(const rapidxml::xml_node<char>* map_node, std::vector<std::int32_t>& parsed_layer) noexcept;
+	void parseBuildings(const rapidxml::xml_node<char>* layer_node) noexcept;
 
 public:
-	std::vector<Layer>      m_layers;
-	std::vector<Object>     m_objects;
-	std::vector<sf::Vertex> m_buildings;
-	std::string             m_collision_mask;
-	std::string             m_title;
-	sf::Vector2i            m_mapSize;
-	sf::Vector2i            m_tileSize;
+	std::vector<Layer>      layers;
+	std::vector<Object>     objects;
+	std::vector<sf::Vertex> staticBuildings;
+	std::vector<sf::Vertex> animatedBuildings;
+	std::string             title;
+	sf::Vector2i            mapSize;
+	sf::Vector2i            tileSize;
 };
 
 #endif // !TILE_MAP_HPP

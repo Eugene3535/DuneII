@@ -1,6 +1,6 @@
 #include "utils/FileProvider.hpp"
 
-std::filesystem::path FileProvider::find_path_to_file(const std::string& name) noexcept
+std::filesystem::path FileProvider::findPathToFile(const std::string& name) noexcept
 {
     static std::filesystem::path resource_folder;
 

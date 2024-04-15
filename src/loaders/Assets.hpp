@@ -19,12 +19,12 @@ public:
 
     static Assets* instance() noexcept;
 
-    sf::Texture* get_texture(const std::string& filename) noexcept;
-    sf::Font*    get_font(const std::string& filename)    noexcept;
+    sf::Texture* getTexture(const std::string& filename) noexcept;
+    sf::Font*    getFont(const std::string& filename)    noexcept;
 
 private:
     template<class T>
-    T* try_load_from_file(const std::string& filename, std::unordered_map<std::string, T>& container) noexcept;
+    T* tryLoadFromFile(const std::string& filename, std::unordered_map<std::string, T>& container) noexcept;
 
 private:
     std::unordered_map<std::string, sf::Texture> m_textures;

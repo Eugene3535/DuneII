@@ -1,5 +1,5 @@
-#ifndef BATTLE_FIELD_HPP
-#define BATTLE_FIELD_HPP
+#ifndef MISSION_HPP
+#define MISSION_HPP
 
 #include "scenes/mission/utils/TileMap.hpp"
 #include "scenes/Scene.hpp"
@@ -23,4 +23,4 @@ private:
     sf::Vector2f m_view_position;
 };
 
-#endif // !BATTLE_FIELD_HPP
+#endif // !MISSION_HPP
