@@ -87,8 +87,18 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 
 		if(auto data_node = layer_node->first_node("data"); data_node != nullptr)
 		{
-			std::vector<std::int32_t> parsed_layer; 
-			parseCSVdata(data_node, parsed_layer);
+			std::vector<std::int32_t> parsed_layer;
+			std::string data(data_node->value());
+
+			std::replace(data.begin(), data.end(), ',', ' ');
+
+			std::stringstream sstream(data);
+			{
+				std::int32_t tile_num = 0;
+
+				while(sstream >> tile_num)
+					parsed_layer.push_back(tile_num);
+			}
 
 			if(parsed_layer.empty())
 				return false;
@@ -184,31 +194,19 @@ void TileMap::parseTilesets(const rapidxml::xml_node<char>* map_node, std::vecto
 		if (tileset == nullptr)
 			continue;
 
-		TilesetData& ts = tilesets.emplace_back();
+		auto tile_count = tilesetNode->first_attribute("tilecount");
+		auto columns    = tilesetNode->first_attribute("columns");
+		auto firstGID   = tilesetNode->first_attribute("firstgid");
 
-		auto tileCount = tilesetNode->first_attribute("tilecount");
-		auto columns   = tilesetNode->first_attribute("columns");
-		auto firstGID  = tilesetNode->first_attribute("firstgid");
+		if(tile_count && columns && firstGID)
+		{
+			TilesetData& ts = tilesets.emplace_back();
 
-		ts.texture   = tileset;
-		ts.tileCount = tileCount ? std::atoi(tileCount->value()) : 0;
-		ts.columns   = columns ? std::atoi(columns->value()) : 0;
-		ts.rows      = (tileCount || !columns) ? 0 : ts.tileCount / ts.columns;
-		ts.firstGID  = firstGID ? std::atoi(firstGID->value()) : 0;
-	}
-}
-
-void TileMap::parseCSVdata(const rapidxml::xml_node<char>* data_node, std::vector<std::int32_t>& parsed_layer) noexcept
-{
-	std::string data(data_node->value());
-	std::replace(data.begin(), data.end(), ',', ' ');
-
-	std::stringstream sstream(data);
-	{
-		std::int32_t tile_num = 0;
-
-		while(sstream >> tile_num)
-			parsed_layer.push_back(tile_num);
+			ts.texture   = tileset;
+			ts.tileCount = tile_count ? std::atoi(tile_count->value()) : 0;
+			ts.columns   = columns ? std::atoi(columns->value()) : 0;
+			ts.firstGID  = firstGID ? std::atoi(firstGID->value()) : 0;
+		}
 	}
 }
 
@@ -218,10 +216,14 @@ void TileMap::parseLandscape(const TilesetData& td, const std::vector<std::int32
 	vertices.reserve(std::count_if(parsed_layer.begin(), parsed_layer.end(),
 		[](std::int32_t n) { return n > 0; }));
 
+//  Cached variables
 	const std::int32_t map_width   = mapSize.x;
 	const std::int32_t map_height  = mapSize.y;
 	const std::int32_t tile_width  = tileSize.x;
 	const std::int32_t tile_height = tileSize.y;
+
+//	Tiled Map Editor arranges tile layers starting from index 1 in the first layer for landscape, 
+//	so we need to correctly calculate the tile range for each layer separately (the variables firstGID and tileCount store the range for each layer).
 	const std::int32_t columns     = td.columns;
 	const std::int32_t firstGID    = td.firstGID;
 
@@ -257,6 +259,7 @@ void TileMap::parseLandscape(const TilesetData& td, const std::vector<std::int32
 			}
 		}
 
+//  Unload to VBO
 	if (!vertices.empty())
 	{
 		landscape.texture = td.texture;
