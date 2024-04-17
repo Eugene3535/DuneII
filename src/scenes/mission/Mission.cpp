@@ -61,8 +61,20 @@ void Mission::update(sf::Time dt) noexcept
 
 void Mission::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    for (auto& layer : m_tilemap.layers)
+    if(m_isLoaded)
     {
-        target.draw(layer.vertexBuffer, layer.texture);
+        const auto& vertexBuffer = m_tilemap.landscape.vertices;
+        states.texture = m_tilemap.landscape.texture;
+        target.draw(vertexBuffer, states);
+
+        // const auto* vertices = m_tilemap.staticBuildings.vertices.data();
+        // states.texture = m_tilemap.staticBuildings.texture;
+        // std::size_t vertexCount = m_tilemap.staticBuildings.vertices.size();
+        // target.draw(vertices, vertexCount, sf::Triangles, states);
+
+        // vertices = m_tilemap.animatedBuildings.vertices.data();
+        // states.texture = m_tilemap.animatedBuildings.texture;
+        // vertexCount = m_tilemap.staticBuildings.vertices.size();
+        // target.draw(vertices, vertexCount, sf::Triangles, states);
     }
 }

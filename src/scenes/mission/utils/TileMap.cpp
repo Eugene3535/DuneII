@@ -35,19 +35,29 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 
 void TileMap::reset() noexcept
 {
-	layers.clear();
+	landscape.vertices.~VertexBuffer();
+	landscape.texture = nullptr;
+	
+	staticBuildings.vertices.clear();
+	staticBuildings.texture = nullptr;
+
+	animatedBuildings.vertices.clear();
+	animatedBuildings.texture = nullptr;
+
 	objects.clear();
-	staticBuildings.clear();
-	animatedBuildings.clear();
 	title.clear();
-	mapSize = { 0, 0 };
+
+	mapSize  = { 0, 0 };
 	tileSize = { 0, 0 };
 }
 
 bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 {
-	std::vector<TilesetData> tilesets; 
+	std::vector<TileMap::TilesetData> tilesets;
 	parseTilesets(map_node, tilesets);
+
+	if(tilesets.empty()) 
+		return false;
 
 	auto pMapW  = map_node->first_attribute("width");
 	auto pMapH  = map_node->first_attribute("height");
@@ -62,94 +72,49 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 	if (!(map_width && map_height && tile_width && tile_height))
 		return false;
 
-	mapSize  = { map_width,  map_height };
+	mapSize  = { map_width,  map_height  };
 	tileSize = { tile_width, tile_height };
 
-	for (auto layerNode = map_node->first_node("layer");
-		      layerNode != nullptr;
-		      layerNode = layerNode->next_sibling("layer"))
+	for (auto layer_node = map_node->first_node("layer");
+		      layer_node != nullptr;
+		      layer_node = layer_node->next_sibling("layer"))
 	{
-		auto name = layerNode->first_attribute("name");
-		std::string layerName = name ? name->value() : std::string();
+		auto name = layer_node->first_attribute("name");
+		std::string layer_name = name ? name->value() : std::string();
 
-		if (layerName.empty())
-			continue;
+		if(layer_name.empty())
+			return false;
 
-		auto dataNode = layerNode->first_node("data");
-
-		if (!dataNode)
-			continue;
-
-		std::vector<std::int32_t> parsed_layer; 
-		parseCSVdata(dataNode, parsed_layer);
-
-		if (parsed_layer.empty())
-			continue;
-
-		const auto bounds = std::minmax_element(parsed_layer.begin(), parsed_layer.end());
-		std::int32_t minTile = *bounds.first;
-		std::int32_t maxTile = *bounds.second;
-
-		auto currentTileset = std::find_if(tilesets.begin(), tilesets.end(),
-		[minTile, maxTile](const TilesetData& ts)
+		if(auto data_node = layer_node->first_node("data"); data_node != nullptr)
 		{
-			return minTile <= ts.firstGID && maxTile <= ts.firstGID + ts.tileCount;
-		});
+			std::vector<std::int32_t> parsed_layer; 
+			parseCSVdata(data_node, parsed_layer);
 
-		if (currentTileset == tilesets.end())
-			continue;
+			if(parsed_layer.empty())
+				return false;
 
-//  Find which render plan the layer belongs to
-		Layer* layer = &layers.emplace_back();
-		layer->name = layerName;
-		layer->texture = currentTileset->texture;
+			const auto bounds = std::minmax_element(parsed_layer.begin(), parsed_layer.end());
+			const std::int32_t min_tile = *bounds.first;
+			const std::int32_t max_tile = *bounds.second;
 
-		std::vector<sf::Vertex> vertices;
-		vertices.reserve(std::count_if(parsed_layer.begin(), parsed_layer.end(),
-			[](std::int32_t n) { return n > 0; }));
-
-		for (std::int32_t y = 0; y < map_height; ++y)
-			for (std::int32_t x = 0; x < map_width; ++x)
-			{
-				std::int32_t tile_id = parsed_layer[y * map_width + x];
-
-				if (tile_id)
+			auto current_tileset = std::find_if(tilesets.begin(), tilesets.end(),
+				[min_tile, max_tile](const TileMap::TilesetData& ts)
 				{
-//  Find the sequence tile number in this tileset
-					std::int32_t tile_num = tile_id - currentTileset->firstGID;
+					return min_tile <= ts.firstGID && max_tile <= ts.firstGID + ts.tileCount;
+				});
 
-					std::int32_t Y = (tile_num >= currentTileset->columns) ? tile_num / currentTileset->columns : 0;
-					std::int32_t X = tile_num % currentTileset->columns;
-
-					std::int32_t offsetX = X * tile_width;
-					std::int32_t offsetY = Y * tile_height;
-
-//  Left-top coords of the tile in texture grid
-					std::int32_t top = (tile_num >= currentTileset->columns) ? tile_num / currentTileset->columns : 0;
-					std::int32_t left = tile_num % currentTileset->columns;
-					sf::Vector2f point(left * tile_width, top * tile_height);
-
-//  First triangle
-					vertices.emplace_back(sf::Vector2f(x * tile_width, y * tile_height), point);
-					vertices.emplace_back(sf::Vector2f(x * tile_width + tile_width, y * tile_height), sf::Vector2f(point.x + tile_width, point.y));
-					vertices.emplace_back(sf::Vector2f(x * tile_width + tile_width, y * tile_height + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
-//  Second triangle
-					vertices.emplace_back(sf::Vector2f(x * tile_width, y * tile_height), point);
-					vertices.emplace_back(sf::Vector2f(x * tile_width + tile_width, y * tile_height + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
-					vertices.emplace_back(sf::Vector2f(x * tile_width, y * tile_height + tile_height), sf::Vector2f(point.x, point.y + tile_height));
-				}
-			}
-
-		if (!vertices.empty())
-		{
-			layer->vertexBuffer.setUsage(sf::VertexBuffer::Static);
-			layer->vertexBuffer.setPrimitiveType(sf::Triangles);
-			layer->vertexBuffer.create(vertices.size());
-			layer->vertexBuffer.update(vertices.data());
+			if(current_tileset == tilesets.end())
+				return false;
+				
+			if(layer_name == "Landscape")	
+				parseLandscape(*current_tileset, parsed_layer);
+			
+			if(layer_name == "Buildings")	
+				parseBuildings(*current_tileset, parsed_layer);
 		}
 	}
 
-	return ( ! layers.empty() );
+	return true;
 }
 
 bool TileMap::loadObjects(const rapidxml::xml_node<char>* map_node) noexcept
@@ -247,25 +212,62 @@ void TileMap::parseCSVdata(const rapidxml::xml_node<char>* data_node, std::vecto
 	}
 }
 
-void TileMap::parseBuildings(const rapidxml::xml_node<char>* layer_node) noexcept
+void TileMap::parseLandscape(const TilesetData& td, const std::vector<std::int32_t>& parsed_layer) noexcept
 {
-	std::vector<std::int32_t> parsed_layer; 
-	parseCSVdata(layer_node, parsed_layer);
+	std::vector<sf::Vertex> vertices;
+	vertices.reserve(std::count_if(parsed_layer.begin(), parsed_layer.end(),
+		[](std::int32_t n) { return n > 0; }));
 
-	if ( parsed_layer.empty() )
-		return;
-
-	std::int32_t map_width  = mapSize.x;
-	std::int32_t map_height = mapSize.y;
+	const std::int32_t map_width   = mapSize.x;
+	const std::int32_t map_height  = mapSize.y;
+	const std::int32_t tile_width  = tileSize.x;
+	const std::int32_t tile_height = tileSize.y;
+	const std::int32_t columns     = td.columns;
+	const std::int32_t firstGID    = td.firstGID;
 
 	for (std::int32_t y = 0; y < map_height; ++y)
 		for (std::int32_t x = 0; x < map_width; ++x)
 		{
 			std::int32_t tile_id = parsed_layer[y * map_width + x];
 
-			if(tile_id)
+			if (tile_id)
 			{
-				
+//  Find the sequence tile number in this tileset
+				std::int32_t tile_num = tile_id - firstGID;
+
+				std::int32_t Y = (tile_num >= columns) ? tile_num / columns : 0;
+				std::int32_t X = tile_num % columns;
+
+				std::int32_t offsetX = X * tile_width;
+				std::int32_t offsetY = Y * tile_height;
+
+//  Left-top coords of the tile in texture grid
+				std::int32_t top = (tile_num >= columns) ? tile_num / columns : 0;
+				std::int32_t left = tile_num % columns;
+				sf::Vector2f point(left * tile_width, top * tile_height);
+
+//  First triangle
+				vertices.emplace_back(sf::Vector2f(x * tile_width, y * tile_height), point);
+				vertices.emplace_back(sf::Vector2f(x * tile_width + tile_width, y * tile_height), sf::Vector2f(point.x + tile_width, point.y));
+				vertices.emplace_back(sf::Vector2f(x * tile_width + tile_width, y * tile_height + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
+//  Second triangle
+				vertices.emplace_back(sf::Vector2f(x * tile_width, y * tile_height), point);
+				vertices.emplace_back(sf::Vector2f(x * tile_width + tile_width, y * tile_height + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
+				vertices.emplace_back(sf::Vector2f(x * tile_width, y * tile_height + tile_height), sf::Vector2f(point.x, point.y + tile_height));
 			}
 		}
+
+	if (!vertices.empty())
+	{
+		landscape.texture = td.texture;
+		landscape.vertices.setUsage(sf::VertexBuffer::Static);
+		landscape.vertices.setPrimitiveType(sf::Triangles);
+		landscape.vertices.create(vertices.size());
+		landscape.vertices.update(vertices.data());
+	}
+}
+
+void TileMap::parseBuildings(const TilesetData& td, const std::vector<std::int32_t>& parsed_layer) noexcept
+{
+	// On my way =)
 }
