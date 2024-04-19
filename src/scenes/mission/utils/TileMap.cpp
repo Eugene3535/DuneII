@@ -178,7 +178,7 @@ void TileMap::parseTilesets(const rapidxml::xml_node<char>* map_node, std::vecto
 			  tilesetNode != nullptr;
 			  tilesetNode = tilesetNode->next_sibling("tileset"))
 	{
-		auto image = tilesetNode->first_node("image");
+		auto image  = tilesetNode->first_node("image");
 		auto source = image->first_attribute("source");
 
 		std::string tex_name = source ? source->value() : std::string();
@@ -221,9 +221,6 @@ void TileMap::parseLandscape(const TilesetData& td, const std::vector<std::int32
 	const std::int32_t map_height  = mapSize.y;
 	const std::int32_t tile_width  = tileSize.x;
 	const std::int32_t tile_height = tileSize.y;
-
-//	Tiled Map Editor arranges tile layers starting from index 1 in the first layer for landscape, 
-//	so we need to correctly calculate the tile range for each layer separately (the variables firstGID and tileCount store the range for each layer).
 	const std::int32_t columns     = td.columns;
 	const std::int32_t firstGID    = td.firstGID;
 
@@ -234,14 +231,10 @@ void TileMap::parseLandscape(const TilesetData& td, const std::vector<std::int32
 
 			if (tile_id)
 			{
-//  Find the sequence tile number in this tileset
-				std::int32_t tile_num = tile_id - firstGID;
-
-				std::int32_t Y = (tile_num >= columns) ? tile_num / columns : 0;
-				std::int32_t X = tile_num % columns;
-
-				std::int32_t offsetX = X * tile_width;
-				std::int32_t offsetY = Y * tile_height;
+//  Vertex XY coords				
+				const std::int32_t tile_num = tile_id - firstGID;
+				float cX = static_cast<float>(x * tile_width);
+				float cY = static_cast<float>(y * tile_height);
 
 //  Left-top coords of the tile in texture grid
 				std::int32_t top = (tile_num >= columns) ? tile_num / columns : 0;
@@ -249,13 +242,13 @@ void TileMap::parseLandscape(const TilesetData& td, const std::vector<std::int32
 				sf::Vector2f point(left * tile_width, top * tile_height);
 
 //  First triangle
-				vertices.emplace_back(sf::Vector2f(x * tile_width, y * tile_height), point);
-				vertices.emplace_back(sf::Vector2f(x * tile_width + tile_width, y * tile_height), sf::Vector2f(point.x + tile_width, point.y));
-				vertices.emplace_back(sf::Vector2f(x * tile_width + tile_width, y * tile_height + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
+				vertices.emplace_back(sf::Vector2f(cX, cY), point);
+				vertices.emplace_back(sf::Vector2f(cX + tile_width, cY), sf::Vector2f(point.x + tile_width, point.y));
+				vertices.emplace_back(sf::Vector2f(cX + tile_width, cY + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
 //  Second triangle
-				vertices.emplace_back(sf::Vector2f(x * tile_width, y * tile_height), point);
-				vertices.emplace_back(sf::Vector2f(x * tile_width + tile_width, y * tile_height + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
-				vertices.emplace_back(sf::Vector2f(x * tile_width, y * tile_height + tile_height), sf::Vector2f(point.x, point.y + tile_height));
+				vertices.emplace_back(sf::Vector2f(cX, cY), point);
+				vertices.emplace_back(sf::Vector2f(cX + tile_width, cY + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
+				vertices.emplace_back(sf::Vector2f(cX, cY + tile_height), sf::Vector2f(point.x, point.y + tile_height));
 			}
 		}
 
@@ -270,7 +263,46 @@ void TileMap::parseLandscape(const TilesetData& td, const std::vector<std::int32
 	}
 }
 
-void TileMap::parseBuildings(const TilesetData& td, const std::vector<std::int32_t>& parsed_layer) noexcept
+void TileMap::parseBuildings(const TilesetData& td, std::vector<std::int32_t>& parsed_layer) noexcept
 {
-	// On my way =)
+	std::vector<sf::Vertex> vertices;
+	vertices.reserve(std::count_if(parsed_layer.begin(), parsed_layer.end(),
+		[](std::int32_t n) { return n > 0; }));
+
+//  Cached variables
+	const std::int32_t map_width   = mapSize.x;
+	const std::int32_t map_height  = mapSize.y;
+	const std::int32_t tile_width  = tileSize.x;
+	const std::int32_t tile_height = tileSize.y;
+	const std::int32_t columns     = td.columns;
+	const std::int32_t firstGID    = td.firstGID;
+	const std::int32_t tile_count  = td.tileCount;
+
+	for (std::int32_t y = 0; y < map_height; ++y)
+		for (std::int32_t x = 0; x < map_width; ++x)
+		{
+			std::int32_t tile_id = parsed_layer[y * map_width + x];
+
+			if (tile_id)
+			{
+//  Vertex XY coords				
+				const std::int32_t tile_num = tile_id - firstGID;
+				float cX = static_cast<float>(x * tile_width);
+				float cY = static_cast<float>(y * tile_height);
+
+//  Left-top coords of the tile in texture grid
+				std::int32_t top = (tile_num >= columns) ? tile_num / columns : 0;
+				std::int32_t left = tile_num % columns;
+				sf::Vector2f point(left * tile_width, top * tile_height);
+
+//  First triangle
+				vertices.emplace_back(sf::Vector2f(cX, cY), point);
+				vertices.emplace_back(sf::Vector2f(cX + tile_width, cY), sf::Vector2f(point.x + tile_width, point.y));
+				vertices.emplace_back(sf::Vector2f(cX + tile_width, cY + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
+//  Second triangle
+				vertices.emplace_back(sf::Vector2f(cX, cY), point);
+				vertices.emplace_back(sf::Vector2f(cX + tile_width, cY + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
+				vertices.emplace_back(sf::Vector2f(cX, cY + tile_height), sf::Vector2f(point.x, point.y + tile_height));
+			}
+		}
 }

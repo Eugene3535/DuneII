@@ -59,7 +59,7 @@ private:
 
 private:
 	void parseLandscape(const TilesetData& td, const std::vector<std::int32_t>& parsed_layer) noexcept;
-	void parseBuildings(const TilesetData& td, const std::vector<std::int32_t>& parsed_layer) noexcept;
+	void parseBuildings(const TilesetData& td, std::vector<std::int32_t>& parsed_layer) noexcept;
 
 public:
 	Layer<sf::VertexBuffer>        landscape;
