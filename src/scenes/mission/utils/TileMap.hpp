@@ -56,15 +56,17 @@ private:
 
 private:
 	void parseTilesets(const rapidxml::xml_node<char>* map_node, std::vector<TilesetData>& tilesets) noexcept;
+	void parseLandscape(const TilesetData& td, const std::vector<std::int32_t>& parsed_layer) noexcept;
+	void parseBuildings(const TilesetData& td, const std::vector<std::int32_t>& parsed_layer) noexcept;
 
 private:
-	void parseLandscape(const TilesetData& td, const std::vector<std::int32_t>& parsed_layer) noexcept;
-	void parseBuildings(const TilesetData& td, std::vector<std::int32_t>& parsed_layer) noexcept;
+	char getTileID(std::int32_t index) const noexcept;
 
 public:
 	Layer<sf::VertexBuffer>        landscape;
-	Layer<std::vector<sf::Vertex>> staticBuildings;
-	Layer<std::vector<sf::Vertex>> animatedBuildings;
+	Layer<std::vector<sf::Vertex>> staticTiles;
+	Layer<std::vector<sf::Vertex>> animatedTiles;
+	std::string                    tileMask;
 	std::vector<Object>            objects;
 
 public:

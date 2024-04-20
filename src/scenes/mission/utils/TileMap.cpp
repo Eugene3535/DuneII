@@ -30,7 +30,11 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 	if (!map_node)
 		return false;
 
-	return ( loadLayers(map_node) && loadObjects(map_node) );
+	if(loadLayers(map_node))
+		if(loadObjects(map_node))
+			return true;
+
+	return false;
 }
 
 void TileMap::reset() noexcept
@@ -38,12 +42,13 @@ void TileMap::reset() noexcept
 	landscape.vertices.~VertexBuffer();
 	landscape.texture = nullptr;
 	
-	staticBuildings.vertices.clear();
-	staticBuildings.texture = nullptr;
+	staticTiles.vertices.clear();
+	staticTiles.texture = nullptr;
 
-	animatedBuildings.vertices.clear();
-	animatedBuildings.texture = nullptr;
+	animatedTiles.vertices.clear();
+	animatedTiles.texture = nullptr;
 
+	tileMask.clear();
 	objects.clear();
 	title.clear();
 
@@ -74,6 +79,7 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 
 	mapSize  = { map_width,  map_height  };
 	tileSize = { tile_width, tile_height };
+	tileMask.resize(static_cast<std::size_t>(map_width * map_height), ' ');
 
 	for (auto layer_node = map_node->first_node("layer");
 		      layer_node != nullptr;
@@ -227,29 +233,26 @@ void TileMap::parseLandscape(const TilesetData& td, const std::vector<std::int32
 	for (std::int32_t y = 0; y < map_height; ++y)
 		for (std::int32_t x = 0; x < map_width; ++x)
 		{
-			std::int32_t tile_id = parsed_layer[y * map_width + x];
+			const std::int32_t tile_id = parsed_layer[y * map_width + x];
 
-			if (tile_id)
-			{
 //  Vertex XY coords				
-				const std::int32_t tile_num = tile_id - firstGID;
-				float cX = static_cast<float>(x * tile_width);
-				float cY = static_cast<float>(y * tile_height);
+			const float cX = static_cast<float>(x * tile_width);
+			const float cY = static_cast<float>(y * tile_height);
 
 //  Left-top coords of the tile in texture grid
-				std::int32_t top = (tile_num >= columns) ? tile_num / columns : 0;
-				std::int32_t left = tile_num % columns;
-				sf::Vector2f point(left * tile_width, top * tile_height);
+			const std::int32_t tile_num = tile_id - firstGID;
+			const std::int32_t top = (tile_num >= columns) ? tile_num / columns : 0;
+			const std::int32_t left = tile_num % columns;
+			const sf::Vector2f point(left * tile_width, top * tile_height);
 
 //  First triangle
-				vertices.emplace_back(sf::Vector2f(cX, cY), point);
-				vertices.emplace_back(sf::Vector2f(cX + tile_width, cY), sf::Vector2f(point.x + tile_width, point.y));
-				vertices.emplace_back(sf::Vector2f(cX + tile_width, cY + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
+			vertices.emplace_back(sf::Vector2f(cX, cY), point);
+			vertices.emplace_back(sf::Vector2f(cX + tile_width, cY), sf::Vector2f(point.x + tile_width, point.y));
+			vertices.emplace_back(sf::Vector2f(cX + tile_width, cY + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
 //  Second triangle
-				vertices.emplace_back(sf::Vector2f(cX, cY), point);
-				vertices.emplace_back(sf::Vector2f(cX + tile_width, cY + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
-				vertices.emplace_back(sf::Vector2f(cX, cY + tile_height), sf::Vector2f(point.x, point.y + tile_height));
-			}
+			vertices.emplace_back(sf::Vector2f(cX, cY), point);
+			vertices.emplace_back(sf::Vector2f(cX + tile_width, cY + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
+			vertices.emplace_back(sf::Vector2f(cX, cY + tile_height), sf::Vector2f(point.x, point.y + tile_height));
 		}
 
 //  Unload to VBO
@@ -263,7 +266,7 @@ void TileMap::parseLandscape(const TilesetData& td, const std::vector<std::int32
 	}
 }
 
-void TileMap::parseBuildings(const TilesetData& td, std::vector<std::int32_t>& parsed_layer) noexcept
+void TileMap::parseBuildings(const TilesetData& td, const std::vector<std::int32_t>& parsed_layer) noexcept
 {
 	std::vector<sf::Vertex> vertices;
 	vertices.reserve(std::count_if(parsed_layer.begin(), parsed_layer.end(),
@@ -305,4 +308,42 @@ void TileMap::parseBuildings(const TilesetData& td, std::vector<std::int32_t>& p
 				vertices.emplace_back(sf::Vector2f(cX, cY + tile_height), sf::Vector2f(point.x, point.y + tile_height));
 			}
 		}
+}
+
+char TileMap::getTileID(std::int32_t index) const noexcept
+{
+	switch (index)
+	{
+	case 1: return 'R';  // rocky soil
+	case 17:  
+	case 18: 
+	case 24: 
+	case 38:
+	case 43:
+	case 47:
+	case 49:
+	case 53:
+	case 62:
+	case 70:
+	case 74:
+	case 76:
+	case 81:
+	case 89:
+	case 99: return 'S';  // sandy soil
+	case 111: 
+	case 112:
+	case 113:
+	case 114:
+	case 115:
+	case 116:
+	case 117:
+	case 118:
+	case 119:
+	case 120: return 'W'; // Wall
+
+	default:
+		break;
+	}
+
+	return 'S'; // sandy soil by default
 }
