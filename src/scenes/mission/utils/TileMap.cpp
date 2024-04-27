@@ -219,8 +219,7 @@ void TileMap::parseTilesets(const rapidxml::xml_node<char>* map_node, std::vecto
 void TileMap::parseLandscape(const TilesetData& td, const std::vector<std::int32_t>& parsed_layer) noexcept
 {
 	std::vector<sf::Vertex> vertices;
-	vertices.reserve(std::count_if(parsed_layer.begin(), parsed_layer.end(),
-		[](std::int32_t n) { return n > 0; }));
+	vertices.reserve(parsed_layer.size());
 
 //  Cached variables
 	const std::int32_t map_width   = mapSize.x;
@@ -233,7 +232,9 @@ void TileMap::parseLandscape(const TilesetData& td, const std::vector<std::int32
 	for (std::int32_t y = 0; y < map_height; ++y)
 		for (std::int32_t x = 0; x < map_width; ++x)
 		{
-			const std::int32_t tile_id = parsed_layer[y * map_width + x];
+			const std::int32_t index = y * map_width + x;
+			const std::int32_t tile_id = parsed_layer[index];
+			tileMask[index] = convertTileNumToChar(tile_id);
 
 //  Vertex XY coords				
 			const float cX = static_cast<float>(x * tile_width);
@@ -284,7 +285,9 @@ void TileMap::parseBuildings(const TilesetData& td, const std::vector<std::int32
 	for (std::int32_t y = 0; y < map_height; ++y)
 		for (std::int32_t x = 0; x < map_width; ++x)
 		{
-			std::int32_t tile_id = parsed_layer[y * map_width + x];
+			const std::int32_t index = y * map_width + x;
+			const std::int32_t tile_id = parsed_layer[index];
+			tileMask[index] = convertTileNumToChar(tile_id);
 
 			if (tile_id)
 			{
@@ -310,6 +313,7 @@ void TileMap::parseBuildings(const TilesetData& td, const std::vector<std::int32
 		}
 }
 
+// See https://gamicus.fandom.com/wiki/List_of_structures_in_Dune_II
 char TileMap::convertTileNumToChar(std::int32_t index) const noexcept
 {
 	switch (index)
@@ -474,7 +478,6 @@ char TileMap::convertTileNumToChar(std::int32_t index) const noexcept
 		case 180:
 		case 181:
 		case 182:
-		case 191:
 		case 192:
 		case 193:
 		case 194:
@@ -494,6 +497,8 @@ char TileMap::convertTileNumToChar(std::int32_t index) const noexcept
 		case 241:
 		case 261:
 		case 285: return 'B'; // Building
+
+		case 191: return 'C'; // Concrete slab
 
 		default: return 'S';
 	}
