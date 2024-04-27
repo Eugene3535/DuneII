@@ -60,7 +60,7 @@ private:
 	void parseBuildings(const TilesetData& td, const std::vector<std::int32_t>& parsed_layer) noexcept;
 
 private:
-	char getTileID(std::int32_t index) const noexcept;
+	char convertTileNumToChar(std::int32_t index) const noexcept;
 
 public:
 	Layer<sf::VertexBuffer>        landscape;
