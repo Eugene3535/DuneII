@@ -287,10 +287,11 @@ void TileMap::parseBuildings(const TilesetData& td, const std::vector<std::int32
 		{
 			const std::int32_t index = y * map_width + x;
 			const std::int32_t tile_id = parsed_layer[index];
-			tileMask[index] = convertTileNumToChar(tile_id);
 
 			if (tile_id)
 			{
+				tileMask[index] = convertTileNumToChar(tile_id);
+
 //  Vertex XY coords				
 				const std::int32_t tile_num = tile_id - firstGID;
 				float cX = static_cast<float>(x * tile_width);
@@ -500,8 +501,6 @@ char TileMap::convertTileNumToChar(std::int32_t index) const noexcept
 
 		case 191: return 'C'; // Concrete slab
 
-		default: return 'S';
+		default: return 'S'; // sandy soil by default
 	}
-
-	return 'S'; // sandy soil by default
 }
