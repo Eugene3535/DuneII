@@ -1,7 +1,7 @@
 #ifndef CONSTRUCTION_YARD_HPP
 #define CONSTRUCTION_YARD_HPP
 
-#include "scenes/mission/buildings/Building.hpp"
+#include "scenes/mission/buildings/base/Building.hpp"
 
 /// \brief 
 /// Build cost : Deploy an MCV which costs 900

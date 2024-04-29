@@ -1,6 +1,7 @@
-#include "scenes/mission/buildings/Building.hpp"
+#include "scenes/mission/buildings/base/Building.hpp"
 
 Building::Building() noexcept:
+    m_texture(nullptr),
     m_armor(0),
     m_maxArmor(0),
     m_cost(0),

@@ -3,6 +3,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "utils/Defines.hpp"
+
 // More information is available here: https://gamicus.fandom.com/wiki/List_of_structures_in_Dune_II
 
 class Building:
@@ -42,6 +44,9 @@ public:
 
     bool isEnemy() const noexcept;
     bool isDestroyed() const noexcept;
+
+protected:
+    const sf::Texture* m_texture; 
 
 protected:
     std::int32_t m_armor;
