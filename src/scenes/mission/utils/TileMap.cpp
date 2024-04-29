@@ -441,6 +441,9 @@ char TileMap::convertTileNumToChar(std::int32_t index) const noexcept
 		case 119:
 		case 120: return 'W'; // Wall
 
+		case 124:
+		case 125:
+		case 126:
 		case 127: 
 		case 128:
 		case 129:
@@ -452,6 +455,9 @@ char TileMap::convertTileNumToChar(std::int32_t index) const noexcept
 		case 135:
 		case 136: 
 		case 137:
+		case 140:
+		case 141: 
+		case 142:
 		case 143:
 		case 144:
 		case 145:
@@ -470,7 +476,6 @@ char TileMap::convertTileNumToChar(std::int32_t index) const noexcept
 		case 163:
 		case 164:
 		case 165:
-		case 166:
 		case 175:
 		case 176:
 		case 177:
@@ -478,26 +483,51 @@ char TileMap::convertTileNumToChar(std::int32_t index) const noexcept
 		case 179:
 		case 180:
 		case 181:
-		case 182:
 		case 192:
 		case 193:
 		case 194:
 		case 195:
-		case 196:
-		case 197:
 		case 207:
 		case 208:
 		case 209:
-		case 212:
-		case 213:
 		case 223:
 		case 224:
 		case 225:
-		case 239:	
+		case 239:
 		case 240:
-		case 241:
+		case 241:	
+		case 255:
+		case 256:
+		case 257:
+		case 258:
+		case 259:
+		case 260:
 		case 261:
-		case 285: return 'B'; // Building
+		case 262:
+		case 263:
+		case 264:
+		case 265:
+		case 266:
+		case 267:
+		case 268:
+		case 269:
+		case 270:
+		case 271:
+		case 272:
+		case 273:
+		case 274:
+		case 275:
+		case 276:
+		case 277:
+		case 278:
+		case 279:
+		case 280: 
+		case 281:
+		case 282:
+		case 283:
+		case 284:
+		case 285:
+		case 286: return 'B'; // Building
 
 		case 191: return 'C'; // Concrete slab
 
