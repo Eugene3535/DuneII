@@ -34,16 +34,21 @@ public:
     Building() noexcept;
     virtual ~Building();
 
+    virtual void construct() noexcept;
     virtual void update(std::int32_t dt) noexcept;
 
     void repair(std::int32_t value) noexcept;
     void damage(std::int32_t value) noexcept;
 
+    Type type() const noexcept;
     std::int32_t armor() const noexcept;
     std::int32_t cost() const noexcept;
 
     bool isEnemy() const noexcept;
     bool isDestroyed() const noexcept;
+
+protected:
+    Type m_type;
 
 protected:
     const sf::Texture* m_texture; 

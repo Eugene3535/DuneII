@@ -1,6 +1,7 @@
 #include "scenes/mission/buildings/base/Building.hpp"
 
 Building::Building() noexcept:
+    m_type(Building::CONCRETE_SLAB),
     m_texture(nullptr),
     m_armor(0),
     m_maxArmor(0),
@@ -11,6 +12,11 @@ Building::Building() noexcept:
 
 Building::~Building()
 {
+}
+
+void Building::construct() noexcept
+{
+
 }
 
 void Building::update(std::int32_t dt) noexcept
@@ -27,6 +33,11 @@ void Building::repair(std::int32_t value) noexcept
 void Building::damage(std::int32_t value) noexcept
 {
     m_armor -= value;
+}
+
+Building::Type Building::type() const noexcept
+{
+    return m_type;
 }
 
 std::int32_t Building::armor() const noexcept
