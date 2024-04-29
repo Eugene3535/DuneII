@@ -28,6 +28,7 @@ set(HDR_FILES
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/Mission.hpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/utils/TileMap.hpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/utils/TileAnimator.hpp
+	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/base/BuildingData.hpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/base/Building.hpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/base/ComponentBuilding.hpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/ConstructionYard.hpp

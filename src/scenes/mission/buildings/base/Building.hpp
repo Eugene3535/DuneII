@@ -34,7 +34,7 @@ public:
     Building() noexcept;
     virtual ~Building();
 
-    virtual void construct() noexcept;
+    virtual void construct(const struct BuildingData* data) noexcept;
     virtual void update(std::int32_t dt) noexcept;
 
     void repair(std::int32_t value) noexcept;

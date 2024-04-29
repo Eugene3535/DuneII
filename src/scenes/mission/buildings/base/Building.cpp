@@ -1,3 +1,4 @@
+#include "scenes/mission/buildings/base/BuildingData.hpp"
 #include "scenes/mission/buildings/base/Building.hpp"
 
 Building::Building() noexcept:
@@ -14,7 +15,7 @@ Building::~Building()
 {
 }
 
-void Building::construct() noexcept
+void Building::construct(const BuildingData* data) noexcept
 {
 
 }
