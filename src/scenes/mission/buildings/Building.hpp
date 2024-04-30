@@ -7,7 +7,7 @@
 
 // More information is available here: https://gamicus.fandom.com/wiki/List_of_structures_in_Dune_II
 
-class Building:
+class Building final:
     public sf::Drawable
 {
 public:
@@ -15,10 +15,10 @@ public:
     {
         CONCRETE_SLAB,
         CONSTRUCTION_YARD,
-        SPICE_SILO,
+        SPICE_SILOS,
         STARPORT,
-        WINDTRAP,
-        REFINERY,
+        WIND_TRAP,
+        SPICE_REFINERY,
         RADAR_OUTPOST,
         REPAIR_FACILITY,
         PALACE,
@@ -33,17 +33,18 @@ public:
 public:
     struct Data
     {
-        char** tileMask = nullptr;
-        std::int32_t startCoordX = 0;
-        std::int32_t startCoordY = 0;
-        std::int32_t horizontalTileCount = 0;
-        std::int32_t verticalTileCount = 0;
-        std::int32_t mapWidth = 0;
-        std::int32_t mapHeight = 0;
+        char** tileMask { nullptr };
+        std::int32_t startCoordX { 0 };
+        std::int32_t startCoordY { 0 };
+        std::int32_t horizontalTileCount { 0 };
+        std::int32_t verticalTileCount { 0 };
+        std::int32_t mapWidth { 0 };
+        std::int32_t mapHeight { 0 };
+        std::int32_t cost { 0 };
         
-        bool hasAnAnimatedDynastyFlag = false;
-        bool hasAnAnimatedLandingPad = false;
-        bool isEnemy = false;
+        bool hasAnAnimatedDynastyFlag { false };
+        bool hasAnAnimatedLandingPad  { false };
+        bool isEnemy                  { false };
     };
 
 public:
