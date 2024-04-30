@@ -1,14 +1,14 @@
 #ifndef CONSTRUCTION_YARD_HPP
 #define CONSTRUCTION_YARD_HPP
 
-#include "scenes/mission/buildings/base/ComponentBuilding.hpp"
+#include "scenes/mission/buildings/base/Building.hpp"
 
 /// \brief 
 /// Build cost : Deploy an MCV which costs 900
 /// Builds all other buildings.
 
 class ConstructionYard:
-    public TwoPartBuilding
+    public Building
 {
 public:
     ConstructionYard() noexcept;

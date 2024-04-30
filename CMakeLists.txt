@@ -7,6 +7,7 @@ set(EXTERNAL_DIR $ENV{External})
 set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/src/utils/FileProvider.cpp
 	${PROJECT_SOURCE_DIR}/src/loaders/Assets.cpp
+	${PROJECT_SOURCE_DIR}/src/animation/Animation.hpp
 	${PROJECT_SOURCE_DIR}/src/effects/ScreenBlackoutEffect.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/Scene.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/intro/MainMenu.cpp
@@ -14,7 +15,6 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/utils/TileMap.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/utils/TileAnimator.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/base/Building.cpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/base/ComponentBuilding.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/ConstructionYard.cpp
 	${PROJECT_SOURCE_DIR}/src/main.cpp
 )
@@ -23,6 +23,8 @@ set(HDR_FILES
 	${PROJECT_SOURCE_DIR}/src/utils/Defines.hpp
 	${PROJECT_SOURCE_DIR}/src/utils/FileProvider.hpp
 	${PROJECT_SOURCE_DIR}/src/loaders/Assets.hpp
+	${PROJECT_SOURCE_DIR}/src/animation/Animation.hpp
+	${PROJECT_SOURCE_DIR}/src/effects/ScreenBlackoutEffect.hpp
 	${PROJECT_SOURCE_DIR}/src/scenes/Scene.hpp
 	${PROJECT_SOURCE_DIR}/src/scenes/intro/MainMenu.hpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/Mission.hpp
@@ -30,7 +32,6 @@ set(HDR_FILES
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/utils/TileAnimator.hpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/base/BuildingData.hpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/base/Building.hpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/base/ComponentBuilding.hpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/ConstructionYard.hpp
 	${PROJECT_SOURCE_DIR}/src/Game/Game.hpp
 )

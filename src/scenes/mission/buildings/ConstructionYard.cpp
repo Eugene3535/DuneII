@@ -1,7 +1,7 @@
 #include "scenes/mission/buildings/ConstructionYard.hpp"
 
 ConstructionYard::ConstructionYard() noexcept:
-    TwoPartBuilding()
+    Building()
 {
     m_type = Building::CONSTRUCTION_YARD;
 }

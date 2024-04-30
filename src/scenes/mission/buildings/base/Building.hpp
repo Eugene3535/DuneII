@@ -48,19 +48,24 @@ public:
     bool isDestroyed() const noexcept;
 
 protected:
+    void setTextureRect(const sf::IntRect& rectangle) noexcept;
+
+private:
+    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+
+protected:
     Type m_type;
 
 protected:
-    const sf::Texture* m_texture; 
+    sf::Vertex         m_vertices[4];     
+    sf::IntRect        m_textureRect;
+    const sf::Texture* m_texture;
 
 protected:
     std::int32_t m_armor;
     std::int32_t m_maxArmor;
     std::int32_t m_cost;
     bool         m_isEnemy;
-
-private:
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 };
 
 #endif // !BUILDING_HPP

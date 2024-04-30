@@ -15,7 +15,7 @@ struct BuildingData
     
     bool hasAnAnimatedDynastyFlag = false;
     bool hasAnAnimatedLandingPad = false;
+    bool isEnemy = false;
 };
-
 
 #endif // !BUILDING_DATA_HPP
