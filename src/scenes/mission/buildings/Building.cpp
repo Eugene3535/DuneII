@@ -1,5 +1,4 @@
-#include "scenes/mission/buildings/base/BuildingData.hpp"
-#include "scenes/mission/buildings/base/Building.hpp"
+#include "scenes/mission/buildings/Building.hpp"
 
 Building::Building() noexcept:
     m_type(Building::CONCRETE_SLAB),
@@ -16,12 +15,7 @@ Building::~Building()
 {
 }
 
-void Building::construct(const BuildingData* data) noexcept
-{
-
-}
-
-void Building::update(std::int32_t dt) noexcept
+void Building::construct(const Building::Data* data) noexcept
 {
 
 }

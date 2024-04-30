@@ -14,8 +14,7 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/Mission.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/utils/TileMap.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/utils/TileAnimator.cpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/base/Building.cpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/ConstructionYard.cpp
+	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/Building.cpp
 	${PROJECT_SOURCE_DIR}/src/main.cpp
 )
 
@@ -30,9 +29,7 @@ set(HDR_FILES
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/Mission.hpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/utils/TileMap.hpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/utils/TileAnimator.hpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/base/BuildingData.hpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/base/Building.hpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/ConstructionYard.hpp
+	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/Building.hpp
 	${PROJECT_SOURCE_DIR}/src/Game/Game.hpp
 )
 

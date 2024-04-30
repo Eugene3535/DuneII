@@ -31,11 +31,26 @@ public:
     };
 
 public:
-    Building() noexcept;
-    virtual ~Building();
+    struct Data
+    {
+        char** tileMask = nullptr;
+        std::int32_t startCoordX = 0;
+        std::int32_t startCoordY = 0;
+        std::int32_t horizontalTileCount = 0;
+        std::int32_t verticalTileCount = 0;
+        std::int32_t mapWidth = 0;
+        std::int32_t mapHeight = 0;
+        
+        bool hasAnAnimatedDynastyFlag = false;
+        bool hasAnAnimatedLandingPad = false;
+        bool isEnemy = false;
+    };
 
-    virtual void construct(const struct BuildingData* data) noexcept;
-    virtual void update(std::int32_t dt) noexcept;
+public:
+    Building() noexcept;
+    ~Building();
+
+    void construct(const struct Building::Data* data) noexcept;
 
     void repair(std::int32_t value) noexcept;
     void damage(std::int32_t value) noexcept;
