@@ -6,7 +6,7 @@
 
 #include "utils/FileProvider.hpp"
 #include "loaders/Assets.hpp"
-#include "scenes/mission/utils/TileMap.hpp"
+#include "scenes/mission/tilemap/TileMap.hpp"
 
 bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 {
@@ -42,14 +42,14 @@ void TileMap::reset() noexcept
 	landscape.vertices.~VertexBuffer();
 	landscape.texture = nullptr;
 	
-	staticTiles.vertices.clear();
-	staticTiles.texture = nullptr;
+	// staticTiles.vertices.clear();
+	// staticTiles.texture = nullptr;
 
-	animatedTiles.vertices.clear();
-	animatedTiles.texture = nullptr;
+	// animatedTiles.vertices.clear();
+	// animatedTiles.texture = nullptr;
 
-	tileMask.clear();
 	objects.clear();
+	tileMask.clear();
 	title.clear();
 
 	mapSize  = { 0, 0 };
@@ -58,7 +58,7 @@ void TileMap::reset() noexcept
 
 bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 {
-	std::vector<TileMap::TilesetData> tilesets;
+	std::vector<TileMap::Tileset> tilesets;
 	parseTilesets(map_node, tilesets);
 
 	if(tilesets.empty()) 
@@ -114,7 +114,7 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 			const std::int32_t max_tile = *bounds.second;
 
 			auto current_tileset = std::find_if(tilesets.begin(), tilesets.end(),
-				[min_tile, max_tile](const TileMap::TilesetData& ts)
+				[min_tile, max_tile](const TileMap::Tileset& ts)
 				{
 					return min_tile <= ts.firstGID && max_tile <= ts.firstGID + ts.tileCount;
 				});
@@ -178,7 +178,7 @@ bool TileMap::loadObjects(const rapidxml::xml_node<char>* map_node) noexcept
 	return !objects.empty();
 }
 
-void TileMap::parseTilesets(const rapidxml::xml_node<char>* map_node, std::vector<TileMap::TilesetData>& tilesets) noexcept
+void TileMap::parseTilesets(const rapidxml::xml_node<char>* map_node, std::vector<TileMap::Tileset>& tilesets) noexcept
 {
 	for (auto tilesetNode = map_node->first_node("tileset");
 			  tilesetNode != nullptr;
@@ -206,7 +206,7 @@ void TileMap::parseTilesets(const rapidxml::xml_node<char>* map_node, std::vecto
 
 		if(tile_count && columns && firstGID)
 		{
-			TilesetData& ts = tilesets.emplace_back();
+			Tileset& ts = tilesets.emplace_back();
 
 			ts.texture   = tileset;
 			ts.tileCount = tile_count ? std::atoi(tile_count->value()) : 0;
@@ -216,7 +216,7 @@ void TileMap::parseTilesets(const rapidxml::xml_node<char>* map_node, std::vecto
 	}
 }
 
-void TileMap::parseLandscape(const TilesetData& td, const std::vector<std::int32_t>& parsed_layer) noexcept
+void TileMap::parseLandscape(const Tileset& tileset, const std::vector<std::int32_t>& parsed_layer) noexcept
 {
 	std::vector<sf::Vertex> vertices;
 	vertices.reserve(parsed_layer.size());
@@ -226,8 +226,8 @@ void TileMap::parseLandscape(const TilesetData& td, const std::vector<std::int32
 	const std::int32_t map_height  = mapSize.y;
 	const std::int32_t tile_width  = tileSize.x;
 	const std::int32_t tile_height = tileSize.y;
-	const std::int32_t columns     = td.columns;
-	const std::int32_t firstGID    = td.firstGID;
+	const std::int32_t columns     = tileset.columns;
+	const std::int32_t firstGID    = tileset.firstGID;
 
 	for (std::int32_t y = 0; y < map_height; ++y)
 		for (std::int32_t x = 0; x < map_width; ++x)
@@ -259,7 +259,7 @@ void TileMap::parseLandscape(const TilesetData& td, const std::vector<std::int32
 //  Unload to VBO
 	if (!vertices.empty())
 	{
-		landscape.texture = td.texture;
+		landscape.texture = tileset.texture;
 		landscape.vertices.setUsage(sf::VertexBuffer::Static);
 		landscape.vertices.setPrimitiveType(sf::Triangles);
 		landscape.vertices.create(vertices.size());
@@ -267,7 +267,7 @@ void TileMap::parseLandscape(const TilesetData& td, const std::vector<std::int32
 	}
 }
 
-void TileMap::parseBuildings(const TilesetData& td, const std::vector<std::int32_t>& parsed_layer) noexcept
+void TileMap::parseBuildings(const Tileset& tileset, const std::vector<std::int32_t>& parsed_layer) noexcept
 {
 	std::vector<sf::Vertex> vertices;
 	vertices.reserve(std::count_if(parsed_layer.begin(), parsed_layer.end(),
@@ -278,9 +278,9 @@ void TileMap::parseBuildings(const TilesetData& td, const std::vector<std::int32
 	const std::int32_t map_height  = mapSize.y;
 	const std::int32_t tile_width  = tileSize.x;
 	const std::int32_t tile_height = tileSize.y;
-	const std::int32_t columns     = td.columns;
-	const std::int32_t firstGID    = td.firstGID;
-	const std::int32_t tile_count  = td.tileCount;
+	const std::int32_t columns     = tileset.columns;
+	const std::int32_t firstGID    = tileset.firstGID;
+	const std::int32_t tile_count  = tileset.tileCount;
 
 	for (std::int32_t y = 0; y < map_height; ++y)
 		for (std::int32_t x = 0; x < map_width; ++x)

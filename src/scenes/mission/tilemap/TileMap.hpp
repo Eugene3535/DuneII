@@ -9,10 +9,12 @@
 
 #include "rapidxml.hpp"
 
+#include "scenes/mission/buildings/Building.hpp"
+
 class TileMap
 {
 private:
-	struct TilesetData
+	struct Tileset
 	{
 		const sf::Texture* texture { nullptr };
 		std::int32_t columns   { 0 };
@@ -55,20 +57,20 @@ private:
 	bool loadObjects(const rapidxml::xml_node<>* map_node) noexcept;
 
 private:
-	void parseTilesets(const rapidxml::xml_node<char>* map_node, std::vector<TilesetData>& tilesets) noexcept;
-	void parseLandscape(const TilesetData& td, const std::vector<std::int32_t>& parsed_layer) noexcept;
-	void parseBuildings(const TilesetData& td, const std::vector<std::int32_t>& parsed_layer) noexcept;
+	void parseTilesets(const rapidxml::xml_node<char>* map_node, std::vector<Tileset>& tilesets) noexcept;
+	void parseLandscape(const Tileset& tileset, const std::vector<std::int32_t>& parsed_layer) noexcept;
+	void parseBuildings(const Tileset& tileset, const std::vector<std::int32_t>& parsed_layer) noexcept;
 
 private:
 	char convertTileNumToChar(std::int32_t index) const noexcept;
 
 public:
 	Layer<sf::VertexBuffer>        landscape;
-	Layer<std::vector<sf::Vertex>> staticTiles;
-	Layer<std::vector<sf::Vertex>> animatedTiles;
-	std::string                    tileMask;
+	// Layer<std::vector<sf::Vertex>> staticTiles;
+	// Layer<std::vector<sf::Vertex>> animatedTiles;
 	std::vector<Object>            objects;
-
+	std::string                    tileMask;
+	
 public:
 	std::string  title;
 	sf::Vector2i mapSize;

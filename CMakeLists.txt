@@ -12,7 +12,7 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/src/scenes/Scene.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/intro/MainMenu.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/Mission.cpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/utils/TileMap.cpp
+	${PROJECT_SOURCE_DIR}/src/scenes/mission/tilemap/TileMap.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/utils/TileAnimator.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/Building.cpp
 	${PROJECT_SOURCE_DIR}/src/main.cpp
@@ -27,7 +27,7 @@ set(HDR_FILES
 	${PROJECT_SOURCE_DIR}/src/scenes/Scene.hpp
 	${PROJECT_SOURCE_DIR}/src/scenes/intro/MainMenu.hpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/Mission.hpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/utils/TileMap.hpp
+	${PROJECT_SOURCE_DIR}/src/scenes/mission/tilemap/TileMap.hpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/utils/TileAnimator.hpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/Building.hpp
 	${PROJECT_SOURCE_DIR}/src/Game/Game.hpp

@@ -1,7 +1,7 @@
 #ifndef MISSION_HPP
 #define MISSION_HPP
 
-#include "scenes/mission/utils/TileMap.hpp"
+#include "scenes/mission/tilemap/TileMap.hpp"
 #include "scenes/Scene.hpp"
 
 class Mission:
