@@ -37,22 +37,71 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 	return false;
 }
 
+Building* TileMap::placeBuilding(std::int32_t x, std::int32_t y, Building::Type type) noexcept
+{
+	if(x < 0 || y < 0)
+		return nullptr;
+
+	Building::Data data{};
+	data.type = type;
+
+	auto texture = Assets::instance()->getTexture("Buildings.png");
+
+	if(!texture)
+		return nullptr;
+
+	switch (type)
+	{
+		case Building::CONCRETE_SLAB: break;
+
+        case Building::CONSTRUCTION_YARD:
+		{
+			data.localBounds = { 0, 32, 64, 64 };
+			data.globalBounds = { (x << 5), (y << 5), 64, 64 };
+			data.cost = 900;	
+		}
+		break;
+
+        case Building::SPICE_SILOS: break;
+        case Building::STARPORT: break;
+        case Building::WIND_TRAP: break;
+        case Building::SPICE_REFINERY: break;
+        case Building::RADAR_OUTPOST: break;
+        case Building::REPAIR_FACILITY: break;
+        case Building::PALACE: break;
+        case Building::HIGH_TECH_FACILITY: break;
+        case Building::BARRACKS: break;
+        case Building::VEHICLE_FACTORY: break;
+        case Building::WALL: break;
+        case Building::TURRET: break;
+        case Building::ROCKET_TURRET: break;
+	}
+
+	if((data.globalBounds.left + data.localBounds.width) >= mapSizeInPixels.x || (data.globalBounds.top + data.localBounds.height) >= mapSizeInPixels.y)
+		return nullptr;
+
+	auto& bld = buildings.emplace_back();
+	bld = std::make_unique<Building>();
+	bld->setTexture(*texture);
+	bld->setTextureRect(data.localBounds);
+	bld->setPosition(data.globalBounds.left, data.globalBounds.top);
+	bld->construct(&data);	
+
+	return bld.get();
+}
+
 void TileMap::reset() noexcept
 {
 	landscape.vertices.~VertexBuffer();
 	landscape.texture = nullptr;
-	
-	// staticTiles.vertices.clear();
-	// staticTiles.texture = nullptr;
-
-	// animatedTiles.vertices.clear();
-	// animatedTiles.texture = nullptr;
 
 	objects.clear();
 	tileMask.clear();
+	collisionMask.clear();
 	title.clear();
 
-	mapSize  = { 0, 0 };
+	mapSizeInTiles  = { 0, 0 };
+	mapSizeInPixels  = { 0, 0 };
 	tileSize = { 0, 0 };
 }
 
@@ -77,9 +126,16 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 	if (!(map_width && map_height && tile_width && tile_height))
 		return false;
 
-	mapSize  = { map_width,  map_height  };
+	mapSizeInTiles  = { map_width,  map_height  };
+	mapSizeInPixels  = { map_width * tile_width,  map_height * tile_height  };
 	tileSize = { tile_width, tile_height };
-	tileMask.resize(static_cast<std::size_t>(map_width * map_height), ' ');
+	tileMask.resize(static_cast<std::size_t>(map_width * map_height), 'S');
+	collisionMask.resize(static_cast<std::size_t>(map_height), nullptr);
+
+	for (std::size_t i = 0; i < map_height; ++i)
+		collisionMask[i] = tileMask.data() + i * map_width;
+
+	placeBuilding(5, 5, Building::CONSTRUCTION_YARD);
 
 	for (auto layer_node = map_node->first_node("layer");
 		      layer_node != nullptr;
@@ -222,8 +278,8 @@ void TileMap::parseLandscape(const Tileset& tileset, const std::vector<std::int3
 	vertices.reserve(parsed_layer.size());
 
 //  Cached variables
-	const std::int32_t map_width   = mapSize.x;
-	const std::int32_t map_height  = mapSize.y;
+	const std::int32_t map_width   = mapSizeInTiles.x;
+	const std::int32_t map_height  = mapSizeInTiles.y;
 	const std::int32_t tile_width  = tileSize.x;
 	const std::int32_t tile_height = tileSize.y;
 	const std::int32_t columns     = tileset.columns;
@@ -274,8 +330,8 @@ void TileMap::parseBuildings(const Tileset& tileset, const std::vector<std::int3
 		[](std::int32_t n) { return n > 0; }));
 
 //  Cached variables
-	const std::int32_t map_width   = mapSize.x;
-	const std::int32_t map_height  = mapSize.y;
+	const std::int32_t map_width   = mapSizeInTiles.x;
+	const std::int32_t map_height  = mapSizeInTiles.y;
 	const std::int32_t tile_width  = tileSize.x;
 	const std::int32_t tile_height = tileSize.y;
 	const std::int32_t columns     = tileset.columns;
@@ -301,15 +357,6 @@ void TileMap::parseBuildings(const Tileset& tileset, const std::vector<std::int3
 				std::int32_t top = (tile_num >= columns) ? tile_num / columns : 0;
 				std::int32_t left = tile_num % columns;
 				sf::Vector2f point(left * tile_width, top * tile_height);
-
-//  First triangle
-				vertices.emplace_back(sf::Vector2f(cX, cY), point);
-				vertices.emplace_back(sf::Vector2f(cX + tile_width, cY), sf::Vector2f(point.x + tile_width, point.y));
-				vertices.emplace_back(sf::Vector2f(cX + tile_width, cY + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
-//  Second triangle
-				vertices.emplace_back(sf::Vector2f(cX, cY), point);
-				vertices.emplace_back(sf::Vector2f(cX + tile_width, cY + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
-				vertices.emplace_back(sf::Vector2f(cX, cY + tile_height), sf::Vector2f(point.x, point.y + tile_height));
 			}
 		}
 }

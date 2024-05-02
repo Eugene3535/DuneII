@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 #include <filesystem>
 
 #include <SFML/Graphics.hpp>
@@ -23,11 +24,10 @@ private:
 	};
 
 public:
-	template<class T>
-	class Layer 
+	struct Landscape 
 	{
 	public:
-		T vertices;
+		sf::VertexBuffer vertices;
 		const sf::Texture* texture { nullptr };
 	};
 
@@ -50,6 +50,7 @@ public:
 
 public:
 	bool loadFromFile(const std::filesystem::path& file_path) noexcept;
+	Building* placeBuilding(std::int32_t x, std::int32_t y, Building::Type type) noexcept;
 	void reset() noexcept;
 
 private:
@@ -65,15 +66,16 @@ private:
 	char convertTileNumToChar(std::int32_t index) const noexcept;
 
 public:
-	Layer<sf::VertexBuffer>        landscape;
-	// Layer<std::vector<sf::Vertex>> staticTiles;
-	// Layer<std::vector<sf::Vertex>> animatedTiles;
-	std::vector<Object>            objects;
-	std::string                    tileMask;
+	Landscape landscape;
+	std::vector<std::unique_ptr<Building>> buildings;
+	std::vector<Object>     objects;
+	std::string             tileMask;
+	std::vector<char*> collisionMask;
 	
 public:
 	std::string  title;
-	sf::Vector2i mapSize;
+	sf::Vector2i mapSizeInTiles;
+	sf::Vector2i mapSizeInPixels;
 	sf::Vector2i tileSize;
 };
 

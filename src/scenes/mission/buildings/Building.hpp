@@ -8,11 +8,12 @@
 // More information is available here: https://gamicus.fandom.com/wiki/List_of_structures_in_Dune_II
 
 class Building final:
-    public sf::Drawable
+    public sf::Sprite
 {
 public:
     enum Type: std::int32_t
     {
+        NONE,
         CONCRETE_SLAB,
         CONSTRUCTION_YARD,
         SPICE_SILOS,
@@ -33,13 +34,9 @@ public:
 public:
     struct Data
     {
-        char** tileMask { nullptr };
-        std::int32_t startCoordX { 0 };
-        std::int32_t startCoordY { 0 };
-        std::int32_t horizontalTileCount { 0 };
-        std::int32_t verticalTileCount { 0 };
-        std::int32_t mapWidth { 0 };
-        std::int32_t mapHeight { 0 };
+        sf::IntRect  localBounds{};
+        sf::IntRect  globalBounds{};
+        Building::Type type { Building::NONE };
         std::int32_t cost { 0 };
         
         bool hasAnAnimatedDynastyFlag { false };
@@ -64,18 +61,7 @@ public:
     bool isDestroyed() const noexcept;
 
 protected:
-    void setTextureRect(const sf::IntRect& rectangle) noexcept;
-
-private:
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
-
-protected:
     Type m_type;
-
-protected:
-    sf::Vertex         m_vertices[4];     
-    sf::IntRect        m_textureRect;
-    const sf::Texture* m_texture;
 
 protected:
     std::int32_t m_armor;

@@ -42,8 +42,8 @@ void Mission::update(sf::Time dt) noexcept
 
     auto& viewport  = m_game.viewport;
     auto view_size  = viewport.getSize();
-    auto map_width  = m_tilemap.mapSize.x * m_tilemap.tileSize.x;
-    auto map_height = m_tilemap.mapSize.y * m_tilemap.tileSize.y;
+    auto map_width  = m_tilemap.mapSizeInPixels.x;
+    auto map_height = m_tilemap.mapSizeInPixels.y;
     
     if(m_view_position.x < 0) m_view_position.x = 0;
     if(m_view_position.y < 0) m_view_position.y = 0;
@@ -67,14 +67,7 @@ void Mission::draw(sf::RenderTarget& target, sf::RenderStates states) const
         states.texture = m_tilemap.landscape.texture;
         target.draw(vertexBuffer, states);
 
-        // const auto* vertices = m_tilemap.staticBuildings.vertices.data();
-        // states.texture = m_tilemap.staticBuildings.texture;
-        // std::size_t vertexCount = m_tilemap.staticBuildings.vertices.size();
-        // target.draw(vertices, vertexCount, sf::Triangles, states);
-
-        // vertices = m_tilemap.animatedBuildings.vertices.data();
-        // states.texture = m_tilemap.animatedBuildings.texture;
-        // vertexCount = m_tilemap.staticBuildings.vertices.size();
-        // target.draw(vertices, vertexCount, sf::Triangles, states);
+        for(auto& b: m_tilemap.buildings)
+            target.draw(*b, states);
     }
 }
