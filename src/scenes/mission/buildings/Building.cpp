@@ -2,8 +2,8 @@
 
 Building::Building() noexcept:
     m_type(Building::CONCRETE_SLAB),
-    m_armor(0),
-    m_maxArmor(0),
+    m_hitPoints(0),
+    m_maxHitPoints(0),
     m_cost(0),
     m_isEnemy(false)
 {
@@ -15,24 +15,27 @@ Building::~Building()
 
 void Building::construct(const Building::Data* data) noexcept
 {
-    m_type = data->type;
-    m_cost = data->cost;
+    m_type         = data->type;
+    m_bounds       = data->globalBounds;
+    m_cost         = data->cost;
+    m_hitPoints    = data->hitPoints;
+    m_maxHitPoints = data->maxHitPoints;
 }
 
-void Building::repair(std::int32_t value) noexcept
+void Building::repair(std::int32_t points) noexcept
 {
     if( (m_type != Building::CONCRETE_SLAB) && (m_type != Building::WALL) )
     {
-        m_armor += value;
+        m_hitPoints += points;
 
-        if(m_armor > m_maxArmor)
-            m_armor = m_maxArmor;
+        if(m_hitPoints > m_maxHitPoints)
+            m_hitPoints = m_maxHitPoints;
     }
 }
 
-void Building::damage(std::int32_t value) noexcept
+void Building::damage(std::int32_t points) noexcept
 {
-    m_armor -= value;
+    m_hitPoints -= points;
 }
 
 Building::Type Building::type() const noexcept
@@ -40,9 +43,14 @@ Building::Type Building::type() const noexcept
     return m_type;
 }
 
-std::int32_t Building::armor() const noexcept
+const sf::IntRect& Building::bounds() const noexcept
 {
-    return (m_armor > 0) ? m_armor : 0;
+    return m_bounds;
+}
+
+std::int32_t Building::hitPoints() const noexcept
+{
+    return (m_hitPoints > 0) ? m_hitPoints : 0;
 }
 
 std::int32_t Building::cost() const noexcept
@@ -57,5 +65,5 @@ bool Building::isEnemy() const noexcept
 
 bool Building::isDestroyed() const noexcept
 {
-    return (m_armor < 1);
+    return (m_hitPoints < 1);
 }

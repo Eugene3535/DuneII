@@ -18,9 +18,9 @@ private:
 	struct Tileset
 	{
 		const sf::Texture* texture { nullptr };
-		std::int32_t columns   { 0 };
-		std::int32_t tileCount { 0 };
-		std::int32_t firstGID  { 1 };
+		int32_t columns   { 0 };
+		int32_t tileCount { 0 };
+		int32_t firstGID  { 1 };
 	};
 
 public:
@@ -50,7 +50,7 @@ public:
 
 public:
 	bool loadFromFile(const std::filesystem::path& file_path) noexcept;
-	Building* placeBuilding(std::int32_t x, std::int32_t y, Building::Type type) noexcept;
+	Building* placeBuilding(int32_t x, int32_t y, Building::Type type) noexcept;
 	void reset() noexcept;
 
 private:
@@ -58,12 +58,12 @@ private:
 	bool loadObjects(const rapidxml::xml_node<>* map_node) noexcept;
 
 private:
-	void parseTilesets(const rapidxml::xml_node<char>* map_node, std::vector<Tileset>& tilesets) noexcept;
-	void parseLandscape(const Tileset& tileset, const std::vector<std::int32_t>& parsed_layer) noexcept;
-	void parseBuildings(const Tileset& tileset, const std::vector<std::int32_t>& parsed_layer) noexcept;
+	void parseTilesets(const rapidxml::xml_node<char>* map_node, std::vector<Tileset>& tilesets)   noexcept;
+	void parseLandscape(const Tileset& tileset, const std::vector<int32_t>& parsed_layer)     noexcept;
+	void parseBuildings(const Tileset& tileset, const std::vector<int32_t>& parsed_layer)     noexcept;
 
 private:
-	char convertTileNumToChar(std::int32_t index) const noexcept;
+	char convertTileNumToChar(int32_t index) const noexcept;
 
 public:
 	Landscape landscape;
