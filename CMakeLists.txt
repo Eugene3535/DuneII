@@ -14,44 +14,12 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/src/scenes/intro/MainMenu.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/Mission.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/tilemap/TileMap.cpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/utils/TileAnimator.cpp
+#	${PROJECT_SOURCE_DIR}/src/scenes/mission/utils/TileAnimator.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/Building.cpp
 	${PROJECT_SOURCE_DIR}/src/main.cpp
 )
 
-set(HDR_FILES
-	${PROJECT_SOURCE_DIR}/src/utils/Defines.hpp
-	${PROJECT_SOURCE_DIR}/src/utils/FileProvider.hpp
-	${PROJECT_SOURCE_DIR}/src/loaders/Assets.hpp
-	${PROJECT_SOURCE_DIR}/src/animation/Animation.hpp
-	${PROJECT_SOURCE_DIR}/src/effects/ScreenBlackoutEffect.hpp
-	${PROJECT_SOURCE_DIR}/src/scenes/Scene.hpp
-	${PROJECT_SOURCE_DIR}/src/scenes/intro/MainMenu.hpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/Mission.hpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/tilemap/TileMap.hpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/utils/TileAnimator.hpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/Building.hpp
-	${PROJECT_SOURCE_DIR}/src/Game/Game.hpp
-)
-
-add_compile_definitions("DEBUG=$<CONFIG:Debug>")
-
-if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
-
-	set(VISUALIZER_ALL_FILES 
-		${VISUALIZER_SRC_FILES} 
-		${VISUALIZER_HDR_FILES})
-
-	foreach(source IN LISTS VISUALIZER_ALL_FILES)
-		get_filename_component(source_path "${source}" PATH)
-		string(REPLACE "/" "\\" source_path_msvc "${source_path}")
-		source_group("${source_path_msvc}" FILES "${source}")
-	endforeach()
-
-endif()
-
-add_executable(${PROJECT_NAME} ${SRC_FILES} ${HDR_FILES})
+add_executable(${PROJECT_NAME} ${SRC_FILES})
 add_subdirectory(${EXTERNAL_DIR}/sfml external/sfml)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -66,6 +34,7 @@ target_link_libraries(${PROJECT_NAME}
 	sfml-audio
 )
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG>)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

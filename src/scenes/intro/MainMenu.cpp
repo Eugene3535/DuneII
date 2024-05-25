@@ -65,13 +65,13 @@ void MainMenu::update(sf::Time dt) noexcept
     {
         if(text.getGlobalBounds().contains(mouse_pos))
         {
-            text.setColor(sf::Color::Red);
+            text.setFillColor(sf::Color::Red);
 
             if(sf::Mouse::isButtonPressed(sf::Mouse::Left))       
                 return true;   
         }
         else   
-            text.setColor(sf::Color::White);
+            text.setFillColor(sf::Color::White);
         
         return false;
     };
