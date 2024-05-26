@@ -63,7 +63,7 @@ private:
 	void parseBuildings(const Tileset& tileset, const std::vector<int32_t>& parsed_layer)     noexcept;
 
 private:
-	int8_t convertTileNumToChar(int32_t index) const noexcept;
+	char convertTileNumToChar(int32_t index) const noexcept;
 
 public:
 	Landscape landscape;

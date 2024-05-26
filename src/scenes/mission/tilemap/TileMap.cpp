@@ -62,7 +62,7 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 			case Building::CONCRETE_SLAB:
 			{
 				return nullptr;
-				
+
 				data.textureRect = { 0, 160, 32, 32 };
 				data.globalBounds = { coordX, coordY, 32, 32 };
 				data.cost = 5;
@@ -138,7 +138,16 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 			}
 			break;
 
-			case Building::REPAIR_FACILITY: break;
+			case Building::REPAIR_FACILITY:
+			{
+				data.textureRect = { 224, 96, 96, 64 };
+				data.globalBounds = { coordX, coordY, 96, 64 };
+				data.cost = 700;
+				data.hitPoints = 1800; 
+				data.maxHitPoints = 1800;
+				setupTilesOnMask(collisionMask.data(), x, y, 3, 2);
+			}
+			break;
 
 			case Building::PALACE:
 			{
@@ -191,7 +200,7 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 				data.cost = 50;
 				data.hitPoints = 140; 
 				data.maxHitPoints = 140;
-				setupTilesOnMask(collisionMask.data(), x, y, 1, 1);
+				setupTilesOnMask(collisionMask.data(), x, y, 1, 1, 'W');
 			}
 			break;
 
@@ -484,6 +493,7 @@ void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int32_t>&
 			case 159: return Building::Type::BARRACKS;
 			case 161: return Building::Type::PALACE;
 			case 164: return Building::Type::HIGH_TECH_FACILITY;
+			case 166: return Building::Type::REPAIR_FACILITY;
 			case 207: return Building::Type::STARPORT;
 			case 261: return Building::Type::TURRET;
 			case 269: return Building::Type::ROCKET_TURRET;
