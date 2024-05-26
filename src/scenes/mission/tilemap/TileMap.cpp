@@ -39,11 +39,11 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 
 Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noexcept
 {
-	auto setupTilesOnMask = [](char** mask, int32_t x, int32_t y, int32_t width, int32_t height)
+	auto setupTilesOnMask = [](char** mask, int32_t x, int32_t y, int32_t width, int32_t height, char symbol = 'B')
 	{
 		for (int32_t i = 0; i < height; ++i)
 			for (int32_t j = 0; j < width; ++j)
-				mask[x + j][y + i] = 'B';
+				mask[x + j][y + i] = symbol;
 	};
 
 	if(x < 0 || y < 0)
@@ -62,12 +62,13 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 			case Building::CONCRETE_SLAB:
 			{
 				return nullptr;
-				// data.textureRect = { 0, 160, 32, 32 };
-				// data.globalBounds = { coordX, coordY, 32, 32 };
-				// data.cost = 5;
-				// data.hitPoints = 40; 
-				// data.maxHitPoints = 40;
-				// setupTilesOnMask(collisionMask.data(), x, y, 1, 1); // need to replace 'B' to 'C'
+				
+				data.textureRect = { 0, 160, 32, 32 };
+				data.globalBounds = { coordX, coordY, 32, 32 };
+				data.cost = 5;
+				data.hitPoints = 40; 
+				data.maxHitPoints = 40;
+				setupTilesOnMask(collisionMask.data(), x, y, 1, 1, 'C');
 			}
 			break;
 
@@ -521,7 +522,7 @@ void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int32_t>&
 }
 
 // See https://gamicus.fandom.com/wiki/List_of_structures_in_Dune_II
-int8_t TileMap::convertTileNumToChar(int32_t index) const noexcept
+char TileMap::convertTileNumToChar(int32_t index) const noexcept
 {
 	switch (index)
 	{
