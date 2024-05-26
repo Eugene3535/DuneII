@@ -49,7 +49,7 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 	if(x < 0 || y < 0)
 		return nullptr;
 
-	Building::Data data{};
+	Building::Data data = {};
 	data.type = type;
 
 	int32_t coordX = (x << 5);
@@ -59,11 +59,21 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 	{
 		switch (type)
 		{
-			case Building::CONCRETE_SLAB: break;
+			case Building::CONCRETE_SLAB:
+			{
+				return nullptr;
+				// data.textureRect = { 0, 160, 32, 32 };
+				// data.globalBounds = { coordX, coordY, 32, 32 };
+				// data.cost = 5;
+				// data.hitPoints = 40; 
+				// data.maxHitPoints = 40;
+				// setupTilesOnMask(collisionMask.data(), x, y, 1, 1); // need to replace 'B' to 'C'
+			}
+			break;
 
 			case Building::CONSTRUCTION_YARD:
 			{
-				data.localBounds = { 0, 32, 64, 64 };
+				data.textureRect = { 0, 32, 64, 64 };
 				data.globalBounds = { coordX, coordY, 64, 64 };
 				data.cost = 900;
 				data.hitPoints = 400; 
@@ -72,37 +82,147 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 			}
 			break;
 
-			case Building::SPICE_SILOS:
+			case Building::SPICE_SILO:
 			{
-				data.localBounds = { 192, 32, 64, 64 };
+				data.textureRect = { 192, 32, 64, 64 };
 				data.globalBounds = { coordX, coordY, 64, 64 };
 				data.cost = 300;
 				data.hitPoints = 150; 
 				data.maxHitPoints = 150;
 				setupTilesOnMask(collisionMask.data(), x, y, 2, 2);
+			}
+			break;
+
+			case Building::STARPORT:
+			{
+				data.textureRect = { 0, 196, 96, 96 };
+				data.globalBounds = { coordX, coordY, 96, 96 };
+				data.cost = 500;
+				data.hitPoints = 1000; 
+				data.maxHitPoints = 1000;
+				setupTilesOnMask(collisionMask.data(), x, y, 3, 3);
 			} 
 			break;
 
-			case Building::STARPORT: break;
-			case Building::WIND_TRAP: break;
-			case Building::SPICE_REFINERY: break;
-			case Building::RADAR_OUTPOST: break;
+			case Building::WIND_TRAP:
+			{
+				data.textureRect = { 64, 32, 64, 64 };
+				data.globalBounds = { coordX, coordY, 64, 64 };
+				data.cost = 300;
+				data.hitPoints = 400; 
+				data.maxHitPoints = 400;
+				setupTilesOnMask(collisionMask.data(), x, y, 2, 2);
+			}
+			break;
+
+			case Building::SPICE_REFINERY:
+			{
+				data.textureRect = { 416, 0, 96, 64 };
+				data.globalBounds = { coordX, coordY, 96, 64 };
+				data.cost = 300;
+				data.hitPoints = 400; 
+				data.maxHitPoints = 400;
+				setupTilesOnMask(collisionMask.data(), x, y, 3, 2);
+			}
+			break;
+
+			case Building::RADAR_OUTPOST:
+			{
+				data.textureRect = { 128, 32, 64, 64 };
+				data.globalBounds = { coordX, coordY, 64, 64 };
+				data.cost = 400;
+				data.hitPoints = 1000; 
+				data.maxHitPoints = 1000;
+				setupTilesOnMask(collisionMask.data(), x, y, 2, 2);
+			}
+			break;
+
 			case Building::REPAIR_FACILITY: break;
-			case Building::PALACE: break;
-			case Building::HIGH_TECH_FACILITY: break;
-			case Building::BARRACKS: break;
-			case Building::VEHICLE_FACTORY: break;
-			case Building::WALL: break;
-			case Building::TURRET: break;
-			case Building::ROCKET_TURRET: break;
+
+			case Building::PALACE:
+			{
+				data.textureRect = { 64, 96, 96, 96 };
+				data.globalBounds = { coordX, coordY, 96, 96 };
+				data.cost = 999;
+				data.hitPoints = 2000; 
+				data.maxHitPoints = 2000;
+				setupTilesOnMask(collisionMask.data(), x, y, 3, 3);
+			}
+			break;
+
+			case Building::HIGH_TECH_FACILITY:
+			{
+				data.textureRect = { 160, 96, 64, 64 };
+				data.globalBounds = { coordX, coordY, 64, 64 };
+				data.cost = 500;
+				data.hitPoints = 1000; 
+				data.maxHitPoints = 1000;
+				setupTilesOnMask(collisionMask.data(), x, y, 2, 2);
+			}
+			break;
+
+			case Building::BARRACKS:
+			{
+				data.textureRect = { 0, 96, 64, 64 };
+				data.globalBounds = { coordX, coordY, 64, 64 };
+				data.cost = 300;
+				data.hitPoints = 600; 
+				data.maxHitPoints = 600;
+				setupTilesOnMask(collisionMask.data(), x, y, 2, 2);
+			}
+			break;
+
+			case Building::VEHICLE_FACTORY:
+			{
+				data.textureRect = { 256, 32, 96, 64 };
+				data.globalBounds = { coordX, coordY, 96, 64 };
+				data.cost = 400;
+				data.hitPoints = 800; 
+				data.maxHitPoints = 800;
+				setupTilesOnMask(collisionMask.data(), x, y, 3, 2);
+			}
+			break;
+
+			case Building::WALL:
+			{
+				data.textureRect = { 0, 0, 32, 32 };
+				data.globalBounds = { coordX, coordY, 32, 32 };
+				data.cost = 50;
+				data.hitPoints = 140; 
+				data.maxHitPoints = 140;
+				setupTilesOnMask(collisionMask.data(), x, y, 1, 1);
+			}
+			break;
+
+			case Building::TURRET:
+			{
+				data.textureRect = { 192, 288, 32, 32 };
+				data.globalBounds = { coordX, coordY, 32, 32 };
+				data.cost = 125;
+				data.hitPoints = 250; 
+				data.maxHitPoints = 250;
+				setupTilesOnMask(collisionMask.data(), x, y, 1, 1);
+			}
+			break;
+
+			case Building::ROCKET_TURRET:
+			{
+				data.textureRect = { 448, 288, 32, 32 };
+				data.globalBounds = { coordX, coordY, 32, 32 };
+				data.cost = 250;
+				data.hitPoints = 500; 
+				data.maxHitPoints = 500;
+				setupTilesOnMask(collisionMask.data(), x, y, 1, 1);
+			}
+			break;
 		}
 
-		if((data.globalBounds.left + data.localBounds.width) >= mapSizeInPixels.x || (data.globalBounds.top + data.localBounds.height) >= mapSizeInPixels.y)
+		if((data.globalBounds.left + data.textureRect.width) >= mapSizeInPixels.x || (data.globalBounds.top + data.textureRect.height) >= mapSizeInPixels.y)
 			return nullptr;
 
 		auto bld = buildings.emplace_back(std::make_unique<Building>()).get();
 		bld->setTexture(*texture);
-		bld->setTextureRect(data.localBounds);
+		bld->setTextureRect(data.textureRect);
 		bld->setPosition(static_cast<float>(coordX), static_cast<float>(coordY));
 		bld->construct(&data);	
 
@@ -358,7 +478,7 @@ void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int32_t>&
 			case 127: return Building::Type::CONSTRUCTION_YARD;
 			case 129: return Building::Type::WIND_TRAP;
 			case 131: return Building::Type::RADAR_OUTPOST;
-			case 133: return Building::Type::SPICE_SILOS;
+			case 133: return Building::Type::SPICE_SILO;
 			case 135: return Building::Type::VEHICLE_FACTORY;
 			case 159: return Building::Type::BARRACKS;
 			case 161: return Building::Type::PALACE;
@@ -394,14 +514,14 @@ void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int32_t>&
 
 				if(bld_type != Building::Type::NONE)
 				{
-					placeBuilding(5, 5, bld_type);
+					placeBuilding(x, y, bld_type);
 				}
 			}
 		}
 }
 
 // See https://gamicus.fandom.com/wiki/List_of_structures_in_Dune_II
-char TileMap::convertTileNumToChar(int32_t index) const noexcept
+int8_t TileMap::convertTileNumToChar(int32_t index) const noexcept
 {
 	switch (index)
 	{

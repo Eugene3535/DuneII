@@ -16,7 +16,7 @@ public:
         NONE,
         CONCRETE_SLAB,
         CONSTRUCTION_YARD,
-        SPICE_SILOS,
+        SPICE_SILO,
         STARPORT,
         WIND_TRAP,
         SPICE_REFINERY,
@@ -34,7 +34,7 @@ public:
 public:
     struct Data
     {
-        sf::IntRect    localBounds{};
+        sf::IntRect    textureRect{};
         sf::IntRect    globalBounds{};
         Building::Type type { Building::NONE };
         int32_t        cost         { 0 };
