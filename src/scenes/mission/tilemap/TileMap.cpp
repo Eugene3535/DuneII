@@ -96,7 +96,7 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 
 			case Building::STARPORT:
 			{
-				data.textureRect = { 0, 196, 96, 96 };
+				data.textureRect = { 0, 192, 96, 96 };
 				data.globalBounds = { coordX, coordY, 96, 96 };
 				data.cost = 500;
 				data.hitPoints = 1000; 
