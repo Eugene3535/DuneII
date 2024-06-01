@@ -7,10 +7,12 @@ Building::Building() noexcept:
     m_cost(0),
     m_isEnemy(false)
 {
+
 }
 
 Building::~Building()
 {
+    
 }
 
 void Building::construct(const Building::Data* data) noexcept
