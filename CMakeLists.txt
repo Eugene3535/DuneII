@@ -14,7 +14,6 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/src/scenes/intro/MainMenu.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/Mission.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/tilemap/TileMap.cpp
-#	${PROJECT_SOURCE_DIR}/src/scenes/mission/utils/TileAnimator.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/Building.cpp
 	${PROJECT_SOURCE_DIR}/src/main.cpp
 )

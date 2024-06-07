@@ -8,6 +8,33 @@
 #include "loaders/Assets.hpp"
 #include "scenes/mission/tilemap/TileMap.hpp"
 
+namespace
+{
+	sf::IntRect getTexCoords(Building::Type type) noexcept
+	{
+		switch (type)
+		{
+			case Building::CONCRETE_SLAB:      return { 0, 160, 32, 32   };
+			case Building::CONSTRUCTION_YARD:  return { 0, 32, 64, 64    };
+			case Building::SPICE_SILO:         return { 192, 32, 64, 64  };
+			case Building::STARPORT:           return { 0, 192, 96, 96   };
+			case Building::WIND_TRAP:          return { 64, 32, 64, 64   };
+			case Building::SPICE_REFINERY:     return { 416, 0, 96, 64   };
+			case Building::RADAR_OUTPOST:      return { 128, 32, 64, 64  };
+			case Building::REPAIR_FACILITY:    return { 224, 96, 96, 64  };
+			case Building::PALACE:             return { 64, 96, 96, 96   };
+			case Building::HIGH_TECH_FACILITY: return { 160, 96, 64, 64  };
+			case Building::BARRACKS:           return { 0, 96, 64, 64    };
+			case Building::VEHICLE_FACTORY:    return { 256, 32, 96, 64  };
+			case Building::WALL:               return { 0, 0, 32, 32     };
+			case Building::TURRET:             return { 192, 288, 32, 32 };
+			case Building::ROCKET_TURRET:      return { 448, 288, 32, 32 };
+
+			default: return sf::IntRect();
+		}
+	}
+}
+
 bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 {
 //  Make sure it hasn't been downloaded before
@@ -37,12 +64,12 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 	return false;
 }
 
-Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noexcept
+Building* TileMap::placeBuilding(int x, int y, Building::Type type) noexcept
 {
-	auto setupTilesOnMask = [](char** mask, int32_t x, int32_t y, int32_t width, int32_t height, char symbol = 'B')
+	auto setupTilesOnMask = [](char** mask, int x, int y, int width, int height, char symbol = 'B')
 	{
-		for (int32_t i = 0; i < height; ++i)
-			for (int32_t j = 0; j < width; ++j)
+		for (int i = 0; i < height; ++i)
+			for (int j = 0; j < width; ++j)
 				mask[x + j][y + i] = symbol;
 	};
 
@@ -52,8 +79,8 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 	Building::Data data = {};
 	data.type = type;
 
-	int32_t coordX = (x << 5);
-	int32_t coordY = (y << 5);
+	int coordX = (x << 5);
+	int coordY = (y << 5);
 
 	if(auto texture = Assets::instance()->getTexture("Buildings.png"); texture != nullptr)
 	{
@@ -63,7 +90,7 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 			{
 				return nullptr;
 
-				data.textureRect = { 0, 160, 32, 32 };
+				data.textureRect = getTexCoords(type);
 				data.globalBounds = { coordX, coordY, 32, 32 };
 				data.cost = 5;
 				data.hitPoints = 40; 
@@ -74,7 +101,7 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 
 			case Building::CONSTRUCTION_YARD:
 			{
-				data.textureRect = { 0, 32, 64, 64 };
+				data.textureRect = getTexCoords(type);
 				data.globalBounds = { coordX, coordY, 64, 64 };
 				data.cost = 900;
 				data.hitPoints = 400; 
@@ -85,7 +112,7 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 
 			case Building::SPICE_SILO:
 			{
-				data.textureRect = { 192, 32, 64, 64 };
+				data.textureRect = getTexCoords(type);
 				data.globalBounds = { coordX, coordY, 64, 64 };
 				data.cost = 300;
 				data.hitPoints = 150; 
@@ -96,7 +123,7 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 
 			case Building::STARPORT:
 			{
-				data.textureRect = { 0, 192, 96, 96 };
+				data.textureRect = getTexCoords(type);
 				data.globalBounds = { coordX, coordY, 96, 96 };
 				data.cost = 500;
 				data.hitPoints = 1000; 
@@ -107,7 +134,7 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 
 			case Building::WIND_TRAP:
 			{
-				data.textureRect = { 64, 32, 64, 64 };
+				data.textureRect = getTexCoords(type);
 				data.globalBounds = { coordX, coordY, 64, 64 };
 				data.cost = 300;
 				data.hitPoints = 400; 
@@ -118,7 +145,7 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 
 			case Building::SPICE_REFINERY:
 			{
-				data.textureRect = { 416, 0, 96, 64 };
+				data.textureRect = getTexCoords(type);
 				data.globalBounds = { coordX, coordY, 96, 64 };
 				data.cost = 300;
 				data.hitPoints = 400; 
@@ -129,7 +156,7 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 
 			case Building::RADAR_OUTPOST:
 			{
-				data.textureRect = { 128, 32, 64, 64 };
+				data.textureRect = getTexCoords(type);
 				data.globalBounds = { coordX, coordY, 64, 64 };
 				data.cost = 400;
 				data.hitPoints = 1000; 
@@ -140,7 +167,7 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 
 			case Building::REPAIR_FACILITY:
 			{
-				data.textureRect = { 224, 96, 96, 64 };
+				data.textureRect = getTexCoords(type);
 				data.globalBounds = { coordX, coordY, 96, 64 };
 				data.cost = 700;
 				data.hitPoints = 1800; 
@@ -151,7 +178,7 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 
 			case Building::PALACE:
 			{
-				data.textureRect = { 64, 96, 96, 96 };
+				data.textureRect = getTexCoords(type);
 				data.globalBounds = { coordX, coordY, 96, 96 };
 				data.cost = 999;
 				data.hitPoints = 2000; 
@@ -162,7 +189,7 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 
 			case Building::HIGH_TECH_FACILITY:
 			{
-				data.textureRect = { 160, 96, 64, 64 };
+				data.textureRect = getTexCoords(type);
 				data.globalBounds = { coordX, coordY, 64, 64 };
 				data.cost = 500;
 				data.hitPoints = 1000; 
@@ -173,7 +200,7 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 
 			case Building::BARRACKS:
 			{
-				data.textureRect = { 0, 96, 64, 64 };
+				data.textureRect = getTexCoords(type);
 				data.globalBounds = { coordX, coordY, 64, 64 };
 				data.cost = 300;
 				data.hitPoints = 600; 
@@ -184,7 +211,7 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 
 			case Building::VEHICLE_FACTORY:
 			{
-				data.textureRect = { 256, 32, 96, 64 };
+				data.textureRect = getTexCoords(type);
 				data.globalBounds = { coordX, coordY, 96, 64 };
 				data.cost = 400;
 				data.hitPoints = 800; 
@@ -195,7 +222,7 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 
 			case Building::WALL:
 			{
-				data.textureRect = { 0, 0, 32, 32 };
+				data.textureRect = getTexCoords(type);
 				data.globalBounds = { coordX, coordY, 32, 32 };
 				data.cost = 50;
 				data.hitPoints = 140; 
@@ -206,7 +233,7 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 
 			case Building::TURRET:
 			{
-				data.textureRect = { 192, 288, 32, 32 };
+				data.textureRect = getTexCoords(type);
 				data.globalBounds = { coordX, coordY, 32, 32 };
 				data.cost = 125;
 				data.hitPoints = 250; 
@@ -217,7 +244,7 @@ Building* TileMap::placeBuilding(int32_t x, int32_t y, Building::Type type) noex
 
 			case Building::ROCKET_TURRET:
 			{
-				data.textureRect = { 448, 288, 32, 32 };
+				data.textureRect = getTexCoords(type);
 				data.globalBounds = { coordX, coordY, 32, 32 };
 				data.cost = 250;
 				data.hitPoints = 500; 
@@ -270,10 +297,10 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 	auto pTileW = map_node->first_attribute("tilewidth");
 	auto pTileH = map_node->first_attribute("tileheight");
 
-	const int32_t map_width   = pMapW  ? std::atoi(pMapW->value())  : 0;
-	const int32_t map_height  = pMapH  ? std::atoi(pMapH->value())  : 0;
-	const int32_t tile_width  = pTileW ? std::atoi(pTileW->value()) : 0;
-	const int32_t tile_height = pTileH ? std::atoi(pTileH->value()) : 0;
+	const int map_width   = pMapW  ? std::atoi(pMapW->value())  : 0;
+	const int map_height  = pMapH  ? std::atoi(pMapH->value())  : 0;
+	const int tile_width  = pTileW ? std::atoi(pTileW->value()) : 0;
+	const int tile_height = pTileH ? std::atoi(pTileH->value()) : 0;
 
 	if (!(map_width && map_height && tile_width && tile_height))
 		return false;
@@ -300,14 +327,14 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 
 		if(auto data_node = layer_node->first_node("data"); data_node != nullptr)
 		{
-			std::vector<int32_t> parsed_layer;
+			std::vector<int> parsed_layer;
 			std::string data(data_node->value());
 
 			std::replace(data.begin(), data.end(), ',', ' ');
 
 			std::stringstream sstream(data);
 			{
-				int32_t tile_num = 0;
+				int tile_num = 0;
 
 				while(sstream >> tile_num)
 					parsed_layer.push_back(tile_num);
@@ -317,8 +344,8 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 				return false;
 
 			const auto bounds = std::minmax_element(parsed_layer.begin(), parsed_layer.end());
-			const int32_t min_tile = *bounds.first;
-			const int32_t max_tile = *bounds.second;
+			const int min_tile = *bounds.first;
+			const int max_tile = *bounds.second;
 
 			auto current_tileset = std::find_if(tilesets.begin(), tilesets.end(),
 				[min_tile, max_tile](const TileMap::Tileset& ts)
@@ -426,24 +453,24 @@ void TileMap::parseTilesets(const rapidxml::xml_node<char>* map_node, std::vecto
 	}
 }
 
-void TileMap::parseLandscape(const Tileset& tileset, const std::vector<int32_t>& parsed_layer) noexcept
+void TileMap::parseLandscape(const Tileset& tileset, const std::vector<int>& parsed_layer) noexcept
 {
 	std::vector<sf::Vertex> vertices;
 	vertices.reserve(parsed_layer.size());
 
 //  Cached variables
-	const int32_t map_width   = mapSizeInTiles.x;
-	const int32_t map_height  = mapSizeInTiles.y;
-	const int32_t tile_width  = tileSize.x;
-	const int32_t tile_height = tileSize.y;
-	const int32_t columns     = tileset.columns;
-	const int32_t firstGID    = tileset.firstGID;
+	const int map_width   = mapSizeInTiles.x;
+	const int map_height  = mapSizeInTiles.y;
+	const int tile_width  = tileSize.x;
+	const int tile_height = tileSize.y;
+	const int columns     = tileset.columns;
+	const int firstGID    = tileset.firstGID;
 
-	for (int32_t y = 0; y < map_height; ++y)
-		for (int32_t x = 0; x < map_width; ++x)
+	for (int y = 0; y < map_height; ++y)
+		for (int x = 0; x < map_width; ++x)
 		{
-			const int32_t index = y * map_width + x;
-			const int32_t tile_id = parsed_layer[index];
+			const int index = y * map_width + x;
+			const int tile_id = parsed_layer[index];
 			tileMask[index] = convertTileNumToChar(tile_id);
 
 //  Vertex XY coords				
@@ -451,9 +478,9 @@ void TileMap::parseLandscape(const Tileset& tileset, const std::vector<int32_t>&
 			const float cY = static_cast<float>(y * tile_height);
 
 //  Left-top coords of the tile in texture grid
-			const int32_t tile_num = tile_id - firstGID;
-			const int32_t top = (tile_num >= columns) ? tile_num / columns : 0;
-			const int32_t left = tile_num % columns;
+			const int tile_num = tile_id - firstGID;
+			const int top = (tile_num >= columns) ? tile_num / columns : 0;
+			const int left = tile_num % columns;
 			const sf::Vector2f point(left * tile_width, top * tile_height);
 
 //  First triangle
@@ -477,9 +504,9 @@ void TileMap::parseLandscape(const Tileset& tileset, const std::vector<int32_t>&
 	}
 }
 
-void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int32_t>& parsed_layer) noexcept
+void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int>& parsed_layer) noexcept
 {
-	auto get_building_type = [](int32_t tile_num)
+	auto get_building_type = [](int tile_num)
 	{
 		switch (tile_num)
 		{
@@ -503,19 +530,19 @@ void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int32_t>&
 	};
 
 //  Cached variables
-	const int32_t map_width   = mapSizeInTiles.x;
-	const int32_t map_height  = mapSizeInTiles.y;
-	const int32_t tile_width  = tileSize.x;
-	const int32_t tile_height = tileSize.y;
-	const int32_t columns     = tileset.columns;
-	const int32_t firstGID    = tileset.firstGID;
-	const int32_t tile_count  = tileset.tileCount;
+	const int map_width   = mapSizeInTiles.x;
+	const int map_height  = mapSizeInTiles.y;
+	const int tile_width  = tileSize.x;
+	const int tile_height = tileSize.y;
+	const int columns     = tileset.columns;
+	const int firstGID    = tileset.firstGID;
+	const int tile_count  = tileset.tileCount;
 
-	for (int32_t y = 0; y < map_height; ++y)
-		for (int32_t x = 0; x < map_width; ++x)
+	for (int y = 0; y < map_height; ++y)
+		for (int x = 0; x < map_width; ++x)
 		{
-			const int32_t index = y * map_width + x;
-			const int32_t tile_id = parsed_layer[index];
+			const int index = y * map_width + x;
+			const int tile_id = parsed_layer[index];
 
 			if (tile_id)
 			{
@@ -532,7 +559,7 @@ void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int32_t>&
 }
 
 // See https://gamicus.fandom.com/wiki/List_of_structures_in_Dune_II
-char TileMap::convertTileNumToChar(int32_t index) const noexcept
+char TileMap::convertTileNumToChar(int index) const noexcept
 {
 	switch (index)
 	{
