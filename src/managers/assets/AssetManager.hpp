@@ -11,13 +11,13 @@
 
 #include "utils/FileProvider.hpp"
 
-class Assets final:
+class AssetManager final:
     private sf::NonCopyable
 {
 public:
-    Assets() noexcept;
+    AssetManager() noexcept;
 
-    static Assets* instance() noexcept;
+    static AssetManager* instance() noexcept;
 
     sf::Texture* getTexture(const std::string& filename) noexcept;
     sf::Font*    getFont(const std::string& filename)    noexcept;
@@ -31,9 +31,11 @@ private:
     std::unordered_map<std::string, sf::Font>    m_fonts;
 
 private:
-    static Assets* m_instance;
+    static AssetManager* m_instance;
 };
 
-#include "loaders/Assets.inl"
+#include "managers/assets/AssetManager.inl"
+
+#define Assets AssetManager::instance
 
 #endif

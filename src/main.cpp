@@ -11,7 +11,7 @@ int main()
 {
     Game game;
 
-    Assets assets;
+    AssetManager assets;
 
     ScreenBlackoutEffect fade_effect;
 

@@ -7,7 +7,7 @@ set(BUILD_SHARED_LIBS OFF)
 
 set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/src/utils/FileProvider.cpp
-	${PROJECT_SOURCE_DIR}/src/loaders/Assets.cpp
+	${PROJECT_SOURCE_DIR}/src/managers/assets/AssetManager.cpp
 	${PROJECT_SOURCE_DIR}/src/animation/Animation.hpp
 	${PROJECT_SOURCE_DIR}/src/effects/ScreenBlackoutEffect.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/Scene.cpp

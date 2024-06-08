@@ -9,7 +9,7 @@ class Building final:
     public sf::Sprite
 {
 public:
-    enum Type: int32_t
+    enum Type: int
     {
         NONE,
         CONCRETE_SLAB,
@@ -35,9 +35,9 @@ public:
         sf::IntRect    textureRect{};
         sf::IntRect    globalBounds{};
         Building::Type type { Building::NONE };
-        int32_t        cost         { 0 };
-        int32_t        hitPoints    { 0 };
-        int32_t        maxHitPoints { 0 };
+        int cost         { 0 };
+        int hitPoints    { 0 };
+        int maxHitPoints { 0 };
         
         bool hasAnAnimatedDynastyFlag { false };
         bool hasAnAnimatedLandingPad  { false };
@@ -48,15 +48,15 @@ public:
     Building() noexcept;
     ~Building();
 
-    void construct(const struct Building::Data* data) noexcept;
+    void construct(const Data* data) noexcept;
 
-    void repair(int32_t points) noexcept;
-    void damage(int32_t points) noexcept;
+    void repair(int points) noexcept;
+    void damage(int points) noexcept;
 
     Type               type()      const noexcept;
     const sf::IntRect& bounds()    const noexcept;
-    int32_t            hitPoints() const noexcept;
-    int32_t            cost()      const noexcept;
+    int            hitPoints() const noexcept;
+    int            cost()      const noexcept;
 
     bool isEnemy() const noexcept;
     bool isDestroyed() const noexcept;
@@ -68,10 +68,10 @@ protected:
     sf::IntRect m_bounds;
 
 protected:
-    int32_t m_hitPoints;
-    int32_t m_maxHitPoints;
-    int32_t m_cost;
-    bool    m_isEnemy;
+    int  m_hitPoints;
+    int  m_maxHitPoints;
+    int  m_cost;
+    bool m_isEnemy;
 };
 
 #endif // !BUILDING_HPP

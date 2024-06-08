@@ -1,19 +1,19 @@
-#include "loaders/Assets.hpp"
+#include "managers/assets/AssetManager.hpp"
 
-Assets* Assets::m_instance;
+AssetManager* AssetManager::m_instance;
 
-Assets::Assets() noexcept
+AssetManager::AssetManager() noexcept
 {
     if (m_instance == nullptr)
         m_instance = this;
 }
 
-Assets* Assets::instance() noexcept
+AssetManager* AssetManager::instance() noexcept
 {
     return m_instance;
 }
 
-sf::Texture* Assets::getTexture(const std::string& filename) noexcept
+sf::Texture* AssetManager::getTexture(const std::string& filename) noexcept
 {
     if (m_instance)
     {
@@ -27,7 +27,7 @@ sf::Texture* Assets::getTexture(const std::string& filename) noexcept
     return nullptr;
 }
 
-sf::Font* Assets::getFont(const std::string& filename) noexcept
+sf::Font* AssetManager::getFont(const std::string& filename) noexcept
 {
     if (m_instance)
     {

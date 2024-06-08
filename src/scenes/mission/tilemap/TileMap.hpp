@@ -26,7 +26,6 @@ private:
 public:
 	struct Landscape 
 	{
-	public:
 		sf::VertexBuffer vertices;
 		const sf::Texture* texture { nullptr };
 	};

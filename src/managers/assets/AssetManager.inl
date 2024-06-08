@@ -1,5 +1,5 @@
 template<class T>
-T* Assets::tryLoadFromFile(const std::string& filename, std::unordered_map<std::string, T>& container) noexcept
+T* AssetManager::tryLoadFromFile(const std::string& filename, std::unordered_map<std::string, T>& container) noexcept
 {
     const auto filepath = FileProvider().findPathToFile(filename);
 

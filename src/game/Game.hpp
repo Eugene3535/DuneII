@@ -8,7 +8,7 @@
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 
-#include "loaders/Assets.hpp"
+#include "managers/assets/AssetManager.hpp"
 
 #include "effects/ScreenBlackoutEffect.hpp"
 

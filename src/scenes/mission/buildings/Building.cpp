@@ -24,7 +24,7 @@ void Building::construct(const Building::Data* data) noexcept
     m_maxHitPoints = data->maxHitPoints;
 }
 
-void Building::repair(int32_t points) noexcept
+void Building::repair(int points) noexcept
 {
     if( (m_type != Building::CONCRETE_SLAB) && (m_type != Building::WALL) )
     {
@@ -35,7 +35,7 @@ void Building::repair(int32_t points) noexcept
     }
 }
 
-void Building::damage(int32_t points) noexcept
+void Building::damage(int points) noexcept
 {
     m_hitPoints -= points;
 }
@@ -50,12 +50,12 @@ const sf::IntRect& Building::bounds() const noexcept
     return m_bounds;
 }
 
-int32_t Building::hitPoints() const noexcept
+int Building::hitPoints() const noexcept
 {
     return (m_hitPoints > 0) ? m_hitPoints : 0;
 }
 
-int32_t Building::cost() const noexcept
+int Building::cost() const noexcept
 {
     return m_cost;
 }
