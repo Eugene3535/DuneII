@@ -10,6 +10,8 @@
 
 #include "rapidxml.hpp"
 
+#include "utils/Defines.hpp"
+#include "utils/ObjectPool.hpp"
 #include "scenes/mission/buildings/Building.hpp"
 
 class TileMap
@@ -49,7 +51,9 @@ public:
 
 public:
 	bool loadFromFile(const std::filesystem::path& file_path) noexcept;
-	Building* placeBuilding(int32_t x, int32_t y, Building::Type type) noexcept;
+
+	int32_t costOf(Building::Type type) const noexcept;
+	Building* placeBuilding(Building::Type type, int32_t cellX, int32_t cellY) noexcept;
 	void reset() noexcept;
 
 private:
@@ -62,7 +66,11 @@ private:
 	void parseBuildings(const Tileset& tileset, const std::vector<int32_t>& parsed_layer)     noexcept;
 
 private:
-	char convertTileNumToChar(int32_t index) const noexcept;
+	char        convertTileNumToChar(int32_t index) const noexcept;
+    sf::IntRect getTexCoords(Building::Type type) const noexcept;
+
+private:
+    ObjectPool<Building, BUILDING_MAX_COUNT> m_buildings;
 
 public:
 	Landscape landscape;

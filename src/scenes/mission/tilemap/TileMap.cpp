@@ -58,29 +58,53 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 		return false;
 
 	if(loadLayers(map_node))
-		if(loadObjects(map_node))
+//		if(loadObjects(map_node))
 			return true;
 
 	return false;
 }
 
-Building* TileMap::placeBuilding(int x, int y, Building::Type type) noexcept
+int32_t TileMap::costOf(Building::Type type) const noexcept
 {
-	auto setupTilesOnMask = [](char** mask, int x, int y, int width, int height, char symbol = 'B')
+    switch (type)
+    {
+        case Building::CONCRETE_SLAB:      return 5;
+        case Building::CONSTRUCTION_YARD:  return 900;
+        case Building::SPICE_SILO:         return 300;
+        case Building::STARPORT:           return 500;
+        case Building::WIND_TRAP:          return 300;
+        case Building::SPICE_REFINERY:     return 300;
+        case Building::RADAR_OUTPOST:      return 400;
+        case Building::REPAIR_FACILITY:    return 700;
+        case Building::PALACE:             return 999;
+        case Building::HIGH_TECH_FACILITY: return 500;
+        case Building::BARRACKS:           return 300;
+        case Building::VEHICLE_FACTORY:    return 400;
+        case Building::WALL:               return 50;
+        case Building::TURRET:             return 125;
+        case Building::ROCKET_TURRET:      return 250;    
+
+        default: return 0;
+    }
+}
+
+Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cellY) noexcept
+{
+	auto setupTilesOnMask = [](char** mask, int32_t x, int32_t y, int32_t width, int32_t height, char symbol = 'B')
 	{
-		for (int i = 0; i < height; ++i)
-			for (int j = 0; j < width; ++j)
+		for (int32_t i = 0; i < height; ++i)
+			for (int32_t j = 0; j < width; ++j)
 				mask[x + j][y + i] = symbol;
 	};
 
-	if(x < 0 || y < 0)
+	if(cellX < 0 || cellY < 0)
 		return nullptr;
 
 	Building::Data data = {};
 	data.type = type;
 
-	int coordX = (x << 5);
-	int coordY = (y << 5);
+	int32_t coordX = (cellX << 5);
+	int32_t coordY = (cellY << 5);
 
 	if(auto texture = Assets()->getTexture("Buildings.png"); texture != nullptr)
 	{
@@ -95,7 +119,7 @@ Building* TileMap::placeBuilding(int x, int y, Building::Type type) noexcept
 				data.cost = 5;
 				data.hitPoints = 40; 
 				data.maxHitPoints = 40;
-				setupTilesOnMask(collisionMask.data(), x, y, 1, 1, 'C');
+				setupTilesOnMask(collisionMask.data(), cellX, cellY, 1, 1, 'C');
 			}
 			break;
 
@@ -106,7 +130,7 @@ Building* TileMap::placeBuilding(int x, int y, Building::Type type) noexcept
 				data.cost = 900;
 				data.hitPoints = 400; 
 				data.maxHitPoints = 400;
-				setupTilesOnMask(collisionMask.data(), x, y, 2, 2);
+				setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);
 			}
 			break;
 
@@ -117,7 +141,7 @@ Building* TileMap::placeBuilding(int x, int y, Building::Type type) noexcept
 				data.cost = 300;
 				data.hitPoints = 150; 
 				data.maxHitPoints = 150;
-				setupTilesOnMask(collisionMask.data(), x, y, 2, 2);
+				setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);
 			}
 			break;
 
@@ -128,7 +152,7 @@ Building* TileMap::placeBuilding(int x, int y, Building::Type type) noexcept
 				data.cost = 500;
 				data.hitPoints = 1000; 
 				data.maxHitPoints = 1000;
-				setupTilesOnMask(collisionMask.data(), x, y, 3, 3);
+				setupTilesOnMask(collisionMask.data(), cellX, cellY, 3, 3);
 			} 
 			break;
 
@@ -139,7 +163,7 @@ Building* TileMap::placeBuilding(int x, int y, Building::Type type) noexcept
 				data.cost = 300;
 				data.hitPoints = 400; 
 				data.maxHitPoints = 400;
-				setupTilesOnMask(collisionMask.data(), x, y, 2, 2);
+				setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);
 			}
 			break;
 
@@ -150,7 +174,7 @@ Building* TileMap::placeBuilding(int x, int y, Building::Type type) noexcept
 				data.cost = 300;
 				data.hitPoints = 400; 
 				data.maxHitPoints = 400;
-				setupTilesOnMask(collisionMask.data(), x, y, 3, 2);
+				setupTilesOnMask(collisionMask.data(), cellX, cellY, 3, 2);
 			}
 			break;
 
@@ -161,7 +185,7 @@ Building* TileMap::placeBuilding(int x, int y, Building::Type type) noexcept
 				data.cost = 400;
 				data.hitPoints = 1000; 
 				data.maxHitPoints = 1000;
-				setupTilesOnMask(collisionMask.data(), x, y, 2, 2);
+				setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);
 			}
 			break;
 
@@ -172,7 +196,7 @@ Building* TileMap::placeBuilding(int x, int y, Building::Type type) noexcept
 				data.cost = 700;
 				data.hitPoints = 1800; 
 				data.maxHitPoints = 1800;
-				setupTilesOnMask(collisionMask.data(), x, y, 3, 2);
+				setupTilesOnMask(collisionMask.data(), cellX, cellY, 3, 2);
 			}
 			break;
 
@@ -183,7 +207,7 @@ Building* TileMap::placeBuilding(int x, int y, Building::Type type) noexcept
 				data.cost = 999;
 				data.hitPoints = 2000; 
 				data.maxHitPoints = 2000;
-				setupTilesOnMask(collisionMask.data(), x, y, 3, 3);
+				setupTilesOnMask(collisionMask.data(), cellX, cellY, 3, 3);
 			}
 			break;
 
@@ -194,7 +218,7 @@ Building* TileMap::placeBuilding(int x, int y, Building::Type type) noexcept
 				data.cost = 500;
 				data.hitPoints = 1000; 
 				data.maxHitPoints = 1000;
-				setupTilesOnMask(collisionMask.data(), x, y, 2, 2);
+				setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);
 			}
 			break;
 
@@ -205,7 +229,7 @@ Building* TileMap::placeBuilding(int x, int y, Building::Type type) noexcept
 				data.cost = 300;
 				data.hitPoints = 600; 
 				data.maxHitPoints = 600;
-				setupTilesOnMask(collisionMask.data(), x, y, 2, 2);
+				setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);
 			}
 			break;
 
@@ -216,7 +240,7 @@ Building* TileMap::placeBuilding(int x, int y, Building::Type type) noexcept
 				data.cost = 400;
 				data.hitPoints = 800; 
 				data.maxHitPoints = 800;
-				setupTilesOnMask(collisionMask.data(), x, y, 3, 2);
+				setupTilesOnMask(collisionMask.data(), cellX, cellY, 3, 2);
 			}
 			break;
 
@@ -227,7 +251,7 @@ Building* TileMap::placeBuilding(int x, int y, Building::Type type) noexcept
 				data.cost = 50;
 				data.hitPoints = 140; 
 				data.maxHitPoints = 140;
-				setupTilesOnMask(collisionMask.data(), x, y, 1, 1, 'W');
+				setupTilesOnMask(collisionMask.data(), cellX, cellY, 1, 1, 'W');
 			}
 			break;
 
@@ -238,7 +262,7 @@ Building* TileMap::placeBuilding(int x, int y, Building::Type type) noexcept
 				data.cost = 125;
 				data.hitPoints = 250; 
 				data.maxHitPoints = 250;
-				setupTilesOnMask(collisionMask.data(), x, y, 1, 1);
+				setupTilesOnMask(collisionMask.data(), cellX, cellY, 1, 1);
 			}
 			break;
 
@@ -249,7 +273,7 @@ Building* TileMap::placeBuilding(int x, int y, Building::Type type) noexcept
 				data.cost = 250;
 				data.hitPoints = 500; 
 				data.maxHitPoints = 500;
-				setupTilesOnMask(collisionMask.data(), x, y, 1, 1);
+				setupTilesOnMask(collisionMask.data(), cellX, cellY, 1, 1);
 			}
 			break;
 		}
@@ -297,10 +321,10 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 	auto pTileW = map_node->first_attribute("tilewidth");
 	auto pTileH = map_node->first_attribute("tileheight");
 
-	const int map_width   = pMapW  ? std::atoi(pMapW->value())  : 0;
-	const int map_height  = pMapH  ? std::atoi(pMapH->value())  : 0;
-	const int tile_width  = pTileW ? std::atoi(pTileW->value()) : 0;
-	const int tile_height = pTileH ? std::atoi(pTileH->value()) : 0;
+	const int32_t map_width   = pMapW  ? std::atoi(pMapW->value())  : 0;
+	const int32_t map_height  = pMapH  ? std::atoi(pMapH->value())  : 0;
+	const int32_t tile_width  = pTileW ? std::atoi(pTileW->value()) : 0;
+	const int32_t tile_height = pTileH ? std::atoi(pTileH->value()) : 0;
 
 	if (!(map_width && map_height && tile_width && tile_height))
 		return false;
@@ -334,7 +358,7 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 
 			std::stringstream sstream(data);
 			{
-				int tile_num = 0;
+				int32_t tile_num = 0;
 
 				while(sstream >> tile_num)
 					parsed_layer.push_back(tile_num);
@@ -344,8 +368,8 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 				return false;
 
 			const auto bounds = std::minmax_element(parsed_layer.begin(), parsed_layer.end());
-			const int min_tile = *bounds.first;
-			const int max_tile = *bounds.second;
+			const int32_t min_tile = *bounds.first;
+			const int32_t max_tile = *bounds.second;
 
 			auto current_tileset = std::find_if(tilesets.begin(), tilesets.end(),
 				[min_tile, max_tile](const TileMap::Tileset& ts)
@@ -459,18 +483,18 @@ void TileMap::parseLandscape(const Tileset& tileset, const std::vector<int>& par
 	vertices.reserve(parsed_layer.size());
 
 //  Cached variables
-	const int map_width   = mapSizeInTiles.x;
-	const int map_height  = mapSizeInTiles.y;
-	const int tile_width  = tileSize.x;
-	const int tile_height = tileSize.y;
-	const int columns     = tileset.columns;
-	const int firstGID    = tileset.firstGID;
+	const int32_t map_width   = mapSizeInTiles.x;
+	const int32_t map_height  = mapSizeInTiles.y;
+	const int32_t tile_width  = tileSize.x;
+	const int32_t tile_height = tileSize.y;
+	const int32_t columns     = tileset.columns;
+	const int32_t firstGID    = tileset.firstGID;
 
-	for (int y = 0; y < map_height; ++y)
-		for (int x = 0; x < map_width; ++x)
+	for (int32_t y = 0; y < map_height; ++y)
+		for (int32_t x = 0; x < map_width; ++x)
 		{
-			const int index = y * map_width + x;
-			const int tile_id = parsed_layer[index];
+			const int32_t index = y * map_width + x;
+			const int32_t tile_id = parsed_layer[index];
 			tileMask[index] = convertTileNumToChar(tile_id);
 
 //  Vertex XY coords				
@@ -478,9 +502,9 @@ void TileMap::parseLandscape(const Tileset& tileset, const std::vector<int>& par
 			const float cY = static_cast<float>(y * tile_height);
 
 //  Left-top coords of the tile in texture grid
-			const int tile_num = tile_id - firstGID;
-			const int top = (tile_num >= columns) ? tile_num / columns : 0;
-			const int left = tile_num % columns;
+			const int32_t tile_num = tile_id - firstGID;
+			const int32_t top = (tile_num >= columns) ? tile_num / columns : 0;
+			const int32_t left = tile_num % columns;
 			const sf::Vector2f point(left * tile_width, top * tile_height);
 
 //  First triangle
@@ -506,43 +530,43 @@ void TileMap::parseLandscape(const Tileset& tileset, const std::vector<int>& par
 
 void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int>& parsed_layer) noexcept
 {
-	auto get_building_type = [](int tile_num)
+	auto get_building_type = [](int32_t tile_num)
 	{
 		switch (tile_num)
 		{
-			case 111 ... 120: return Building::Type::WALL;
-			case 124: return Building::Type::SPICE_REFINERY;
-			case 127: return Building::Type::CONSTRUCTION_YARD;
-			case 129: return Building::Type::WIND_TRAP;
-			case 131: return Building::Type::RADAR_OUTPOST;
-			case 133: return Building::Type::SPICE_SILO;
-			case 135: return Building::Type::VEHICLE_FACTORY;
-			case 159: return Building::Type::BARRACKS;
-			case 161: return Building::Type::PALACE;
-			case 164: return Building::Type::HIGH_TECH_FACILITY;
-			case 166: return Building::Type::REPAIR_FACILITY;
-			case 207: return Building::Type::STARPORT;
-			case 261: return Building::Type::TURRET;
-			case 269: return Building::Type::ROCKET_TURRET;
+			case 111 ... 120: return Building::WALL;
+			case 124: return Building::SPICE_REFINERY;
+			case 127: return Building::CONSTRUCTION_YARD;
+			case 129: return Building::WIND_TRAP;
+			case 131: return Building::RADAR_OUTPOST;
+			case 133: return Building::SPICE_SILO;
+			case 135: return Building::VEHICLE_FACTORY;
+			case 159: return Building::BARRACKS;
+			case 161: return Building::PALACE;
+			case 164: return Building::HIGH_TECH_FACILITY;
+			case 166: return Building::REPAIR_FACILITY;
+			case 207: return Building::STARPORT;
+			case 261: return Building::TURRET;
+			case 269: return Building::ROCKET_TURRET;
 		
-			default: return Building::Type::NONE;
+			default: return Building::NONE;
 		}
 	};
 
 //  Cached variables
-	const int map_width   = mapSizeInTiles.x;
-	const int map_height  = mapSizeInTiles.y;
-	const int tile_width  = tileSize.x;
-	const int tile_height = tileSize.y;
-	const int columns     = tileset.columns;
-	const int firstGID    = tileset.firstGID;
-	const int tile_count  = tileset.tileCount;
+	const int32_t map_width   = mapSizeInTiles.x;
+	const int32_t map_height  = mapSizeInTiles.y;
+	const int32_t tile_width  = tileSize.x;
+	const int32_t tile_height = tileSize.y;
+	const int32_t columns     = tileset.columns;
+	const int32_t firstGID    = tileset.firstGID;
+	const int32_t tile_count  = tileset.tileCount;
 
-	for (int y = 0; y < map_height; ++y)
-		for (int x = 0; x < map_width; ++x)
+	for (int32_t y = 0; y < map_height; ++y)
+		for (int32_t x = 0; x < map_width; ++x)
 		{
-			const int index = y * map_width + x;
-			const int tile_id = parsed_layer[index];
+			const int32_t index = y * map_width + x;
+			const int32_t tile_id = parsed_layer[index];
 
 			if (tile_id)
 			{
@@ -552,14 +576,13 @@ void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int>& par
 
 				if(bld_type != Building::Type::NONE)
 				{
-					placeBuilding(x, y, bld_type);
+					placeBuilding(bld_type, x, y);
 				}
 			}
 		}
 }
 
-// See https://gamicus.fandom.com/wiki/List_of_structures_in_Dune_II
-char TileMap::convertTileNumToChar(int index) const noexcept
+char TileMap::convertTileNumToChar(int32_t index) const noexcept
 {
 	switch (index)
 	{
@@ -606,4 +629,28 @@ char TileMap::convertTileNumToChar(int index) const noexcept
 
 		default: return 'S'; // sandy soil by default
 	}
+}
+
+sf::IntRect TileMap::getTexCoords(Building::Type type) const noexcept
+{
+    switch (type)
+    {
+        case Building::CONCRETE_SLAB:      return { 0, 160, 32, 32   };
+        case Building::CONSTRUCTION_YARD:  return { 0, 32, 64, 64    };
+        case Building::SPICE_SILO:         return { 192, 32, 64, 64  };
+        case Building::STARPORT:           return { 0, 192, 96, 96   };
+        case Building::WIND_TRAP:          return { 64, 32, 64, 64   };
+        case Building::SPICE_REFINERY:     return { 416, 0, 96, 64   };
+        case Building::RADAR_OUTPOST:      return { 128, 32, 64, 64  };
+        case Building::REPAIR_FACILITY:    return { 224, 96, 96, 64  };
+        case Building::PALACE:             return { 64, 96, 96, 96   };
+        case Building::HIGH_TECH_FACILITY: return { 160, 96, 64, 64  };
+        case Building::BARRACKS:           return { 0, 96, 64, 64    };
+        case Building::VEHICLE_FACTORY:    return { 256, 32, 96, 64  };
+        case Building::WALL:               return { 0, 0, 32, 32     };
+        case Building::TURRET:             return { 192, 288, 32, 32 };
+        case Building::ROCKET_TURRET:      return { 448, 288, 32, 32 };
+
+        default: return sf::IntRect();
+    }
 }
