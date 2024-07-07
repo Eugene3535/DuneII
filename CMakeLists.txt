@@ -8,7 +8,6 @@ set(BUILD_SHARED_LIBS OFF)
 set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/src/utils/FileProvider.cpp
 	${PROJECT_SOURCE_DIR}/src/managers/assets/AssetManager.cpp
-	${PROJECT_SOURCE_DIR}/src/managers/buildings/BuildingManager.cpp
 	${PROJECT_SOURCE_DIR}/src/animation/Animation.hpp
 	${PROJECT_SOURCE_DIR}/src/effects/ScreenBlackoutEffect.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/Scene.cpp
@@ -16,6 +15,7 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/Mission.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/tilemap/TileMap.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/Building.cpp
+	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/Builder.cpp
 	${PROJECT_SOURCE_DIR}/src/main.cpp
 )
 

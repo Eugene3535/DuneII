@@ -1,22 +1,22 @@
 
 #include "scenes/mission/tilemap/TileMap.hpp"
-#include "managers/buildings/BuildingManager.hpp"
+#include "scenes/mission/buildings/Builder.hpp"
 
-BuildingManager::BuildingManager() noexcept
+Builder::Builder() noexcept
 {
 
 }
 
-BuildingManager::~BuildingManager()
+Builder::~Builder()
 {
 }
 
-bool BuildingManager::load(TileMap* tilemap) noexcept
+bool Builder::loadFromTilemap(TileMap* tilemap) noexcept
 {
     return false;
 }
 
-Building* BuildingManager::construct(Building::Type type, int32_t cellX, int32_t cellY) noexcept
+Building* Builder::construct(Building::Type type, int32_t cellX, int32_t cellY) noexcept
 {
     if(auto building = m_buildings.findUnusedObject(); building != nullptr)
     {
@@ -26,12 +26,12 @@ Building* BuildingManager::construct(Building::Type type, int32_t cellX, int32_t
     return nullptr;
 }
 
-void BuildingManager::destroy(const Building* target) noexcept
+void Builder::destroy(const Building* target) noexcept
 {
     m_buildings.returnObjectBack(target);
 }
 
-int32_t BuildingManager::costOf(Building::Type type) const noexcept
+int32_t Builder::costOf(Building::Type type) const noexcept
 {
     switch (type)
     {
@@ -55,7 +55,7 @@ int32_t BuildingManager::costOf(Building::Type type) const noexcept
     }
 }
 
-sf::IntRect BuildingManager::getTexCoords(Building::Type type) const noexcept
+sf::IntRect Builder::getTexCoords(Building::Type type) const noexcept
 {
     switch (type)
     {

@@ -5,13 +5,13 @@
 #include "utils/ObjectPool.hpp"
 #include "scenes/mission/buildings/Building.hpp"
 
-class BuildingManager
+class Builder
 {
 public:
-    BuildingManager() noexcept;
-    ~BuildingManager();
+    Builder() noexcept;
+    ~Builder();
 
-    bool load(class TileMap* tilemap) noexcept;
+    bool loadFromTilemap(class TileMap* tilemap) noexcept;
 
     Building* construct(Building::Type type, int32_t cellX, int32_t cellY) noexcept;
     void      destroy(const Building* target) noexcept;
