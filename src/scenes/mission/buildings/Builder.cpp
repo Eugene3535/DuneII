@@ -21,6 +21,8 @@ Building* Builder::construct(Building::Type type, int32_t cellX, int32_t cellY) 
     if(auto building = m_buildings.findUnusedObject(); building != nullptr)
     {
 
+
+        m_buildings.returnObjectBack(building);
     }
 
     return nullptr;

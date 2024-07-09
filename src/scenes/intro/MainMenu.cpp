@@ -16,7 +16,7 @@ bool MainMenu::load(const std::string& info) noexcept
     if(m_isLoaded)
         return true;
 
-    if(auto assets = Assets(); assets != nullptr)
+    if(auto assets = Assets; assets != nullptr)
     {
         auto font = assets->getFont("AvanteNrBook.ttf");
         auto texture = assets->getTexture("Dune.png");

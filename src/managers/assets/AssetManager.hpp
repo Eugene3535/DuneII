@@ -36,6 +36,6 @@ private:
 
 #include "managers/assets/AssetManager.inl"
 
-#define Assets AssetManager::instance
+#define Assets AssetManager::instance()
 
 #endif

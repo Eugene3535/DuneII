@@ -106,7 +106,7 @@ Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
 	int32_t coordX = (cellX << 5);
 	int32_t coordY = (cellY << 5);
 
-	if(auto texture = Assets()->getTexture("Buildings.png"); texture != nullptr)
+	if(auto texture = Assets->getTexture("Buildings.png"); texture != nullptr)
 	{
 		switch (type)
 		{
@@ -456,7 +456,7 @@ void TileMap::parseTilesets(const rapidxml::xml_node<char>* map_node, std::vecto
 		if (size_t last_slash_pos = tex_name.find_last_of('/'); last_slash_pos != std::string::npos)
 			tex_name.erase(0, last_slash_pos + 1);
 
-		sf::Texture* tileset = Assets()->getTexture(tex_name);
+		sf::Texture* tileset = Assets->getTexture(tex_name);
 
 		if (tileset == nullptr)
 			continue;

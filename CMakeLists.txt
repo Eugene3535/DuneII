@@ -3,20 +3,25 @@ cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 project(DuneII LANGUAGES C CXX)
 
 set(EXTERNAL_DIR $ENV{External})
-set(BUILD_SHARED_LIBS OFF)
+set(BUILD_SHARED_LIBS ON)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/$<$<CXX_COMPILER_ID:MSVC>:$<CONFIG>>)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/$<$<CXX_COMPILER_ID:MSVC>:$<CONFIG>>)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/$<$<CXX_COMPILER_ID:MSVC>:$<CONFIG>>/lib)
+set(SRC_FILE_DIR ${PROJECT_SOURCE_DIR}/src)
 
 set(SRC_FILES
-	${PROJECT_SOURCE_DIR}/src/utils/FileProvider.cpp
-	${PROJECT_SOURCE_DIR}/src/managers/assets/AssetManager.cpp
-	${PROJECT_SOURCE_DIR}/src/animation/Animation.hpp
-	${PROJECT_SOURCE_DIR}/src/effects/ScreenBlackoutEffect.cpp
-	${PROJECT_SOURCE_DIR}/src/scenes/Scene.cpp
-	${PROJECT_SOURCE_DIR}/src/scenes/intro/MainMenu.cpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/Mission.cpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/tilemap/TileMap.cpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/Building.cpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/Builder.cpp
-	${PROJECT_SOURCE_DIR}/src/main.cpp
+	${SRC_FILE_DIR}/utils/FileProvider.cpp
+	${SRC_FILE_DIR}/managers/assets/AssetManager.cpp
+	${SRC_FILE_DIR}/animation/Animation.hpp
+	${SRC_FILE_DIR}/effects/ScreenBlackoutEffect.cpp
+	${SRC_FILE_DIR}/scenes/Scene.cpp
+	${SRC_FILE_DIR}/scenes/intro/MainMenu.cpp
+	${SRC_FILE_DIR}/scenes/mission/Mission.cpp
+	${SRC_FILE_DIR}/scenes/mission/tilemap/TileMap.cpp
+	${SRC_FILE_DIR}/scenes/mission/buildings/Building.cpp
+	${SRC_FILE_DIR}/scenes/mission/buildings/Builder.cpp
+	${SRC_FILE_DIR}/main.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SRC_FILES})
@@ -39,4 +44,5 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/res             $<TARGET_FILE_DIR:${PROJECT_NAME}>/res
-	COMMAND ${CMAKE_COMMAND} -E copy ${EXTERNAL_DIR}/install/sfml/bin/openal32.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>/openal32.dll)
+	COMMAND ${CMAKE_COMMAND} -E copy ${EXTERNAL_DIR}/install/sfml/bin/openal32.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>/openal32.dll
+)
