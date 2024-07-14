@@ -64,7 +64,7 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 	return false;
 }
 
-int32_t TileMap::costOf(Building::Type type) const noexcept
+int TileMap::costOf(Building::Type type) const noexcept
 {
     switch (type)
     {
@@ -88,12 +88,12 @@ int32_t TileMap::costOf(Building::Type type) const noexcept
     }
 }
 
-Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cellY) noexcept
+Building* TileMap::placeBuilding(Building::Type type, int cellX, int cellY) noexcept
 {
-	auto setupTilesOnMask = [](char** mask, int32_t x, int32_t y, int32_t width, int32_t height, char symbol = 'B')
+	auto setupTilesOnMask = [](char** mask, int x, int y, int width, int height, char symbol = 'B')
 	{
-		for (int32_t i = 0; i < height; ++i)
-			for (int32_t j = 0; j < width; ++j)
+		for (int i = 0; i < height; ++i)
+			for (int j = 0; j < width; ++j)
 				mask[x + j][y + i] = symbol;
 	};
 
@@ -103,10 +103,10 @@ Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
 	Building::Data data = {};
 	data.type = type;
 
-	int32_t coordX = (cellX << 5);
-	int32_t coordY = (cellY << 5);
+	int coordX = (cellX << 5);
+	int coordY = (cellY << 5);
 
-	if(auto texture = Assets->getTexture("Buildings.png"); texture != nullptr)
+	if(const auto texture = Assets->getTexture("Buildings.png"); texture != nullptr)
 	{
 		switch (type)
 		{
@@ -282,10 +282,9 @@ Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
 			return nullptr;
 
 		auto bld = buildings.emplace_back(std::make_unique<Building>()).get();
-		bld->setTexture(*texture);
+		bld->setTexture(texture);
 		bld->setTextureRect(data.textureRect);
 		bld->setPosition(static_cast<float>(coordX), static_cast<float>(coordY));
-		bld->construct(&data);	
 
 		return bld;
 	}
@@ -321,10 +320,10 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 	auto pTileW = map_node->first_attribute("tilewidth");
 	auto pTileH = map_node->first_attribute("tileheight");
 
-	const int32_t map_width   = pMapW  ? std::atoi(pMapW->value())  : 0;
-	const int32_t map_height  = pMapH  ? std::atoi(pMapH->value())  : 0;
-	const int32_t tile_width  = pTileW ? std::atoi(pTileW->value()) : 0;
-	const int32_t tile_height = pTileH ? std::atoi(pTileH->value()) : 0;
+	const int map_width   = pMapW  ? std::atoi(pMapW->value())  : 0;
+	const int map_height  = pMapH  ? std::atoi(pMapH->value())  : 0;
+	const int tile_width  = pTileW ? std::atoi(pTileW->value()) : 0;
+	const int tile_height = pTileH ? std::atoi(pTileH->value()) : 0;
 
 	if (!(map_width && map_height && tile_width && tile_height))
 		return false;
@@ -358,7 +357,7 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 
 			std::stringstream sstream(data);
 			{
-				int32_t tile_num = 0;
+				int tile_num = 0;
 
 				while(sstream >> tile_num)
 					parsed_layer.push_back(tile_num);
@@ -368,8 +367,8 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 				return false;
 
 			const auto bounds = std::minmax_element(parsed_layer.begin(), parsed_layer.end());
-			const int32_t min_tile = *bounds.first;
-			const int32_t max_tile = *bounds.second;
+			const int min_tile = *bounds.first;
+			const int max_tile = *bounds.second;
 
 			auto current_tileset = std::find_if(tilesets.begin(), tilesets.end(),
 				[min_tile, max_tile](const TileMap::Tileset& ts)
@@ -483,18 +482,18 @@ void TileMap::parseLandscape(const Tileset& tileset, const std::vector<int>& par
 	vertices.reserve(parsed_layer.size());
 
 //  Cached variables
-	const int32_t map_width   = mapSizeInTiles.x;
-	const int32_t map_height  = mapSizeInTiles.y;
-	const int32_t tile_width  = tileSize.x;
-	const int32_t tile_height = tileSize.y;
-	const int32_t columns     = tileset.columns;
-	const int32_t firstGID    = tileset.firstGID;
+	const int map_width   = mapSizeInTiles.x;
+	const int map_height  = mapSizeInTiles.y;
+	const int tile_width  = tileSize.x;
+	const int tile_height = tileSize.y;
+	const int columns     = tileset.columns;
+	const int firstGID    = tileset.firstGID;
 
-	for (int32_t y = 0; y < map_height; ++y)
-		for (int32_t x = 0; x < map_width; ++x)
+	for (int y = 0; y < map_height; ++y)
+		for (int x = 0; x < map_width; ++x)
 		{
-			const int32_t index = y * map_width + x;
-			const int32_t tile_id = parsed_layer[index];
+			const int index = y * map_width + x;
+			const int tile_id = parsed_layer[index];
 			tileMask[index] = convertTileNumToChar(tile_id);
 
 //  Vertex XY coords				
@@ -502,9 +501,9 @@ void TileMap::parseLandscape(const Tileset& tileset, const std::vector<int>& par
 			const float cY = static_cast<float>(y * tile_height);
 
 //  Left-top coords of the tile in texture grid
-			const int32_t tile_num = tile_id - firstGID;
-			const int32_t top = (tile_num >= columns) ? tile_num / columns : 0;
-			const int32_t left = tile_num % columns;
+			const int tile_num = tile_id - firstGID;
+			const int top = (tile_num >= columns) ? tile_num / columns : 0;
+			const int left = tile_num % columns;
 			const sf::Vector2f point(left * tile_width, top * tile_height);
 
 //  First triangle
@@ -530,7 +529,7 @@ void TileMap::parseLandscape(const Tileset& tileset, const std::vector<int>& par
 
 void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int>& parsed_layer) noexcept
 {
-	auto get_building_type = [](int32_t tile_num)
+	auto get_building_type = [](int tile_num)
 	{
 		switch (tile_num)
 		{
@@ -554,19 +553,19 @@ void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int>& par
 	};
 
 //  Cached variables
-	const int32_t map_width   = mapSizeInTiles.x;
-	const int32_t map_height  = mapSizeInTiles.y;
-	const int32_t tile_width  = tileSize.x;
-	const int32_t tile_height = tileSize.y;
-	const int32_t columns     = tileset.columns;
-	const int32_t firstGID    = tileset.firstGID;
-	const int32_t tile_count  = tileset.tileCount;
+	const int map_width   = mapSizeInTiles.x;
+	const int map_height  = mapSizeInTiles.y;
+	const int tile_width  = tileSize.x;
+	const int tile_height = tileSize.y;
+	const int columns     = tileset.columns;
+	const int firstGID    = tileset.firstGID;
+	const int tile_count  = tileset.tileCount;
 
-	for (int32_t y = 0; y < map_height; ++y)
-		for (int32_t x = 0; x < map_width; ++x)
+	for (int y = 0; y < map_height; ++y)
+		for (int x = 0; x < map_width; ++x)
 		{
-			const int32_t index = y * map_width + x;
-			const int32_t tile_id = parsed_layer[index];
+			const int index = y * map_width + x;
+			const int tile_id = parsed_layer[index];
 
 			if (tile_id)
 			{
@@ -582,52 +581,53 @@ void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int>& par
 		}
 }
 
-char TileMap::convertTileNumToChar(int32_t index) const noexcept
+char TileMap::convertTileNumToChar(int index) const noexcept
 {
 	switch (index)
 	{
-		case 1 ... 5:
-		case 13 ... 16:
-		case 25 ... 27:
-		case 31 ... 34: 
-		case 40 ... 42:
-		case 45:
-		case 48:
-		case 55: 
-		case 61: 
-		case 82:
-		case 83:
-		case 101: return 'R';  // rocky soil
+//      rocky soil
+		case 1 ... 5:     return 'R';
+		case 13 ... 16:   return 'R';
+		case 25 ... 27:   return 'R';
+		case 31 ... 34:   return 'R';
+		case 40 ... 42:   return 'R';
+		case 45:          return 'R';
+		case 48:          return 'R';
+		case 55:          return 'R';
+		case 61:          return 'R'; 
+		case 82:          return 'R';
+		case 83:          return 'R';
+		case 101:         return 'R';
+//      sandy soil
+		case 6 ... 12:    return 'S';
+		case 17 ... 24:   return 'S';	
+		case 28 ... 30:   return 'S';
+		case 35 ... 39:   return 'S';
+		case 43:          return 'S';
+		case 44:          return 'S';
+		case 46:          return 'S';
+		case 47:          return 'S';
+		case 49 ... 54:   return 'S';
+		case 56 ... 60:   return 'S';
+		case 62 ... 81:   return 'S';
+		case 84 ... 100:  return 'S';
+		case 102 ... 109: return 'S';
+//      Wall
+		case 111 ... 120: return 'W';
+//      Building
+		case 124 ... 137: return 'B';
+		case 140 ... 153: return 'B';
+		case 159 ... 165: return 'B';
+		case 175 ... 181: return 'B';
+		case 192 ... 195: return 'B';
+		case 207 ... 209: return 'B';
+		case 223 ... 225: return 'B';
+		case 239 ... 241: return 'B';	
+		case 255 ... 286: return 'B';
+//      Concrete slab
+		case 191:         return 'C';
 
-		case 6 ... 12:
-		case 17 ... 24: 	
-		case 28 ... 30:
-		case 35 ... 39:
-		case 43:
-		case 44:
-		case 46:
-		case 47:
-		case 49 ... 54:
-		case 56 ... 60:
-		case 62 ... 81:
-		case 84 ... 100:
-		case 102 ... 109: return 'S';  // sandy soil
-
-		case 111 ... 120: return 'W'; // Wall
-
-		case 124 ... 137:
-		case 140 ... 153:
-		case 159 ... 165:
-		case 175 ... 181:
-		case 192 ... 195:
-		case 207 ... 209:
-		case 223 ... 225:
-		case 239 ... 241:	
-		case 255 ... 286: return 'B'; // Building
-
-		case 191: return 'C'; // Concrete slab
-
-		default: return 'S'; // sandy soil by default
+		default:          return 'S'; // sandy soil by default
 	}
 }
 

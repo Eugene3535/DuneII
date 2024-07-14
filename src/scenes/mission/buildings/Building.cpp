@@ -15,15 +15,6 @@ Building::~Building()
     
 }
 
-void Building::construct(const Building::Data* data) noexcept
-{
-    m_type         = data->type;
-    //m_bounds       = data->globalBounds;
-    m_cost         = data->cost;
-    m_hitPoints    = data->hitPoints;
-    m_maxHitPoints = data->maxHitPoints;
-}
-
 void Building::repair(int32_t points) noexcept
 {
     if( (m_type != Building::CONCRETE_SLAB) && (m_type != Building::WALL) )

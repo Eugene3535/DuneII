@@ -1,12 +1,12 @@
 #ifndef BUILDING_HPP
 #define BUILDING_HPP
 
-#include <SFML/Graphics.hpp>
+#include "scenes/mission/animated_tile/AnimatedTile.hpp"
 
 // More information is available here: https://gamicus.fandom.com/wiki/List_of_structures_in_Dune_II
 
 class Building final:
-    public sf::Sprite
+    public AnimatedTile
 {
 public:
     enum Type: int32_t
@@ -48,8 +48,6 @@ public:
     Building() noexcept;
     ~Building();
 
-    void construct(const Data* data) noexcept;
-
     void repair(int32_t points) noexcept;
     void damage(int32_t points) noexcept;
 
@@ -61,17 +59,17 @@ public:
     bool isEnemy() const noexcept;
     bool isDestroyed() const noexcept;
 
-//protected:
+private:
     Type m_type;
 
-//protected:
+private:
     sf::Rect<uint8_t> m_bounds;
 
-//protected:
+private:
     int32_t  m_hitPoints;
     int32_t  m_maxHitPoints;
     int32_t  m_cost;
-    bool m_isEnemy;
+    bool     m_isEnemy;
 };
 
 #endif // !BUILDING_HPP

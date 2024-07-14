@@ -20,9 +20,9 @@ private:
 	struct Tileset
 	{
 		const sf::Texture* texture { nullptr };
-		int32_t columns   { 0 };
-		int32_t tileCount { 0 };
-		int32_t firstGID  { 1 };
+		int columns   { 0 };
+		int tileCount { 0 };
+		int firstGID  { 1 };
 	};
 
 public:
@@ -52,8 +52,8 @@ public:
 public:
 	bool loadFromFile(const std::filesystem::path& file_path) noexcept;
 
-	int32_t costOf(Building::Type type) const noexcept;
-	Building* placeBuilding(Building::Type type, int32_t cellX, int32_t cellY) noexcept;
+	int costOf(Building::Type type) const noexcept;
+	Building* placeBuilding(Building::Type type, int cellX, int cellY) noexcept;
 	void reset() noexcept;
 
 private:
@@ -62,11 +62,11 @@ private:
 
 private:
 	void parseTilesets(const rapidxml::xml_node<char>* map_node, std::vector<Tileset>& tilesets)   noexcept;
-	void parseLandscape(const Tileset& tileset, const std::vector<int32_t>& parsed_layer)     noexcept;
-	void parseBuildings(const Tileset& tileset, const std::vector<int32_t>& parsed_layer)     noexcept;
+	void parseLandscape(const Tileset& tileset, const std::vector<int>& parsed_layer)     noexcept;
+	void parseBuildings(const Tileset& tileset, const std::vector<int>& parsed_layer)     noexcept;
 
 private:
-	char        convertTileNumToChar(int32_t index) const noexcept;
+	char        convertTileNumToChar(int index) const noexcept;
     sf::IntRect getTexCoords(Building::Type type) const noexcept;
 
 private:

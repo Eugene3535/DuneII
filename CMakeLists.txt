@@ -18,9 +18,9 @@ set(SRC_FILES
 	${SRC_FILE_DIR}/scenes/Scene.cpp
 	${SRC_FILE_DIR}/scenes/intro/MainMenu.cpp
 	${SRC_FILE_DIR}/scenes/mission/Mission.cpp
+	${SRC_FILE_DIR}/scenes/mission/animated_tile/AnimatedTile.cpp
 	${SRC_FILE_DIR}/scenes/mission/tilemap/TileMap.cpp
 	${SRC_FILE_DIR}/scenes/mission/buildings/Building.cpp
-	${SRC_FILE_DIR}/scenes/mission/buildings/Builder.cpp
 	${SRC_FILE_DIR}/main.cpp
 )
 
