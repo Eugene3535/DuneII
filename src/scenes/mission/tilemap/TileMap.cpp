@@ -281,12 +281,12 @@ Building* TileMap::placeBuilding(Building::Type type, int cellX, int cellY) noex
 		if((data.globalBounds.left + data.textureRect.width) >= mapSizeInPixels.x || (data.globalBounds.top + data.textureRect.height) >= mapSizeInPixels.y)
 			return nullptr;
 
-		auto bld = buildings.emplace_back(std::make_unique<Building>()).get();
-		bld->setTexture(texture);
-		bld->setTextureRect(data.textureRect);
-		bld->setPosition(static_cast<float>(coordX), static_cast<float>(coordY));
+		auto& bld = buildings.emplace_back();
+		bld.setTexture(texture);
+		bld.setTextureRect(data.textureRect);
+		bld.setPosition(static_cast<float>(coordX), static_cast<float>(coordY));
 
-		return bld;
+		return &bld;
 	}
 
 	return nullptr;

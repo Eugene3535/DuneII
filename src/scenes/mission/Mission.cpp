@@ -68,6 +68,6 @@ void Mission::draw(sf::RenderTarget& target, sf::RenderStates states) const
         target.draw(vertexBuffer, states);
 
         for(auto& b: m_tilemap.buildings)
-            target.draw(*b, states);
+            target.draw(b, states);
     }
 }

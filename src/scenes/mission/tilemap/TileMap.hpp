@@ -3,7 +3,6 @@
 
 #include <string>
 #include <vector>
-#include <memory>
 #include <filesystem>
 
 #include <SFML/Graphics.hpp>
@@ -74,7 +73,7 @@ private:
 
 public:
 	Landscape landscape;
-	std::vector<std::unique_ptr<Building>> buildings;
+	std::vector<Building> buildings;
 	std::vector<Object>     objects;
 	std::string             tileMask;
 	std::vector<char*> collisionMask;
