@@ -1,18 +1,13 @@
 #ifndef OBJECT_POOL_HPP
 #define OBJECT_POOL_HPP
 
-#include <cstring>
+#include <bitset>
 #include <array>
+#include <iterator>
 
 template<class T, size_t U>
 class ObjectPool
 {
-	struct Object
-	{
-		T    object;
-		bool isEnabled = false;
-	};
-
 public:
 	ObjectPool() noexcept;
 
@@ -20,8 +15,9 @@ public:
 	void returnObjectBack(const T* object) noexcept;
 
 private:
-	std::array<Object, U> m_objects;
-	std::size_t           m_lastUsedIndex;
+	std::array<T, U> m_objects;
+	std::bitset<U>   m_pool;
+	size_t           m_lastUsedIndex;
 };
 
 #include "ObjectPool.inl"

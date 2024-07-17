@@ -5,8 +5,6 @@
 #include <vector>
 #include <filesystem>
 
-#include <SFML/Graphics.hpp>
-
 #include "rapidxml.hpp"
 
 #include "utils/Defines.hpp"
@@ -69,7 +67,7 @@ private:
     sf::IntRect getTexCoords(Building::Type type) const noexcept;
 
 private:
-    ObjectPool<Building, BUILDING_MAX_COUNT> m_buildings;
+    ObjectPool<Building, PRODUCTION_BUILDING_LIMIT> m_buildings;
 
 public:
 	Landscape landscape;
