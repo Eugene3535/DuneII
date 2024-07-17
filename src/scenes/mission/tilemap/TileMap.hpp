@@ -17,9 +17,9 @@ private:
 	struct Tileset
 	{
 		const sf::Texture* texture { nullptr };
-		int columns   { 0 };
-		int tileCount { 0 };
-		int firstGID  { 1 };
+		int32_t columns   { 0 };
+		int32_t tileCount { 0 };
+		int32_t firstGID  { 1 };
 	};
 
 public:
@@ -49,8 +49,8 @@ public:
 public:
 	bool loadFromFile(const std::filesystem::path& file_path) noexcept;
 
-	int costOf(Building::Type type) const noexcept;
-	Building* placeBuilding(Building::Type type, int cellX, int cellY) noexcept;
+	int32_t costOf(Building::Type type) const noexcept;
+	Building* placeBuilding(Building::Type type, int32_t cellX, int32_t cellY) noexcept;
 	void reset() noexcept;
 
 private:
@@ -63,15 +63,16 @@ private:
 	void parseBuildings(const Tileset& tileset, const std::vector<int>& parsed_layer)     noexcept;
 
 private:
-	char        convertTileNumToChar(int index) const noexcept;
+	char        convertTileNumToChar(int32_t index) const noexcept;
     sf::IntRect getTexCoords(Building::Type type) const noexcept;
+	int32_t     getHitPoints(Building::Type type) const noexcept;
 
 private:
-    ObjectPool<Building, PRODUCTION_BUILDING_LIMIT> m_buildings;
+    ObjectPool<Building, ALL_BUILDING_LIMIT_ON_MAP> m_buildings;
 
 public:
 	Landscape landscape;
-	std::vector<Building> buildings;
+	std::vector<Building*> buildings;
 	std::vector<Object>     objects;
 	std::string             tileMask;
 	std::vector<char*> collisionMask;

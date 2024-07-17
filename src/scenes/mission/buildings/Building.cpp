@@ -4,7 +4,6 @@ Building::Building() noexcept:
     m_type(Building::CONCRETE_SLAB),
     m_hitPoints(0),
     m_maxHitPoints(0),
-    m_cost(0),
     m_isEnemy(false)
 {
 
@@ -17,7 +16,7 @@ Building::~Building()
 
 void Building::repair(int32_t points) noexcept
 {
-    if( (m_type != Building::CONCRETE_SLAB) && (m_type != Building::WALL) )
+    if( ( m_type != Building::CONCRETE_SLAB) && (m_type != Building::WALL) )
     {
         m_hitPoints += points;
 
@@ -44,11 +43,6 @@ const sf::Rect<uint8_t>& Building::bounds() const noexcept
 int32_t Building::hitPoints() const noexcept
 {
     return (m_hitPoints > 0) ? m_hitPoints : 0;
-}
-
-int32_t Building::cost() const noexcept
-{
-    return m_cost;
 }
 
 bool Building::isEnemy() const noexcept

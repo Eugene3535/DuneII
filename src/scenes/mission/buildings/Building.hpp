@@ -30,21 +30,6 @@ public:
     };
 
 public:
-    struct Data
-    {
-        sf::IntRect    textureRect{};
-        sf::IntRect    globalBounds{};
-        Building::Type type { Building::NONE };
-        int32_t cost         { 0 };
-        int32_t hitPoints    { 0 };
-        int32_t maxHitPoints { 0 };
-        
-        bool hasAnAnimatedDynastyFlag { false };
-        bool hasAnAnimatedLandingPad  { false };
-        bool isEnemy                  { false };
-    };
-
-public:
     Building() noexcept;
     ~Building();
 
@@ -54,22 +39,18 @@ public:
     Type               type()      const noexcept;
     const sf::Rect<uint8_t>& bounds()    const noexcept;
     int32_t            hitPoints() const noexcept;
-    int32_t            cost()      const noexcept;
 
     bool isEnemy() const noexcept;
     bool isDestroyed() const noexcept;
 
 private:
     Type m_type;
-
-private:
     sf::Rect<uint8_t> m_bounds;
-
-private:
     int32_t  m_hitPoints;
     int32_t  m_maxHitPoints;
-    int32_t  m_cost;
     bool     m_isEnemy;
+
+    friend class TileMap;
 };
 
 #endif // !BUILDING_HPP
