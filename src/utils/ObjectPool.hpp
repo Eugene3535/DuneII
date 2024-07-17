@@ -3,7 +3,6 @@
 
 #include <bitset>
 #include <array>
-#include <iterator>
 
 template<class T, size_t U>
 class ObjectPool
@@ -12,7 +11,7 @@ public:
 	ObjectPool() noexcept;
 
 	T*   findUnusedObject() noexcept;
-	void returnObjectBack(const T* object) noexcept;
+	void returnObjectBack(const T* objectPtr) noexcept;
 
 private:
 	std::array<T, U> m_objects;

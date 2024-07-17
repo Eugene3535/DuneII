@@ -8,6 +8,9 @@ ObjectPool<T, U>::ObjectPool() noexcept:
 template<class T, size_t U>
 T* ObjectPool<T, U>::findUnusedObject() noexcept
 {
+	if(m_pool.all())
+		return nullptr;
+
 //  Search from last used object, this will usually return almost instantly
 	for (size_t i = m_lastUsedIndex; i < m_pool.size(); ++i)
 	{
@@ -31,7 +34,7 @@ T* ObjectPool<T, U>::findUnusedObject() noexcept
 			return (m_objects.data() + i);
 		}
 	}
-	
+
 //  No free objects	
 	m_lastUsedIndex = 0;
 
@@ -39,14 +42,14 @@ T* ObjectPool<T, U>::findUnusedObject() noexcept
 }
 
 template<class T, size_t U>
-void ObjectPool<T, U>::returnObjectBack(const T* object) noexcept
+void ObjectPool<T, U>::returnObjectBack(const T* objectPtr) noexcept
 {
-	auto beginPtr = m_objects.data();
-	size_t index = std::distance(beginPtr, object);
+	const auto beginPtr = m_objects.data();
+	size_t index = static_cast<size_t>(objectPtr - beginPtr);
 
 	if(index < m_objects.size())
 	{
-		if(object == (beginPtr + index))
+		if(objectPtr == (beginPtr + index))
 		{
 			m_pool.reset(index);
 		}
