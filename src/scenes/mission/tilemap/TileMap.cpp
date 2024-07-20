@@ -38,7 +38,7 @@ namespace
 bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 {
 //  Make sure it hasn't been downloaded before
-	reset();
+	unload();
 
 	if (file_path.empty())
 		return false;
@@ -144,8 +144,6 @@ Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
 
 				return nullptr;
 			}
-
-			buildings.push_back(building);
 				
 			return building;
 		}
@@ -154,7 +152,17 @@ Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
 	return nullptr;
 }
 
-void TileMap::reset() noexcept
+void TileMap::eraseBuilding(const Building* building) noexcept
+{
+	m_buildings.returnObjectBack(building);
+}
+
+std::vector<Building*> TileMap::getAllBuildings() noexcept
+{
+	return m_buildings.getOccupiedObjects();
+}
+
+void TileMap::unload() noexcept
 {
 	landscape.vertices.~VertexBuffer();
 	landscape.texture = nullptr;

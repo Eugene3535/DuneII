@@ -51,7 +51,9 @@ public:
 
 	int32_t costOf(Building::Type type) const noexcept;
 	Building* placeBuilding(Building::Type type, int32_t cellX, int32_t cellY) noexcept;
-	void reset() noexcept;
+	void eraseBuilding(const Building* building) noexcept;
+	std::vector<Building*> getAllBuildings() noexcept;
+	void unload() noexcept;
 
 private:
 	bool loadLayers(const rapidxml::xml_node<>* map_node)  noexcept;
@@ -73,7 +75,6 @@ private:
 
 public:
 	Landscape landscape;
-	std::vector<Building*> buildings;
 	std::vector<Object>     objects;
 	std::string             tileMask;
 	std::vector<char*> collisionMask;

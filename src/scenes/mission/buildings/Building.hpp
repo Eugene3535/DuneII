@@ -1,6 +1,7 @@
 #ifndef BUILDING_HPP
 #define BUILDING_HPP
 
+#include "common/Enums.hpp"
 #include "scenes/mission/animated_tile/AnimatedTile.hpp"
 
 // More information is available here: https://gamicus.fandom.com/wiki/List_of_structures_in_Dune_II
@@ -36,19 +37,23 @@ public:
     void repair(int32_t points) noexcept;
     void damage(int32_t points) noexcept;
 
-    Type               type()      const noexcept;
-    const sf::IntRect& bounds()    const noexcept;
-    int32_t            hitPoints() const noexcept;
+    void changeOwner(House house) noexcept;
 
-    bool isEnemy() const noexcept;
+    Type               getType()         const noexcept;
+    House              getOwner()        const noexcept;
+    const sf::IntRect& getBounds()       const noexcept;
+    int32_t            getHitPoints()    const noexcept;
+    int32_t            getMaxHitPoints() const noexcept;
+
     bool isDestroyed() const noexcept;
 
 private:
     Type m_type;
+    House m_owner;
+
     sf::IntRect m_bounds;
-    int32_t  m_hitPoints;
-    int32_t  m_maxHitPoints;
-    bool     m_isEnemy;
+    int32_t     m_hitPoints;
+    int32_t     m_maxHitPoints;
 
     friend class TileMap;
 };

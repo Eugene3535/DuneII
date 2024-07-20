@@ -20,6 +20,9 @@ bool Mission::load(const std::string& info) noexcept
 
     m_isLoaded = m_tilemap.loadFromFile(FileProvider().findPathToFile(info));
 
+    if(m_isLoaded)
+        m_buildings = m_tilemap.getAllBuildings();
+
     return m_isLoaded;
 }
 
@@ -67,7 +70,7 @@ void Mission::draw(sf::RenderTarget& target, sf::RenderStates states) const
         states.texture = m_tilemap.landscape.texture;
         target.draw(vertexBuffer, states);
 
-        for(auto& b: m_tilemap.buildings)
+        for(auto& b: m_buildings)
             target.draw(*b, states);
     }
 }

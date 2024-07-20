@@ -1,10 +1,11 @@
 #include "scenes/mission/buildings/Building.hpp"
 
 Building::Building() noexcept:
-    m_type(Building::CONCRETE_SLAB),
+    m_type(Building::NONE),
+    m_owner(House::Fremen),
+    m_bounds(),
     m_hitPoints(0),
-    m_maxHitPoints(0),
-    m_isEnemy(false)
+    m_maxHitPoints(0)
 {
 
 }
@@ -16,7 +17,9 @@ Building::~Building()
 
 void Building::repair(int32_t points) noexcept
 {
-    if( ( m_type != Building::CONCRETE_SLAB) && (m_type != Building::WALL) )
+    const bool repairable = ((m_type != Building::CONCRETE_SLAB) && (m_type != Building::WALL));
+
+    if( repairable )
     {
         m_hitPoints += points;
 
@@ -28,26 +31,39 @@ void Building::repair(int32_t points) noexcept
 void Building::damage(int32_t points) noexcept
 {
     m_hitPoints -= points;
+
+    if(m_hitPoints < 0)
+        m_hitPoints = 0;
 }
 
-Building::Type Building::type() const noexcept
+void Building::changeOwner(House house) noexcept
+{
+    m_owner = house;
+}
+
+Building::Type Building::getType() const noexcept
 {
     return m_type;
 }
 
-const sf::IntRect& Building::bounds() const noexcept
+House Building::getOwner() const noexcept
+{
+    return m_owner;
+}
+
+const sf::IntRect& Building::getBounds() const noexcept
 {
     return m_bounds;
 }
 
-int32_t Building::hitPoints() const noexcept
+int32_t Building::getHitPoints() const noexcept
 {
-    return (m_hitPoints > 0) ? m_hitPoints : 0;
+    return m_hitPoints;
 }
 
-bool Building::isEnemy() const noexcept
+int32_t Building::getMaxHitPoints() const noexcept
 {
-    return m_isEnemy;
+    return m_maxHitPoints;
 }
 
 bool Building::isDestroyed() const noexcept

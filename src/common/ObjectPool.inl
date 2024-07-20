@@ -55,3 +55,19 @@ void ObjectPool<T, U>::returnObjectBack(const T* objectPtr) noexcept
 		}
 	}
 }
+
+template<class T, size_t U>
+std::vector<T*> ObjectPool<T, U>::getOccupiedObjects() noexcept
+{
+	std::vector<T*> objects;
+	objects.reserve(m_pool.count());
+	auto beginPtr = m_objects.data();
+
+	for (size_t i = 0; i < m_pool.size(); ++i)
+	{
+		if(m_pool[i])
+			objects.push_back(beginPtr + i);
+	}
+	
+	return objects;
+}

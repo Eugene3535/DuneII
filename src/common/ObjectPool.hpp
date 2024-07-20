@@ -3,6 +3,7 @@
 
 #include <bitset>
 #include <array>
+#include <vector>
 
 template<class T, size_t U>
 class ObjectPool
@@ -12,6 +13,7 @@ public:
 
 	T*   findUnusedObject() noexcept;
 	void returnObjectBack(const T* objectPtr) noexcept;
+	std::vector<T*> getOccupiedObjects() noexcept;
 
 private:
 	std::array<T, U> m_objects;

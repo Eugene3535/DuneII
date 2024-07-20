@@ -19,6 +19,7 @@ private:
 
 private:
     TileMap m_tilemap;
+    std::vector<Building*> m_buildings;
 
     sf::Vector2f m_view_position;
 };
