@@ -8,33 +8,6 @@
 #include "managers/assets/AssetManager.hpp"
 #include "scenes/mission/tilemap/TileMap.hpp"
 
-namespace
-{
-	sf::IntRect getTexCoords(Building::Type type) noexcept
-	{
-		switch (type)
-		{
-			case Building::CONCRETE_SLAB:      return { 0, 160, 32, 32   };
-			case Building::CONSTRUCTION_YARD:  return { 0, 32, 64, 64    };
-			case Building::SPICE_SILO:         return { 192, 32, 64, 64  };
-			case Building::STARPORT:           return { 0, 192, 96, 96   };
-			case Building::WIND_TRAP:          return { 64, 32, 64, 64   };
-			case Building::SPICE_REFINERY:     return { 416, 0, 96, 64   };
-			case Building::RADAR_OUTPOST:      return { 128, 32, 64, 64  };
-			case Building::REPAIR_FACILITY:    return { 224, 96, 96, 64  };
-			case Building::PALACE:             return { 64, 96, 96, 96   };
-			case Building::HIGH_TECH_FACILITY: return { 160, 96, 64, 64  };
-			case Building::BARRACKS:           return { 0, 96, 64, 64    };
-			case Building::VEHICLE_FACTORY:    return { 256, 32, 96, 64  };
-			case Building::WALL:               return { 0, 0, 32, 32     };
-			case Building::TURRET:             return { 192, 288, 32, 32 };
-			case Building::ROCKET_TURRET:      return { 448, 288, 32, 32 };
-
-			default: return sf::IntRect();
-		}
-	}
-}
-
 bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 {
 //  Make sure it hasn't been downloaded before
@@ -102,7 +75,7 @@ Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
 		{
 			building->m_type = type;
 			building->setTexture(texture);
-			building->setTextureRect(getTexCoords(type));
+			building->setTextureRect(getTexCoordsOf(type));
 			building->setPosition(coordX, coordY);
 			building->m_hitPoints = building->m_maxHitPoints = getHitPointsOf(type);
 			building->m_bounds = getBoundsOf(type, coordX, coordY);
