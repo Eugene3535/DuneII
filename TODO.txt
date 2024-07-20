@@ -1,0 +1,4 @@
+1) Ensure that the dynasty house to which a structure belongs is detected when loading a tile map
+2) Autoconfiguration of wall construction
+3) Render walls and concrete slabs as a single array of vertices
+4) Animation of buildings with landing pad
