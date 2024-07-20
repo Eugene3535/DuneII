@@ -7,8 +7,8 @@
 
 #include "rapidxml.hpp"
 
-#include "utils/Defines.hpp"
-#include "utils/ObjectPool.hpp"
+#include "common/Defines.hpp"
+#include "common/ObjectPool.hpp"
 #include "scenes/mission/buildings/Building.hpp"
 
 class TileMap

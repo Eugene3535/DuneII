@@ -4,7 +4,7 @@
 
 #include "rapidxml_utils.hpp"
 
-#include "utils/FileProvider.hpp"
+#include "common/FileProvider.hpp"
 #include "managers/assets/AssetManager.hpp"
 #include "scenes/mission/tilemap/TileMap.hpp"
 
@@ -103,7 +103,7 @@ Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
 			building->m_type = type;
 			building->setTexture(texture);
 			building->setTextureRect(getTexCoords(type));
-			building->setPosition(static_cast<float>(coordX), static_cast<float>(coordY));
+			building->setPosition(coordX, coordY);
 			building->m_hitPoints = building->m_maxHitPoints = getHitPointsOf(type);
 			building->m_bounds = getBoundsOf(type, coordX, coordY);
 

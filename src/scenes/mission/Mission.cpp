@@ -1,4 +1,4 @@
-#include "utils/FileProvider.hpp"
+#include "common/FileProvider.hpp"
 #include "game/Game.hpp"
 #include "scenes/mission/Mission.hpp"
 

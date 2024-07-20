@@ -11,7 +11,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/$<$<CXX_COMPILER_ID:MSVC>
 set(SRC_FILE_DIR ${PROJECT_SOURCE_DIR}/src)
 
 set(SRC_FILES
-	${SRC_FILE_DIR}/utils/FileProvider.cpp
+	${SRC_FILE_DIR}/common/FileProvider.cpp
 	${SRC_FILE_DIR}/managers/assets/AssetManager.cpp
 	${SRC_FILE_DIR}/animation/Animation.hpp
 	${SRC_FILE_DIR}/effects/ScreenBlackoutEffect.cpp

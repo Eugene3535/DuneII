@@ -9,7 +9,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 
-#include "utils/FileProvider.hpp"
+#include "common/FileProvider.hpp"
 
 class AssetManager final:
     private sf::NonCopyable
