@@ -35,7 +35,7 @@ Building::Type Building::type() const noexcept
     return m_type;
 }
 
-const sf::Rect<uint8_t>& Building::bounds() const noexcept
+const sf::IntRect& Building::bounds() const noexcept
 {
     return m_bounds;
 }

@@ -64,8 +64,9 @@ private:
 
 private:
 	char        convertTileNumToChar(int32_t index) const noexcept;
-    sf::IntRect getTexCoords(Building::Type type) const noexcept;
-	int32_t     getHitPoints(Building::Type type) const noexcept;
+    sf::IntRect getTexCoordsOf(Building::Type type) const noexcept;
+	sf::IntRect getBoundsOf(Building::Type type, int32_t coordX, int32_t coordY) const noexcept;
+	int32_t     getHitPointsOf(Building::Type type) const noexcept;
 
 private:
     ObjectPool<Building, ALL_BUILDING_LIMIT_ON_MAP> m_buildings;

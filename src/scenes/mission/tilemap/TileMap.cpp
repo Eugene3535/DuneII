@@ -90,13 +90,6 @@ int32_t TileMap::costOf(Building::Type type) const noexcept
 
 Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cellY) noexcept
 {
-	auto setupTilesOnMask = [](char** mask, int32_t x, int32_t y, int32_t width, int32_t height, char symbol = 'B')
-	{
-		for (int32_t i = 0; i < height; ++i)
-			for (int32_t j = 0; j < width; ++j)
-				mask[x + j][y + i] = symbol;
-	};
-
 	if(cellX < 0 || cellY < 0)
 		return nullptr;
 
@@ -105,127 +98,47 @@ Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
 
 	if(auto building = m_buildings.findUnusedObject(); building != nullptr)
 	{
-		building->m_type = type;
-
 		if(const auto texture = Assets->getTexture("Buildings.png"); texture != nullptr)
 		{
+			building->m_type = type;
 			building->setTexture(texture);
 			building->setTextureRect(getTexCoords(type));
 			building->setPosition(static_cast<float>(coordX), static_cast<float>(coordY));
-			building->m_hitPoints = building->m_maxHitPoints = getHitPoints(type);
+			building->m_hitPoints = building->m_maxHitPoints = getHitPointsOf(type);
+			building->m_bounds = getBoundsOf(type, coordX, coordY);
+
+			auto setupTilesOnMask = [](char** mask, int32_t x, int32_t y, int32_t width, int32_t height, char symbol = 'B')
+			{
+				for (int32_t i = 0; i < height; ++i)
+					for (int32_t j = 0; j < width; ++j)
+						mask[x + j][y + i] = symbol;
+			};
 
 			switch (type)
 			{
-				case Building::CONCRETE_SLAB:
-				{	
-					building->m_bounds = { cellX, cellY, 32, 32 };
-					setupTilesOnMask(collisionMask.data(), cellX, cellY, 1, 1, 'C');
-				}
-				break;
+				case Building::CONCRETE_SLAB:      setupTilesOnMask(collisionMask.data(), cellX, cellY, 1, 1, 'C'); break;
+				case Building::CONSTRUCTION_YARD:  setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);      break;
+				case Building::SPICE_SILO:         setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);      break;
+				case Building::STARPORT:           setupTilesOnMask(collisionMask.data(), cellX, cellY, 3, 3);      break;
+				case Building::WIND_TRAP:          setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);      break;
+				case Building::SPICE_REFINERY:     setupTilesOnMask(collisionMask.data(), cellX, cellY, 3, 2);      break;
+				case Building::RADAR_OUTPOST:      setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);      break;
+				case Building::REPAIR_FACILITY:    setupTilesOnMask(collisionMask.data(), cellX, cellY, 3, 2);      break;
+				case Building::PALACE:             setupTilesOnMask(collisionMask.data(), cellX, cellY, 3, 3);      break;
+				case Building::HIGH_TECH_FACILITY: setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);      break;
+				case Building::BARRACKS:           setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);      break;
+				case Building::VEHICLE_FACTORY:    setupTilesOnMask(collisionMask.data(), cellX, cellY, 3, 2);      break;
+				case Building::WALL:               setupTilesOnMask(collisionMask.data(), cellX, cellY, 1, 1, 'W'); break;
+				case Building::TURRET:             setupTilesOnMask(collisionMask.data(), cellX, cellY, 1, 1);      break;
+				case Building::ROCKET_TURRET:      setupTilesOnMask(collisionMask.data(), cellX, cellY, 1, 1);      break;
 
-				case Building::CONSTRUCTION_YARD:
-				{
-					building->m_bounds = { cellX, cellY, 64, 64 };
-					setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);
-				}
-				break;
-
-				case Building::SPICE_SILO:
-				{
-					building->m_bounds = { cellX, cellY, 64, 64 };
-					setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);
-				}
-				break;
-
-				case Building::STARPORT:
-				{
-					building->m_bounds = { cellX, cellY, 96, 96 };
-					setupTilesOnMask(collisionMask.data(), cellX, cellY, 3, 3);
-				} 
-				break;
-
-				case Building::WIND_TRAP:
-				{
-					building->m_bounds = { cellX, cellY, 64, 64 };
-					setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);
-				}
-				break;
-
-				case Building::SPICE_REFINERY:
-				{
-					building->m_bounds = { cellX, cellY, 96, 64 };
-					setupTilesOnMask(collisionMask.data(), cellX, cellY, 3, 2);
-				}
-				break;
-
-				case Building::RADAR_OUTPOST:
-				{
-					building->m_bounds = { cellX, cellY, 64, 64 };
-					setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);
-				}
-				break;
-
-				case Building::REPAIR_FACILITY:
-				{
-					building->m_bounds = { cellX, cellY, 96, 64 };
-					setupTilesOnMask(collisionMask.data(), cellX, cellY, 3, 2);
-				}
-				break;
-
-				case Building::PALACE:
-				{
-					building->m_bounds = { cellX, cellY, 96, 96 };
-					setupTilesOnMask(collisionMask.data(), cellX, cellY, 3, 3);
-				}
-				break;
-
-				case Building::HIGH_TECH_FACILITY:
-				{
-					building->m_bounds = { cellX, cellY, 64, 64 };
-					setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);
-				}
-				break;
-
-				case Building::BARRACKS:
-				{
-					building->m_bounds = { cellX, cellY, 64, 64 };
-					setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);
-				}
-				break;
-
-				case Building::VEHICLE_FACTORY:
-				{
-					building->m_bounds = { cellX, cellY, 96, 64 };
-					setupTilesOnMask(collisionMask.data(), cellX, cellY, 3, 2);
-				}
-				break;
-
-				case Building::WALL:
-				{
-					building->m_bounds = { cellX, cellY, 32, 32 };
-					setupTilesOnMask(collisionMask.data(), cellX, cellY, 1, 1, 'W');
-				}
-				break;
-
-				case Building::TURRET:
-				{
-					building->m_bounds = { cellX, cellY, 32, 32 };
-					setupTilesOnMask(collisionMask.data(), cellX, cellY, 1, 1);
-				}
-				break;
-
-				case Building::ROCKET_TURRET:
-				{
-					building->m_bounds = { cellX, cellY, 32, 32 };
-					setupTilesOnMask(collisionMask.data(), cellX, cellY, 1, 1);
-				}
-				break;
+				default: break;
 			}
 
-			int32_t right = cellX + (building->getSize().x >> 2);
-			int32_t bottom = cellY + (building->getSize().y >> 2);
+			int32_t right = coordX + building->getSize().x;
+			int32_t bottom = coordY + building->getSize().y;
 
-			if( right >= mapSizeInTiles.x || bottom >= mapSizeInTiles.y)
+			if( right >= mapSizeInPixels.x || bottom >= mapSizeInPixels.y)
 			{
 				m_buildings.returnObjectBack(building);
 
@@ -234,7 +147,6 @@ Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
 
 			buildings.push_back(building);
 				
-
 			return building;
 		}
 	}
@@ -581,7 +493,7 @@ char TileMap::convertTileNumToChar(int32_t index) const noexcept
 	}
 }
 
-sf::IntRect TileMap::getTexCoords(Building::Type type) const noexcept
+sf::IntRect TileMap::getTexCoordsOf(Building::Type type) const noexcept
 {
     switch (type)
     {
@@ -605,7 +517,31 @@ sf::IntRect TileMap::getTexCoords(Building::Type type) const noexcept
     }
 }
 
-int32_t TileMap::getHitPoints(Building::Type type) const noexcept
+sf::IntRect TileMap::getBoundsOf(Building::Type type, int32_t coordX, int32_t coordY) const noexcept
+{
+	switch (type)
+	{
+		case Building::CONCRETE_SLAB:      return { coordX, coordY, 32, 32 };
+		case Building::CONSTRUCTION_YARD:  return { coordX, coordY, 64, 64 };
+		case Building::SPICE_SILO:         return { coordX, coordY, 64, 64 };
+		case Building::STARPORT:           return { coordX, coordY, 96, 96 };
+		case Building::WIND_TRAP:          return { coordX, coordY, 64, 64 };
+		case Building::SPICE_REFINERY:     return { coordX, coordY, 96, 64 };
+		case Building::RADAR_OUTPOST:      return { coordX, coordY, 64, 64 };
+		case Building::REPAIR_FACILITY:    return { coordX, coordY, 96, 64 };
+		case Building::PALACE:             return { coordX, coordY, 96, 96 };
+		case Building::HIGH_TECH_FACILITY: return { coordX, coordY, 64, 64 };
+		case Building::BARRACKS:           return { coordX, coordY, 64, 64 };
+		case Building::VEHICLE_FACTORY:    return { coordX, coordY, 96, 64 };
+		case Building::WALL:               return { coordX, coordY, 32, 32 };
+		case Building::TURRET:             return { coordX, coordY, 32, 32 };
+		case Building::ROCKET_TURRET:      return { coordX, coordY, 32, 32 };
+
+		default: return sf::IntRect();
+	}
+}
+
+int32_t TileMap::getHitPointsOf(Building::Type type) const noexcept
 {
     switch (type)
     {

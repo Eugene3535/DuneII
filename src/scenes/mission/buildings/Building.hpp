@@ -37,7 +37,7 @@ public:
     void damage(int32_t points) noexcept;
 
     Type               type()      const noexcept;
-    const sf::Rect<uint8_t>& bounds()    const noexcept;
+    const sf::IntRect& bounds()    const noexcept;
     int32_t            hitPoints() const noexcept;
 
     bool isEnemy() const noexcept;
@@ -45,7 +45,7 @@ public:
 
 private:
     Type m_type;
-    sf::Rect<uint8_t> m_bounds;
+    sf::IntRect m_bounds;
     int32_t  m_hitPoints;
     int32_t  m_maxHitPoints;
     bool     m_isEnemy;
