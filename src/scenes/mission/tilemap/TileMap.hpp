@@ -60,7 +60,7 @@ private:
 	bool loadObjects(const rapidxml::xml_node<>* map_node) noexcept;
 
 private:
-	void parseTilesets(const rapidxml::xml_node<char>* map_node, std::vector<Tileset>& tilesets)   noexcept;
+	void parseTilesets(const rapidxml::xml_node<>* map_node, std::vector<Tileset>& tilesets)   noexcept;
 	void parseLandscape(const Tileset& tileset, const std::vector<int>& parsed_layer)     noexcept;
 	void parseBuildings(const Tileset& tileset, const std::vector<int>& parsed_layer)     noexcept;
 

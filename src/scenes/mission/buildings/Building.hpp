@@ -36,7 +36,6 @@ public:
 
     void repair(int32_t points) noexcept;
     void damage(int32_t points) noexcept;
-
     void changeOwner(House house) noexcept;
 
     Type               getType()         const noexcept;

@@ -281,7 +281,7 @@ bool TileMap::loadObjects(const rapidxml::xml_node<char>* map_node) noexcept
 	return !objects.empty();
 }
 
-void TileMap::parseTilesets(const rapidxml::xml_node<char>* map_node, std::vector<TileMap::Tileset>& tilesets) noexcept
+void TileMap::parseTilesets(const rapidxml::xml_node<>* map_node, std::vector<TileMap::Tileset>& tilesets) noexcept
 {
 	for (auto tilesetNode = map_node->first_node("tileset");
 			  tilesetNode != nullptr;
