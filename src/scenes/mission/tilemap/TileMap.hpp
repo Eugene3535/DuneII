@@ -42,8 +42,7 @@ public:
 		std::vector<Property> properties;
 		std::string           name;
 		std::string           type;
-		sf::Vector2i          position;
-		sf::Vector2i          size;
+		sf::IntRect           bounds;
 	};
 
 public:
@@ -54,6 +53,8 @@ public:
 	void eraseBuilding(const Building* building) noexcept;
 	std::vector<Building*> getAllBuildings() noexcept;
 	void unload() noexcept;
+
+	const std::vector<Object>& getObjects() const noexcept;
 
 private:
 	bool loadLayers(const rapidxml::xml_node<>* map_node)  noexcept;
@@ -72,10 +73,11 @@ private:
 
 private:
     ObjectPool<Building, ALL_BUILDING_LIMIT_ON_MAP> m_buildings;
+	std::vector<Object> m_objects;
 
 public:
 	Landscape landscape;
-	std::vector<Object>     objects;
+	
 	std::string             tileMask;
 	std::vector<char*> collisionMask;
 	

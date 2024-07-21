@@ -31,7 +31,7 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 		return false;
 
 	if(loadLayers(map_node))
-//		if(loadObjects(map_node))
+		if(loadObjects(map_node))
 			return true;
 
 	return false;
@@ -140,7 +140,7 @@ void TileMap::unload() noexcept
 	landscape.vertices.~VertexBuffer();
 	landscape.texture = nullptr;
 
-	objects.clear();
+	m_objects.clear();
 	tileMask.clear();
 	collisionMask.clear();
 	title.clear();
@@ -148,6 +148,11 @@ void TileMap::unload() noexcept
 	mapSizeInTiles  = { 0, 0 };
 	mapSizeInPixels  = { 0, 0 };
 	tileSize = { 0, 0 };
+}
+
+const std::vector<TileMap::Object>& TileMap::getObjects() const noexcept
+{
+	return m_objects;
 }
 
 bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
@@ -246,14 +251,14 @@ bool TileMap::loadObjects(const rapidxml::xml_node<char>* map_node) noexcept
 			      objectNode != nullptr;
 			      objectNode = objectNode->next_sibling("object"))
 		{
-			auto& tme_object = objects.emplace_back();
+			auto& tme_object = m_objects.emplace_back();
 
 			for (auto attr = objectNode->first_attribute(); attr != nullptr; attr = attr->next_attribute())
 			{
-				if (strcmp(attr->name(), "x")      == 0) { tme_object.position.x = std::atoi(attr->value()); continue; }
-				if (strcmp(attr->name(), "y")      == 0) { tme_object.position.y = std::atoi(attr->value()); continue; }
-				if (strcmp(attr->name(), "width")  == 0) { tme_object.size.x     = std::atoi(attr->value()); continue; }
-				if (strcmp(attr->name(), "height") == 0) { tme_object.size.y     = std::atoi(attr->value()); continue; }
+				if (strcmp(attr->name(), "x")      == 0) { tme_object.bounds.left   = std::atoi(attr->value()); continue; }
+				if (strcmp(attr->name(), "y")      == 0) { tme_object.bounds.top    = std::atoi(attr->value()); continue; }
+				if (strcmp(attr->name(), "width")  == 0) { tme_object.bounds.width  = std::atoi(attr->value()); continue; }
+				if (strcmp(attr->name(), "height") == 0) { tme_object.bounds.height = std::atoi(attr->value()); continue; }
 
 				if (strcmp(attr->name(), "name") == 0)  tme_object.name = attr->value();
 				if (strcmp(attr->name(), "class") == 0) tme_object.type = attr->value();
@@ -278,7 +283,59 @@ bool TileMap::loadObjects(const rapidxml::xml_node<char>* map_node) noexcept
 		}
 	}
 
-	return !objects.empty();
+	if(!m_objects.empty())
+	{
+		auto get_area_of = [this](House houseName) -> sf::IntRect
+		{
+			for(auto& object : m_objects)
+			{
+				if(object.name == "Area")
+				{
+					auto found = std::find_if(object.properties.begin(), object.properties.end(), [houseName](const TileMap::Object::Property& property)
+					{
+						return houseName == static_cast<House>(std::stoul(property.value));
+					});
+
+					if(found != object.properties.end())
+						return object.bounds;
+				}
+			}
+
+			return sf::IntRect();
+		};
+
+		auto atreides_area  = get_area_of(House::Atreides);
+		auto ordos_area     = get_area_of(House::Ordos);
+		auto harkonnen_area = get_area_of(House::Harkonnen);
+
+		auto buildings = getAllBuildings();
+
+		for(auto b : buildings)
+		{
+			auto type = b->getType();
+			const bool repairable = ((type!= Building::CONCRETE_SLAB) && (type != Building::WALL));
+
+			if(repairable)
+			{
+				if(b->getBounds().intersects(atreides_area))
+				{
+					b->changeOwner(House::Atreides);
+				}
+				else if(b->getBounds().intersects(ordos_area))
+				{
+					b->changeOwner(House::Ordos);
+				}
+				else if(b->getBounds().intersects(harkonnen_area))
+				{
+					b->changeOwner(House::Harkonnen);
+				}
+			}
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 void TileMap::parseTilesets(const rapidxml::xml_node<>* map_node, std::vector<TileMap::Tileset>& tilesets) noexcept
