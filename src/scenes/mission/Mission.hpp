@@ -1,7 +1,7 @@
 #ifndef MISSION_HPP
 #define MISSION_HPP
 
-#include "scenes/mission/tilemap/TileMap.hpp"
+#include "scenes/mission/buildings/Builder.hpp"
 #include "scenes/Scene.hpp"
 
 class Mission:
@@ -19,6 +19,7 @@ private:
 
 private:
     TileMap m_tilemap;
+    Builder m_builder;
     std::vector<Building*> m_buildings;
 
     sf::Vector2f m_view_position;

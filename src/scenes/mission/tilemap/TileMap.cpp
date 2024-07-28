@@ -68,11 +68,14 @@ Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
 
 	int32_t coordX = (cellX << 5);
 	int32_t coordY = (cellY << 5);
+	int32_t origin = cellY * mapSizeInTiles.x + cellX;
 
-	if(auto building = m_buildings.findUnusedObject(); building != nullptr)
+	if(auto found = m_buildings.find(origin); found == m_buildings.end())
 	{
 		if(const auto texture = Assets->getTexture("Buildings.png"); texture != nullptr)
 		{
+			auto building = &m_buildings[origin];
+
 			building->m_type = type;
 			building->setTexture(texture);
 			building->setTextureRect(getTexCoordsOf(type));
@@ -107,16 +110,6 @@ Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
 
 				default: break;
 			}
-
-			int32_t right = coordX + building->getSize().x;
-			int32_t bottom = coordY + building->getSize().y;
-
-			if( right >= mapSizeInPixels.x || bottom >= mapSizeInPixels.y)
-			{
-				m_buildings.returnObjectBack(building);
-
-				return nullptr;
-			}
 				
 			return building;
 		}
@@ -127,12 +120,17 @@ Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
 
 void TileMap::eraseBuilding(const Building* building) noexcept
 {
-	m_buildings.returnObjectBack(building);
+	//m_buildings.returnObjectBack(building);
 }
 
 std::vector<Building*> TileMap::getAllBuildings() noexcept
 {
-	return m_buildings.getOccupiedObjects();
+	std::vector<Building*> blds;
+
+	for(auto& [id, building] : m_buildings)
+		blds.push_back(&building);
+
+	return blds; //m_buildings.getOccupiedObjects();
 }
 
 void TileMap::unload() noexcept
@@ -433,7 +431,7 @@ void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int>& par
 	{
 		switch (tile_num)
 		{
-			case 111 ... 120: return Building::WALL;
+			case 111 ... 122: return Building::WALL;
 			case 124: return Building::SPICE_REFINERY;
 			case 127: return Building::CONSTRUCTION_YARD;
 			case 129: return Building::WIND_TRAP;
@@ -513,7 +511,7 @@ char TileMap::convertTileNumToChar(int32_t index) const noexcept
 		case 84 ... 100:  return 'S';
 		case 102 ... 109: return 'S';
 //      Wall
-		case 111 ... 120: return 'W';
+		case 111 ... 122: return 'W';
 //      Building
 		case 124 ... 137: return 'B';
 		case 140 ... 153: return 'B';

@@ -3,17 +3,17 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <filesystem>
 
 #include "rapidxml.hpp"
 
-#include "common/Defines.hpp"
-#include "common/ObjectPool.hpp"
 #include "scenes/mission/buildings/Building.hpp"
 
 class TileMap
 {
-private:
+	friend class Builder;
+
 	struct Tileset
 	{
 		const sf::Texture* texture { nullptr };
@@ -48,11 +48,11 @@ public:
 public:
 	bool loadFromFile(const std::filesystem::path& file_path) noexcept;
 
-	int32_t costOf(Building::Type type) const noexcept;
-	Building* placeBuilding(Building::Type type, int32_t cellX, int32_t cellY) noexcept;
-	void eraseBuilding(const Building* building) noexcept;
+	int32_t                costOf(Building::Type type) const noexcept;
+	Building*              placeBuilding(Building::Type type, int32_t cellX, int32_t cellY) noexcept;
+	void                   eraseBuilding(const Building* building) noexcept;
 	std::vector<Building*> getAllBuildings() noexcept;
-	void unload() noexcept;
+	void                   unload() noexcept;
 
 	const std::vector<Object>& getObjects() const noexcept;
 
@@ -72,7 +72,7 @@ private:
 	int32_t     getHitPointsOf(Building::Type type) const noexcept;
 
 private:
-    ObjectPool<Building, ALL_BUILDING_LIMIT_ON_MAP> m_buildings;
+    std::unordered_map<int32_t, Building> m_buildings;
 	std::vector<Object> m_objects;
 
 public:
