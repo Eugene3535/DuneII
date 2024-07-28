@@ -87,7 +87,7 @@ Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
 			{
 				for (int32_t i = 0; i < height; ++i)
 					for (int32_t j = 0; j < width; ++j)
-						mask[x + j][y + i] = symbol;
+						mask[y + i][x + j] = symbol;
 			};
 
 			switch (type)
