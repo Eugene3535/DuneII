@@ -120,7 +120,7 @@ Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
 
 void TileMap::eraseBuilding(const Building* building) noexcept
 {
-	//m_buildings.returnObjectBack(building);
+	
 }
 
 std::vector<Building*> TileMap::getAllBuildings() noexcept
@@ -130,7 +130,7 @@ std::vector<Building*> TileMap::getAllBuildings() noexcept
 	for(auto& [id, building] : m_buildings)
 		blds.push_back(&building);
 
-	return blds; //m_buildings.getOccupiedObjects();
+	return blds;
 }
 
 void TileMap::unload() noexcept
@@ -442,6 +442,7 @@ void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int>& par
 			case 161: return Building::PALACE;
 			case 164: return Building::HIGH_TECH_FACILITY;
 			case 166: return Building::REPAIR_FACILITY;
+			case 191: return Building::CONCRETE_SLAB;
 			case 207: return Building::STARPORT;
 			case 261: return Building::TURRET;
 			case 269: return Building::ROCKET_TURRET;
