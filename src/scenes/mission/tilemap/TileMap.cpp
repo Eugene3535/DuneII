@@ -386,13 +386,14 @@ void TileMap::parseLandscape(const Tileset& tileset, const std::vector<int>& par
 	const int32_t tile_height = tileSize.y;
 	const int32_t columns     = tileset.columns;
 	const int32_t firstGID    = tileset.firstGID;
+	size_t index = 0;
 
 	for (int32_t y = 0; y < map_height; ++y)
 		for (int32_t x = 0; x < map_width; ++x)
 		{
-			const int32_t index = y * map_width + x;
 			const int32_t tile_id = parsed_layer[index];
 			tileMask[index] = convertTileNumToChar(tile_id);
+			index++;
 
 //  Vertex XY coords				
 			const float cX = static_cast<float>(x * tile_width);
