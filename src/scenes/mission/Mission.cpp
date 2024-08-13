@@ -32,28 +32,28 @@ void Mission::update(sf::Time dt) noexcept
         return;
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-        m_view_position.x -= 10;
+        m_viewPosition.x -= 10;
     
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-        m_view_position.x += 10;
+        m_viewPosition.x += 10;
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-        m_view_position.y -= 10;
+        m_viewPosition.y -= 10;
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-        m_view_position.y += 10;
+        m_viewPosition.y += 10;
 
     auto& viewport  = m_game.viewport;
     auto view_size  = viewport.getSize();
     auto map_width  = m_tilemap.mapSizeInPixels.x;
     auto map_height = m_tilemap.mapSizeInPixels.y;
     
-    if(m_view_position.x < 0) m_view_position.x = 0;
-    if(m_view_position.y < 0) m_view_position.y = 0;
-    if(m_view_position.x + view_size.x > map_width)  m_view_position.x = map_width - view_size.x;
-    if(m_view_position.y + view_size.y > map_height) m_view_position.y = map_height - view_size.y;
+    if(m_viewPosition.x < 0) m_viewPosition.x = 0;
+    if(m_viewPosition.y < 0) m_viewPosition.y = 0;
+    if(m_viewPosition.x + view_size.x > map_width)  m_viewPosition.x = map_width - view_size.x;
+    if(m_viewPosition.y + view_size.y > map_height) m_viewPosition.y = map_height - view_size.y;
 
-    viewport.setCenter(m_view_position + (view_size * 0.5f));
+    viewport.setCenter(m_viewPosition + (view_size * 0.5f));
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::X))
     {
@@ -70,7 +70,19 @@ void Mission::draw(sf::RenderTarget& target, sf::RenderStates states) const
         states.texture = m_tilemap.landscape.texture;
         target.draw(vertexBuffer, states);
 
+        const auto& view = target.getView();
+
+        sf::Vector2i center(view.getCenter());
+        sf::IntRect  viewport = target.getViewport(view);
+        viewport.left = center.x - (viewport.width >> 1);
+        viewport.top  = center.y - (viewport.height >> 1);
+
         for(auto& b: m_buildings)
-            target.draw(*b, states);
+        {
+            if(viewport.intersects(b->getBounds()))
+            {
+                target.draw(*b, states);
+            }     
+        }        
     }
 }

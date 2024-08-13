@@ -22,7 +22,7 @@ private:
     Builder m_builder;
     std::vector<Building*> m_buildings;
 
-    sf::Vector2f m_view_position;
+    sf::Vector2f m_viewPosition;
 };
 
 #endif // !MISSION_HPP
