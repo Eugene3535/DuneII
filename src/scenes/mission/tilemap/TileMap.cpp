@@ -37,92 +37,6 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 	return false;
 }
 
-int32_t TileMap::costOf(Building::Type type) const noexcept
-{
-    switch (type)
-    {
-        case Building::CONCRETE_SLAB:      return 5;
-        case Building::CONSTRUCTION_YARD:  return 900;
-        case Building::SPICE_SILO:         return 300;
-        case Building::STARPORT:           return 500;
-        case Building::WIND_TRAP:          return 300;
-        case Building::SPICE_REFINERY:     return 300;
-        case Building::RADAR_OUTPOST:      return 400;
-        case Building::REPAIR_FACILITY:    return 700;
-        case Building::PALACE:             return 999;
-        case Building::HIGH_TECH_FACILITY: return 500;
-        case Building::BARRACKS:           return 300;
-        case Building::VEHICLE_FACTORY:    return 400;
-        case Building::WALL:               return 50;
-        case Building::TURRET:             return 125;
-        case Building::ROCKET_TURRET:      return 250;    
-
-        default: return 0;
-    }
-}
-
-Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cellY) noexcept
-{
-	if(cellX < 0 || cellY < 0)
-		return nullptr;
-
-	int32_t coordX = (cellX << 5);
-	int32_t coordY = (cellY << 5);
-	int32_t origin = cellY * mapSizeInTiles.x + cellX;
-
-	if(auto found = m_buildings.find(origin); found == m_buildings.end())
-	{
-		if(const auto texture = Assets->getTexture("Buildings.png"); texture != nullptr)
-		{
-			auto building = &m_buildings[origin];
-
-			building->m_type = type;
-			building->setTexture(texture);
-			building->setTextureRect(getTexCoordsOf(type));
-			building->setPosition(coordX, coordY);
-			building->m_hitPoints = building->m_maxHitPoints = getHitPointsOf(type);
-			building->m_bounds = getBoundsOf(type, coordX, coordY);
-
-			auto setupTilesOnMask = [](char** mask, int32_t x, int32_t y, int32_t width, int32_t height, char symbol = 'B')
-			{
-				for (int32_t i = 0; i < height; ++i)
-					for (int32_t j = 0; j < width; ++j)
-						mask[y + i][x + j] = symbol;
-			};
-
-			switch (type)
-			{
-				case Building::CONCRETE_SLAB:      setupTilesOnMask(collisionMask.data(), cellX, cellY, 1, 1, 'C'); break;
-				case Building::CONSTRUCTION_YARD:  setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);      break;
-				case Building::SPICE_SILO:         setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);      break;
-				case Building::STARPORT:           setupTilesOnMask(collisionMask.data(), cellX, cellY, 3, 3);      break;
-				case Building::WIND_TRAP:          setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);      break;
-				case Building::SPICE_REFINERY:     setupTilesOnMask(collisionMask.data(), cellX, cellY, 3, 2);      break;
-				case Building::RADAR_OUTPOST:      setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);      break;
-				case Building::REPAIR_FACILITY:    setupTilesOnMask(collisionMask.data(), cellX, cellY, 3, 2);      break;
-				case Building::PALACE:             setupTilesOnMask(collisionMask.data(), cellX, cellY, 3, 3);      break;
-				case Building::HIGH_TECH_FACILITY: setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);      break;
-				case Building::BARRACKS:           setupTilesOnMask(collisionMask.data(), cellX, cellY, 2, 2);      break;
-				case Building::VEHICLE_FACTORY:    setupTilesOnMask(collisionMask.data(), cellX, cellY, 3, 2);      break;
-				case Building::WALL:               setupTilesOnMask(collisionMask.data(), cellX, cellY, 1, 1, 'W'); break;
-				case Building::TURRET:             setupTilesOnMask(collisionMask.data(), cellX, cellY, 1, 1);      break;
-				case Building::ROCKET_TURRET:      setupTilesOnMask(collisionMask.data(), cellX, cellY, 1, 1);      break;
-
-				default: break;
-			}
-				
-			return building;
-		}
-	}
-
-	return nullptr;
-}
-
-void TileMap::eraseBuilding(const Building* building) noexcept
-{
-	
-}
-
 std::vector<Building*> TileMap::getAllBuildings() noexcept
 {
 	std::vector<Building*> blds;
@@ -282,57 +196,8 @@ bool TileMap::loadObjects(const rapidxml::xml_node<char>* map_node) noexcept
 	}
 
 	if(!m_objects.empty())
-	{
-		auto get_area_of = [this](House houseName) -> sf::IntRect
-		{
-			for(auto& object : m_objects)
-			{
-				if(object.name == "Area")
-				{
-					auto found = std::find_if(object.properties.begin(), object.properties.end(), [houseName](const TileMap::Object::Property& property)
-					{
-						return houseName == static_cast<House>(std::stoul(property.value));
-					});
-
-					if(found != object.properties.end())
-						return object.bounds;
-				}
-			}
-
-			return sf::IntRect();
-		};
-
-		auto atreides_area  = get_area_of(House::Atreides);
-		auto ordos_area     = get_area_of(House::Ordos);
-		auto harkonnen_area = get_area_of(House::Harkonnen);
-
-		auto buildings = getAllBuildings();
-
-		for(auto b : buildings)
-		{
-			auto type = b->getType();
-			const bool repairable = ((type!= Building::CONCRETE_SLAB) && (type != Building::WALL));
-
-			if(repairable)
-			{
-				if(b->getBounds().intersects(atreides_area))
-				{
-					b->changeOwner(House::Atreides);
-				}
-				else if(b->getBounds().intersects(ordos_area))
-				{
-					b->changeOwner(House::Ordos);
-				}
-				else if(b->getBounds().intersects(harkonnen_area))
-				{
-					b->changeOwner(House::Harkonnen);
-				}
-			}
-		}
-
 		return true;
-	}
-
+	
 	return false;
 }
 
@@ -453,13 +318,8 @@ void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int>& par
 	};
 
 //  Cached variables
-	const int32_t map_width   = mapSizeInTiles.x;
-	const int32_t map_height  = mapSizeInTiles.y;
-	const int32_t tile_width  = tileSize.x;
-	const int32_t tile_height = tileSize.y;
-	const int32_t columns     = tileset.columns;
-	const int32_t firstGID    = tileset.firstGID;
-	const int32_t tile_count  = tileset.tileCount;
+	const int32_t map_width  = mapSizeInTiles.x;
+	const int32_t map_height = mapSizeInTiles.y;
 
 	for (int32_t y = 0; y < map_height; ++y)
 		for (int32_t x = 0; x < map_width; ++x)
@@ -475,7 +335,8 @@ void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int>& par
 
 				if(bld_type != Building::Type::NONE)
 				{
-					placeBuilding(bld_type, x, y);
+					// placeBuilding(bld_type, x, y);
+					m_buildingsOnLoad.emplace_back(bld_type, x, y);
 				}
 			}
 		}
@@ -529,76 +390,4 @@ char TileMap::convertTileNumToChar(int32_t index) const noexcept
 
 		default:          return 'S'; // sandy soil by default
 	}
-}
-
-sf::IntRect TileMap::getTexCoordsOf(Building::Type type) const noexcept
-{
-    switch (type)
-    {
-        case Building::CONCRETE_SLAB:      return { 0, 160, 32, 32   };
-        case Building::CONSTRUCTION_YARD:  return { 0, 32, 64, 64    };
-        case Building::SPICE_SILO:         return { 192, 32, 64, 64  };
-        case Building::STARPORT:           return { 0, 192, 96, 96   };
-        case Building::WIND_TRAP:          return { 64, 32, 64, 64   };
-        case Building::SPICE_REFINERY:     return { 416, 0, 96, 64   };
-        case Building::RADAR_OUTPOST:      return { 128, 32, 64, 64  };
-        case Building::REPAIR_FACILITY:    return { 224, 96, 96, 64  };
-        case Building::PALACE:             return { 64, 96, 96, 96   };
-        case Building::HIGH_TECH_FACILITY: return { 160, 96, 64, 64  };
-        case Building::BARRACKS:           return { 0, 96, 64, 64    };
-        case Building::VEHICLE_FACTORY:    return { 256, 32, 96, 64  };
-        case Building::WALL:               return { 0, 0, 32, 32     };
-        case Building::TURRET:             return { 192, 288, 32, 32 };
-        case Building::ROCKET_TURRET:      return { 448, 288, 32, 32 };
-
-        default: return sf::IntRect();
-    }
-}
-
-sf::IntRect TileMap::getBoundsOf(Building::Type type, int32_t coordX, int32_t coordY) const noexcept
-{
-	switch (type)
-	{
-		case Building::CONCRETE_SLAB:      return { coordX, coordY, 32, 32 };
-		case Building::CONSTRUCTION_YARD:  return { coordX, coordY, 64, 64 };
-		case Building::SPICE_SILO:         return { coordX, coordY, 64, 64 };
-		case Building::STARPORT:           return { coordX, coordY, 96, 96 };
-		case Building::WIND_TRAP:          return { coordX, coordY, 64, 64 };
-		case Building::SPICE_REFINERY:     return { coordX, coordY, 96, 64 };
-		case Building::RADAR_OUTPOST:      return { coordX, coordY, 64, 64 };
-		case Building::REPAIR_FACILITY:    return { coordX, coordY, 96, 64 };
-		case Building::PALACE:             return { coordX, coordY, 96, 96 };
-		case Building::HIGH_TECH_FACILITY: return { coordX, coordY, 64, 64 };
-		case Building::BARRACKS:           return { coordX, coordY, 64, 64 };
-		case Building::VEHICLE_FACTORY:    return { coordX, coordY, 96, 64 };
-		case Building::WALL:               return { coordX, coordY, 32, 32 };
-		case Building::TURRET:             return { coordX, coordY, 32, 32 };
-		case Building::ROCKET_TURRET:      return { coordX, coordY, 32, 32 };
-
-		default: return sf::IntRect();
-	}
-}
-
-int32_t TileMap::getHitPointsOf(Building::Type type) const noexcept
-{
-    switch (type)
-    {
-        case Building::CONCRETE_SLAB:      return 40;
-        case Building::CONSTRUCTION_YARD:  return 800;
-        case Building::SPICE_SILO:         return 300;
-        case Building::STARPORT:           return 1000;
-        case Building::WIND_TRAP:          return 400;
-        case Building::SPICE_REFINERY:     return 900;
-        case Building::RADAR_OUTPOST:      return 1000;
-        case Building::REPAIR_FACILITY:    return 1800;
-        case Building::PALACE:             return 2000;
-        case Building::HIGH_TECH_FACILITY: return 1000;
-        case Building::BARRACKS:           return 600;
-        case Building::VEHICLE_FACTORY:    return 800;
-        case Building::WALL:               return 140;
-        case Building::TURRET:             return 250;
-        case Building::ROCKET_TURRET:      return 500;
-
-        default: return 1;
-    }
 }

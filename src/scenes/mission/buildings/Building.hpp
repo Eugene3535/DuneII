@@ -9,6 +9,8 @@
 class Building final:
     public AnimatedTile
 {
+    friend class Builder;
+
 public:
     enum Type: int32_t
     {

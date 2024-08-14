@@ -1,9 +1,10 @@
-#ifndef TILE_MAP_HPP
-#define TILE_MAP_HPP
+#ifndef TILEMAP_HPP
+#define TILEMAP_HPP
 
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <tuple>
 #include <filesystem>
 
 #include "rapidxml.hpp"
@@ -48,9 +49,6 @@ public:
 public:
 	bool loadFromFile(const std::filesystem::path& file_path) noexcept;
 
-	int32_t                costOf(Building::Type type) const noexcept;
-	Building*              placeBuilding(Building::Type type, int32_t cellX, int32_t cellY) noexcept;
-	void                   eraseBuilding(const Building* building) noexcept;
 	std::vector<Building*> getAllBuildings() noexcept;
 	void                   unload() noexcept;
 
@@ -66,14 +64,12 @@ private:
 	void parseBuildings(const Tileset& tileset, const std::vector<int>& parsed_layer)     noexcept;
 
 private:
-	char        convertTileNumToChar(int32_t index) const noexcept;
-    sf::IntRect getTexCoordsOf(Building::Type type) const noexcept;
-	sf::IntRect getBoundsOf(Building::Type type, int32_t coordX, int32_t coordY) const noexcept;
-	int32_t     getHitPointsOf(Building::Type type) const noexcept;
+	char convertTileNumToChar(int32_t index) const noexcept;
 
 private:
     std::unordered_map<int32_t, Building> m_buildings;
 	std::vector<Object> m_objects;
+	std::vector<std::tuple<Building::Type, int32_t, int32_t>> m_buildingsOnLoad;
 
 public:
 	Landscape landscape;
@@ -88,4 +84,4 @@ public:
 	sf::Vector2i tileSize;
 };
 
-#endif // !TILE_MAP_HPP
+#endif // !TILEMAP_HPP

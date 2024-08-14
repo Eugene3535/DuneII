@@ -1,10 +1,7 @@
-#ifndef WALL_BUILDER_HPP
-#define WALL_BUILDER_HPP
+#ifndef BUILDER_HPP
+#define BUILDER_HPP
 
 #include "scenes/mission/tilemap/TileMap.hpp"
-
-#include <SFML/Graphics/Rect.hpp>
-
 class Builder
 {
     enum WallCellType : uint32_t
@@ -29,20 +26,25 @@ public:
 
     bool init(TileMap& tilemap) noexcept;
 
+    void placeBuilding(const std::tuple<Building::Type, int32_t, int32_t>& params) noexcept;
     void placeWall(int32_t cellX, int32_t cellY) noexcept;
 
 private:
     void         updateWall(int32_t origin, int32_t level) noexcept;
     WallCellType getWallType(bool left, bool top, bool right, bool bottom) noexcept;
     sf::IntRect  getTexCoordsOf(WallCellType type) noexcept;
+    sf::IntRect  getTexCoordsOf(Building::Type type) const noexcept;
+	sf::IntRect  getBoundsOf(Building::Type type, int32_t coordX, int32_t coordY) const noexcept;
+	int32_t      getHitPointsOf(Building::Type type) const noexcept;
 
 private:
     std::unordered_map<int32_t, Building>* m_buildings;
     std::string* m_tileMask;
+    std::vector<char*>* m_collisionMask;
     int32_t m_mapWidthInTiles;
     int32_t m_mapHeightInTiles;
     int32_t m_tileWidth;
     int32_t m_tileHeight;
 };
 
-#endif // !WALL_BUILDER_HPP
+#endif // !BUILDER_HPP
