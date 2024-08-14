@@ -31,14 +31,6 @@ bool Builder::init(TileMap& tilemap) noexcept
     for(const auto& building : tilemap.m_buildingsOnLoad)
         placeBuilding(building);
 
-    for(auto& [id, building] : *m_buildings)
-    {
-        if(building.getType() == Building::WALL)
-        {
-            updateWall(id, 1);
-        }
-    }
-
     auto& objects = tilemap.m_objects;
 
     auto get_area_of = [&objects](House houseName) -> sf::IntRect
@@ -140,16 +132,11 @@ void Builder::placeBuilding(const std::tuple<Building::Type, int32_t, int32_t>& 
 
 				default: break;
 			}
+
+            if(type == Building::WALL)
+                updateWall(origin, 1);
 		}
 	}
-}
-
-void Builder::placeWall(int32_t cellX, int32_t cellY) noexcept
-{
-    int32_t origin = cellY * m_mapWidthInTiles + cellX;
-    auto wall_cell = m_tileMask->data() + origin;
-    *wall_cell = 'W';
-    updateWall(origin, 2);
 }
 
 void Builder::updateWall(int32_t origin, int32_t level) noexcept

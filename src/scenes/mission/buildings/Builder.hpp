@@ -25,9 +25,7 @@ public:
     ~Builder();
 
     bool init(TileMap& tilemap) noexcept;
-
     void placeBuilding(const std::tuple<Building::Type, int32_t, int32_t>& params) noexcept;
-    void placeWall(int32_t cellX, int32_t cellY) noexcept;
 
 private:
     void         updateWall(int32_t origin, int32_t level) noexcept;

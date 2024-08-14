@@ -335,7 +335,6 @@ void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int>& par
 
 				if(bld_type != Building::Type::NONE)
 				{
-					// placeBuilding(bld_type, x, y);
 					m_buildingsOnLoad.emplace_back(bld_type, x, y);
 				}
 			}
