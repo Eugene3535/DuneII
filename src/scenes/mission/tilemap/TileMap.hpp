@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include <tuple>
 #include <filesystem>
 
 #include "rapidxml.hpp"
@@ -47,6 +46,14 @@ public:
 	};
 
 public:
+	struct BuildingData 
+	{
+		Building::Type type;
+		int32_t cellX;
+		int32_t cellY;
+	};
+
+public:
 	bool loadFromFile(const std::filesystem::path& file_path) noexcept;
 
 	std::vector<Building*> getAllBuildings() noexcept;
@@ -69,7 +76,7 @@ private:
 private:
     std::unordered_map<int32_t, Building> m_buildings;
 	std::vector<Object> m_objects;
-	std::vector<std::tuple<Building::Type, int32_t, int32_t>> m_buildingsOnLoad;
+	std::vector<BuildingData> m_buildingsOnLoad;
 
 public:
 	Landscape landscape;

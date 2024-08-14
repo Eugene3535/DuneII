@@ -29,7 +29,7 @@ bool Builder::init(TileMap& tilemap) noexcept
     m_tileHeight       = tilemap.tileSize.y;
 
     for(const auto& building : tilemap.m_buildingsOnLoad)
-        placeBuilding(building);
+        placeBuilding(building.type, building.cellX, building.cellY);
 
     auto& objects = tilemap.m_objects;
 
@@ -81,12 +81,10 @@ bool Builder::init(TileMap& tilemap) noexcept
     return true;
 }
 
-void Builder::placeBuilding(const std::tuple<Building::Type, int32_t, int32_t>& params) noexcept
+Building* Builder::placeBuilding(Building::Type type, int32_t cellX, int32_t cellY) noexcept
 {
-    const auto& [type, cellX, cellY] = params;
-
     if(cellX < 0 || cellY < 0)
-		return;
+		return nullptr;
 
 	int32_t coordX = cellX * m_tileWidth;
 	int32_t coordY = cellY * m_tileHeight;
@@ -134,9 +132,13 @@ void Builder::placeBuilding(const std::tuple<Building::Type, int32_t, int32_t>& 
 			}
 
             if(type == Building::WALL)
-                updateWall(origin, 1);
+                updateWall(origin, 2);
+
+            return building;
 		}
 	}
+
+    return nullptr;
 }
 
 void Builder::updateWall(int32_t origin, int32_t level) noexcept

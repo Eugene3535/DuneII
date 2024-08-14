@@ -42,7 +42,7 @@ void Mission::update(sf::Time dt) noexcept
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
         m_viewPosition.y += 10;
-
+        
     auto& view            = m_game.viewport;
     const auto view_size  = view.getSize();
     const auto map_width  = m_tilemap.mapSizeInPixels.x;
