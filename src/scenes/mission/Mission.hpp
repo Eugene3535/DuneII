@@ -21,6 +21,7 @@ private:
     TileMap m_tilemap;
     Builder m_builder;
     std::vector<Building*> m_buildings;
+    std::vector<sf::Drawable*> m_drawables;
 
     sf::Vector2f m_viewPosition;
 };

@@ -43,17 +43,29 @@ void Mission::update(sf::Time dt) noexcept
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
         m_viewPosition.y += 10;
 
-    auto& viewport  = m_game.viewport;
-    auto view_size  = viewport.getSize();
-    auto map_width  = m_tilemap.mapSizeInPixels.x;
-    auto map_height = m_tilemap.mapSizeInPixels.y;
+    auto& view            = m_game.viewport;
+    const auto view_size  = view.getSize();
+    const auto map_width  = m_tilemap.mapSizeInPixels.x;
+    const auto map_height = m_tilemap.mapSizeInPixels.y;
     
     if(m_viewPosition.x < 0) m_viewPosition.x = 0;
     if(m_viewPosition.y < 0) m_viewPosition.y = 0;
     if(m_viewPosition.x + view_size.x > map_width)  m_viewPosition.x = map_width - view_size.x;
     if(m_viewPosition.y + view_size.y > map_height) m_viewPosition.y = map_height - view_size.y;
 
-    viewport.setCenter(m_viewPosition + (view_size * 0.5f));
+    view.setCenter(m_viewPosition + (view_size * 0.5f));
+
+    sf::IntRect viewport = sf::IntRect(m_viewPosition.x, m_viewPosition.y, view_size.x, view_size.y);
+
+    m_drawables.clear();
+
+    for(auto b: m_buildings)
+    {
+        if(viewport.intersects(b->getBounds()))
+        {
+            m_drawables.push_back(b);
+        }     
+    }  
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::X))
     {
@@ -70,19 +82,9 @@ void Mission::draw(sf::RenderTarget& target, sf::RenderStates states) const
         states.texture = m_tilemap.landscape.texture;
         target.draw(vertexBuffer, states);
 
-        const auto& view = target.getView();
-
-        sf::Vector2i center(view.getCenter());
-        sf::IntRect  viewport = target.getViewport(view);
-        viewport.left = center.x - (viewport.width >> 1);
-        viewport.top  = center.y - (viewport.height >> 1);
-
-        for(auto& b: m_buildings)
+        for(auto drawable: m_drawables)
         {
-            if(viewport.intersects(b->getBounds()))
-            {
-                target.draw(*b, states);
-            }     
-        }        
+            target.draw(*drawable, states);   
+        }    
     }
 }
