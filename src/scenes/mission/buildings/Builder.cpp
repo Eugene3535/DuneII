@@ -85,26 +85,19 @@ Building* Builder::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
 	int32_t coordY = cellY * m_tileHeight;
     auto bounds = getBoundsOf(type, coordX, coordY);
 
-    auto out_of_bounds = [this, bounds]() -> bool
-    {
+    {// out of bounds ?
         int32_t map_width  = m_mapWidthInTiles * m_tileWidth;
         int32_t map_height = m_mapHeightInTiles * m_tileHeight;
 
-        if(bounds.left < 0) return true;
-        if(bounds.top < 0)  return true;
-        if(bounds.left + bounds.width > map_width)  return true;
-        if(bounds.top + bounds.height > map_height) return true;
+        if(bounds.left < 0) return nullptr;
+        if(bounds.top < 0)  return nullptr;
+        if(bounds.left + bounds.width > map_width)  return nullptr;
+        if(bounds.top + bounds.height > map_height) return nullptr;
+    }
 
-        return false;
-    };
+    const int32_t origin = cellY * m_mapWidthInTiles + cellX;
 
-    if(out_of_bounds()) 
-        return nullptr;
-
-    int32_t origin = cellY * m_mapWidthInTiles + cellX;
-
-    auto can_be_constructed = [this, origin](Building::Type type) mutable -> bool
-    {
+    {// can be constructed ?
         sf::Vector2i size;
 
         switch (type)
@@ -129,21 +122,17 @@ Building* Builder::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
         }
 
         const char* mask = m_tileMask->data();
+        int32_t offset = origin;
 
         for (int32_t i = 0; i < size.y; ++i)
         {
             for (int32_t j = 0; j < size.x; ++j)  
-                if(mask[origin + j] != 'R')
-                    return false;
+                if(mask[offset + j] != 'R')
+                    return nullptr;
             
-            origin += m_mapWidthInTiles;
+            offset += m_mapWidthInTiles;
         }
-
-        return true;
-    };
-
-    if(!can_be_constructed(type))
-        return nullptr;
+    }
 
 	if(auto found = m_buildings->find(origin); found == m_buildings->end())
 	{
@@ -158,16 +147,17 @@ Building* Builder::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
 			building->m_hitPoints = building->m_maxHitPoints = getHitPointsOf(type);
 			building->m_bounds = bounds;
 
-			auto setup_tiles_on_mask = [this, origin](int32_t width, int32_t height, char symbol = 'B') mutable -> void
+			auto setup_tiles_on_mask = [this, origin](int32_t width, int32_t height, char symbol = 'B') -> void
 			{
                 char* mask = m_tileMask->data();
+                int32_t offset = origin;
 
 				for (int32_t i = 0; i < height; ++i)
                 {
 					for (int32_t j = 0; j < width; ++j)  
-                        mask[origin + j] = symbol;    
+                        mask[offset + j] = symbol;    
                     
-                    origin += m_mapWidthInTiles;
+                    offset += m_mapWidthInTiles;
                 }
 			};
 
