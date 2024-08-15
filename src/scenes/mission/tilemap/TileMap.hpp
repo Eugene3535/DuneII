@@ -53,10 +53,13 @@ public:
 	bool loadFromFile(const std::filesystem::path& file_path) noexcept;
 
 	std::vector<Building*> getAllBuildings() noexcept;
-	void                   unload() noexcept;
+	void                   unload()          noexcept;
 
-	const std::vector<Object>& getObjects()  const noexcept;
-	std::string_view           getTileMask() const noexcept;
+	const std::vector<Object>& getObjects()         const noexcept;
+	std::string_view           getTileMask()        const noexcept;
+	const sf::Vector2i&        getMapSizeInTiles()  const noexcept;
+	const sf::Vector2i&        getMapSizeInPixels() const noexcept;
+	const sf::Vector2i&        getTileSize()        const noexcept;
 	
 
 private:
@@ -64,9 +67,9 @@ private:
 	bool loadObjects(const rapidxml::xml_node<>* map_node) noexcept;
 
 private:
-	void parseTilesets(const rapidxml::xml_node<>* map_node, std::vector<Tileset>& tilesets)   noexcept;
-	void parseLandscape(const Tileset& tileset, const std::vector<int>& parsed_layer)     noexcept;
-	void parseBuildings(const Tileset& tileset, const std::vector<int>& parsed_layer)     noexcept;
+	void parseTilesets(const rapidxml::xml_node<>* map_node, std::vector<Tileset>& tilesets) noexcept;
+	void parseLandscape(const Tileset& tileset, const std::vector<int>& parsed_layer)        noexcept;
+	void parseBuildings(const Tileset& tileset, const std::vector<int>& parsed_layer)        noexcept;
 
 private:
 	char convertTileNumToChar(int32_t index) const noexcept;

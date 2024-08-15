@@ -21,10 +21,10 @@ bool Builder::init(TileMap& tilemap) noexcept
 {
     m_buildings        = &tilemap.m_buildings;
     m_tileMask         = &tilemap.m_tileMask;
-    m_mapWidthInTiles  = tilemap.mapSizeInTiles.x;
-    m_mapHeightInTiles = tilemap.mapSizeInTiles.y;
-    m_tileWidth        = tilemap.tileSize.x;
-    m_tileHeight       = tilemap.tileSize.y;
+    m_mapWidthInTiles  = tilemap.m_mapSizeInTiles.x;
+    m_mapHeightInTiles = tilemap.m_mapSizeInTiles.y;
+    m_tileWidth        = tilemap.m_tileSize.x;
+    m_tileHeight       = tilemap.m_tileSize.y;
 
     for(const auto& building : tilemap.m_buildingsOnLoad)
         placeBuilding(building.type, building.cellX, building.cellY);

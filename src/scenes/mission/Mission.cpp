@@ -43,15 +43,14 @@ void Mission::update(sf::Time dt) noexcept
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
         m_viewPosition.y += 10;
         
-    auto& view            = m_game.viewport;
-    const auto view_size  = view.getSize();
-    const auto map_width  = m_tilemap.mapSizeInPixels.x;
-    const auto map_height = m_tilemap.mapSizeInPixels.y;
+    auto& view           = m_game.viewport;
+    const auto view_size = view.getSize();
+    const auto map_size  = m_tilemap.getMapSizeInPixels();
     
     if(m_viewPosition.x < 0) m_viewPosition.x = 0;
     if(m_viewPosition.y < 0) m_viewPosition.y = 0;
-    if(m_viewPosition.x + view_size.x > map_width)  m_viewPosition.x = map_width - view_size.x;
-    if(m_viewPosition.y + view_size.y > map_height) m_viewPosition.y = map_height - view_size.y;
+    if(m_viewPosition.x + view_size.x > map_size.x) m_viewPosition.x = map_size.x - view_size.x;
+    if(m_viewPosition.y + view_size.y > map_size.y) m_viewPosition.y = map_size.y - view_size.y;
 
     view.setCenter(m_viewPosition + (view_size * 0.5f));
 

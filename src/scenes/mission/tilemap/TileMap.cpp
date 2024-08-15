@@ -25,7 +25,7 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 	if(file_path.extension().string() != ".tmx")
 		return false;
 
-	title = file_path.stem().string();
+	m_title = file_path.stem().string();
 
 	auto document = std::make_unique<rapidxml::xml_document<char>>();
 	rapidxml::file<char> xmlFile(file_path.string().c_str());
@@ -60,11 +60,11 @@ void TileMap::unload() noexcept
 
 	m_objects.clear();
 	m_tileMask.clear();
-	title.clear();
+	m_title.clear();
 
-	mapSizeInTiles  = { 0, 0 };
-	mapSizeInPixels = { 0, 0 };
-	tileSize        = { 0, 0 };
+	m_mapSizeInTiles  = { 0, 0 };
+	m_mapSizeInPixels = { 0, 0 };
+	m_tileSize        = { 0, 0 };
 }
 
 const std::vector<TileMap::Object>& TileMap::getObjects() const noexcept
@@ -75,6 +75,21 @@ const std::vector<TileMap::Object>& TileMap::getObjects() const noexcept
 std::string_view TileMap::getTileMask() const noexcept
 {
 	return m_tileMask;
+}
+
+const sf::Vector2i& TileMap::getMapSizeInTiles()  const noexcept
+{
+	return m_mapSizeInTiles;
+}
+
+const sf::Vector2i& TileMap::getMapSizeInPixels() const noexcept
+{
+	return m_mapSizeInPixels;
+}
+
+const sf::Vector2i& TileMap::getTileSize() const noexcept
+{
+	return m_tileSize;
 }
 
 bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
@@ -98,9 +113,9 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 	if (!(map_width && map_height && tile_width && tile_height))
 		return false;
 
-	mapSizeInTiles  = { map_width,  map_height  };
-	mapSizeInPixels = { map_width * tile_width,  map_height * tile_height  };
-	tileSize        = { tile_width, tile_height };
+	m_mapSizeInTiles  = { map_width,  map_height  };
+	m_mapSizeInPixels = { map_width * tile_width,  map_height * tile_height  };
+	m_tileSize        = { tile_width, tile_height };
 
 	m_tileMask.resize(static_cast<size_t>(map_width * map_height), 'S');
 
@@ -251,10 +266,10 @@ void TileMap::parseLandscape(const Tileset& tileset, const std::vector<int>& par
 	vertices.reserve(parsed_layer.size());
 
 //  Cached variables
-	const int32_t map_width   = mapSizeInTiles.x;
-	const int32_t map_height  = mapSizeInTiles.y;
-	const int32_t tile_width  = tileSize.x;
-	const int32_t tile_height = tileSize.y;
+	const int32_t map_width   = m_mapSizeInTiles.x;
+	const int32_t map_height  = m_mapSizeInTiles.y;
+	const int32_t tile_width  = m_tileSize.x;
+	const int32_t tile_height = m_tileSize.y;
 	const int32_t columns     = tileset.columns;
 	const int32_t firstGID    = tileset.firstGID;
 	size_t index = 0;
@@ -324,8 +339,8 @@ void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int>& par
 	};
 
 //  Cached variables
-	const int32_t map_width  = mapSizeInTiles.x;
-	const int32_t map_height = mapSizeInTiles.y;
+	const int32_t map_width  = m_mapSizeInTiles.x;
+	const int32_t map_height = m_mapSizeInTiles.y;
 
 	for (int32_t y = 0; y < map_height; ++y)
 		for (int32_t x = 0; x < map_width; ++x)
