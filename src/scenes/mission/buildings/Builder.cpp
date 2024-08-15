@@ -27,7 +27,7 @@ bool Builder::init(TileMap& tilemap) noexcept
     m_tileHeight       = tilemap.m_tileSize.y;
 
     for(const auto& building : tilemap.m_buildingsOnLoad)
-        placeBuilding(building.type, building.cellX, building.cellY);
+        placeBuilding(building.type, building.cellX, building.cellY);   
 
     auto& objects = tilemap.m_objects;
 

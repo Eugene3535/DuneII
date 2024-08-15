@@ -318,7 +318,18 @@ void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int>& par
 	{
 		switch (tile_num)
 		{
-			case 111 ... 122: return Building::WALL;
+			case 111: return Building::WALL;
+			case 112: return Building::WALL;
+			case 113: return Building::WALL;
+			case 114: return Building::WALL;
+			case 115: return Building::WALL;
+			case 116: return Building::WALL;
+			case 117: return Building::WALL;
+			case 118: return Building::WALL;
+			case 119: return Building::WALL;
+			case 120: return Building::WALL;
+			case 121: return Building::WALL;
+			case 122: return Building::WALL;
 			case 124: return Building::SPICE_REFINERY;
 			case 127: return Building::CONSTRUCTION_YARD;
 			case 129: return Building::WIND_TRAP;
@@ -365,6 +376,8 @@ void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int>& par
 
 char TileMap::convertTileNumToChar(int32_t index) const noexcept
 {
+#if defined(__GNUC__) || defined(__MINGW32__)
+
 	switch (index)
 	{
 //      rocky soil
@@ -394,7 +407,6 @@ char TileMap::convertTileNumToChar(int32_t index) const noexcept
 		case 62 ... 81:   return 'S';
 		case 84 ... 100:  return 'S';
 		case 102 ... 109: return 'S';
-
 //      NOTE: Tiles occupied by buildings will be filled in later when loaded by the Builder class
 //      Wall
 		case 111 ... 122: return 'R';
@@ -410,9 +422,235 @@ char TileMap::convertTileNumToChar(int32_t index) const noexcept
 		case 255 ... 286: return 'R';
 //      Concrete slab
 		case 191:         return 'R';
-
-		default:          return 'S'; // sandy soil by default
+//      sandy soil by default
+		default:          return 'S';
 	}
+
+#elif defined(_MSC_VER)
+
+	switch (index)
+	{
+//      rocky soil
+		case 1:   return 'R';
+		case 2:   return 'R';
+		case 3:   return 'R';
+		case 4:   return 'R';
+		case 5:   return 'R';
+		case 13:  return 'R';
+		case 14:  return 'R';
+		case 15:  return 'R';
+		case 16:  return 'R';
+		case 25:  return 'R';
+		case 26:  return 'R';
+		case 27:  return 'R';
+		case 31:  return 'R';
+		case 32:  return 'R';
+		case 33:  return 'R';
+		case 34:  return 'R';
+		case 40:  return 'R';
+		case 41:  return 'R';
+		case 42:  return 'R';
+		case 45:  return 'R';
+		case 48:  return 'R';
+		case 55:  return 'R';
+		case 61:  return 'R'; 
+		case 82:  return 'R';
+		case 83:  return 'R';
+		case 101: return 'R';
+//      sandy soil
+		case 6:   return 'S';
+		case 7:   return 'S';
+		case 8:   return 'S';
+		case 9:   return 'S';
+		case 10:  return 'S';
+		case 11:  return 'S';
+		case 12:  return 'S';
+		case 17:  return 'S';
+		case 18:  return 'S';
+		case 19:  return 'S';
+		case 20:  return 'S';
+		case 21:  return 'S';
+		case 22:  return 'S';
+		case 23:  return 'S';
+		case 24:  return 'S';
+		case 28:  return 'S';
+		case 29:  return 'S';
+		case 30:  return 'S';
+		case 35:  return 'S';
+		case 36:  return 'S';
+		case 37:  return 'S';
+		case 38:  return 'S';
+		case 39:  return 'S';
+		case 43:  return 'S';
+		case 44:  return 'S';
+		case 46:  return 'S';
+		case 47:  return 'S';
+		case 49:  return 'S';
+		case 50:  return 'S';
+		case 51:  return 'S';
+		case 52:  return 'S';
+		case 53:  return 'S';
+		case 54:  return 'S';
+		case 56:  return 'S';
+		case 57:  return 'S';
+		case 58:  return 'S';
+		case 59:  return 'S';
+		case 60:  return 'S';
+		case 62:  return 'S';
+		case 63:  return 'S';
+		case 64:  return 'S';
+		case 65:  return 'S';
+		case 66:  return 'S';
+		case 67:  return 'S';
+		case 68:  return 'S';
+		case 69:  return 'S';
+		case 70:  return 'S';
+		case 71:  return 'S';
+		case 72:  return 'S';
+		case 73:  return 'S';
+		case 74:  return 'S';
+		case 75:  return 'S';
+		case 76:  return 'S';
+		case 77:  return 'S';
+		case 78:  return 'S';
+		case 79:  return 'S';
+		case 80:  return 'S';
+		case 81:  return 'S';
+		case 84:  return 'S';
+		case 85:  return 'S';
+		case 86:  return 'S';
+		case 87:  return 'S';
+		case 88:  return 'S';
+		case 89:  return 'S';
+		case 90:  return 'S';
+		case 91:  return 'S';
+		case 92:  return 'S';
+		case 93:  return 'S';
+		case 94:  return 'S';
+		case 95:  return 'S';
+		case 96:  return 'S';
+		case 97:  return 'S';
+		case 98:  return 'S';
+		case 99:  return 'S';
+		case 100: return 'S';
+		case 102: return 'S';
+		case 103: return 'S';
+		case 104: return 'S';
+		case 105: return 'S';
+		case 106: return 'S';
+		case 107: return 'S';
+		case 108: return 'S';
+		case 109: return 'S';
+//      NOTE: Tiles occupied by buildings will be filled in later when loaded by the Builder class
+//      Wall
+		case 111: return 'R';
+		case 112: return 'R';
+		case 113: return 'R';
+		case 114: return 'R';
+		case 115: return 'R';
+		case 116: return 'R';
+		case 117: return 'R';
+		case 118: return 'R';
+		case 119: return 'R';
+		case 120: return 'R';
+		case 121: return 'R';
+		case 122: return 'R';
+		case 124: return 'R';
+		case 125: return 'R';
+		case 126: return 'R';
+		case 127: return 'R';
+		case 128: return 'R';
+		case 129: return 'R';
+		case 130: return 'R';
+		case 131: return 'R';
+		case 132: return 'R';
+		case 133: return 'R';
+		case 134: return 'R';
+		case 135: return 'R';
+		case 136: return 'R';
+		case 137: return 'R';
+		case 140: return 'R';
+		case 141: return 'R';
+		case 142: return 'R';
+		case 143: return 'R';
+		case 144: return 'R';
+		case 145: return 'R';
+		case 146: return 'R';
+		case 147: return 'R';
+		case 148: return 'R';
+		case 149: return 'R';
+		case 150: return 'R';
+		case 151: return 'R';
+		case 152: return 'R';
+		case 153: return 'R';
+		case 159: return 'R';
+		case 160: return 'R';
+		case 161: return 'R';
+		case 162: return 'R';
+		case 163: return 'R';
+		case 164: return 'R';
+		case 165: return 'R';
+		case 175: return 'R';
+		case 176: return 'R';
+		case 177: return 'R';
+		case 178: return 'R';
+		case 179: return 'R';
+		case 180: return 'R';
+		case 181: return 'R';
+		case 192: return 'R';
+		case 193: return 'R';
+		case 194: return 'R';
+		case 195: return 'R';
+		case 207: return 'R';
+		case 208: return 'R';
+		case 209: return 'R';
+		case 223: return 'R';
+		case 224: return 'R';
+		case 225: return 'R';
+		case 239: return 'R';
+		case 240: return 'R';
+		case 241: return 'R';
+		case 255: return 'R';
+		case 256: return 'R';
+		case 257: return 'R';
+		case 258: return 'R';
+		case 259: return 'R';
+		case 260: return 'R';
+		case 261: return 'R';
+		case 262: return 'R';
+		case 263: return 'R';
+		case 264: return 'R';
+		case 265: return 'R';
+		case 266: return 'R';
+		case 267: return 'R';
+		case 268: return 'R';
+		case 269: return 'R';
+		case 270: return 'R';
+		case 271: return 'R';
+		case 272: return 'R';
+		case 273: return 'R';
+		case 274: return 'R';
+		case 275: return 'R';
+		case 276: return 'R';
+		case 277: return 'R';
+		case 278: return 'R';
+		case 279: return 'R';
+		case 280: return 'R';
+		case 281: return 'R';
+		case 282: return 'R';
+		case 283: return 'R';
+		case 284: return 'R';
+		case 285: return 'R';
+		case 286: return 'R';
+//      Concrete slab
+		case 191: return 'R';
+//      sandy soil by default
+		default:  return 'S';
+	}
+
+#else
+    #error "Unsupported compiler"
+#endif
 }
 
 void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const
