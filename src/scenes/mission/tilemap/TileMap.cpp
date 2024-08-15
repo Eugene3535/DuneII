@@ -8,6 +8,12 @@
 #include "managers/assets/AssetManager.hpp"
 #include "scenes/mission/tilemap/TileMap.hpp"
 
+TileMap::TileMap() noexcept:
+	m_texture(nullptr)
+{
+
+}
+
 bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 {
 //  Make sure it hasn't been downloaded before
@@ -49,21 +55,26 @@ std::vector<Building*> TileMap::getAllBuildings() noexcept
 
 void TileMap::unload() noexcept
 {
-	landscape.vertices.~VertexBuffer();
-	landscape.texture = nullptr;
+	m_vertices.~VertexBuffer();
+	m_texture = nullptr;
 
 	m_objects.clear();
-	tileMask.clear();
+	m_tileMask.clear();
 	title.clear();
 
 	mapSizeInTiles  = { 0, 0 };
-	mapSizeInPixels  = { 0, 0 };
-	tileSize = { 0, 0 };
+	mapSizeInPixels = { 0, 0 };
+	tileSize        = { 0, 0 };
 }
 
 const std::vector<TileMap::Object>& TileMap::getObjects() const noexcept
 {
 	return m_objects;
+}
+
+std::string_view TileMap::getTileMask() const noexcept
+{
+	return m_tileMask;
 }
 
 bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
@@ -91,7 +102,7 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 	mapSizeInPixels = { map_width * tile_width,  map_height * tile_height  };
 	tileSize        = { tile_width, tile_height };
 
-	tileMask.resize(static_cast<size_t>(map_width * map_height), 'S');
+	m_tileMask.resize(static_cast<size_t>(map_width * map_height), 'S');
 
 	for (auto layer_node = map_node->first_node("layer");
 		      layer_node != nullptr;
@@ -252,12 +263,12 @@ void TileMap::parseLandscape(const Tileset& tileset, const std::vector<int>& par
 		for (int32_t x = 0; x < map_width; ++x)
 		{
 			const int32_t tile_id = parsed_layer[index];
-			tileMask[index] = convertTileNumToChar(tile_id);
-			index++;
+			m_tileMask[index] = convertTileNumToChar(tile_id);
+			++index;
 
 //  Vertex XY coords				
-			const float cX = static_cast<float>(x * tile_width);
-			const float cY = static_cast<float>(y * tile_height);
+			const float vX = static_cast<float>(x * tile_width);
+			const float vY = static_cast<float>(y * tile_height);
 
 //  Left-top coords of the tile in texture grid
 			const int32_t tile_num = tile_id - firstGID;
@@ -266,23 +277,23 @@ void TileMap::parseLandscape(const Tileset& tileset, const std::vector<int>& par
 			const sf::Vector2f point(left * tile_width, top * tile_height);
 
 //  First triangle
-			vertices.emplace_back(sf::Vector2f(cX, cY), point);
-			vertices.emplace_back(sf::Vector2f(cX + tile_width, cY), sf::Vector2f(point.x + tile_width, point.y));
-			vertices.emplace_back(sf::Vector2f(cX + tile_width, cY + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
+			vertices.emplace_back(sf::Vector2f(vX, vY), point);
+			vertices.emplace_back(sf::Vector2f(vX + tile_width, vY), sf::Vector2f(point.x + tile_width, point.y));
+			vertices.emplace_back(sf::Vector2f(vX + tile_width, vY + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
 //  Second triangle
-			vertices.emplace_back(sf::Vector2f(cX, cY), point);
-			vertices.emplace_back(sf::Vector2f(cX + tile_width, cY + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
-			vertices.emplace_back(sf::Vector2f(cX, cY + tile_height), sf::Vector2f(point.x, point.y + tile_height));
+			vertices.emplace_back(sf::Vector2f(vX, vY), point);
+			vertices.emplace_back(sf::Vector2f(vX + tile_width, vY + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
+			vertices.emplace_back(sf::Vector2f(vX, vY + tile_height), sf::Vector2f(point.x, point.y + tile_height));
 		}
 
 //  Unload to VBO
 	if (!vertices.empty())
 	{
-		landscape.texture = tileset.texture;
-		landscape.vertices.setUsage(sf::VertexBuffer::Static);
-		landscape.vertices.setPrimitiveType(sf::Triangles);
-		landscape.vertices.create(vertices.size());
-		landscape.vertices.update(vertices.data());
+		m_texture = tileset.texture;
+		m_vertices.setUsage(sf::VertexBuffer::Static);
+		m_vertices.setPrimitiveType(sf::Triangles);
+		m_vertices.create(vertices.size());
+		m_vertices.update(vertices.data());
 	}
 }
 
@@ -324,7 +335,7 @@ void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int>& par
 
 			if (tile_id)
 			{
-				tileMask[index] = convertTileNumToChar(tile_id);
+				m_tileMask[index] = convertTileNumToChar(tile_id);
 
 				auto bld_type = get_building_type(tile_id);
 
@@ -386,5 +397,14 @@ char TileMap::convertTileNumToChar(int32_t index) const noexcept
 		case 191:         return 'R';
 
 		default:          return 'S'; // sandy soil by default
+	}
+}
+
+void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const
+{
+	if(m_texture)
+	{
+		states.texture = m_texture;
+		target.draw(m_vertices, states);
 	}
 }

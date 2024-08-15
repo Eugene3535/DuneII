@@ -10,7 +10,8 @@
 
 #include "scenes/mission/buildings/Building.hpp"
 
-class TileMap
+class TileMap:
+	public sf::Drawable
 {
 	friend class Builder;
 
@@ -20,13 +21,6 @@ class TileMap
 		int32_t columns   { 0 };
 		int32_t tileCount { 0 };
 		int32_t firstGID  { 1 };
-	};
-
-public:
-	struct Landscape 
-	{
-		sf::VertexBuffer vertices;
-		const sf::Texture* texture { nullptr };
 	};
 
 public:
@@ -54,12 +48,16 @@ public:
 	};
 
 public:
+	TileMap() noexcept;
+
 	bool loadFromFile(const std::filesystem::path& file_path) noexcept;
 
 	std::vector<Building*> getAllBuildings() noexcept;
 	void                   unload() noexcept;
 
-	const std::vector<Object>& getObjects() const noexcept;
+	const std::vector<Object>& getObjects()  const noexcept;
+	std::string_view           getTileMask() const noexcept;
+	
 
 private:
 	bool loadLayers(const rapidxml::xml_node<>* map_node)  noexcept;
@@ -74,19 +72,23 @@ private:
 	char convertTileNumToChar(int32_t index) const noexcept;
 
 private:
-    std::unordered_map<int32_t, Building> m_buildings;
-	std::vector<Object> m_objects;
-	std::vector<BuildingData> m_buildingsOnLoad;
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
-public:
-	Landscape landscape;
-	std::string tileMask;
+private:
+	sf::VertexBuffer   m_vertices;
+	const sf::Texture* m_texture;
+
+private:
+    std::unordered_map<int32_t, Building> m_buildings;
+	std::vector<Object>                   m_objects;
+	std::vector<BuildingData>             m_buildingsOnLoad;
+	std::string                           m_tileMask;
 	
-public:
-	std::string  title;
-	sf::Vector2i mapSizeInTiles;
-	sf::Vector2i mapSizeInPixels;
-	sf::Vector2i tileSize;
+private:
+	std::string  m_title;
+	sf::Vector2i m_mapSizeInTiles;
+	sf::Vector2i m_mapSizeInPixels;
+	sf::Vector2i m_tileSize;
 };
 
 #endif // !TILEMAP_HPP

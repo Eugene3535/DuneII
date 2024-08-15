@@ -20,7 +20,7 @@ Builder::~Builder()
 bool Builder::init(TileMap& tilemap) noexcept
 {
     m_buildings        = &tilemap.m_buildings;
-    m_tileMask         = &tilemap.tileMask;
+    m_tileMask         = &tilemap.m_tileMask;
     m_mapWidthInTiles  = tilemap.mapSizeInTiles.x;
     m_mapHeightInTiles = tilemap.mapSizeInTiles.y;
     m_tileWidth        = tilemap.tileSize.x;

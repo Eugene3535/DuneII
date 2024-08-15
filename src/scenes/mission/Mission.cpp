@@ -78,9 +78,7 @@ void Mission::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     if(m_isLoaded)
     {
-        const auto& vertexBuffer = m_tilemap.landscape.vertices;
-        states.texture = m_tilemap.landscape.texture;
-        target.draw(vertexBuffer, states);
+        target.draw(m_tilemap);
 
         for(auto drawable: m_drawables)
         {
