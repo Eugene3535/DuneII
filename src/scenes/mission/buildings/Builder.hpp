@@ -38,7 +38,6 @@ private:
 private:
     std::unordered_map<int32_t, Building>* m_buildings;
     std::string* m_tileMask;
-    std::vector<char*>* m_collisionMask;
     int32_t m_mapWidthInTiles;
     int32_t m_mapHeightInTiles;
     int32_t m_tileWidth;

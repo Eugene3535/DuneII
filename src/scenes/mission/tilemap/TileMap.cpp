@@ -54,7 +54,6 @@ void TileMap::unload() noexcept
 
 	m_objects.clear();
 	tileMask.clear();
-	collisionMask.clear();
 	title.clear();
 
 	mapSizeInTiles  = { 0, 0 };
@@ -93,10 +92,6 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 	tileSize        = { tile_width, tile_height };
 
 	tileMask.resize(static_cast<size_t>(map_width * map_height), 'S');
-	collisionMask.resize(static_cast<size_t>(map_height), nullptr);
-
-	for (size_t i = 0; i < map_height; ++i)
-		collisionMask[i] = tileMask.data() + i * map_width;
 
 	for (auto layer_node = map_node->first_node("layer");
 		      layer_node != nullptr;
@@ -373,20 +368,22 @@ char TileMap::convertTileNumToChar(int32_t index) const noexcept
 		case 62 ... 81:   return 'S';
 		case 84 ... 100:  return 'S';
 		case 102 ... 109: return 'S';
+
+//      NOTE: Tiles occupied by buildings will be filled in later when loaded by the Builder class
 //      Wall
-		case 111 ... 122: return 'W';
+		case 111 ... 122: return 'R';
 //      Building
-		case 124 ... 137: return 'B';
-		case 140 ... 153: return 'B';
-		case 159 ... 165: return 'B';
-		case 175 ... 181: return 'B';
-		case 192 ... 195: return 'B';
-		case 207 ... 209: return 'B';
-		case 223 ... 225: return 'B';
-		case 239 ... 241: return 'B';	
-		case 255 ... 286: return 'B';
+		case 124 ... 137: return 'R';
+		case 140 ... 153: return 'R';
+		case 159 ... 165: return 'R';
+		case 175 ... 181: return 'R';
+		case 192 ... 195: return 'R';
+		case 207 ... 209: return 'R';
+		case 223 ... 225: return 'R';
+		case 239 ... 241: return 'R';	
+		case 255 ... 286: return 'R';
 //      Concrete slab
-		case 191:         return 'C';
+		case 191:         return 'R';
 
 		default:          return 'S'; // sandy soil by default
 	}

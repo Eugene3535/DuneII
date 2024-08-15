@@ -80,9 +80,7 @@ private:
 
 public:
 	Landscape landscape;
-	
-	std::string             tileMask;
-	std::vector<char*> collisionMask;
+	std::string tileMask;
 	
 public:
 	std::string  title;

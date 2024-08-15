@@ -4,7 +4,6 @@
 Builder::Builder() noexcept:
     m_buildings(nullptr),
     m_tileMask(nullptr),
-    m_collisionMask(nullptr),
     m_mapWidthInTiles(0),
     m_mapHeightInTiles(0),
     m_tileWidth(0),
@@ -22,7 +21,6 @@ bool Builder::init(TileMap& tilemap) noexcept
 {
     m_buildings        = &tilemap.m_buildings;
     m_tileMask         = &tilemap.tileMask;
-    m_collisionMask    = &tilemap.collisionMask;
     m_mapWidthInTiles  = tilemap.mapSizeInTiles.x;
     m_mapHeightInTiles = tilemap.mapSizeInTiles.y;
     m_tileWidth        = tilemap.tileSize.x;
@@ -83,12 +81,69 @@ bool Builder::init(TileMap& tilemap) noexcept
 
 Building* Builder::placeBuilding(Building::Type type, int32_t cellX, int32_t cellY) noexcept
 {
-    if(cellX < 0 || cellY < 0)
-		return nullptr;
-
 	int32_t coordX = cellX * m_tileWidth;
 	int32_t coordY = cellY * m_tileHeight;
-	int32_t origin = cellY * m_mapWidthInTiles + cellX;
+    auto bounds = getBoundsOf(type, coordX, coordY);
+
+    auto out_of_bounds = [this, bounds]() -> bool
+    {
+        int32_t map_width  = m_mapWidthInTiles * m_tileWidth;
+        int32_t map_height = m_mapHeightInTiles * m_tileHeight;
+
+        if(bounds.left < 0) return true;
+        if(bounds.top < 0)  return true;
+        if(bounds.left + bounds.width > map_width)  return true;
+        if(bounds.top + bounds.height > map_height) return true;
+
+        return false;
+    };
+
+    if(out_of_bounds()) 
+        return nullptr;
+
+    int32_t origin = cellY * m_mapWidthInTiles + cellX;
+
+    auto can_be_constructed = [this, origin](Building::Type type) mutable -> bool
+    {
+        sf::Vector2i size;
+
+        switch (type)
+        {
+            case Building::CONCRETE_SLAB:      size = { 1, 1 }; break;
+            case Building::CONSTRUCTION_YARD:  size = { 2, 2 }; break;
+            case Building::SPICE_SILO:         size = { 2, 2 }; break;
+            case Building::STARPORT:           size = { 3, 3 }; break;
+            case Building::WIND_TRAP:          size = { 2, 2 }; break;
+            case Building::SPICE_REFINERY:     size = { 3, 2 }; break;
+            case Building::RADAR_OUTPOST:      size = { 2, 2 }; break;
+            case Building::REPAIR_FACILITY:    size = { 3, 2 }; break;
+            case Building::PALACE:             size = { 3, 3 }; break;
+            case Building::HIGH_TECH_FACILITY: size = { 2, 2 }; break;
+            case Building::BARRACKS:           size = { 2, 2 }; break;
+            case Building::VEHICLE_FACTORY:    size = { 3, 2 }; break;
+            case Building::WALL:               size = { 1, 1 }; break;
+            case Building::TURRET:             size = { 1, 1 }; break;
+            case Building::ROCKET_TURRET:      size = { 1, 1 }; break;
+
+            default: break;
+        }
+
+        const char* mask = m_tileMask->data();
+
+        for (int32_t i = 0; i < size.y; ++i)
+        {
+            for (int32_t j = 0; j < size.x; ++j)  
+                if(mask[origin + j] != 'R')
+                    return false;
+            
+            origin += m_mapWidthInTiles;
+        }
+
+        return true;
+    };
+
+    if(!can_be_constructed(type))
+        return nullptr;
 
 	if(auto found = m_buildings->find(origin); found == m_buildings->end())
 	{
@@ -101,32 +156,38 @@ Building* Builder::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
 			building->setTextureRect(getTexCoordsOf(type));
 			building->setPosition(coordX, coordY);
 			building->m_hitPoints = building->m_maxHitPoints = getHitPointsOf(type);
-			building->m_bounds = getBoundsOf(type, coordX, coordY);
+			building->m_bounds = bounds;
 
-			auto setupTilesOnMask = [](char** mask, int32_t x, int32_t y, int32_t width, int32_t height, char symbol = 'B')
+			auto setup_tiles_on_mask = [this, origin](int32_t width, int32_t height, char symbol = 'B') mutable -> void
 			{
+                char* mask = m_tileMask->data();
+
 				for (int32_t i = 0; i < height; ++i)
-					for (int32_t j = 0; j < width; ++j)
-						mask[y + i][x + j] = symbol;
+                {
+					for (int32_t j = 0; j < width; ++j)  
+                        mask[origin + j] = symbol;    
+                    
+                    origin += m_mapWidthInTiles;
+                }
 			};
 
 			switch (type)
 			{
-				case Building::CONCRETE_SLAB:      setupTilesOnMask(m_collisionMask->data(), cellX, cellY, 1, 1, 'C'); break;
-				case Building::CONSTRUCTION_YARD:  setupTilesOnMask(m_collisionMask->data(), cellX, cellY, 2, 2);      break;
-				case Building::SPICE_SILO:         setupTilesOnMask(m_collisionMask->data(), cellX, cellY, 2, 2);      break;
-				case Building::STARPORT:           setupTilesOnMask(m_collisionMask->data(), cellX, cellY, 3, 3);      break;
-				case Building::WIND_TRAP:          setupTilesOnMask(m_collisionMask->data(), cellX, cellY, 2, 2);      break;
-				case Building::SPICE_REFINERY:     setupTilesOnMask(m_collisionMask->data(), cellX, cellY, 3, 2);      break;
-				case Building::RADAR_OUTPOST:      setupTilesOnMask(m_collisionMask->data(), cellX, cellY, 2, 2);      break;
-				case Building::REPAIR_FACILITY:    setupTilesOnMask(m_collisionMask->data(), cellX, cellY, 3, 2);      break;
-				case Building::PALACE:             setupTilesOnMask(m_collisionMask->data(), cellX, cellY, 3, 3);      break;
-				case Building::HIGH_TECH_FACILITY: setupTilesOnMask(m_collisionMask->data(), cellX, cellY, 2, 2);      break;
-				case Building::BARRACKS:           setupTilesOnMask(m_collisionMask->data(), cellX, cellY, 2, 2);      break;
-				case Building::VEHICLE_FACTORY:    setupTilesOnMask(m_collisionMask->data(), cellX, cellY, 3, 2);      break;
-				case Building::WALL:               setupTilesOnMask(m_collisionMask->data(), cellX, cellY, 1, 1, 'W'); break;
-				case Building::TURRET:             setupTilesOnMask(m_collisionMask->data(), cellX, cellY, 1, 1);      break;
-				case Building::ROCKET_TURRET:      setupTilesOnMask(m_collisionMask->data(), cellX, cellY, 1, 1);      break;
+				case Building::CONCRETE_SLAB:      setup_tiles_on_mask(1, 1, 'C'); break;
+				case Building::CONSTRUCTION_YARD:  setup_tiles_on_mask(2, 2);      break;
+				case Building::SPICE_SILO:         setup_tiles_on_mask(2, 2);      break;
+				case Building::STARPORT:           setup_tiles_on_mask(3, 3);      break;
+				case Building::WIND_TRAP:          setup_tiles_on_mask(2, 2);      break;
+				case Building::SPICE_REFINERY:     setup_tiles_on_mask(3, 2);      break;
+				case Building::RADAR_OUTPOST:      setup_tiles_on_mask(2, 2);      break;
+				case Building::REPAIR_FACILITY:    setup_tiles_on_mask(3, 2);      break;
+				case Building::PALACE:             setup_tiles_on_mask(3, 3);      break;
+				case Building::HIGH_TECH_FACILITY: setup_tiles_on_mask(2, 2);      break;
+				case Building::BARRACKS:           setup_tiles_on_mask(2, 2);      break;
+				case Building::VEHICLE_FACTORY:    setup_tiles_on_mask(3, 2);      break;
+				case Building::WALL:               setup_tiles_on_mask(1, 1, 'W'); break;
+				case Building::TURRET:             setup_tiles_on_mask(1, 1);      break;
+				case Building::ROCKET_TURRET:      setup_tiles_on_mask(1, 1);      break;
 
 				default: break;
 			}
