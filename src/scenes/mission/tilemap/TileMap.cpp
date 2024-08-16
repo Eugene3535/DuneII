@@ -43,16 +43,6 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 	return false;
 }
 
-std::vector<Building*> TileMap::getAllBuildings() noexcept
-{
-	std::vector<Building*> blds;
-
-	for(auto& [id, building] : m_buildings)
-		blds.push_back(&building);
-
-	return blds;
-}
-
 void TileMap::unload() noexcept
 {
 	m_vertices.~VertexBuffer();
@@ -65,6 +55,16 @@ void TileMap::unload() noexcept
 	m_mapSizeInTiles  = { 0, 0 };
 	m_mapSizeInPixels = { 0, 0 };
 	m_tileSize        = { 0, 0 };
+}
+
+std::vector<Building*> TileMap::getAllBuildings() noexcept
+{
+	std::vector<Building*> blds;
+
+	for(auto& [id, building] : m_buildings)
+		blds.push_back(&building);
+
+	return blds;
 }
 
 const std::vector<TileMap::Object>& TileMap::getObjects() const noexcept

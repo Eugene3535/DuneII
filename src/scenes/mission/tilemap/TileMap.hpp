@@ -51,17 +51,15 @@ public:
 	TileMap() noexcept;
 
 	bool loadFromFile(const std::filesystem::path& file_path) noexcept;
+	void unload() noexcept;
 
-	std::vector<Building*> getAllBuildings() noexcept;
-	void                   unload()          noexcept;
-
+	std::vector<Building*>     getAllBuildings()          noexcept;
 	const std::vector<Object>& getObjects()         const noexcept;
 	std::string_view           getTileMask()        const noexcept;
 	const sf::Vector2i&        getMapSizeInTiles()  const noexcept;
 	const sf::Vector2i&        getMapSizeInPixels() const noexcept;
 	const sf::Vector2i&        getTileSize()        const noexcept;
 	
-
 private:
 	bool loadLayers(const rapidxml::xml_node<>* map_node)  noexcept;
 	bool loadObjects(const rapidxml::xml_node<>* map_node) noexcept;
