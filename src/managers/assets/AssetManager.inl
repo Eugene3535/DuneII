@@ -10,14 +10,23 @@ T* AssetManager::tryLoadFromFile(const std::string& filename, std::unordered_map
 
     if(result)
     {
-        if (!iterator->second.loadFromFile(filepath.generic_string()))
-        {
-            container.erase(iterator);
+        bool sucsess = false;
 
-            return nullptr;
+        if constexpr (std::is_same<T, sf::Music>::value)
+		{
+            sucsess = iterator->second.openFromFile(filepath.generic_string());
+		}
+        else
+        {
+            sucsess = iterator->second.loadFromFile(filepath.generic_string());
         }
 
-        return &iterator->second;
+        if (sucsess)
+        {
+            return &iterator->second;
+        }
+
+        container.erase(iterator);
     }
 
     return nullptr;

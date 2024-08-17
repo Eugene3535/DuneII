@@ -20,8 +20,8 @@ sf::Texture* AssetManager::getTexture(const std::string& filename) noexcept
         if(auto found = m_textures.find(filename); found != m_textures.end())
             return &found->second;
 
-        if(auto new_texture = tryLoadFromFile<sf::Texture>(filename, m_textures); new_texture != nullptr)
-            return new_texture;
+        if(auto texture = tryLoadFromFile<sf::Texture>(filename, m_textures); texture != nullptr)
+            return texture;
     }
 
     return nullptr;
@@ -34,9 +34,37 @@ sf::Font* AssetManager::getFont(const std::string& filename) noexcept
         if(auto found = m_fonts.find(filename); found != m_fonts.end())
             return &found->second;
 
-        if(auto new_font = tryLoadFromFile<sf::Font>(filename, m_fonts); new_font != nullptr)
-            return new_font;
+        if(auto font = tryLoadFromFile<sf::Font>(filename, m_fonts); font != nullptr)
+            return font;
     }
     
+    return nullptr;
+}
+
+sf::SoundBuffer* AssetManager::getSoundBuffer(const std::string& filename) noexcept
+{
+    if (m_instance)
+    {
+        if(auto found = m_soundBuffers.find(filename); found != m_soundBuffers.end())
+            return &found->second;
+
+        if(auto soundBuffer = tryLoadFromFile<sf::SoundBuffer>(filename, m_soundBuffers); soundBuffer != nullptr)
+            return soundBuffer;
+    }
+    
+    return nullptr;
+}
+
+sf::Music* AssetManager::getMusic(const std::string& filename) noexcept
+{
+    if (m_instance)
+    {
+        if(auto found = m_musicBox.find(filename); found != m_musicBox.end())
+            return &found->second;
+        
+        if(auto music = tryLoadFromFile<sf::Music>(filename, m_musicBox); music != nullptr)
+            return music;
+    }
+
     return nullptr;
 }

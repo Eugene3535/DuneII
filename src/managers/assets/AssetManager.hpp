@@ -3,7 +3,6 @@
 
 #include <unordered_map>
 #include <type_traits>
-#include <memory>
 
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
@@ -19,16 +18,20 @@ public:
 
     static AssetManager* instance() noexcept;
 
-    sf::Texture* getTexture(const std::string& filename) noexcept;
-    sf::Font*    getFont(const std::string& filename)    noexcept;
+    sf::Texture*     getTexture(const std::string& filename)     noexcept;
+    sf::Font*        getFont(const std::string& filename)        noexcept;
+    sf::SoundBuffer* getSoundBuffer(const std::string& filename) noexcept;
+    sf::Music*       getMusic(const std::string& filename)       noexcept;
 
 private:
     template<class T>
     T* tryLoadFromFile(const std::string& filename, std::unordered_map<std::string, T>& container) noexcept;
 
 private:
-    std::unordered_map<std::string, sf::Texture> m_textures;
-    std::unordered_map<std::string, sf::Font>    m_fonts;
+    std::unordered_map<std::string, sf::Texture>     m_textures;
+    std::unordered_map<std::string, sf::Font>        m_fonts;
+    std::unordered_map<std::string, sf::SoundBuffer> m_soundBuffers;
+    std::unordered_map<std::string, sf::Music>       m_musicBox;
 
 private:
     static AssetManager* m_instance;
