@@ -20,12 +20,12 @@ public:
     {
         if (m_frames)
         {
-            m_current_frame += dt * m_fps;
+            m_timer += dt * m_fps;
 
             if (isOver())
                 restart();
 
-            object.setTextureRect((*m_frames)[static_cast<std::size_t>(m_current_frame)]);
+            object.setTextureRect((*m_frames)[static_cast<std::size_t>(m_timer)]);
         }
     }
 
@@ -35,7 +35,7 @@ public:
 
 private:
     const std::vector<sf::IntRect>* m_frames;
-    float                           m_current_frame;
+    float                           m_timer;
     float                           m_fps;
 };
 

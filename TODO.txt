@@ -5,3 +5,4 @@
 5) Move all construction to the builder class (closed)
 6) Construction mode with user interface (opened)
 7) Dynamic background music playback manager (opened)
+8) Navigating the map with the cursor (opened)

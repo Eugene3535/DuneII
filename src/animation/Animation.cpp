@@ -2,7 +2,7 @@
 
 Animation::Animation() noexcept:
     m_frames(nullptr), 
-    m_current_frame(0.0f), 
+    m_timer(0.0f), 
     m_fps(0.0f) 
 {
 
@@ -27,7 +27,7 @@ void Animation::setRate(float fps) noexcept
 
 void Animation::restart() noexcept
 {
-    m_current_frame = 0;
+    m_timer = 0;
 }
 
 const std::vector<sf::IntRect>* Animation::getFrames() const noexcept
@@ -42,5 +42,5 @@ float Animation::getRate() const noexcept
 
 bool Animation::isOver() const noexcept
 {
-    return m_current_frame + m_fps >= m_frames->size();
+    return static_cast<size_t>(m_timer + m_fps) >= m_frames->size();
 }

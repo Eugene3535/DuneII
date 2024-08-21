@@ -1,6 +1,9 @@
 #ifndef DEFINES_HPP
 #define DEFINES_HPP
 
+#define DEGTORAD 0.017453f
+#define RADTODEG 57.29577f
+
 // Limit of production buildings on the map, excluding slabs and walls
 #define PRODUCTION_BUILDING_LIMIT 99
 

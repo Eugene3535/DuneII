@@ -22,9 +22,7 @@ bool Mission::load(const std::string& info) noexcept
         m_isLoaded = m_builder.init(m_tilemap);
         m_buildings = m_tilemap.getAllBuildings();
 
-        auto theme = Assets->getMusic("08 - Command Post.flac");
-
-        if(theme)
+        if(auto theme = Assets->getMusic("08 - Command Post.flac"); theme != nullptr)
         {
             theme->setLoop(true);
             theme->play();
@@ -79,9 +77,7 @@ void Mission::update(sf::Time dt) noexcept
         m_game.sceneNeedToBeChanged = true;
         m_game.next_scene = Game::GameScene::MAIN_MENU;
 
-        auto theme = Assets->getMusic("08 - Command Post.flac");
-
-        if(theme)
+        if(auto theme = Assets->getMusic("08 - Command Post.flac"); theme != nullptr)
         {
             theme->stop();
         }

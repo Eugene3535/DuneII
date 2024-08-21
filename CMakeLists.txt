@@ -12,8 +12,8 @@ set(SRC_FILE_DIR ${PROJECT_SOURCE_DIR}/src)
 
 set(SRC_FILES
 	${SRC_FILE_DIR}/common/FileProvider.cpp
+	${SRC_FILE_DIR}/common/MathUtils.cpp
 	${SRC_FILE_DIR}/managers/assets/AssetManager.cpp
-	${SRC_FILE_DIR}/animation/Animation.hpp
 	${SRC_FILE_DIR}/effects/ScreenBlackoutEffect.cpp
 	${SRC_FILE_DIR}/scenes/Scene.cpp
 	${SRC_FILE_DIR}/scenes/intro/MainMenu.cpp
