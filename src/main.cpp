@@ -26,7 +26,7 @@ int main()
     std::uint32_t height = static_cast<std::uint32_t>(visible_area.height);
 
     window.create(sf::VideoMode(width, height), "Dune: The Battle For Arrakis");
-    window.setFramerateLimit(60U);
+    window.setVerticalSyncEnabled(true);
 
     auto main_menu = std::make_unique<MainMenu>(game);
     auto mission =  std::make_unique<Mission>(game); 
