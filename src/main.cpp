@@ -1,5 +1,3 @@
-#include <thread>
-
 #include "scenes/intro/MainMenu.hpp"
 #include "scenes/mission/Mission.hpp"
 
@@ -69,19 +67,16 @@ int main()
         if(game.sceneNeedToBeChanged)
         {
             fade_effect.prepare(viewport.getCenter(), window.getSize());
-            constexpr auto delay = std::chrono::milliseconds(1000 / 60);
-            std::thread t(&ScreenBlackoutEffect::apply, &fade_effect);
             
             while(!fade_effect.isOver())
             {     
+                fade_effect.update();
+
                 window.clear();
                 window.draw(*current_scene);
                 window.draw(fade_effect);
                 window.display();
-                std::this_thread::sleep_for(std::chrono::milliseconds(delay));
             }
-
-            t.join();
             
             switch (game.next_scene)
             {

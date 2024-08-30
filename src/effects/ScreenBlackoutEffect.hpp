@@ -15,7 +15,7 @@ public:
     ~ScreenBlackoutEffect();
 
     void prepare(const sf::Vector2f& view_center, const sf::Vector2u& window_size) noexcept;
-    void apply() noexcept;
+    void update() noexcept;
 
     bool isOver() const noexcept;
 
@@ -23,8 +23,9 @@ private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 private:
-    sf::RectangleShape m_blackout_shape;
-    bool m_is_over;
+    sf::RectangleShape m_blackoutShape;
+    std::int32_t m_alpha;
+    bool m_isOver;
 };
 
 #endif
