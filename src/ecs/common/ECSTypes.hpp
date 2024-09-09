@@ -7,10 +7,10 @@
 
 BEGIN_NAMESPACE_ECS
 
-using Entity        = uint32_t;
-using ComponentId   = uint32_t;
-using ComponentType = uint32_t;
-using EntitySetType = size_t;
+using entity_t       = uint32_t;
+using component_id_t = uint32_t;
+using component_t    = uint32_t;
+using entity_set_t   = size_t;
 
 END_NAMESPACE_ECS
 

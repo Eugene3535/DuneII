@@ -3,7 +3,7 @@
 
 #include <functional>
 
-#include "ecs/common/Component.hpp"
+#include "Component.hpp"
 
 BEGIN_NAMESPACE_ECS
 
@@ -26,7 +26,7 @@ public:
         };
     }
 
-    void handle(ComponentType componentType, BaseComponent* component) const noexcept
+    void handle(component_t componentType, BaseComponent* component) const noexcept
     {
         if (m_handlers[componentType])
             m_handlers[componentType](*component);

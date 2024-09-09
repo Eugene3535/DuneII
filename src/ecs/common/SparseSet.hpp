@@ -1,7 +1,6 @@
 #ifndef SPARSE_SET_HPP
 #define SPARSE_SET_HPP
 
-#include <limits>
 #include <vector>
 
 #include "ecs/common/ECSTypes.hpp"

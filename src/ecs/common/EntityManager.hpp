@@ -9,42 +9,45 @@ BEGIN_NAMESPACE_ECS
 class EntityManager
 {
 public:
-    // static constexpr uint32_t UndefinedEntity = UINT32_MAX;
+    static constexpr uint32_t UndefinedEntity = UINT32_MAX;
 
+public:
     EntityManager() noexcept;
+
+    static EntityManager* instance() noexcept;
 
     void reserve(size_t size) noexcept;
     
 //  Entities
-    bool   hasEntity(Entity entity)                     const noexcept;
-    Entity createEntity()                                     noexcept;
-    void   removeEntity(Entity entity)                        noexcept;
-    void   visitEntity(Entity entity, const Visitor& visitor) noexcept;
+    bool   hasEntity(entity_t entity)                     const noexcept;
+    entity_t createEntity()                                     noexcept;
+    void   removeEntity(entity_t entity)                        noexcept;
+    void   visitEntity(entity_t entity, const Visitor& visitor) noexcept;
 
 //  Components
-    template<class T>
-    bool hasComponent(Entity entity) const noexcept;
-
-    template<class ...Ts>
-    bool hasComponents(Entity entity) const noexcept;
-
-    template<class T>
-    T& getComponent(Entity entity) noexcept;
-
-    template<class T>
-    const T& getComponent(Entity entity) const noexcept;
-
-    template<class ...Ts>
-    std::tuple<Ts&...> getComponents(Entity entity) noexcept;
-
-    template<class ...Ts>
-    std::tuple<const Ts&...> getComponents(Entity entity) const noexcept;
-
     template<class T, class ...Args>
-    T& addComponent(Entity entity, Args&&... args) noexcept;
+    T& addComponent(entity_t entity, Args&&... args) noexcept;
 
     template<class T>
-    void removeComponent(Entity entity) noexcept;
+    void removeComponent(entity_t entity) noexcept;
+    
+    template<class T>
+    bool hasComponent(entity_t entity) const noexcept;
+
+    template<class ...Ts>
+    bool hasComponents(entity_t entity) const noexcept;
+
+    template<class T>
+    T& getComponent(entity_t entity) noexcept;
+
+    template<class T>
+    const T& getComponent(entity_t entity) const noexcept;
+
+    template<class ...Ts>
+    std::tuple<Ts&...> getComponents(entity_t entity) noexcept;
+
+    template<class ...Ts>
+    std::tuple<const Ts&...> getComponents(entity_t entity) const noexcept;
 
 //  Entity sets
     template<class ...Ts>
@@ -65,9 +68,12 @@ private:
     EntityContainer                                      m_entities;
     std::vector<std::unique_ptr<BaseEntitySet>>          m_entitySets;
     std::vector<std::vector<BaseEntitySet*>>             m_componentToEntitySets;
+
+private:
+    static EntityManager* s_instance;
 };
 
-#include "ecs/EntityManager.inl"
+#include "ecs/common/EntityManager.inl"
 
 END_NAMESPACE_ECS
 

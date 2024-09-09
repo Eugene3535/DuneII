@@ -6,7 +6,6 @@
 #include <utility>
 
 #include "ecs/common/SparseSet.hpp"
-#include "ecs/common/ECSTypes.hpp"
 
 BEGIN_NAMESPACE_ECS
 
@@ -28,7 +27,7 @@ public:
         return m_it != it.m_it;
     }
 
-    std::pair<Entity, std::tuple<Ts&...>> operator *() noexcept
+    std::pair<entity_t, std::tuple<Ts&...>> operator *() noexcept
     {
         return std::pair(m_it->first, getComponentsByIds(m_it->second, std::index_sequence_for<Ts...>{}));
     }
@@ -42,13 +41,13 @@ public:
 
 private:
     template<std::size_t ...Is>
-    std::tuple<Ts&...> getComponentsByIds(const std::array<ComponentId, sizeof...(Ts)>& componentIds, std::index_sequence<Is...>) noexcept
+    std::tuple<Ts&...> getComponentsByIds(const std::array<component_id_t, sizeof...(Ts)>& componentIds, std::index_sequence<Is...>) noexcept
     {
         return std::tie(std::get<Is>(m_componentContainers)[componentIds[Is]]...);
     }
 
     template<std::size_t ...Is>
-    std::tuple<const Ts&...> getComponentsByIds(const std::array<ComponentId, sizeof...(Ts)>& componentIds, std::index_sequence<Is...>) const noexcept
+    std::tuple<const Ts&...> getComponentsByIds(const std::array<component_id_t, sizeof...(Ts)>& componentIds, std::index_sequence<Is...>) const noexcept
     {
         return std::tie(std::as_const(std::get<Is>(m_componentContainers).get(componentIds[Is]))...);
     }

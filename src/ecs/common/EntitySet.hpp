@@ -23,19 +23,19 @@ public:
                                                           const std::vector<std::unique_ptr<BaseComponentContainer>>& componentContainers,
                                                           std::vector<std::vector<BaseEntitySet*>>& componentToEntitySets) noexcept;
 
-    bool hasEntity(Entity entity) const noexcept;
-    void onEntityUpdated(Entity entity) noexcept;
-    void onEntityRemoved(Entity entity) noexcept;
+    bool hasEntity(entity_t entity) const noexcept;
+    void onEntityUpdated(entity_t entity) noexcept;
+    void onEntityRemoved(entity_t entity) noexcept;
 
 protected:
-    virtual bool satisfyRequirements(Entity entity)             noexcept;
-    virtual void addEntity(Entity entity)                       noexcept;
-    virtual void removeEntity(Entity entity, bool updateEntity) noexcept;
+    virtual bool satisfyRequirements(entity_t entity)             noexcept;
+    virtual void addEntity(entity_t entity)                       noexcept;
+    virtual void removeEntity(entity_t entity, bool updateEntity) noexcept;
 
-    std::unordered_map<Entity, size_t> m_entityToIndex;
+    std::unordered_map<entity_t, size_t> m_entityToIndex;
 
     template<class ...Ts>
-    static EntitySetType generateEntitySetType() noexcept;
+    static entity_set_t generateEntitySetType() noexcept;
 
 private:
     using EntitySetFactory = std::unique_ptr<BaseEntitySet>(*)(EntityContainer&,
@@ -50,7 +50,7 @@ inline std::vector<BaseEntitySet::EntitySetFactory> BaseEntitySet::s_factories;
 template<class ...Ts>
 class EntitySet : public BaseEntitySet
 {
-    using ValueType           = std::pair<Entity, std::array<ComponentId, sizeof...(Ts)>>;
+    using ValueType           = std::pair<entity_t, std::array<component_id_t, sizeof...(Ts)>>;
     using UIterator           = class std::vector<ValueType>::iterator;       // Underlying iterator
     using UConstIterator      = class std::vector<ValueType>::const_iterator; // Underlying const iterator
     using ComponentContainers = std::tuple<ComponentSparseSet<Ts>&...>;
@@ -59,10 +59,10 @@ public:
     using Iterator              = EntitySetIterator<UIterator, Ts...>;
     using ConstIterator         = EntitySetIterator<UConstIterator, const Ts...>;
     using ListenerId            = uint32_t;
-    using EntityAddedListener   = std::function<void(Entity)>;
-    using EntityRemovedListener = std::function<void(Entity)>;
+    using EntityAddedListener   = std::function<void(entity_t)>;
+    using EntityRemovedListener = std::function<void(entity_t)>;
 
-    static const EntitySetType Type;
+    static const entity_set_t Type;
 
     EntitySet(EntityContainer& entities, const ComponentContainers& componentContainers) noexcept;
 
@@ -80,9 +80,9 @@ public:
     void       removeEntityRemovedListener(ListenerId id)               noexcept;
 
 protected:
-    bool satisfyRequirements(Entity entity)             noexcept override;
-    void addEntity(Entity entity)                       noexcept override;
-    void removeEntity(Entity entity, bool updateEntity) noexcept override;
+    bool satisfyRequirements(entity_t entity)             noexcept override;
+    void addEntity(entity_t entity)                       noexcept override;
+    void removeEntity(entity_t entity, bool updateEntity) noexcept override;
 
 private:
     std::vector<ValueType>                       m_managedEntities;
@@ -95,7 +95,7 @@ private:
 #include "ecs/common/EntitySet.inl"
 
 template<class ...Ts>
-const EntitySetType EntitySet<Ts...>::Type = BaseEntitySet::generateEntitySetType<Ts...>();
+const entity_set_t EntitySet<Ts...>::Type = BaseEntitySet::generateEntitySetType<Ts...>();
 
 END_NAMESPACE_ECS
 

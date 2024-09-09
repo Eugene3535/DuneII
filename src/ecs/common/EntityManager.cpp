@@ -1,23 +1,35 @@
+#include <cassert>
+
 #include "ecs/common/EntityManager.hpp"
 
 BEGIN_NAMESPACE_ECS
 
+EntityManager* EntityManager::s_instance;
+
 EntityManager::EntityManager() noexcept
 {
-    auto nbComponents = BaseComponent::getComponentCount();
+    assert((s_instance == nullptr) && "EntityManager must be a unique instance.");
+    s_instance = this;
+
+    auto component_count = BaseComponent::getComponentCount();
 
     // Component containers
-    m_componentContainers.resize(nbComponents);
+    m_componentContainers.resize(component_count);
 
     for (size_t type = 0; type < m_componentContainers.size(); ++type)
         m_componentContainers[type] = BaseComponent::createComponentContainer(type);
         
     // Entity sets
-    m_componentToEntitySets.resize(nbComponents);
+    m_componentToEntitySets.resize(component_count);
     m_entitySets.resize(BaseEntitySet::getEntitySetCount());
 
     for (size_t type = 0; type < m_entitySets.size(); ++type)
         m_entitySets[type] = BaseEntitySet::createEntitySet(type, m_entities, m_componentContainers, m_componentToEntitySets);
+}
+
+EntityManager* EntityManager::instance() noexcept
+{
+    return s_instance;
 }
 
 void EntityManager::reserve(size_t size) noexcept
@@ -26,17 +38,17 @@ void EntityManager::reserve(size_t size) noexcept
 }
 
 // Entities
-bool EntityManager::hasEntity(Entity entity) const noexcept
+bool EntityManager::hasEntity(entity_t entity) const noexcept
 {
     return m_entities.has(entity);
 }
 
-Entity EntityManager::createEntity() noexcept
+entity_t EntityManager::createEntity() noexcept
 {
     return m_entities.emplace().first;
 }
 
-void EntityManager::removeEntity(Entity entity) noexcept
+void EntityManager::removeEntity(entity_t entity) noexcept
 {
     const auto& entityData = m_entities[entity];
 
@@ -52,7 +64,7 @@ void EntityManager::removeEntity(Entity entity) noexcept
     m_entities.erase(entity);
 }
 
-void EntityManager::visitEntity(Entity entity, const Visitor& visitor) noexcept
+void EntityManager::visitEntity(entity_t entity, const Visitor& visitor) noexcept
 {
     for (const auto& [componentType, componentId] : m_entities[entity].getComponents())
         visitor.handle(componentType, m_componentContainers[componentType]->get(componentId));

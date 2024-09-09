@@ -22,14 +22,14 @@ public:
 
 protected:
     template<class T> 
-    static ComponentType generateComponentType() noexcept
+    static component_t generateComponentType() noexcept
     {
         s_factories.push_back([]() -> std::unique_ptr<BaseComponentContainer>
         {
             return std::make_unique<ComponentContainer<T>>();
         });
 
-        return static_cast<ComponentType>(s_factories.size() - 1);
+        return static_cast<component_t>(s_factories.size() - 1);
     }
 
 private:
@@ -44,11 +44,11 @@ template<class T>
 class Component : public BaseComponent
 {
 public:
-    static const ComponentType Type;
+    static const component_t Type;
 };
 
 template<class T>
-const ComponentType Component<T>::Type = BaseComponent::generateComponentType<T>();
+const component_t Component<T>::Type = BaseComponent::generateComponentType<T>();
 
 template<class T>
 constexpr void checkComponentType()

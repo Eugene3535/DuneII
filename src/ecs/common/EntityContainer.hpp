@@ -9,13 +9,13 @@
 BEGIN_NAMESPACE_ECS
 class EntityData
 {
-    using ComponentIdContainer   = std::unordered_map<ComponentType, ComponentId>;
-    using EntitySetTypeContainer = std::unordered_set<EntitySetType>;
+    using ComponentIdContainer   = std::unordered_map<component_t, component_id_t>;
+    using EntitySetTypeContainer = std::unordered_set<entity_set_t>;
 
 public:
 //  Components
     template<class T>
-    void addComponent(ComponentId id) noexcept;
+    void addComponent(component_id_t id) noexcept;
 
     template<class T>
     bool hasComponent() const noexcept;
@@ -24,17 +24,17 @@ public:
     bool hasComponents() const noexcept;
 
     template<class T>
-    ComponentId getComponent() const noexcept;
+    component_id_t getComponent() const noexcept;
 
     template<class T>
-    ComponentId removeComponent() noexcept;
+    component_id_t removeComponent() noexcept;
 
     const ComponentIdContainer& getComponents() const noexcept;
 
 //  Types
     const EntitySetTypeContainer& getEntitySets() const noexcept;
-    void addEntitySet(EntitySetType type) noexcept;
-    void removeEntitySet(EntitySetType type) noexcept;
+    void addEntitySet(entity_set_t type) noexcept;
+    void removeEntitySet(entity_set_t type) noexcept;
 
 private:
     template<class T>
@@ -47,7 +47,7 @@ private:
 
 #include "ecs/common/EntityContainer.inl"
 
-using EntityContainer = SparseSet<Entity, EntityData>;
+using EntityContainer = SparseSet<entity_t, EntityData>;
 
 END_NAMESPACE_ECS
 

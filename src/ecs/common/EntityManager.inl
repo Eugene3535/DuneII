@@ -1,56 +1,6 @@
 // Components
-template<class T>
-bool EntityManager::hasComponent(Entity entity) const noexcept
-{
-    checkComponentType<T>();
-
-    return m_entities[entity].hasComponent<T>();
-}
-
-template<class ...Ts>
-bool EntityManager::hasComponents(Entity entity) const noexcept
-{
-    checkComponentTypes<Ts...>();
-
-    return m_entities[entity].hasComponents<Ts...>();
-}
-
-template<class T>
-T& EntityManager::getComponent(Entity entity) noexcept
-{
-    checkComponentType<T>();
-
-    return getComponentSparseSet<T>()[m_entities[entity].getComponent<T>()];
-}
-
-template<class T>
-const T& EntityManager::getComponent(Entity entity) const noexcept
-{
-    checkComponentType<T>();
-
-    return getComponentSparseSet<T>().get(m_entities[entity].getComponent<T>());
-}
-
-template<class ...Ts>
-std::tuple<Ts&...> EntityManager::getComponents(Entity entity) noexcept
-{
-    checkComponentTypes<Ts...>();
-    auto& entityData = m_entities[entity];
-
-    return std::tie(getComponentSparseSet<Ts>()[entityData.getComponent<Ts>()]...);
-}
-
-template<class ...Ts>
-std::tuple<const Ts&...> EntityManager::getComponents(Entity entity) const noexcept
-{
-    checkComponentTypes<Ts...>();
-    auto& entityData = m_entities[entity];
-
-    return std::tie(std::as_const(getComponentSparseSet<Ts>().get(entityData.getComponent<Ts>()))...);
-}
-
 template<class T, class ...Args>
-T& EntityManager::addComponent(Entity entity, Args&&... args) noexcept
+T& EntityManager::addComponent(entity_t entity, Args&&... args) noexcept
 {
     checkComponentType<T>();
 
@@ -66,7 +16,7 @@ T& EntityManager::addComponent(Entity entity, Args&&... args) noexcept
 }
 
 template<class T>
-void EntityManager::removeComponent(Entity entity) noexcept
+void EntityManager::removeComponent(entity_t entity) noexcept
 {
     checkComponentType<T>();
 
@@ -76,6 +26,56 @@ void EntityManager::removeComponent(Entity entity) noexcept
     // Send message to entity sets
     for (auto entitySet : m_componentToEntitySets[T::Type])
         entitySet->onEntityUpdated(entity);
+}
+
+template<class T>
+bool EntityManager::hasComponent(entity_t entity) const noexcept
+{
+    checkComponentType<T>();
+
+    return m_entities[entity].hasComponent<T>();
+}
+
+template<class ...Ts>
+bool EntityManager::hasComponents(entity_t entity) const noexcept
+{
+    checkComponentTypes<Ts...>();
+
+    return m_entities[entity].hasComponents<Ts...>();
+}
+
+template<class T>
+T& EntityManager::getComponent(entity_t entity) noexcept
+{
+    checkComponentType<T>();
+
+    return getComponentSparseSet<T>()[m_entities[entity].getComponent<T>()];
+}
+
+template<class T>
+const T& EntityManager::getComponent(entity_t entity) const noexcept
+{
+    checkComponentType<T>();
+
+    return getComponentSparseSet<T>().get(m_entities[entity].getComponent<T>());
+}
+
+template<class ...Ts>
+std::tuple<Ts&...> EntityManager::getComponents(entity_t entity) noexcept
+{
+    checkComponentTypes<Ts...>();
+    auto& entityData = m_entities[entity];
+
+    return std::tie(getComponentSparseSet<Ts>()[entityData.getComponent<Ts>()]...);
+}
+
+template<class ...Ts>
+std::tuple<const Ts&...> EntityManager::getComponents(entity_t entity) const noexcept
+{
+    checkComponentTypes<Ts...>();
+    auto& entityData = m_entities[entity];
+
+    return std::tie(std::as_const(getComponentSparseSet<Ts>().get(entityData.getComponent<Ts>()))...);
 }
 
 // Entity sets

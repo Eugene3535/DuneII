@@ -12,12 +12,12 @@ const EntityData::EntitySetTypeContainer& EntityData::getEntitySets() const noex
     return m_entitySetTypes;
 }
 
-void EntityData::addEntitySet(EntitySetType type) noexcept
+void EntityData::addEntitySet(entity_set_t type) noexcept
 {
     m_entitySetTypes.insert(type);
 }
 
-void EntityData::removeEntitySet(EntitySetType type) noexcept
+void EntityData::removeEntitySet(entity_set_t type) noexcept
 {
     m_entitySetTypes.erase(type);
 }

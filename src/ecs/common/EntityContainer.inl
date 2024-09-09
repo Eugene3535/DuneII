@@ -1,5 +1,5 @@
 template<class T>
-void EntityData::addComponent(ComponentId id) noexcept
+void EntityData::addComponent(component_id_t id) noexcept
 {
     m_componentIds[T::Type] = id;
 }
@@ -17,13 +17,13 @@ bool EntityData::hasComponents() const noexcept
 }
 
 template<class T>
-ComponentId EntityData::getComponent() const noexcept
+component_id_t EntityData::getComponent() const noexcept
 {
     return findComponent<T>()->second;
 }
 
 template<class T>
-ComponentId EntityData::removeComponent() noexcept
+component_id_t EntityData::removeComponent() noexcept
 {
     auto it = findComponent<T>();
     auto componentId = it->second;

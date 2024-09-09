@@ -6,26 +6,26 @@
 BEGIN_NAMESPACE_ECS
 
 template<class T>
-using ComponentSparseSet = SparseSet<ComponentId, T>;
+using ComponentSparseSet = SparseSet<component_id_t, T>;
 
 class BaseComponentContainer
 {
 public:
     virtual ~BaseComponentContainer() = default;
-    virtual class BaseComponent* get(ComponentId id) noexcept { return nullptr; }
-    virtual void remove(ComponentId id) noexcept {}
+    virtual class BaseComponent* get(component_id_t id) noexcept { return nullptr; }
+    virtual void remove(component_id_t id) noexcept {}
 };
 
 template<class T>
 class ComponentContainer : public BaseComponentContainer
 {
 public:
-    class BaseComponent* get(ComponentId id) noexcept override
+    class BaseComponent* get(component_id_t id) noexcept override
     {
         return &components[id];
     }
 
-    void remove(ComponentId id) noexcept override
+    void remove(component_id_t id) noexcept override
     {
         components.erase(id);
     }

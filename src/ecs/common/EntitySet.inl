@@ -1,5 +1,5 @@
 template<class ...Ts>
-EntitySetType BaseEntitySet::generateEntitySetType() noexcept
+entity_set_t BaseEntitySet::generateEntitySetType() noexcept
 {
     s_factories.push_back([](EntityContainer& entities,
         const std::vector<std::unique_ptr<BaseComponentContainer>>& componentContainers,
@@ -8,6 +8,7 @@ EntitySetType BaseEntitySet::generateEntitySetType() noexcept
     {
         auto entitySet = std::make_unique<EntitySet<Ts...>>(entities,
             std::tie(static_cast<ComponentContainer<Ts>*>(componentContainers[Ts::Type].get())->components...));
+            
         (componentToEntitySets[Ts::Type].push_back(entitySet.get()), ...);
 
         return std::move(entitySet);
@@ -80,18 +81,18 @@ void EntitySet<Ts ...>::removeEntityRemovedListener(ListenerId id) noexcept
 }
 
 template<class ...Ts>
-bool EntitySet<Ts ...>::satisfyRequirements(Entity entity) noexcept
+bool EntitySet<Ts ...>::satisfyRequirements(entity_t entity) noexcept
 {
     return m_entities[entity].template hasComponents<Ts...>();
 }
 
 template<class ...Ts>
-void EntitySet<Ts ...>::addEntity(Entity entity) noexcept
+void EntitySet<Ts ...>::addEntity(entity_t entity) noexcept
 {
     m_entityToIndex[entity] = m_managedEntities.size();
     auto& entityData = m_entities[entity];
     entityData.addEntitySet(Type);
-    m_managedEntities.emplace_back(entity, std::array<ComponentId, sizeof...(Ts)>{entityData.template getComponent<Ts>()...});
+    m_managedEntities.emplace_back(entity, std::array<component_id_t, sizeof...(Ts)>{entityData.template getComponent<Ts>()...});
     
 //  Call listeners
     for (const auto& listener : m_entityAddedListeners.getObjects())
@@ -99,7 +100,7 @@ void EntitySet<Ts ...>::addEntity(Entity entity) noexcept
 }
 
 template<class ...Ts>
-void EntitySet<Ts ...>::removeEntity(Entity entity, bool updateEntity) noexcept
+void EntitySet<Ts ...>::removeEntity(entity_t entity, bool updateEntity) noexcept
 {
 //  Call listeners
     for (const auto& listener : m_entityRemovedListeners.getObjects())
