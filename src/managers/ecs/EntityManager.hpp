@@ -6,7 +6,6 @@
 #include <utility>
 #include <type_traits>
 
-#include "managers/ecs/common/Components.hpp"
 #include "managers/ecs/common/ComponentTable.hpp"
 
 BEGIN_NAMESPACE_ECS

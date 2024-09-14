@@ -1,6 +1,8 @@
 #ifndef DEFINES_HPP
 #define DEFINES_HPP
 
+#include <cstdint>
+
 #define DEGTORAD 0.017453f
 #define RADTODEG 57.29577f
 
