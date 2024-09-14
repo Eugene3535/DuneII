@@ -10,7 +10,10 @@
 // Limit of all buildings on the map
 #define ALL_BUILDING_LIMIT_ON_MAP 1024
 
+// ECS
 #define BEGIN_NAMESPACE_ECS namespace ecs {
 #define END_NAMESPACE_ECS }
+
+#define UNDEFINED_COMPONENT -1
 
 #endif // !DEFINES_HPP
