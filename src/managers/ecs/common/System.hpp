@@ -1,27 +1,13 @@
 #ifndef SYSTEM_HPP
 #define SYSTEM_HPP
 
-#include "common/Defines.hpp"
-
-BEGIN_NAMESPACE_ECS
-
 class BaseSystem
 {
 public:
-    BaseSystem(class EntityManager& entityManager) noexcept:
-        m_entityManager(entityManager)
-    {
-
-    }
-
+    BaseSystem(class EntityManager& entityManager) noexcept;
     virtual ~BaseSystem() = default;
-
-    virtual void execute() noexcept {}
-
-    static uint32_t getSystemCount() noexcept
-    {
-        return s_type; 
-    }
+    virtual void execute() noexcept;
+    static uint32_t getSystemCount() noexcept;
 
 protected:
     template<class T> 
@@ -40,13 +26,11 @@ private:
     static uint32_t s_type;
 };
 
-uint32_t BaseSystem::s_type = 0;
-
 template<class T>
 class System : public BaseSystem
 {
 public:
-    System(class EntityManager& entityManager) noexcept:
+    System(EntityManager& entityManager) noexcept:
         BaseSystem(entityManager)
     {
 
@@ -58,7 +42,5 @@ public:
 
 template<class T>
 const uint32_t System<T>::Type = BaseSystem::generateComponentType<T>();
-
-END_NAMESPACE_ECS
 
 #endif // !SYSTEM_HPP

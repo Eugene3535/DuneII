@@ -9,21 +9,26 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-file(GLOB_RECURSE DUNE_II_SOURCE_FILES RELATIVE 
-	"${CMAKE_CURRENT_SOURCE_DIR}"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp"
+set(_src_files
+	${PROJECT_SOURCE_DIR}/src/main.cpp
+	${PROJECT_SOURCE_DIR}/src/common/FileProvider.cpp
+	${PROJECT_SOURCE_DIR}/src/common/MathUtils.cpp
+	${PROJECT_SOURCE_DIR}/src/effects/ScreenBlackoutEffect.cpp
+	${PROJECT_SOURCE_DIR}/src/managers/assets/AssetManager.cpp
+	${PROJECT_SOURCE_DIR}/src/managers/ecs/EntityManager.cpp
+	${PROJECT_SOURCE_DIR}/src/managers/ecs/common/System.cpp
+	${PROJECT_SOURCE_DIR}/src/managers/ecsystem/systems/MoveSystem.cpp
+	${PROJECT_SOURCE_DIR}/src/managers/ecsystem/SystemManager.cpp
+	${PROJECT_SOURCE_DIR}/src/scenes/Scene.cpp
+	${PROJECT_SOURCE_DIR}/src/scenes/intro/MainMenu.cpp
+	${PROJECT_SOURCE_DIR}/src/scenes/mission/Mission.cpp
+	${PROJECT_SOURCE_DIR}/src/scenes/mission/animated_tile/AnimatedTile.cpp
+	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/Builder.cpp
+	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/Building.cpp
+	${PROJECT_SOURCE_DIR}/src/scenes/mission/tilemap/TileMap.cpp
 )
 
-if(MSVC)
-	foreach(source IN LISTS DUNE_II_SOURCE_FILES)
-		get_filename_component(source_path "${source}" PATH)
-		string(REPLACE "/" "\\" source_path_msvc "${source_path}")
-		source_group("${source_path_msvc}" FILES "${source}")
-	endforeach()
-endif()
-
-add_executable(${PROJECT_NAME} ${DUNE_II_SOURCE_FILES})
+add_executable(${PROJECT_NAME} ${_src_files})
 add_subdirectory(${EXTERNAL_DIR}/sfml sfml)
 
 if(MSVC)
@@ -32,7 +37,7 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE
 	"${EXTERNAL_DIR}/rapidxml"
-	"${CMAKE_SOURCE_DIR}/src"
+	"${PROJECT_SOURCE_DIR}/src"
 )
 
 target_link_libraries(${PROJECT_NAME}

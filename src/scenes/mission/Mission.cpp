@@ -17,6 +17,8 @@ bool Mission::load(const std::string& info) noexcept
     if(m_isLoaded)
         return true;
 
+    m_systems.initialize(m_entities);
+
     if(m_isLoaded = m_tilemap.loadFromFile(FileProvider().findPathToFile(info)); m_isLoaded)
     {       
         m_isLoaded = m_builder.init(m_tilemap);

@@ -8,8 +8,6 @@
 
 #include "managers/ecs/common/ComponentTable.hpp"
 
-BEGIN_NAMESPACE_ECS
-
 class EntityManager
 {
     using PositionContainer  = std::vector<std::pair<int32_t, Position>>;
@@ -48,7 +46,5 @@ public:
 };
 
 #include "managers/ecs/EntityManager.inl"
-
-END_NAMESPACE_ECS
 
 #endif // !ENTITY_MANAGER_HPP

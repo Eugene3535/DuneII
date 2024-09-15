@@ -2,9 +2,6 @@
 #define MOVE_SYSTEM_HPP
 
 #include "managers/ecs/common/System.hpp"
-
-BEGIN_NAMESPACE_ECS
-
 class MoveSystem : public System<MoveSystem>
 {
 public:
@@ -13,7 +10,5 @@ public:
 
     void execute() noexcept override;
 };
-
-END_NAMESPACE_ECS
 
 #endif // !MOVE_SYSTEM_HPP

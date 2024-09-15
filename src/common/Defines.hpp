@@ -1,8 +1,6 @@
 #ifndef DEFINES_HPP
 #define DEFINES_HPP
 
-#include <cstdint>
-
 #define DEGTORAD 0.017453f
 #define RADTODEG 57.29577f
 
@@ -13,9 +11,6 @@
 #define ALL_BUILDING_LIMIT_ON_MAP 1024
 
 // ECS
-#define BEGIN_NAMESPACE_ECS namespace ecs {
-#define END_NAMESPACE_ECS }
-
 #define UNDEFINED_COMPONENT -1
 
 #endif // !DEFINES_HPP

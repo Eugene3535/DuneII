@@ -1,11 +1,10 @@
 #ifndef COMPONENTS_HPP
 #define COMPONENTS_HPP
 
+#include <cstdint>
+
 #include <SFML/Graphics/Rect.hpp>
 
-#include "common/Defines.hpp"
-
-BEGIN_NAMESPACE_ECS
 struct Position
 {
     float x = 0.0f;
@@ -25,7 +24,5 @@ struct Animation
     float              timer = 0.0f;
     float              fps = 0.0f;
 };
-
-END_NAMESPACE_ECS
 
 #endif // !COMPONENTS_HPP

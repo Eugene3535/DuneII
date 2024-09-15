@@ -2,7 +2,10 @@
 
 #include "managers/ecs/EntityManager.hpp"
 
-BEGIN_NAMESPACE_ECS
+EntityManager::EntityManager() noexcept
+{
+    
+}
 
 int32_t EntityManager::createEntity() noexcept
 {
@@ -26,5 +29,3 @@ void EntityManager::destroyEntity(int32_t entity) noexcept
     entities.pop_back();
     tables.pop_back();
 }
-
-END_NAMESPACE_ECS

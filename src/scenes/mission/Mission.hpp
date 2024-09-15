@@ -4,6 +4,8 @@
 #include "scenes/mission/buildings/Builder.hpp"
 #include "scenes/Scene.hpp"
 
+#include "managers/ecsystem/SystemManager.hpp"
+
 class Mission:
     public Scene
 {
@@ -20,6 +22,9 @@ private:
 private:
     TileMap m_tilemap;
     Builder m_builder;
+
+    EntityManager m_entities;
+    SystemManager m_systems;
 
 private:
     std::vector<Building*>     m_buildings;
