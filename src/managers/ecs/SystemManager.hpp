@@ -3,10 +3,9 @@
 
 #include <vector>
 #include <unordered_map>
-#include <cstddef>
+#include <stddef.h>
 
-#include "managers/ecs/system/System.hpp"
-#include "managers/ecs/entity/EntityManager.hpp"
+#include "managers/ecs/systems/base/System.hpp"
 
 class SystemManager
 {
@@ -14,10 +13,10 @@ public:
     SystemManager() noexcept;
     ~SystemManager();
 
-    bool initialize(EntityManager& entityManager) noexcept;
+    bool initialize(entt::registry& registry) noexcept;
 
     template<class T>
-    T* addSystem(EntityManager& entityManager) noexcept;
+    T* addSystem(entt::registry& registry) noexcept;
 
     template<class T>
     T* getSystem() noexcept;
@@ -32,6 +31,6 @@ private:
     size_t                 m_offset;
 };
 
-#include "managers/ecs/system/SystemManager.inl"
+#include "managers/ecs/SystemManager.inl"
 
 #endif // !SYSTEM_MANAGER_HPP

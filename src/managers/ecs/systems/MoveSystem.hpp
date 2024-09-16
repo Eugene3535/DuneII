@@ -1,12 +1,12 @@
 #ifndef MOVE_SYSTEM_HPP
 #define MOVE_SYSTEM_HPP
 
-#include "managers/ecs/system/System.hpp"
+#include "managers/ecs/systems/base/System.hpp"
 
 class MoveSystem : public System<MoveSystem>
 {
 public:
-    MoveSystem(class EntityManager& entityManager) noexcept;
+    MoveSystem(entt::registry& registry) noexcept;
     ~MoveSystem();
 
     void execute() noexcept override;

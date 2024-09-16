@@ -4,7 +4,7 @@
 #include "scenes/mission/buildings/Builder.hpp"
 #include "scenes/Scene.hpp"
 
-#include "managers/ecs/system/SystemManager.hpp"
+#include "managers/ecs/SystemManager.hpp"
 
 class Mission:
     public Scene
@@ -23,8 +23,8 @@ private:
     TileMap m_tilemap;
     Builder m_builder;
 
-    EntityManager m_entities;
-    SystemManager m_systems;
+    entt::registry m_registry;
+    SystemManager  m_systems;
 
 private:
     std::vector<Building*>     m_buildings;
