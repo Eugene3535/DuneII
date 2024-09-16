@@ -1,7 +1,7 @@
 #include <new>
 
-#include "managers/ecsystem/systems/MoveSystem.hpp"
-#include "managers/ecsystem/SystemManager.hpp"
+#include "managers/ecs/system/MoveSystem.hpp"
+#include "managers/ecs/system/SystemManager.hpp"
 
 SystemManager::SystemManager() noexcept:
     m_offset(0)

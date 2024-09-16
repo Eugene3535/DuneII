@@ -4,7 +4,7 @@
 #include "scenes/mission/buildings/Builder.hpp"
 #include "scenes/Scene.hpp"
 
-#include "managers/ecsystem/SystemManager.hpp"
+#include "managers/ecs/system/SystemManager.hpp"
 
 class Mission:
     public Scene

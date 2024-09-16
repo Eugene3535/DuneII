@@ -1,6 +1,6 @@
 #include <algorithm>
 
-#include "managers/ecs/EntityManager.hpp"
+#include "managers/ecs/entity/EntityManager.hpp"
 
 EntityManager::EntityManager() noexcept
 {

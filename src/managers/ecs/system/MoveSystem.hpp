@@ -1,7 +1,8 @@
 #ifndef MOVE_SYSTEM_HPP
 #define MOVE_SYSTEM_HPP
 
-#include "managers/ecs/common/System.hpp"
+#include "managers/ecs/system/System.hpp"
+
 class MoveSystem : public System<MoveSystem>
 {
 public:

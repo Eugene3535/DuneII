@@ -1,5 +1,5 @@
-#include "managers/ecs/EntityManager.hpp"
-#include "managers/ecs/common/System.hpp"
+#include "managers/ecs/entity/EntityManager.hpp"
+#include "managers/ecs/system/System.hpp"
 
 uint32_t BaseSystem::s_type = 0;
 

@@ -5,8 +5,8 @@
 #include <unordered_map>
 #include <cstddef>
 
-#include "managers/ecs/common/System.hpp"
-#include "managers/ecs/EntityManager.hpp"
+#include "managers/ecs/system/System.hpp"
+#include "managers/ecs/entity/EntityManager.hpp"
 
 class SystemManager
 {
@@ -32,6 +32,6 @@ private:
     size_t                 m_offset;
 };
 
-#include "managers/ecsystem/SystemManager.inl"
+#include "managers/ecs/system/SystemManager.inl"
 
 #endif // !SYSTEM_MANAGER_HPP

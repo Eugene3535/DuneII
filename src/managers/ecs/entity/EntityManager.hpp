@@ -6,7 +6,7 @@
 #include <utility>
 #include <type_traits>
 
-#include "managers/ecs/common/ComponentTable.hpp"
+#include "managers/ecs/component/ComponentTable.hpp"
 
 class EntityManager
 {
@@ -45,6 +45,6 @@ public:
     NameContainer      names;
 };
 
-#include "managers/ecs/EntityManager.inl"
+#include "managers/ecs/entity/EntityManager.inl"
 
 #endif // !ENTITY_MANAGER_HPP

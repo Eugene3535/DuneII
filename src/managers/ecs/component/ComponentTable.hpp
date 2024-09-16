@@ -2,7 +2,7 @@
 #define COMPONENT_TABLE_HPP
 
 #include "common/Defines.hpp"
-#include "managers/ecs/common/Components.hpp"
+#include "managers/ecs/component/Components.hpp"
 
 struct ComponentTable
 {

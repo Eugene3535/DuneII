@@ -15,10 +15,10 @@ set(_src_files
 	${PROJECT_SOURCE_DIR}/src/common/MathUtils.cpp
 	${PROJECT_SOURCE_DIR}/src/effects/ScreenBlackoutEffect.cpp
 	${PROJECT_SOURCE_DIR}/src/managers/assets/AssetManager.cpp
-	${PROJECT_SOURCE_DIR}/src/managers/ecs/EntityManager.cpp
-	${PROJECT_SOURCE_DIR}/src/managers/ecs/common/System.cpp
-	${PROJECT_SOURCE_DIR}/src/managers/ecsystem/systems/MoveSystem.cpp
-	${PROJECT_SOURCE_DIR}/src/managers/ecsystem/SystemManager.cpp
+	${PROJECT_SOURCE_DIR}/src/managers/ecs/entity/EntityManager.cpp
+	${PROJECT_SOURCE_DIR}/src/managers/ecs/system/System.cpp
+	${PROJECT_SOURCE_DIR}/src/managers/ecs/system/MoveSystem.cpp
+	${PROJECT_SOURCE_DIR}/src/managers/ecs/system/SystemManager.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/Scene.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/intro/MainMenu.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/Mission.cpp
