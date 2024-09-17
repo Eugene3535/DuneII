@@ -1,6 +1,11 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Drawable.hpp>
+#include <SFML/Graphics/RenderStates.hpp>
+#include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Color.hpp>
 
 // Non-transformable lightweight graphical object with animation capability
 class AnimatedTile: 

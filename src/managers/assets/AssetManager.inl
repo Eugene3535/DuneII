@@ -50,7 +50,7 @@ T* AssetManager::tryLoadFromFile(const std::string& filename, std::unordered_map
     {
         bool sucsess = false;
 
-        if constexpr (std::is_same<T, sf::Music>::value)
+        if constexpr (std::is_same_v<T, sf::Music>)
 		{
             sucsess = iterator->second.openFromFile(filepath.generic_string());
 		}

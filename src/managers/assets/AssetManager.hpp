@@ -4,9 +4,11 @@
 #include <unordered_map>
 #include <type_traits>
 
-#include <SFML/System.hpp>
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
+#include <SFML/System/NonCopyable.hpp>
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Font.hpp>
+#include <SFML/Audio/SoundBuffer.hpp>
+#include <SFML/Audio/Music.hpp>
 
 #include "common/FileProvider.hpp"
 

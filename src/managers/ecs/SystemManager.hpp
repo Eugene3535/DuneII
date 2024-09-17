@@ -5,9 +5,12 @@
 #include <unordered_map>
 #include <stddef.h>
 
+#include <SFML/System/NonCopyable.hpp>
+
 #include "managers/ecs/systems/base/System.hpp"
 
-class SystemManager
+class SystemManager:
+    private sf::NonCopyable
 {
 public:
     SystemManager() noexcept;

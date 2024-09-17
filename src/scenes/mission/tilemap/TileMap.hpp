@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <filesystem>
 
+#include <SFML/Graphics/VertexBuffer.hpp>
+
 #include "rapidxml.hpp"
 
 #include "scenes/mission/buildings/Building.hpp"

@@ -1,11 +1,13 @@
+#include <cassert>
+
 #include "managers/assets/AssetManager.hpp"
 
 AssetManager* AssetManager::m_instance;
 
 AssetManager::AssetManager() noexcept
 {
-    if (m_instance == nullptr)
-        m_instance = this;
+    assert((m_instance == nullptr) && "AssetManager must be unique!");
+    m_instance = this;
 }
 
 AssetManager* AssetManager::instance() noexcept
