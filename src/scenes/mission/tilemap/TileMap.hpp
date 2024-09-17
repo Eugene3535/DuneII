@@ -8,7 +8,7 @@
 
 #include <SFML/Graphics/VertexBuffer.hpp>
 
-#include "rapidxml.hpp"
+#include "RapidXML/rapidxml.hpp"
 
 #include "scenes/mission/buildings/Building.hpp"
 

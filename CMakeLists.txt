@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 
 project(DuneII LANGUAGES C CXX)
 
-set(EXTERNAL_DIR $ENV{External})
+set(EXTERNAL_DIR $ENV{external})
 set(BUILD_SHARED_LIBS ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})

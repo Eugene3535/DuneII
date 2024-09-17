@@ -4,7 +4,7 @@
 
 #include <SFML/Graphics/RenderTarget.hpp>
 
-#include "rapidxml_utils.hpp"
+#include "RapidXML/rapidxml_utils.hpp"
 
 #include "common/FileProvider.hpp"
 #include "managers/assets/AssetManager.hpp"
