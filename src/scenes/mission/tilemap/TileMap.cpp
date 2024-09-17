@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <cstring>
 
+#include <SFML/Graphics/RenderTarget.hpp>
+
 #include "rapidxml_utils.hpp"
 
 #include "common/FileProvider.hpp"

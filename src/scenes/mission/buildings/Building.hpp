@@ -1,13 +1,14 @@
 #ifndef BUILDING_HPP
 #define BUILDING_HPP
 
+#include <SFML/Graphics/Sprite.hpp>
+
 #include "common/Enums.hpp"
-#include "scenes/mission/animated_tile/AnimatedTile.hpp"
 
 // More information is available here: https://gamicus.fandom.com/wiki/List_of_structures_in_Dune_II
 
 class Building final:
-    public AnimatedTile
+    public sf::Sprite
 {
     friend class Builder;
 

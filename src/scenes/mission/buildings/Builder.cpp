@@ -141,7 +141,7 @@ Building* Builder::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
 			auto building = &m_buildings->emplace(origin, Building()).first->second;
 
 			building->m_type = type;
-			building->setTexture(texture);
+			building->setTexture(*texture);
 			building->setTextureRect(getTexCoordsOf(type));
 			building->setPosition(coordX, coordY);
 			building->m_hitPoints = building->m_maxHitPoints = getHitPointsOf(type);

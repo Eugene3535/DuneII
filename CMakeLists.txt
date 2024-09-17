@@ -21,7 +21,6 @@ set(_src_files
 	${PROJECT_SOURCE_DIR}/src/scenes/Scene.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/intro/MainMenu.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/Mission.cpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/animated_tile/AnimatedTile.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/Builder.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/Building.cpp
 	${PROJECT_SOURCE_DIR}/src/scenes/mission/tilemap/TileMap.cpp
