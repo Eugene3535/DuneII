@@ -1,5 +1,6 @@
 #include "common/FileProvider.hpp"
 #include "game/Game.hpp"
+#include "managers/ecs/systems/MoveSystem.hpp"
 #include "scenes/mission/Mission.hpp"
 
 Mission::Mission(Game& game) noexcept:
@@ -17,14 +18,15 @@ bool Mission::load(const std::string& info) noexcept
     if(m_isLoaded)
         return true;
 
-    m_systems.initialize(m_registry);
+    m_systems.initialize();
+    m_systems.addSystem<MoveSystem>(m_registry);
 
     if(m_isLoaded = m_tilemap.loadFromFile(FileProvider().findPathToFile(info)); m_isLoaded)
     {       
         m_isLoaded = m_builder.init(m_tilemap);
         m_buildings = m_tilemap.getAllBuildings();
 
-        if(auto theme = Assets->getMusic("08 - Command Post.flac"); theme != nullptr)
+        if(auto theme = Assets->getResource<sf::Music>("08 - Command Post.flac"); theme != nullptr)
         {
             theme->setLoop(true);
             theme->play();
@@ -79,7 +81,7 @@ void Mission::update(sf::Time dt) noexcept
         m_game.sceneNeedToBeChanged = true;
         m_game.next_scene = Game::GameScene::MAIN_MENU;
 
-        if(auto theme = Assets->getMusic("08 - Command Post.flac"); theme != nullptr)
+        if(auto theme = Assets->getResource<sf::Music>("08 - Command Post.flac"); theme != nullptr)
         {
             theme->stop();
         }

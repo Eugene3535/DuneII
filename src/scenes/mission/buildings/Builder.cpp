@@ -136,7 +136,7 @@ Building* Builder::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
 
 	if(auto found = m_buildings->find(origin); found == m_buildings->end())
 	{
-		if(const auto texture = Assets->getTexture("Buildings.png"); texture != nullptr)
+		if(const auto texture = Assets->getResource<sf::Texture>("Buildings.png"); texture != nullptr)
 		{
 			auto building = &m_buildings->emplace(origin, Building()).first->second;
 

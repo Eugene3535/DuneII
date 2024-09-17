@@ -18,8 +18,8 @@ bool MainMenu::load(const std::string& info) noexcept
 
     if(auto assets = Assets; assets != nullptr)
     {
-        auto font = assets->getFont("AvanteNrBook.ttf");
-        auto texture = assets->getTexture("Dune.png");
+        auto font = assets->getResource<sf::Font>("AvanteNrBook.ttf");
+        auto texture = assets->getResource<sf::Texture>("Dune.png");
 
         if(!(font && texture))
             return false;

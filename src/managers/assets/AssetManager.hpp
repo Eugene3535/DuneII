@@ -18,10 +18,8 @@ public:
 
     static AssetManager* instance() noexcept;
 
-    sf::Texture*     getTexture(const std::string& filename)     noexcept;
-    sf::Font*        getFont(const std::string& filename)        noexcept;
-    sf::SoundBuffer* getSoundBuffer(const std::string& filename) noexcept;
-    sf::Music*       getMusic(const std::string& filename)       noexcept;
+    template<class T>
+    T* getResource(const std::string& filename) noexcept;
 
 private:
     template<class T>

@@ -239,7 +239,7 @@ void TileMap::parseTilesets(const rapidxml::xml_node<>* map_node, std::vector<Ti
 		if (size_t last_slash_pos = tex_name.find_last_of('/'); last_slash_pos != std::string::npos)
 			tex_name.erase(0, last_slash_pos + 1);
 
-		sf::Texture* tileset = Assets->getTexture(tex_name);
+		sf::Texture* tileset = Assets->getResource<sf::Texture>(tex_name);
 
 		if (tileset == nullptr)
 			continue;

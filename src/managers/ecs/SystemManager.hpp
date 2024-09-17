@@ -13,7 +13,7 @@ public:
     SystemManager() noexcept;
     ~SystemManager();
 
-    bool initialize(entt::registry& registry) noexcept;
+    void initialize() noexcept;
 
     template<class T>
     T* addSystem(entt::registry& registry) noexcept;
@@ -22,6 +22,8 @@ public:
     T* getSystem() noexcept;
 
     void updateAllSystems() noexcept;
+
+    void clear() noexcept;
 
 private:
     std::vector<BaseSystem*>                  m_sequentialAccessSystems;
