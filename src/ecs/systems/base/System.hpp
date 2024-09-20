@@ -1,8 +1,13 @@
 #ifndef SYSTEM_HPP
 #define SYSTEM_HPP
 
-#include "ecs/EntityManager.hpp"
+#include <cstdint>
 
+#include "common/Defines.hpp"
+
+BEGIN_NAMESPACE_ECS
+class EntityManager;
+END_NAMESPACE_ECS
 class BaseSystem
 {
 public:

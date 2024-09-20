@@ -4,6 +4,7 @@
 #include "scenes/mission/buildings/Builder.hpp"
 #include "scenes/Scene.hpp"
 
+#include "ecs/EntityManager.hpp"
 #include "ecs/SystemManager.hpp"
 
 class Mission:

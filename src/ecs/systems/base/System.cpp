@@ -1,3 +1,4 @@
+#include "ecs/EntityManager.hpp"
 #include "ecs/systems/base/System.hpp"
 
 uint32_t BaseSystem::s_type = 0;
