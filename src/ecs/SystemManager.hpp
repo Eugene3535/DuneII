@@ -7,7 +7,7 @@
 
 #include <SFML/System/NonCopyable.hpp>
 
-#include "managers/ecs/systems/base/System.hpp"
+#include "ecs/systems/base/System.hpp"
 
 class SystemManager:
     private sf::NonCopyable
@@ -19,7 +19,7 @@ public:
     void initialize() noexcept;
 
     template<class T>
-    T* addSystem(entt::registry& registry) noexcept;
+    T* addSystem(ecs::EntityManager& entityManager) noexcept;
 
     template<class T>
     T* getSystem() noexcept;
@@ -36,6 +36,6 @@ private:
     size_t                 m_offset;
 };
 
-#include "managers/ecs/SystemManager.inl"
+#include "ecs/SystemManager.inl"
 
 #endif // !SYSTEM_MANAGER_HPP

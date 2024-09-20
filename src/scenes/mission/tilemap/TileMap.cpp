@@ -7,7 +7,7 @@
 #include "RapidXML/rapidxml_utils.hpp"
 
 #include "common/FileProvider.hpp"
-#include "managers/assets/AssetManager.hpp"
+#include "assets/AssetManager.hpp"
 #include "scenes/mission/tilemap/TileMap.hpp"
 
 TileMap::TileMap() noexcept:

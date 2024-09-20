@@ -5,30 +5,40 @@ project(DuneII LANGUAGES C CXX)
 set(EXTERNAL_DIR $ENV{external})
 set(BUILD_SHARED_LIBS ON)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 
-set(_src_files
-	${PROJECT_SOURCE_DIR}/src/main.cpp
-	${PROJECT_SOURCE_DIR}/src/common/FileProvider.cpp
-	${PROJECT_SOURCE_DIR}/src/common/MathUtils.cpp
-	${PROJECT_SOURCE_DIR}/src/effects/ScreenBlackoutEffect.cpp
-	${PROJECT_SOURCE_DIR}/src/managers/assets/AssetManager.cpp
-	${PROJECT_SOURCE_DIR}/src/managers/ecs/systems/base/System.cpp
-	${PROJECT_SOURCE_DIR}/src/managers/ecs/systems/MoveSystem.cpp
-	${PROJECT_SOURCE_DIR}/src/managers/ecs/SystemManager.cpp
-	${PROJECT_SOURCE_DIR}/src/scenes/Scene.cpp
-	${PROJECT_SOURCE_DIR}/src/scenes/intro/MainMenu.cpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/Mission.cpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/Builder.cpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/buildings/Building.cpp
-	${PROJECT_SOURCE_DIR}/src/scenes/mission/tilemap/TileMap.cpp
+if(WIN32)
+	string(APPEND CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin")
+	string(APPEND CMAKE_LIBRARY_OUTPUT_DIRECTORY "lib")
+	string(APPEND CMAKE_ARCHIVE_OUTPUT_DIRECTORY "lib")
+endif()
+
+set(SRC_DIR ${PROJECT_SOURCE_DIR}/src)
+
+set(_duneII_src_files
+	${SRC_DIR}/main.cpp
+	${SRC_DIR}/common/FileProvider.cpp
+	${SRC_DIR}/common/MathUtils.cpp
+	${SRC_DIR}/effects/ScreenBlackoutEffect.cpp
+	${SRC_DIR}/assets/AssetManager.cpp
+	${SRC_DIR}/ecs/common/EntityContainer.cpp
+	${SRC_DIR}/ecs/common/EntitySet.cpp
+	${SRC_DIR}/ecs/EntityManager.cpp
+	${SRC_DIR}/ecs/systems/base/System.cpp
+	${SRC_DIR}/ecs/systems/MoveSystem.cpp
+	${SRC_DIR}/ecs/SystemManager.cpp
+	${SRC_DIR}/scenes/Scene.cpp
+	${SRC_DIR}/scenes/intro/MainMenu.cpp
+	${SRC_DIR}/scenes/mission/Mission.cpp
+	${SRC_DIR}/scenes/mission/buildings/Builder.cpp
+	${SRC_DIR}/scenes/mission/buildings/Building.cpp
+	${SRC_DIR}/scenes/mission/tilemap/TileMap.cpp
 )
 
-add_executable(${PROJECT_NAME} ${_src_files})
+add_executable(${PROJECT_NAME} ${_duneII_src_files})
 add_subdirectory(${EXTERNAL_DIR}/sfml sfml)
-add_subdirectory(${EXTERNAL_DIR}/entt entt)
 
 if(MSVC)
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
@@ -44,7 +54,6 @@ target_link_libraries(${PROJECT_NAME}
 	sfml-window
 	sfml-system
 	sfml-audio
-	EnTT::EnTT
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG>)

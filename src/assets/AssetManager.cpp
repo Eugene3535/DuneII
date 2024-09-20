@@ -1,6 +1,6 @@
 #include <cassert>
 
-#include "managers/assets/AssetManager.hpp"
+#include "assets/AssetManager.hpp"
 
 AssetManager* AssetManager::m_instance;
 

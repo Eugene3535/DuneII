@@ -1,12 +1,12 @@
 #ifndef SYSTEM_HPP
 #define SYSTEM_HPP
 
-#include <entt/entt.hpp>
+#include "ecs/EntityManager.hpp"
 
 class BaseSystem
 {
 public:
-    BaseSystem(entt::registry& registry) noexcept;
+    BaseSystem(ecs::EntityManager& entityManager) noexcept;
     virtual ~BaseSystem() = default;
     virtual void execute() noexcept;
     static uint32_t getSystemCount() noexcept;
@@ -22,7 +22,7 @@ protected:
     }
 
 protected:
-    entt::registry& m_registry;
+    ecs::EntityManager& m_entityManager;
 
 private:
     static uint32_t s_type;
@@ -32,8 +32,8 @@ template<class T>
 class System : public BaseSystem
 {
 public:
-    System(entt::registry& registry) noexcept:
-        BaseSystem(registry)
+    System(ecs::EntityManager& entityManager) noexcept:
+        BaseSystem(entityManager)
     {
 
     }

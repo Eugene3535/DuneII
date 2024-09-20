@@ -37,7 +37,7 @@ private:
     static AssetManager* m_instance;
 };
 
-#include "managers/assets/AssetManager.inl"
+#include "assets/AssetManager.inl"
 
 #define Assets AssetManager::instance()
 

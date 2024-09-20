@@ -1,9 +1,9 @@
-#include "managers/ecs/systems/base/System.hpp"
+#include "ecs/systems/base/System.hpp"
 
 uint32_t BaseSystem::s_type = 0;
 
-BaseSystem::BaseSystem(entt::registry& registry) noexcept:
-    m_registry(registry)
+BaseSystem::BaseSystem(ecs::EntityManager& entityManager) noexcept:
+    m_entityManager(entityManager)
 {
 
 }

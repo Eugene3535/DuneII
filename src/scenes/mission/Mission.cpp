@@ -1,6 +1,6 @@
 #include "common/FileProvider.hpp"
 #include "game/Game.hpp"
-#include "managers/ecs/systems/MoveSystem.hpp"
+#include "ecs/systems/MoveSystem.hpp"
 #include "scenes/mission/Mission.hpp"
 
 Mission::Mission(Game& game) noexcept:
@@ -19,7 +19,7 @@ bool Mission::load(const std::string& info) noexcept
         return true;
 
     m_systems.initialize();
-    m_systems.addSystem<MoveSystem>(m_registry);
+    m_systems.addSystem<MoveSystem>(m_entityManager);
 
     if(m_isLoaded = m_tilemap.loadFromFile(FileProvider().findPathToFile(info)); m_isLoaded)
     {       

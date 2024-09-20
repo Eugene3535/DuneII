@@ -1,6 +1,6 @@
 #include <new>
 
-#include "managers/ecs/SystemManager.hpp"
+#include "ecs/SystemManager.hpp"
 
 SystemManager::SystemManager() noexcept:
     m_offset(0)

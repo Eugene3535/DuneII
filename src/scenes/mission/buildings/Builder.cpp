@@ -1,4 +1,4 @@
-#include "managers/assets/AssetManager.hpp"
+#include "assets/AssetManager.hpp"
 #include "scenes/mission/buildings/Builder.hpp"
 
 Builder::Builder() noexcept:
