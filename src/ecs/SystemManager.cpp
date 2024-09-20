@@ -1,5 +1,3 @@
-#include <new>
-
 #include "ecs/SystemManager.hpp"
 
 SystemManager::SystemManager() noexcept:

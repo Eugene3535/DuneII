@@ -3,7 +3,8 @@
 
 #include <vector>
 #include <unordered_map>
-#include <stddef.h>
+#include <cstddef>
+#include <new>
 
 #include <SFML/System/NonCopyable.hpp>
 
