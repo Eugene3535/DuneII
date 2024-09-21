@@ -1,3 +1,5 @@
+#include <cstdint>
+
 #include "scenes/mission/buildings/Building.hpp"
 
 Building::Building() noexcept:
