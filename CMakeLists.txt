@@ -29,7 +29,8 @@ set(_duneII_src_files
 	${SRC_DIR}/ecs/systems/base/System.cpp
 	${SRC_DIR}/ecs/systems/MoveSystem.cpp
 	${SRC_DIR}/ecs/SystemManager.cpp
-	${SRC_DIR}/ecs/components/SpriteComponent.cpp
+	${SRC_DIR}/ecs/components/Sprite.cpp
+	${SRC_DIR}/ecs/components/Bounds.cpp
 	${SRC_DIR}/scenes/Scene.cpp
 	${SRC_DIR}/scenes/intro/MainMenu.cpp
 	${SRC_DIR}/scenes/mission/Mission.cpp
