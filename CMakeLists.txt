@@ -34,7 +34,6 @@ set(_duneII_src_files
 	${SRC_DIR}/scenes/Scene.cpp
 	${SRC_DIR}/scenes/intro/MainMenu.cpp
 	${SRC_DIR}/scenes/mission/Mission.cpp
-	${SRC_DIR}/scenes/mission/buildings/Builder.cpp
 	${SRC_DIR}/scenes/mission/buildings/Building.cpp
 	${SRC_DIR}/scenes/mission/tilemap/TileMap.cpp
 )

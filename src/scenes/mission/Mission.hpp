@@ -1,7 +1,7 @@
 #ifndef MISSION_HPP
 #define MISSION_HPP
 
-#include "scenes/mission/buildings/Builder.hpp"
+#include "scenes/mission/tilemap/TileMap.hpp"
 #include "scenes/Scene.hpp"
 
 #include "ecs/EntityManager.hpp"
@@ -22,7 +22,6 @@ private:
 
 private:
     TileMap m_tilemap;
-    Builder m_builder;
 
     ecs::EntityManager m_entityManager;
     SystemManager      m_systems;
