@@ -43,10 +43,6 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 	if(loadLayers(map_node))
 		if(loadObjects(map_node))
 		{
-			for(const auto& building : m_buildingsOnLoad)
-				if(putBuildingOnMap(building.type, building.cellX, building.cellY) != true)
-					return false;   
-
 			auto get_area_of = [this](House houseName) -> sf::IntRect
 			{
 				for(auto& object : m_objects)
@@ -263,7 +259,7 @@ const sf::Vector2i& TileMap::getTileSize() const noexcept
 bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 {
 	std::vector<TileMap::Tileset> tilesets;
-	parseTilesets(map_node, tilesets);
+	loadTilesets(map_node, tilesets);
 
 	if(tilesets.empty()) 
 		return false;
@@ -330,12 +326,12 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 				
 			if(layer_name == "Landscape")
 			{
-				parseLandscape(*current_tileset, parsed_layer);
+				loadLandscape(*current_tileset, parsed_layer);
 				continue;
 			}	
 
 			if(layer_name == "Buildings")	
-				parseBuildings(*current_tileset, parsed_layer);
+				loadBuildings(*current_tileset, parsed_layer);
 		}
 	}
 
@@ -390,7 +386,7 @@ bool TileMap::loadObjects(const rapidxml::xml_node<char>* map_node) noexcept
 	return false;
 }
 
-void TileMap::parseTilesets(const rapidxml::xml_node<>* map_node, std::vector<TileMap::Tileset>& tilesets) noexcept
+void TileMap::loadTilesets(const rapidxml::xml_node<>* map_node, std::vector<TileMap::Tileset>& tilesets) noexcept
 {
 	for (auto tilesetNode = map_node->first_node("tileset");
 			  tilesetNode != nullptr;
@@ -428,7 +424,7 @@ void TileMap::parseTilesets(const rapidxml::xml_node<>* map_node, std::vector<Ti
 	}
 }
 
-void TileMap::parseLandscape(const Tileset& tileset, const std::vector<int>& parsed_layer) noexcept
+void TileMap::loadLandscape(const Tileset& tileset, const std::vector<int>& parsed_layer) noexcept
 {
 	std::vector<sf::Vertex> vertices;
 	vertices.reserve(parsed_layer.size());
@@ -480,7 +476,7 @@ void TileMap::parseLandscape(const Tileset& tileset, const std::vector<int>& par
 	}
 }
 
-void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int>& parsed_layer) noexcept
+void TileMap::loadBuildings(const Tileset& tileset, const std::vector<int>& parsed_layer) noexcept
 {
 	auto get_building_type = [](int32_t tile_num)
 	{
@@ -535,8 +531,7 @@ void TileMap::parseBuildings(const Tileset& tileset, const std::vector<int>& par
 
 				if(bld_type != Building::Type::NONE)
 				{
-					TileMap::BuildingData data = { bld_type, x, y };
-					m_buildingsOnLoad.emplace_back(data);
+					putBuildingOnMap(bld_type, x, y);
 				}
 			}
 		}

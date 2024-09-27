@@ -61,14 +61,6 @@ public:
 	};
 
 public:
-	struct BuildingData 
-	{
-		Building::Type type;
-		int32_t cellX;
-		int32_t cellY;
-	};
-
-public:
 	TileMap(class ecs::EntityManager& entityManager) noexcept;
 
 	bool loadFromFile(const std::filesystem::path& file_path)                noexcept;
@@ -85,9 +77,9 @@ public:
 private:
 	bool         loadLayers(const rapidxml::xml_node<>* map_node)                                    noexcept;
 	bool         loadObjects(const rapidxml::xml_node<>* map_node)                                   noexcept;
-	void         parseTilesets(const rapidxml::xml_node<>* map_node, std::vector<Tileset>& tilesets) noexcept;
-	void         parseLandscape(const Tileset& tileset, const std::vector<int>& parsed_layer)        noexcept;
-	void         parseBuildings(const Tileset& tileset, const std::vector<int>& parsed_layer)        noexcept;
+	void         loadTilesets(const rapidxml::xml_node<>* map_node, std::vector<Tileset>& tilesets)  noexcept;
+	void         loadLandscape(const Tileset& tileset, const std::vector<int>& parsed_layer)         noexcept;
+	void         loadBuildings(const Tileset& tileset, const std::vector<int>& parsed_layer)         noexcept;
 	char         convertTileNumToChar(int32_t index)                                           const noexcept;
 	void         draw(sf::RenderTarget& target, sf::RenderStates states)                       const override;
 	void         updateWall(int32_t origin, int32_t level)                                           noexcept;
@@ -103,7 +95,6 @@ private:
 	const sf::Texture*                    m_texture;
     std::unordered_map<int32_t, Building> m_buildings;
 	std::vector<Object>                   m_objects;
-	std::vector<BuildingData>             m_buildingsOnLoad;
 	std::string                           m_tileMask;
 	std::string                           m_title;
 	sf::Vector2i                          m_mapSizeInTiles;
