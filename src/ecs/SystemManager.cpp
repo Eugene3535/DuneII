@@ -3,7 +3,7 @@
 SystemManager::SystemManager() noexcept:
     m_offset(0)
 {
-
+    m_rawMemory.resize(max_memory_size);
 }
 
 SystemManager::~SystemManager()
@@ -11,16 +11,10 @@ SystemManager::~SystemManager()
     clear();
 };
 
-void SystemManager::initialize() noexcept
-{
-    constexpr size_t memory_size = 1024 << 6; // 64 kB
-    m_rawMemory.resize(memory_size);
-}
-
-void SystemManager::updateAllSystems() noexcept
+void SystemManager::update(sf::Time dt) noexcept
 {
     for(auto system : m_sequentialAccessSystems)
-        system->execute();
+        system->execute(dt);
 }
 
 void SystemManager::clear() noexcept

@@ -1,6 +1,7 @@
 #include "common/FileProvider.hpp"
 #include "game/Game.hpp"
 #include "ecs/systems/MoveSystem.hpp"
+#include "ecs/systems/SpriteRenderSystem.hpp"
 #include "scenes/mission/Mission.hpp"
 
 Mission::Mission(Game& game) noexcept:
@@ -17,8 +18,8 @@ bool Mission::load(const std::string& info) noexcept
     if(m_isLoaded)
         return true;
 
-    m_systems.initialize();
-    m_systems.addSystem<MoveSystem>(m_entityManager);
+    m_systems.add<ecs::MoveSystem>(m_entityManager);
+    m_systems.add<ecs::SpriteRenderSystem>(m_entityManager, m_game.window);
 
     if(m_isLoaded = m_tilemap.loadFromFile(FileProvider().findPathToFile(info)); m_isLoaded)
     {       
@@ -66,6 +67,9 @@ void Mission::update(sf::Time dt) noexcept
 
         sf::IntRect viewport = sf::IntRect(m_viewPosition.x, m_viewPosition.y, view_size.x, view_size.y);
 
+        if(auto sprite_render_system = m_systems.get<ecs::SpriteRenderSystem>(); sprite_render_system != nullptr)
+            sprite_render_system->setViewport(viewport);
+
         m_drawables.clear();
 
         for(auto b: m_buildings)
@@ -74,7 +78,7 @@ void Mission::update(sf::Time dt) noexcept
             {
                 m_drawables.push_back(b);
             }     
-        }  
+        }
 
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::X))
         {
@@ -86,6 +90,8 @@ void Mission::update(sf::Time dt) noexcept
                 theme->stop();
             }
         }
+
+        m_systems.update(dt);
     }
 }
 

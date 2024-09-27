@@ -7,27 +7,27 @@
 #include <new>
 
 #include <SFML/System/NonCopyable.hpp>
+#include <SFML/System/Time.hpp>
 
 #include "ecs/systems/base/System.hpp"
 
 class SystemManager:
     private sf::NonCopyable
 {
+    static constexpr size_t max_memory_size = 1024 << 3; // 8 kB
+
 public:
     SystemManager() noexcept;
     ~SystemManager();
 
-    void initialize() noexcept;
-
-    template<class T>
-    T* addSystem(ecs::EntityManager& entityManager) noexcept;
-
-    template<class T>
-    T* getSystem() noexcept;
-
-    void updateAllSystems() noexcept;
-
+    void update(sf::Time dt) noexcept;
     void clear() noexcept;
+
+    template<class T, class... Args>
+    T* add(ecs::EntityManager& entityManager, Args&& ... args) noexcept;
+
+    template<class T>
+    T* get() noexcept;
 
 private:
     std::vector<BaseSystem*>                  m_sequentialAccessSystems;

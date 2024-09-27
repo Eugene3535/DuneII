@@ -3,17 +3,16 @@
 
 #include <cstdint>
 
-#include "common/Defines.hpp"
+#include <SFML/System/Time.hpp>
 
-BEGIN_NAMESPACE_ECS
-class EntityManager;
-END_NAMESPACE_ECS
+#include "ecs/EntityManager.hpp"
+
 class BaseSystem
 {
 public:
     BaseSystem(ecs::EntityManager& entityManager) noexcept;
     virtual ~BaseSystem() = default;
-    virtual void execute() noexcept;
+    virtual void execute(sf::Time dt) noexcept;
     static uint32_t getSystemCount() noexcept;
 
 protected:

@@ -1,4 +1,3 @@
-#include "ecs/EntityManager.hpp"
 #include "ecs/systems/base/System.hpp"
 
 uint32_t BaseSystem::s_type = 0;
@@ -9,7 +8,7 @@ BaseSystem::BaseSystem(ecs::EntityManager& entityManager) noexcept:
 
 }
 
-void BaseSystem::execute() noexcept
+void BaseSystem::execute(sf::Time dt) noexcept
 {
 
 }
