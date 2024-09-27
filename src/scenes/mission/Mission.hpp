@@ -3,9 +3,9 @@
 
 #include "scenes/mission/tilemap/TileMap.hpp"
 #include "scenes/Scene.hpp"
-
 #include "ecs/EntityManager.hpp"
 #include "ecs/SystemManager.hpp"
+#include "ecs/components/Sprite.hpp"
 
 class Mission:
     public Scene
@@ -27,10 +27,8 @@ private:
     SystemManager      m_systems;
 
 private:
-    std::vector<Building*>     m_buildings;
-    std::vector<sf::Drawable*> m_drawables;
-
     sf::Vector2f m_viewPosition;
+    std::vector<ecs::Sprite*> m_sprites;
 };
 
 #endif // !MISSION_HPP

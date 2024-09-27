@@ -28,7 +28,6 @@ set(_duneII_src_files
 	${SRC_DIR}/ecs/EntityManager.cpp
 	${SRC_DIR}/ecs/systems/base/System.cpp
 	${SRC_DIR}/ecs/systems/MoveSystem.cpp
-	${SRC_DIR}/ecs/systems/SpriteRenderSystem.cpp
 	${SRC_DIR}/ecs/SystemManager.cpp
 	${SRC_DIR}/ecs/components/Sprite.cpp
 	${SRC_DIR}/ecs/components/Bounds.cpp

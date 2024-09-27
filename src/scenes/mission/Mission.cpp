@@ -1,7 +1,7 @@
 #include "common/FileProvider.hpp"
 #include "game/Game.hpp"
 #include "ecs/systems/MoveSystem.hpp"
-#include "ecs/systems/SpriteRenderSystem.hpp"
+#include "ecs/components/Bounds.hpp"
 #include "scenes/mission/Mission.hpp"
 
 Mission::Mission(Game& game) noexcept:
@@ -19,12 +19,9 @@ bool Mission::load(const std::string& info) noexcept
         return true;
 
     m_systems.add<ecs::MoveSystem>(m_entityManager);
-    m_systems.add<ecs::SpriteRenderSystem>(m_entityManager, m_game.window);
 
     if(m_isLoaded = m_tilemap.loadFromFile(FileProvider().findPathToFile(info)); m_isLoaded)
     {       
-        m_buildings = m_tilemap.getAllBuildings();
-
         if(auto theme = Assets->getResource<sf::Music>("08 - Command Post.flac"); theme != nullptr)
         {
             theme->setLoop(true);
@@ -67,17 +64,14 @@ void Mission::update(sf::Time dt) noexcept
 
         sf::IntRect viewport = sf::IntRect(m_viewPosition.x, m_viewPosition.y, view_size.x, view_size.y);
 
-        if(auto sprite_render_system = m_systems.get<ecs::SpriteRenderSystem>(); sprite_render_system != nullptr)
-            sprite_render_system->setViewport(viewport);
+        m_sprites.clear();
 
-        m_drawables.clear();
-
-        for(auto b: m_buildings)
+        for (auto [entity, components] : m_entityManager.getEntitySet<ecs::Bounds, ecs::Sprite>())
         {
-            if(viewport.intersects(b->bounds))
-            {
-                m_drawables.push_back(b);
-            }     
+            auto [bounds, sprite] = components;
+
+            if(viewport.intersects(bounds))
+                m_sprites.push_back(&sprite);
         }
 
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::X))
@@ -99,11 +93,9 @@ void Mission::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     if(m_isLoaded)
     {
-        target.draw(m_tilemap);
+        target.draw(m_tilemap, states);
 
-        for(auto drawable: m_drawables)
-        {
-            target.draw(*drawable, states);   
-        }    
+        for(auto sprite : m_sprites)
+            target.draw(*sprite, states);
     }
 }

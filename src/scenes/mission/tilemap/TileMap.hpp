@@ -11,7 +11,8 @@
 #include "RapidXML/rapidxml.hpp"
 
 #include "common/Defines.hpp"
-#include "scenes/mission/buildings/Building.hpp"
+#include "common/Enums.hpp"
+#include "ecs/common/ECSTypes.hpp"
 
 BEGIN_NAMESPACE_ECS
 class EntityManager;
@@ -63,11 +64,10 @@ public:
 public:
 	TileMap(class ecs::EntityManager& entityManager) noexcept;
 
-	bool loadFromFile(const std::filesystem::path& file_path)                noexcept;
-	void unload()                                                            noexcept;
-	bool putBuildingOnMap(Building::Type type, int32_t cellX, int32_t cellY) noexcept;
+	bool loadFromFile(const std::filesystem::path& file_path)               noexcept;
+	void unload()                                                           noexcept;
+	bool putBuildingOnMap(StructureType type, int32_t cellX, int32_t cellY) noexcept;
 
-	std::vector<Building*>     getAllBuildings()          noexcept;
 	const std::vector<Object>& getObjects()         const noexcept;
 	std::string_view           getTileMask()        const noexcept;
 	const sf::Vector2i&        getMapSizeInTiles()  const noexcept;
@@ -82,24 +82,23 @@ private:
 	void         loadBuildings(const Tileset& tileset, const std::vector<int>& parsed_layer)         noexcept;
 	char         convertTileNumToChar(int32_t index)                                           const noexcept;
 	void         draw(sf::RenderTarget& target, sf::RenderStates states)                       const override;
-	void         updateWall(int32_t origin, int32_t level)                                           noexcept;
+	void         updateWall(ecs::entity_t entity, int32_t origin, int32_t level)                     noexcept;
     WallCellType getWallType(bool left, bool top, bool right, bool bottom)                           noexcept;
     sf::IntRect  getTexCoordsOf(WallCellType type)                                                   noexcept;
-    sf::IntRect  getTexCoordsOf(Building::Type type)                                           const noexcept;
-	sf::IntRect  getBoundsOf(Building::Type type, int32_t coordX, int32_t coordY)              const noexcept;
-	int32_t      getHitPointsOf(Building::Type type)                                           const noexcept;
+    sf::IntRect  getTexCoordsOf(StructureType type)                                            const noexcept;
+	sf::IntRect  getBoundsOf(StructureType type, int32_t coordX, int32_t coordY)               const noexcept;
+	int32_t      getHitPointsOf(StructureType type)                                            const noexcept;
 
 private:
-	class ecs::EntityManager&             m_entityManager;
-	sf::VertexBuffer                      m_vertices;
-	const sf::Texture*                    m_texture;
-    std::unordered_map<int32_t, Building> m_buildings;
-	std::vector<Object>                   m_objects;
-	std::string                           m_tileMask;
-	std::string                           m_title;
-	sf::Vector2i                          m_mapSizeInTiles;
-	sf::Vector2i                          m_mapSizeInPixels;
-	sf::Vector2i                          m_tileSize;
+	class ecs::EntityManager& m_entityManager;
+	sf::VertexBuffer          m_vertices;
+	const sf::Texture*        m_texture;
+	std::vector<Object>       m_objects;
+	std::string               m_tileMask;
+	std::string               m_title;
+	sf::Vector2i              m_mapSizeInTiles;
+	sf::Vector2i              m_mapSizeInPixels;
+	sf::Vector2i              m_tileSize;
 };
 
 #endif // !TILEMAP_HPP
