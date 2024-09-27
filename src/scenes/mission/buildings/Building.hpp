@@ -7,11 +7,9 @@
 
 // More information is available here: https://gamicus.fandom.com/wiki/List_of_structures_in_Dune_II
 
-class Building final:
+class Building:
     public sf::Sprite
 {
-    friend class Builder;
-
 public:
     enum Type: int32_t
     {
@@ -33,31 +31,11 @@ public:
         ROCKET_TURRET
     };
 
-public:
-    Building() noexcept;
-    ~Building();
-
-    void repair(int32_t points) noexcept;
-    void damage(int32_t points) noexcept;
-    void changeOwner(House house) noexcept;
-
-    Type               getType()         const noexcept;
-    House              getOwner()        const noexcept;
-    const sf::IntRect& getBounds()       const noexcept;
-    int32_t            getHitPoints()    const noexcept;
-    int32_t            getMaxHitPoints() const noexcept;
-
-    bool isDestroyed() const noexcept;
-
-private:
-    Type m_type;
-    House m_owner;
-
-    sf::IntRect m_bounds;
-    int32_t     m_hitPoints;
-    int32_t     m_maxHitPoints;
-
-    friend class TileMap;
+    Type        type = Type::NONE;
+    House       owner = House::Fremen;
+    sf::IntRect bounds;
+    int32_t     hitPoints = 0;
+    int32_t     maxHitPoints = 0;
 };
 
 #endif // !BUILDING_HPP

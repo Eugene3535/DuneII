@@ -4,7 +4,8 @@
 #include "scenes/mission/Mission.hpp"
 
 Mission::Mission(Game& game) noexcept:
-    Scene(game)
+    Scene(game),
+    m_tilemap(m_entityManager)
 {
 
 }
@@ -69,7 +70,7 @@ void Mission::update(sf::Time dt) noexcept
 
         for(auto b: m_buildings)
         {
-            if(viewport.intersects(b->getBounds()))
+            if(viewport.intersects(b->bounds))
             {
                 m_drawables.push_back(b);
             }     

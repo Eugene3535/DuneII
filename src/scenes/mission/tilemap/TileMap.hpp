@@ -10,13 +10,16 @@
 
 #include "RapidXML/rapidxml.hpp"
 
+#include "common/Defines.hpp"
 #include "scenes/mission/buildings/Building.hpp"
+
+BEGIN_NAMESPACE_ECS
+class EntityManager;
+END_NAMESPACE_ECS
 
 class TileMap:
 	public sf::Drawable
 {
-	friend class Builder;
-
 	struct Tileset
 	{
 		const sf::Texture* texture = nullptr ;
@@ -66,7 +69,7 @@ public:
 	};
 
 public:
-	TileMap() noexcept;
+	TileMap(class ecs::EntityManager& entityManager) noexcept;
 
 	bool loadFromFile(const std::filesystem::path& file_path)                  noexcept;
 	void unload()                                                              noexcept;
@@ -95,6 +98,7 @@ private:
 	int32_t      getHitPointsOf(Building::Type type)                                           const noexcept;
 
 private:
+	class ecs::EntityManager&             m_entityManager;
 	sf::VertexBuffer                      m_vertices;
 	const sf::Texture*                    m_texture;
     std::unordered_map<int32_t, Building> m_buildings;

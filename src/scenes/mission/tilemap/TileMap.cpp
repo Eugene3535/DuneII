@@ -8,9 +8,11 @@
 
 #include "common/FileProvider.hpp"
 #include "assets/AssetManager.hpp"
+#include "ecs/EntityManager.hpp"
 #include "scenes/mission/tilemap/TileMap.hpp"
 
-TileMap::TileMap() noexcept:
+TileMap::TileMap(ecs::EntityManager& entityManager) noexcept:
+	m_entityManager(entityManager),
 	m_texture(nullptr)
 {
 
@@ -71,22 +73,22 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 
 			for(auto& [id, building] : m_buildings)
 			{
-				auto type = building.getType();
+				auto type = building.type;
 				const bool repairable = ((type!= Building::CONCRETE_SLAB) && (type != Building::WALL));
 
 				if(repairable)
 				{
-					if(building.getBounds().intersects(atreides_area))
+					if(building.bounds.intersects(atreides_area))
 					{
-						building.changeOwner(House::Atreides);
+						building.owner = House::Atreides;
 					}
-					else if(building.getBounds().intersects(ordos_area))
+					else if(building.bounds.intersects(ordos_area))
 					{
-						building.changeOwner(House::Ordos);
+						building.owner = House::Ordos;
 					}
-					else if(building.getBounds().intersects(harkonnen_area))
+					else if(building.bounds.intersects(harkonnen_area))
 					{
-						building.changeOwner(House::Harkonnen);
+						building.owner = House::Harkonnen;
 					}
 				}
 			}
@@ -172,12 +174,12 @@ Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
 		{
 			auto building = &m_buildings.emplace(origin, Building()).first->second;
 
-			building->m_type = type;
+			building->type = type;
 			building->setTexture(*texture);
 			building->setTextureRect(getTexCoordsOf(type));
 			building->setPosition(coordX, coordY);
-			building->m_hitPoints = building->m_maxHitPoints = getHitPointsOf(type);
-			building->m_bounds = bounds;
+			building->hitPoints = building->maxHitPoints = getHitPointsOf(type);
+			building->bounds = bounds;
 
 			auto setup_tiles_on_mask = [this, origin](int32_t width, int32_t height, char symbol = 'B') -> void
 			{
