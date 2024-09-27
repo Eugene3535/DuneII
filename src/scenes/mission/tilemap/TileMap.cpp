@@ -44,13 +44,12 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 		if(loadObjects(map_node))
 		{
 			for(const auto& building : m_buildingsOnLoad)
-				placeBuilding(building.type, building.cellX, building.cellY);   
+				if(putBuildingOnMap(building.type, building.cellX, building.cellY) != true)
+					return false;   
 
-			auto& objects = m_objects;
-
-			auto get_area_of = [&objects](House houseName) -> sf::IntRect
+			auto get_area_of = [this](House houseName) -> sf::IntRect
 			{
-				for(auto& object : objects)
+				for(auto& object : m_objects)
 				{
 					if(object.name == "Area")
 					{
@@ -113,7 +112,7 @@ void TileMap::unload() noexcept
 	m_tileSize        = { 0, 0 };
 }
 
-Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cellY) noexcept
+bool TileMap::putBuildingOnMap(Building::Type type, int32_t cellX, int32_t cellY) noexcept
 {
 	int32_t coordX = cellX * m_tileSize.x;
 	int32_t coordY = cellY * m_tileSize.y;
@@ -123,10 +122,10 @@ Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
         int32_t map_width  = m_mapSizeInTiles.x * m_tileSize.x;
         int32_t map_height = m_mapSizeInTiles.y * m_tileSize.y;
 
-        if(bounds.left < 0) return nullptr;
-        if(bounds.top < 0)  return nullptr;
-        if(bounds.left + bounds.width > map_width)  return nullptr;
-        if(bounds.top + bounds.height > map_height) return nullptr;
+        if(bounds.left < 0)                         return false;
+        if(bounds.top < 0)                          return false;
+        if(bounds.left + bounds.width > map_width)  return false;
+        if(bounds.top + bounds.height > map_height) return false;
     }
 
     const int32_t origin = cellY * m_mapSizeInTiles.x + cellX;
@@ -162,7 +161,7 @@ Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
         {
             for (int32_t j = 0; j < size.x; ++j)  
                 if(mask[offset + j] != 'R')
-                    return nullptr;
+                    return false;
             
             offset += m_mapSizeInTiles.x;
         }
@@ -223,7 +222,7 @@ Building* TileMap::placeBuilding(Building::Type type, int32_t cellX, int32_t cel
 		}
 	}
 
-    return nullptr;
+    return true;
 }
 
 std::vector<Building*> TileMap::getAllBuildings() noexcept

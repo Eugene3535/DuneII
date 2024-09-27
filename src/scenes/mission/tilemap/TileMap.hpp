@@ -71,9 +71,9 @@ public:
 public:
 	TileMap(class ecs::EntityManager& entityManager) noexcept;
 
-	bool loadFromFile(const std::filesystem::path& file_path)                  noexcept;
-	void unload()                                                              noexcept;
-	Building* placeBuilding(Building::Type type, int32_t cellX, int32_t cellY) noexcept;
+	bool loadFromFile(const std::filesystem::path& file_path)                noexcept;
+	void unload()                                                            noexcept;
+	bool putBuildingOnMap(Building::Type type, int32_t cellX, int32_t cellY) noexcept;
 
 	std::vector<Building*>     getAllBuildings()          noexcept;
 	const std::vector<Object>& getObjects()         const noexcept;
