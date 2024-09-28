@@ -82,7 +82,7 @@ private:
 	void         loadBuildings(const Tileset& tileset, const std::vector<int>& parsed_layer)         noexcept;
 	char         convertTileNumToChar(int32_t index)                                           const noexcept;
 	void         draw(sf::RenderTarget& target, sf::RenderStates states)                       const override;
-	void         updateWall(ecs::entity_t entity, int32_t origin, int32_t level)                     noexcept;
+	void         updateWall(int32_t origin, int32_t level)                                           noexcept;
     WallCellType getWallType(bool left, bool top, bool right, bool bottom)                           noexcept;
     sf::IntRect  getTexCoordsOf(WallCellType type)                                                   noexcept;
     sf::IntRect  getTexCoordsOf(StructureType type)                                            const noexcept;
@@ -90,6 +90,7 @@ private:
 	int32_t      getHitPointsOf(StructureType type)                                            const noexcept;
 
 private:
+	std::unordered_map<int32_t, ecs::entity_t> m_structuresById;
 	class ecs::EntityManager& m_entityManager;
 	sf::VertexBuffer          m_vertices;
 	const sf::Texture*        m_texture;

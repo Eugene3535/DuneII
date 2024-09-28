@@ -211,8 +211,10 @@ bool TileMap::putBuildingOnMap(StructureType type, int32_t cellX, int32_t cellY)
             default: break;
         }
 
+		m_structuresById[origin] = entity;
+
 		if(type == StructureType::WALL)
-			updateWall(entity, origin, 2);
+			updateWall(origin, 2);
 
 		return true;
 	}
@@ -814,32 +816,36 @@ void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	}
 }
 
-void TileMap::updateWall(ecs::entity_t entity, int32_t origin, int32_t level) noexcept
+void TileMap::updateWall(int32_t origin, int32_t level) noexcept
 {
-    if(level < 1) return;
+    if(level > 0)
+	{
+		int32_t left   = origin - 1;
+		int32_t top    = origin - m_mapSizeInTiles.x;
+		int32_t right  = origin + 1;
+		int32_t bottom = origin + m_mapSizeInTiles.x;
 
-    int32_t left   = origin - 1;
-    int32_t top    = origin - m_mapSizeInTiles.x;
-    int32_t right  = origin + 1;
-    int32_t bottom = origin + m_mapSizeInTiles.x;
+		const char* field = m_tileMask.data();
 
-    const char* field = m_tileMask.data();
+		bool a = (left >= 0)                  ? (field[left]   == 'W') : false;
+		bool b = (top >= 0)                   ? (field[top]    == 'W') : false;
+		bool c = (right < m_tileMask.size())  ? (field[right]  == 'W') : false;
+		bool d = (bottom < m_tileMask.size()) ? (field[bottom] == 'W') : false;
 
-    bool a = (left >= 0)                  ? (field[left]   == 'W') : false;
-    bool b = (top >= 0)                   ? (field[top]    == 'W') : false;
-    bool c = (right < m_tileMask.size())  ? (field[right]  == 'W') : false;
-    bool d = (bottom < m_tileMask.size()) ? (field[bottom] == 'W') : false;
+		auto tex_coords = getTexCoordsOf(getWallType(a, b, c, d));
+		auto entity = m_structuresById[origin];
 
-    auto wall_type  = getWallType(a, b, c, d);
-    auto tex_coords = getTexCoordsOf(wall_type);
+		if(m_entityManager.hasComponent<ecs::Sprite>(entity))
+		{
+			auto& sprite = m_entityManager.getComponent<ecs::Sprite>(entity);
+			sprite.setTextureRect(tex_coords);
+		}
 
-	auto& sprite = m_entityManager.getComponent<ecs::Sprite>(entity);
-    sprite.setTextureRect(tex_coords);
-
-    if(a) updateWall(entity, left, level - 1);
-    if(b) updateWall(entity, top, level - 1);
-    if(c) updateWall(entity, right, level - 1);
-    if(d) updateWall(entity, bottom, level - 1);
+		if(a) updateWall(left, level - 1);
+		if(b) updateWall(top, level - 1);
+		if(c) updateWall(right, level - 1);
+		if(d) updateWall(bottom, level - 1);
+	}
 }
 
 TileMap::WallCellType TileMap::getWallType(bool left, bool top, bool right, bool bottom) noexcept
