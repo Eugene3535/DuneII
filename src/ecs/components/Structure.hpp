@@ -11,10 +11,10 @@ BEGIN_NAMESPACE_ECS
 class Structure: public ecs::Component<Structure>
 {
 public:
-    StructureType type         = StructureType::INVALID;
-    HouseType     owner        = HouseType::INVALID;
-    int32_t       hitPoints    = 0;
-    int32_t       maxHitPoints = 0;
+    StructureType type          = StructureType::INVALID;
+    HouseType     owner         = HouseType::INVALID;
+    int32_t       hitPoints     = 0;
+    int32_t       maxHitPoints  = 0;
 };
 
 END_NAMESPACE_ECS

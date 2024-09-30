@@ -46,7 +46,7 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 	if(loadLayers(map_node))
 		if(loadObjects(map_node))
 		{
-			auto get_area_of = [this](House houseName) -> sf::IntRect
+			auto get_area_of = [this](HouseType houseName) -> sf::IntRect
 			{
 				for(auto& object : m_objects)
 				{
@@ -54,7 +54,7 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 					{
 						auto found = std::find_if(object.properties.begin(), object.properties.end(), [houseName](const TileMap::Object::Property& property)
 						{
-							return houseName == static_cast<House>(std::stoul(property.value));
+							return houseName == static_cast<HouseType>(std::stoul(property.value));
 						});
 
 						if(found != object.properties.end())
@@ -65,9 +65,9 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 				return sf::IntRect();
 			};
 
-			auto atreides_area  = get_area_of(House::Atreides);
-			auto ordos_area     = get_area_of(House::Ordos);
-			auto harkonnen_area = get_area_of(House::Harkonnen);
+			auto atreides_area  = get_area_of(HouseType::ATREIDES);
+			auto ordos_area     = get_area_of(HouseType::ORDOS);
+			auto harkonnen_area = get_area_of(HouseType::HARKONNEN);
 
 			for (auto [entity, components] : m_entityManager.getEntitySet<ecs::Structure, ecs::Bounds>())
 			{
@@ -107,7 +107,7 @@ void TileMap::unload() noexcept
 	m_tileSize        = { 0, 0 };
 }
 
-bool TileMap::putBuildingOnMap(StructureType type, int32_t cellX, int32_t cellY) noexcept
+bool TileMap::putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY) noexcept
 {
 	int32_t coordX = cellX * m_tileSize.x;
 	int32_t coordY = cellY * m_tileSize.y;
@@ -223,6 +223,58 @@ bool TileMap::putBuildingOnMap(StructureType type, int32_t cellX, int32_t cellY)
 	}
 
     return false;
+}
+
+void TileMap::removeStructureFromMap(int32_t structureId) noexcept
+{
+	if(auto found = m_structuresById.find(structureId); found != m_structuresById.end())
+	{
+		const auto entity = found->second;
+		const auto& data = m_entityManager.getComponent<ecs::Structure>(entity);
+		const auto type = data.type;
+
+		{// structure area
+			sf::Vector2i size;
+
+			switch (type)
+			{
+				case StructureType::SLAB_1x1:          size = { 1, 1 }; break;
+				case StructureType::PALACE:            size = { 3, 3 }; break;
+				case StructureType::VEHICLE:           size = { 3, 2 }; break;
+				case StructureType::HIGH_TECH:         size = { 2, 2 }; break;
+				case StructureType::CONSTRUCTION_YARD: size = { 2, 2 }; break;
+				case StructureType::WIND_TRAP:         size = { 2, 2 }; break;
+				case StructureType::BARRACKS:          size = { 2, 2 }; break;
+				case StructureType::STARPORT:          size = { 3, 3 }; break;
+				case StructureType::REFINERY:          size = { 3, 2 }; break;
+				case StructureType::REPAIR:            size = { 3, 2 }; break;
+				case StructureType::WALL:              size = { 1, 1 }; break;
+				case StructureType::TURRET:            size = { 1, 1 }; break;
+				case StructureType::ROCKET_TURRET:     size = { 1, 1 }; break;
+				case StructureType::SILO:              size = { 2, 2 }; break;
+				case StructureType::OUTPOST:           size = { 2, 2 }; break;
+
+				default: break;
+			}
+
+			if(size == sf::Vector2i(0, 0))
+				return;
+
+			char* mask = m_tileMask.data();
+			int32_t offset = structureId;
+
+			for (int32_t i = 0; i < size.y; ++i)
+			{
+				for (int32_t j = 0; j < size.x; ++j)  
+					mask[offset + j] = 'R';
+				
+				offset += m_mapSizeInTiles.x;
+			}
+    	}
+
+		m_entityManager.removeEntity(entity);
+		m_structuresById.erase(found);
+	}
 }
 
 const std::vector<TileMap::Object>& TileMap::getObjects() const noexcept
@@ -525,7 +577,7 @@ void TileMap::loadBuildings(const Tileset& tileset, const std::vector<int>& pars
 
 				if(bld_type != StructureType::MAX && bld_type != StructureType::INVALID)
 				{
-					putBuildingOnMap(bld_type, x, y);
+					putStructureOnMap(bld_type, x, y);
 				}
 			}
 		}

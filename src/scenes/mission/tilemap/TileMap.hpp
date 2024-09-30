@@ -64,9 +64,10 @@ public:
 public:
 	TileMap(class ecs::EntityManager& entityManager) noexcept;
 
-	bool loadFromFile(const std::filesystem::path& file_path)               noexcept;
-	void unload()                                                           noexcept;
-	bool putBuildingOnMap(StructureType type, int32_t cellX, int32_t cellY) noexcept;
+	bool loadFromFile(const std::filesystem::path& file_path)                noexcept;
+	void unload()                                                            noexcept;
+	bool putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY) noexcept;
+	void removeStructureFromMap(int32_t structureId)                         noexcept;
 
 	const std::vector<Object>& getObjects()         const noexcept;
 	std::string_view           getTileMask()        const noexcept;
