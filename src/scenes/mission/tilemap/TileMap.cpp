@@ -125,6 +125,9 @@ bool TileMap::putBuildingOnMap(StructureType type, int32_t cellX, int32_t cellY)
 
     const int32_t origin = cellY * m_mapSizeInTiles.x + cellX;
 
+	if(auto found = m_structuresById.find(origin); found != m_structuresById.end())
+		return false;
+
     {// can be constructed ?
         sf::Vector2i size;
 
