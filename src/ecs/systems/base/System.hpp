@@ -5,12 +5,12 @@
 
 #include <SFML/System/Time.hpp>
 
-#include "ecs/EntityManager.hpp"
+#include <entt/entity/registry.hpp>
 
 class BaseSystem
 {
 public:
-    BaseSystem(ecs::EntityManager& entityManager) noexcept;
+    BaseSystem(entt::registry& registry) noexcept;
     virtual ~BaseSystem() = default;
     virtual void execute(sf::Time dt) noexcept;
     static uint32_t getSystemCount() noexcept;
@@ -26,7 +26,7 @@ protected:
     }
 
 protected:
-    ecs::EntityManager& m_entityManager;
+    entt::registry& m_registry;
 
 private:
     static uint32_t s_type;
@@ -36,8 +36,8 @@ template<class T>
 class System : public BaseSystem
 {
 public:
-    System(ecs::EntityManager& entityManager) noexcept:
-        BaseSystem(entityManager)
+    System(entt::registry& registry) noexcept:
+        BaseSystem(registry)
     {
 
     }

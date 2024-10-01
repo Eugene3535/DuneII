@@ -24,7 +24,7 @@ public:
     void clear() noexcept;
 
     template<class T, class... Args>
-    T* add(ecs::EntityManager& entityManager, Args&& ... args) noexcept;
+    T* add(entt::registry& registry, Args&& ... args) noexcept;
 
     template<class T>
     T* get() noexcept;

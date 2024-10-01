@@ -3,19 +3,17 @@
 #include <cstring>
 
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 
 #include "RapidXML/rapidxml_utils.hpp"
 
 #include "common/FileProvider.hpp"
 #include "assets/AssetManager.hpp"
-#include "ecs/EntityManager.hpp"
-#include "ecs/components/Bounds.hpp"
-#include "ecs/components/Sprite.hpp"
 #include "ecs/components/Structure.hpp"
 #include "scenes/mission/tilemap/TileMap.hpp"
 
-TileMap::TileMap(ecs::EntityManager& entityManager) noexcept:
-	m_entityManager(entityManager),
+TileMap::TileMap(entt::registry& registry) noexcept:
+	m_registry(registry),
 	m_texture(nullptr)
 {
 
@@ -69,10 +67,10 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 			auto ordos_area     = get_area_of(HouseType::ORDOS);
 			auto harkonnen_area = get_area_of(HouseType::HARKONNEN);
 
-			for (auto [entity, components] : m_entityManager.getEntitySet<ecs::Structure, ecs::Bounds>())
-			{
-				auto [structure, bounds] = components;
+			auto view = m_registry.view<Structure, sf::IntRect>();
 
+			for (auto [entity, structure, bounds] : view.each())
+			{
 				if(bounds.intersects(atreides_area))
 				{
 					structure.owner = HouseType::ATREIDES;
@@ -170,10 +168,10 @@ bool TileMap::putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY
 
 	if(const auto texture = Assets->getResource<sf::Texture>("Buildings.png"); texture != nullptr)
 	{
-		auto entity = m_entityManager.createEntity();
-		m_entityManager.addComponent<ecs::Bounds>(entity, bounds);
-		auto& sprite = m_entityManager.addComponent<ecs::Sprite>(entity, texture, getTexCoordsOf(type));
-		auto& structure = m_entityManager.addComponent<ecs::Structure>(entity);
+		const auto entity = m_registry.create();
+		m_registry.emplace<sf::IntRect>(entity, bounds);
+		auto& sprite = m_registry.emplace<sf::Sprite>(entity, *texture, getTexCoordsOf(type));
+		auto& structure = m_registry.emplace<Structure>(entity);
 
 		structure.type = type;
 		sprite.setPosition(coordX, coordY);
@@ -229,8 +227,9 @@ void TileMap::removeStructureFromMap(int32_t structureId) noexcept
 {
 	if(auto found = m_structuresById.find(structureId); found != m_structuresById.end())
 	{
+		auto view = m_registry.view<Structure>();
 		const auto entity = found->second;
-		const auto& data = m_entityManager.getComponent<ecs::Structure>(entity);
+		const auto& data = view.get<Structure>(entity);
 		const auto type = data.type;
 
 		{// structure area
@@ -272,7 +271,7 @@ void TileMap::removeStructureFromMap(int32_t structureId) noexcept
 			}
     	}
 
-		m_entityManager.removeEntity(entity);
+		m_registry.destroy(entity);
 		m_structuresById.erase(found);
 	}
 }
@@ -887,14 +886,12 @@ void TileMap::updateWall(int32_t origin, int32_t level) noexcept
 		bool c = (right < m_tileMask.size())  ? (field[right]  == 'W') : false;
 		bool d = (bottom < m_tileMask.size()) ? (field[bottom] == 'W') : false;
 
-		auto tex_coords = getTexCoordsOf(getWallType(a, b, c, d));
-		auto entity = m_structuresById[origin];
+		const auto tex_coords = getTexCoordsOf(getWallType(a, b, c, d));
+		const auto entity = m_structuresById[origin];
 
-		if(m_entityManager.hasComponent<ecs::Sprite>(entity))
-		{
-			auto& sprite = m_entityManager.getComponent<ecs::Sprite>(entity);
-			sprite.setTextureRect(tex_coords);
-		}
+		auto view = m_registry.view<sf::Sprite>();
+		auto& sprite = view.get<sf::Sprite>(entity);
+		sprite.setTextureRect(tex_coords);
 
 		if(a) updateWall(left, level - 1);
 		if(b) updateWall(top, level - 1);

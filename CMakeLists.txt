@@ -23,14 +23,9 @@ set(_duneII_src_files
 	${SRC_DIR}/common/MathUtils.cpp
 	${SRC_DIR}/effects/ScreenBlackoutEffect.cpp
 	${SRC_DIR}/assets/AssetManager.cpp
-	${SRC_DIR}/ecs/common/EntityContainer.cpp
-	${SRC_DIR}/ecs/common/EntitySet.cpp
-	${SRC_DIR}/ecs/EntityManager.cpp
 	${SRC_DIR}/ecs/systems/base/System.cpp
 	${SRC_DIR}/ecs/systems/MoveSystem.cpp
 	${SRC_DIR}/ecs/SystemManager.cpp
-	${SRC_DIR}/ecs/components/Sprite.cpp
-	${SRC_DIR}/ecs/components/Bounds.cpp
 	${SRC_DIR}/scenes/Scene.cpp
 	${SRC_DIR}/scenes/intro/MainMenu.cpp
 	${SRC_DIR}/scenes/mission/Mission.cpp
@@ -39,6 +34,7 @@ set(_duneII_src_files
 
 add_executable(${PROJECT_NAME} ${_duneII_src_files})
 add_subdirectory(${EXTERNAL_DIR}/sfml sfml)
+add_subdirectory(${EXTERNAL_DIR}/entt entt)
 
 if(MSVC)
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
@@ -54,6 +50,7 @@ target_link_libraries(${PROJECT_NAME}
 	sfml-window
 	sfml-system
 	sfml-audio
+	EnTT::EnTT
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG>)

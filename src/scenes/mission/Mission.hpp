@@ -1,11 +1,13 @@
 #ifndef MISSION_HPP
 #define MISSION_HPP
 
+#include <SFML/Graphics/Sprite.hpp>
+
+#include <entt/entity/registry.hpp>
+
 #include "scenes/mission/tilemap/TileMap.hpp"
 #include "scenes/Scene.hpp"
-#include "ecs/EntityManager.hpp"
 #include "ecs/SystemManager.hpp"
-#include "ecs/components/Sprite.hpp"
 
 class Mission:
     public Scene
@@ -21,14 +23,11 @@ private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 private:
-    TileMap m_tilemap;
-
-    ecs::EntityManager m_entityManager;
-    SystemManager      m_systems;
-
-private:
-    sf::Vector2f m_viewPosition;
-    std::vector<ecs::Sprite*> m_sprites;
+    TileMap                  m_tilemap;
+    entt::registry           m_registry;
+    SystemManager            m_systems;
+    sf::Vector2f             m_viewPosition;
+    std::vector<sf::Sprite*> m_sprites;
 };
 
 #endif // !MISSION_HPP

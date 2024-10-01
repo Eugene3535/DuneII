@@ -5,7 +5,7 @@ constexpr void checkSystemType()
 }
 
 template<class T, class... Args>
-T* SystemManager::add(ecs::EntityManager& entityManager, Args&&... args) noexcept
+T* SystemManager::add(entt::registry& registry, Args&&... args) noexcept
 {
     checkSystemType<T>();
 
@@ -15,7 +15,7 @@ T* SystemManager::add(ecs::EntityManager& entityManager, Args&&... args) noexcep
     if(m_offset + sizeof(T) >= m_rawMemory.size())
         return nullptr;
 
-    auto system = new(m_rawMemory.data() + m_offset)T(entityManager, std::forward<Args>(args)...);
+    auto system = new(m_rawMemory.data() + m_offset)T(registry, std::forward<Args>(args)...);
     m_offset += sizeof(T);
 
     m_randomAccessSystems.emplace(T::Type, system);

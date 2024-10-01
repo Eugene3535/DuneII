@@ -1,12 +1,11 @@
 #include "common/FileProvider.hpp"
 #include "game/Game.hpp"
 #include "ecs/systems/MoveSystem.hpp"
-#include "ecs/components/Bounds.hpp"
 #include "scenes/mission/Mission.hpp"
 
 Mission::Mission(Game& game) noexcept:
     Scene(game),
-    m_tilemap(m_entityManager)
+    m_tilemap(m_registry)
 {
 
 }
@@ -18,7 +17,7 @@ bool Mission::load(const std::string& info) noexcept
     if(m_isLoaded)
         return true;
 
-    m_systems.add<ecs::MoveSystem>(m_entityManager);
+    m_systems.add<MoveSystem>(m_registry);
 
     if(m_isLoaded = m_tilemap.loadFromFile(FileProvider().findPathToFile(info)); m_isLoaded)
     {       
@@ -66,10 +65,10 @@ void Mission::update(sf::Time dt) noexcept
 
         m_sprites.clear();
 
-        for (auto [entity, components] : m_entityManager.getEntitySet<ecs::Bounds, ecs::Sprite>())
-        {
-            auto [bounds, sprite] = components;
+        auto ecs_view = m_registry.view<sf::Sprite, sf::IntRect>();
 
+        for (auto [entity, sprite, bounds] : ecs_view.each())
+        {
             if(viewport.intersects(bounds))
                 m_sprites.push_back(&sprite);
         }

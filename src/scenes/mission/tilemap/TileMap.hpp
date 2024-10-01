@@ -10,13 +10,9 @@
 
 #include "RapidXML/rapidxml.hpp"
 
-#include "common/Defines.hpp"
-#include "common/Enums.hpp"
-#include "ecs/common/ECSTypes.hpp"
+#include <entt/entity/registry.hpp>
 
-BEGIN_NAMESPACE_ECS
-class EntityManager;
-END_NAMESPACE_ECS
+#include "common/Enums.hpp"
 
 class TileMap:
 	public sf::Drawable
@@ -62,7 +58,7 @@ public:
 	};
 
 public:
-	TileMap(class ecs::EntityManager& entityManager) noexcept;
+	TileMap(entt::registry& registry) noexcept;
 
 	bool loadFromFile(const std::filesystem::path& file_path)                noexcept;
 	void unload()                                                            noexcept;
@@ -91,8 +87,8 @@ private:
 	int32_t      getHitPointsOf(StructureType type)                                            const noexcept;
 
 private:
-	std::unordered_map<int32_t, ecs::entity_t> m_structuresById;
-	class ecs::EntityManager& m_entityManager;
+	std::unordered_map<int32_t, entt::entity> m_structuresById;
+	entt::registry&           m_registry;
 	sf::VertexBuffer          m_vertices;
 	const sf::Texture*        m_texture;
 	std::vector<Object>       m_objects;

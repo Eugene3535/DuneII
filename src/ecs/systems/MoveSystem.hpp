@@ -3,17 +3,13 @@
 
 #include "ecs/systems/base/System.hpp"
 
-BEGIN_NAMESPACE_ECS
-
 class MoveSystem : public System<MoveSystem>
 {
 public:
-    MoveSystem(ecs::EntityManager& entityManager) noexcept;
+    MoveSystem(entt::registry& registry) noexcept;
     ~MoveSystem();
 
     void execute(sf::Time dt) noexcept override;
 };
-
-END_NAMESPACE_ECS
 
 #endif // !MOVE_SYSTEM_HPP
