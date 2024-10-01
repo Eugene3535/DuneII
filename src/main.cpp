@@ -18,8 +18,8 @@ int main()
 
     visible_area = sf::FloatRect(0.f, 0.f, 800.0f, 600.0f);
 
-    std::uint32_t width  = static_cast<std::uint32_t>(visible_area.width);
-    std::uint32_t height = static_cast<std::uint32_t>(visible_area.height);
+    uint32_t width  = static_cast<uint32_t>(visible_area.width);
+    uint32_t height = static_cast<uint32_t>(visible_area.height);
 
     window.create(sf::VideoMode(width, height), "Dune: The Battle For Arrakis");
     window.setVerticalSyncEnabled(true);

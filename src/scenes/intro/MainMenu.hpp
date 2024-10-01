@@ -1,5 +1,5 @@
-#ifndef TITLE_SCREEN_HPP
-#define TITLE_SCREEN_HPP
+#ifndef MAIN_MENU_HPP
+#define MAIN_MENU_HPP
 
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
@@ -26,4 +26,4 @@ private:
     sf::Text   m_tutorial;
 };
 
-#endif // !TITLE_SCREEN_HPP
+#endif // !MAIN_MENU_HPP
