@@ -1,11 +1,11 @@
 #ifndef SCENE_HPP
 #define SCENE_HPP
 
-#include <cstdint>
 #include <string>
 
-#include <SFML/System.hpp>
-#include <SFML/Graphics.hpp>
+#include <SFML/System/NonCopyable.hpp>
+#include <SFML/System/Time.hpp>
+#include <SFML/Graphics/Drawable.hpp>
 
 class Scene:
     public sf::Drawable,

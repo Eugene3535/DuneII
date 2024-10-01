@@ -1,8 +1,6 @@
 #include "scenes/intro/MainMenu.hpp"
 #include "scenes/mission/Mission.hpp"
-
 #include "effects/ScreenBlackoutEffect.hpp"
-
 #include "game/Game.hpp"
 
 int main()

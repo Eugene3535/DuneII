@@ -2,7 +2,6 @@
 #define MISSION_HPP
 
 #include <SFML/Graphics/Sprite.hpp>
-
 #include <entt/entity/registry.hpp>
 
 #include "scenes/mission/tilemap/TileMap.hpp"

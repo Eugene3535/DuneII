@@ -1,6 +1,9 @@
 #ifndef TITLE_SCREEN_HPP
 #define TITLE_SCREEN_HPP
 
+#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Text.hpp>
+
 #include "scenes/Scene.hpp"
 
 class MainMenu:

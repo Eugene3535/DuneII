@@ -4,7 +4,6 @@
 
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/Sprite.hpp>
-
 #include "RapidXML/rapidxml_utils.hpp"
 
 #include "common/FileProvider.hpp"

@@ -1,6 +1,8 @@
 #include <limits>
 #include <thread>
 
+#include <SFML/Window/VideoMode.hpp>
+
 #include "effects/ScreenBlackoutEffect.hpp"
 
 ScreenBlackoutEffect::ScreenBlackoutEffect() noexcept:

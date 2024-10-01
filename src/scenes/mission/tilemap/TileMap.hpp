@@ -7,9 +7,7 @@
 #include <filesystem>
 
 #include <SFML/Graphics/VertexBuffer.hpp>
-
 #include "RapidXML/rapidxml.hpp"
-
 #include <entt/entity/registry.hpp>
 
 #include "common/Enums.hpp"
