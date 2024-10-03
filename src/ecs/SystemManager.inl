@@ -5,7 +5,7 @@ constexpr void checkSystemType()
 }
 
 template<class T, class... Args>
-T* SystemManager::add(entt::registry& registry, Args&&... args) noexcept
+T* SystemManager::addSystem(entt::registry& registry, Args&&... args) noexcept
 {
     checkSystemType<T>();
 
@@ -25,7 +25,7 @@ T* SystemManager::add(entt::registry& registry, Args&&... args) noexcept
 }
 
 template<class T>
-T* SystemManager::get() noexcept
+T* SystemManager::getSystem() noexcept
 {
     if(auto found = m_randomAccessSystems.find(T::Type); found != m_randomAccessSystems.end())
         return dynamic_cast<T*>(found->second);

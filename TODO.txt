@@ -1,8 +1,0 @@
-1) Ensure that the dynasty house to which a structure belongs is detected when loading a tile map (closed)
-2) Autoconfiguration of wall and concrete slabs construction (closed)
-3) Render walls and concrete slabs as a single array of vertices (unnecessary)
-4) Animation of buildings with landing pad (opened)
-5) Move all construction to the builder class (closed)
-6) Construction mode with user interface (opened)
-7) Dynamic background music playback manager (opened)
-8) Navigating the map with the cursor (opened)

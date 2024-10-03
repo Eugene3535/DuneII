@@ -24,7 +24,7 @@ set(_duneII_src_files
 	${SRC_DIR}/effects/ScreenBlackoutEffect.cpp
 	${SRC_DIR}/assets/AssetManager.cpp
 	${SRC_DIR}/ecs/systems/base/System.cpp
-	${SRC_DIR}/ecs/systems/MoveSystem.cpp
+	${SRC_DIR}/ecs/systems/MovementController.cpp
 	${SRC_DIR}/ecs/SystemManager.cpp
 	${SRC_DIR}/scenes/Scene.cpp
 	${SRC_DIR}/scenes/intro/MainMenu.cpp

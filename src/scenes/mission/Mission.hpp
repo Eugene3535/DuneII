@@ -25,8 +25,10 @@ private:
     TileMap                  m_tilemap;
     entt::registry           m_registry;
     SystemManager            m_systems;
-    sf::Vector2f             m_viewPosition;
     std::vector<sf::Sprite*> m_sprites;
+
+    sf::Vector2i m_viewPosition;
+    sf::Vector2i m_previousCursorPosition;
 };
 
 #endif // !MISSION_HPP

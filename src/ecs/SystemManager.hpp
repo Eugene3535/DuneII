@@ -24,10 +24,10 @@ public:
     void clear() noexcept;
 
     template<class T, class... Args>
-    T* add(entt::registry& registry, Args&& ... args) noexcept;
+    T* addSystem(entt::registry& registry, Args&& ... args) noexcept;
 
     template<class T>
-    T* get() noexcept;
+    T* getSystem() noexcept;
 
 private:
     std::vector<BaseSystem*>                  m_sequentialAccessSystems;

@@ -1,6 +1,7 @@
+#include "common/Defines.hpp"
 #include "common/FileProvider.hpp"
 #include "game/Game.hpp"
-#include "ecs/systems/MoveSystem.hpp"
+#include "ecs/systems/MovementController.hpp"
 #include "scenes/mission/Mission.hpp"
 
 Mission::Mission(Game& game) noexcept:
@@ -17,7 +18,7 @@ bool Mission::load(const std::string& info) noexcept
     if(m_isLoaded)
         return true;
 
-    m_systems.add<MoveSystem>(m_registry);
+    m_systems.addSystem<MovementController>(m_registry);
 
     if(m_isLoaded = m_tilemap.loadFromFile(FileProvider().findPathToFile(info)); m_isLoaded)
     {       
@@ -36,32 +37,69 @@ void Mission::update(sf::Time dt) noexcept
     if(m_isLoaded)
     {
         auto seconds = dt.asSeconds();
-        float movement = seconds * 600; // camera speed
+        float camera_velocity = seconds * CAMERA_VELOCITY;
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-            m_viewPosition.x -= movement;
-        
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-            m_viewPosition.x += movement;
+        auto& render_target = m_game.window;
+        sf::Vector2i mouse_position = sf::Mouse::getPosition(render_target);
+        sf::Vector2i cursor_position = static_cast<sf::Vector2i>(render_target.mapPixelToCoords(mouse_position));
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-            m_viewPosition.y -= movement;
+        auto& view                   = m_game.viewport;
+        const sf::Vector2i view_size = static_cast<sf::Vector2i>(view.getSize());
+        const sf::Vector2i map_size  = m_tilemap.getMapSizeInPixels();
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-            m_viewPosition.y += movement;
-            
-        auto& view           = m_game.viewport;
-        const auto view_size = view.getSize();
-        const auto map_size  = m_tilemap.getMapSizeInPixels();
-        
-        if(m_viewPosition.x < 0) m_viewPosition.x = 0;
-        if(m_viewPosition.y < 0) m_viewPosition.y = 0;
+        if(cursor_position != m_previousCursorPosition)
+        {
+            if(cursor_position.x < m_previousCursorPosition.x) // moved left
+            {
+                bool is_near_the_left_edge = (mouse_position.x > 0 && mouse_position.x < SCREEN_MARGIN);
+
+                if(is_near_the_left_edge)
+                {
+                    m_viewPosition.x -= camera_velocity;
+                }
+            }
+
+            if(cursor_position.y < m_previousCursorPosition.y) // moved up
+            {
+                bool is_near_the_top_edge = (mouse_position.y > 0 && mouse_position.y < SCREEN_MARGIN);
+
+                if(is_near_the_top_edge)
+                {
+                    m_viewPosition.y -= camera_velocity;
+                }
+            }
+
+            if(cursor_position.x > m_previousCursorPosition.x) // moved right
+            {
+                bool is_near_the_right_edge = (mouse_position.x > (view_size.x - SCREEN_MARGIN) && mouse_position.x < view_size.x);
+
+                if(is_near_the_right_edge)
+                {
+                    m_viewPosition.x += camera_velocity;
+                }
+            }
+
+            if(cursor_position.y > m_previousCursorPosition.y) // moved down
+            {
+                bool is_near_the_bottom_edge = (mouse_position.y > (view_size.y - SCREEN_MARGIN) && mouse_position.y < view_size.y);
+
+                if(is_near_the_bottom_edge)
+                {
+                    m_viewPosition.y += camera_velocity;
+                }              
+            }
+
+            m_previousCursorPosition = cursor_position;
+        }
+     
+        if(m_viewPosition.x < 0)                        m_viewPosition.x = 0;
+        if(m_viewPosition.y < 0)                        m_viewPosition.y = 0;
         if(m_viewPosition.x + view_size.x > map_size.x) m_viewPosition.x = map_size.x - view_size.x;
         if(m_viewPosition.y + view_size.y > map_size.y) m_viewPosition.y = map_size.y - view_size.y;
 
-        view.setCenter(m_viewPosition + (view_size * 0.5f));
+        view.setCenter(static_cast<sf::Vector2f>(m_viewPosition + sf::Vector2i(view_size.x >> 1, view_size.y >> 1)));
 
-        sf::IntRect viewport = sf::IntRect(m_viewPosition.x, m_viewPosition.y, view_size.x, view_size.y);
+        sf::IntRect viewport = sf::IntRect(m_viewPosition.x, m_viewPosition.y, static_cast<int>(view_size.x), static_cast<int>(view_size.y));
 
         m_sprites.clear();
 
