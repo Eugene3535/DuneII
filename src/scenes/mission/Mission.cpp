@@ -47,50 +47,22 @@ void Mission::update(sf::Time dt) noexcept
         const sf::Vector2i view_size = static_cast<sf::Vector2i>(view.getSize());
         const sf::Vector2i map_size  = m_tilemap.getMapSizeInPixels();
 
-        if(cursor_position != m_previousCursorPosition)
-        {
-            if(cursor_position.x < m_previousCursorPosition.x) // moved left
-            {
-                bool is_near_the_left_edge = (mouse_position.x > 0 && mouse_position.x < SCREEN_MARGIN);
+        bool is_near_the_left_edge   = (mouse_position.x > 0 && mouse_position.x < SCREEN_MARGIN);
+        bool is_near_the_top_edge    = (mouse_position.y > 0 && mouse_position.y < SCREEN_MARGIN);
+        bool is_near_the_right_edge  = (mouse_position.x > (view_size.x - SCREEN_MARGIN) && mouse_position.x < view_size.x);
+        bool is_near_the_bottom_edge = (mouse_position.y > (view_size.y - SCREEN_MARGIN) && mouse_position.y < view_size.y);
 
-                if(is_near_the_left_edge)
-                {
-                    m_viewPosition.x -= camera_velocity;
-                }
-            }
-
-            if(cursor_position.y < m_previousCursorPosition.y) // moved up
-            {
-                bool is_near_the_top_edge = (mouse_position.y > 0 && mouse_position.y < SCREEN_MARGIN);
-
-                if(is_near_the_top_edge)
-                {
-                    m_viewPosition.y -= camera_velocity;
-                }
-            }
-
-            if(cursor_position.x > m_previousCursorPosition.x) // moved right
-            {
-                bool is_near_the_right_edge = (mouse_position.x > (view_size.x - SCREEN_MARGIN) && mouse_position.x < view_size.x);
-
-                if(is_near_the_right_edge)
-                {
-                    m_viewPosition.x += camera_velocity;
-                }
-            }
-
-            if(cursor_position.y > m_previousCursorPosition.y) // moved down
-            {
-                bool is_near_the_bottom_edge = (mouse_position.y > (view_size.y - SCREEN_MARGIN) && mouse_position.y < view_size.y);
-
-                if(is_near_the_bottom_edge)
-                {
-                    m_viewPosition.y += camera_velocity;
-                }              
-            }
-
-            m_previousCursorPosition = cursor_position;
-        }
+        if(is_near_the_left_edge)
+            m_viewPosition.x -= camera_velocity;
+        
+        if(is_near_the_top_edge)
+            m_viewPosition.y -= camera_velocity;
+        
+        if(is_near_the_right_edge)
+            m_viewPosition.x += camera_velocity;
+        
+        if(is_near_the_bottom_edge)
+            m_viewPosition.y += camera_velocity;            
      
         if(m_viewPosition.x < 0)                        m_viewPosition.x = 0;
         if(m_viewPosition.y < 0)                        m_viewPosition.y = 0;

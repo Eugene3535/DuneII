@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 
-project(DuneII LANGUAGES C CXX)
+project(DuneII LANGUAGES CXX)
 
 set(EXTERNAL_DIR $ENV{external})
 set(BUILD_SHARED_LIBS ON)
