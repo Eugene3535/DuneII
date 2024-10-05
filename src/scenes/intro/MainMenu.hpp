@@ -4,7 +4,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
 
-#include "scenes/Scene.hpp"
+#include "scenes/base/Scene.hpp"
 
 class MainMenu:
     public Scene

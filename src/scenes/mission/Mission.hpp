@@ -5,7 +5,7 @@
 #include <entt/entity/registry.hpp>
 
 #include "scenes/mission/tilemap/TileMap.hpp"
-#include "scenes/Scene.hpp"
+#include "scenes/base/Scene.hpp"
 #include "ecs/SystemManager.hpp"
 
 class Mission:

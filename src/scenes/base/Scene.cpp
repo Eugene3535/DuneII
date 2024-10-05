@@ -1,5 +1,5 @@
 #include "game/Game.hpp"
-#include "scenes/Scene.hpp"
+#include "scenes/base/Scene.hpp"
 
 Scene::Scene(Game& game) noexcept:
     m_game(game),

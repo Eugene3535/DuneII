@@ -1,5 +1,5 @@
-#ifndef BUILDING_DATA_HPP
-#define BUILDING_DATA_HPP
+#ifndef STRUCTURE_HPP
+#define STRUCTURE_HPP
 
 #include "common/Enums.hpp"
 
@@ -14,4 +14,4 @@ public:
     int32_t       maxHitPoints  = 0;
 };
 
-#endif // !BUILDING_DATA_HPP
+#endif // !STRUCTURE_HPP
