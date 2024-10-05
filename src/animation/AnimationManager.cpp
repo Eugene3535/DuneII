@@ -1,6 +1,5 @@
 #include <cassert>
 
-#include "common/FileProvider.hpp"
 #include "animation/AnimationManager.hpp"
 
 AnimationManager::AnimationManager() noexcept
@@ -61,9 +60,9 @@ Animation AnimationManager::createAnimation(const AnimationData& data) noexcept
 				assert(data.columns);
 				assert(data.rows);
 
-				uint32_t columns  = data.columns;
-				uint32_t rows     = data.rows;
-				uint32_t duration = rows * columns;
+				const uint32_t columns  = data.columns;
+				const uint32_t rows     = data.rows;
+				const uint32_t duration = rows * columns;
 				frames.reserve(static_cast<size_t>(duration));
 
 				sf::IntRect    frame  = data.startFrame;
