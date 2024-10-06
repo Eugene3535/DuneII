@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <string_view>
 
+#include <SFML/System/Time.hpp>
+
 #include "ecs/components/Animation.hpp"
 
 class AnimationData
@@ -11,18 +13,19 @@ class AnimationData
 public:
     enum Layout
     {
-        SINGLE,
+        SINGLE = 0,
         LINEAR,
         GRID
     } layout;
 
-    const sf::Texture* texture = nullptr;
+    const sf::Texture* texture    = nullptr;
     sf::IntRect        startFrame;
     std::string_view   name;
-    uint32_t           columns = 0u;
-    uint32_t           rows = 0u;
-    uint32_t           duration = 0u;
-    uint32_t           delay = 0u;
+    uint32_t           columns    = 0u;
+    uint32_t           rows       = 0u;
+    uint32_t           duration   = 0u;
+    sf::Time           delay;
+    bool               isLooped   = false;
 };
 
 #endif //!ANIMATION_DATA_HPP

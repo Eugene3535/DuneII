@@ -1,6 +1,7 @@
 #include <sstream>
 #include <algorithm>
 #include <cstring>
+#include <cassert>
 
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/Sprite.hpp>
@@ -9,10 +10,12 @@
 #include "common/FileProvider.hpp"
 #include "assets/AssetManager.hpp"
 #include "ecs/components/Structure.hpp"
+#include "animation/AnimationManager.hpp"
 #include "scenes/mission/tilemap/TileMap.hpp"
 
-TileMap::TileMap(entt::registry& registry) noexcept:
+TileMap::TileMap(entt::registry& registry, AnimationManager& animationManager) noexcept:
 	m_registry(registry),
+	m_animationManager(animationManager),
 	m_texture(nullptr)
 {
 
@@ -84,6 +87,24 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 				}
 			}
 
+			auto flag_view = m_registry.view<Animation, sf::Sprite, sf::IntRect>();
+
+			for (auto [entity, animation, sprite, bounds] : flag_view.each())
+			{
+				if(bounds.intersects(atreides_area))
+				{
+					sprite.setColor(sf::Color::Blue);
+				}
+				else if(bounds.intersects(ordos_area))
+				{
+					sprite.setColor(sf::Color::Green);
+				}
+				else if(bounds.intersects(harkonnen_area))
+				{
+					sprite.setColor(sf::Color::Red);
+				}
+			}
+
 			return true;
 		}
 
@@ -106,6 +127,8 @@ void TileMap::unload() noexcept
 
 bool TileMap::putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY) noexcept
 {
+	assert((type != StructureType::INVALID) && (type != StructureType::MAX));
+
 	int32_t coordX = cellX * m_tileSize.x;
 	int32_t coordY = cellY * m_tileSize.y;
     auto bounds = getBoundsOf(type, coordX, coordY);
@@ -215,6 +238,27 @@ bool TileMap::putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY
 
 		if(type == StructureType::WALL)
 			updateWall(origin, 2);
+
+		bool need_to_plant_a_flag = ((type != StructureType::SLAB_1x1) &&
+									 (type != StructureType::SLAB_2x2) && 
+									 (type != StructureType::WALL)     && 
+									 (type != StructureType::TURRET)   && 
+									 (type != StructureType::ROCKET_TURRET));
+
+		if(need_to_plant_a_flag)
+		{
+			const auto flag = m_registry.create();
+
+			auto animation = m_animationManager.getAnimation("Flag");
+			m_registry.emplace<Animation>(flag, animation);
+
+			auto& sprite = m_registry.emplace<sf::Sprite>(flag, *animation.texture, animation.frames[0]);
+
+			int32_t flagX = bounds.left;
+			int32_t flagY = bounds.top + bounds.height - sprite.getTextureRect().height;
+			sprite.setPosition(flagX, flagY);
+			m_registry.emplace<sf::IntRect>(flag, sf::IntRect(sf::Vector2i(flagX, flagY), sprite.getTextureRect().getSize()));
+		}
 
 		return true;
 	}

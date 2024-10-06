@@ -1,12 +1,12 @@
 #include "common/Defines.hpp"
 #include "common/FileProvider.hpp"
 #include "game/Game.hpp"
-#include "ecs/systems/MovementController.hpp"
+#include "ecs/systems/AnimationController.hpp"
 #include "scenes/mission/Mission.hpp"
 
 Mission::Mission(Game& game) noexcept:
     Scene(game),
-    m_tilemap(m_registry)
+    m_tilemap(m_registry, m_animationManager)
 {
 
 }
@@ -18,7 +18,18 @@ bool Mission::load(const std::string& info) noexcept
     if(m_isLoaded)
         return true;
 
-    m_systems.addSystem<MovementController>(m_registry);
+    m_systems.addSystem<AnimationController>(m_registry);
+
+    AnimationData flagData;
+    flagData.name = "Flag";
+    flagData.layout = AnimationData::GRID;
+    flagData.texture = Assets->getResource<sf::Texture>("Buildings.png");
+    flagData.startFrame = { 352, 32, 14, 14 };
+    flagData.columns = 4u;
+    flagData.rows = 2u;
+    flagData.isLooped = true;
+    flagData.delay = sf::seconds(0.5f);
+    m_animationManager.createAnimation(flagData);
 
     if(m_isLoaded = m_tilemap.loadFromFile(FileProvider().findPathToFile(info)); m_isLoaded)
     {       
@@ -78,6 +89,15 @@ void Mission::update(sf::Time dt) noexcept
         auto ecs_view = m_registry.view<sf::Sprite, sf::IntRect>();
 
         for (auto [entity, sprite, bounds] : ecs_view.each())
+        {
+            if(viewport.intersects(bounds))
+                m_sprites.push_back(&sprite);
+        }
+
+        
+        auto anim_view = m_registry.view<sf::Sprite, sf::IntRect, Animation>();
+
+        for (auto [entity, sprite, bounds, animation] : anim_view.each())
         {
             if(viewport.intersects(bounds))
                 m_sprites.push_back(&sprite);

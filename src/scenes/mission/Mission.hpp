@@ -7,6 +7,7 @@
 #include "scenes/mission/tilemap/TileMap.hpp"
 #include "scenes/base/Scene.hpp"
 #include "ecs/SystemManager.hpp"
+#include "animation/AnimationManager.hpp"
 
 class Mission:
     public Scene
@@ -25,6 +26,7 @@ private:
     TileMap                  m_tilemap;
     entt::registry           m_registry;
     SystemManager            m_systems;
+    AnimationManager         m_animationManager;
     std::vector<sf::Sprite*> m_sprites;
 
     sf::Vector2i m_viewPosition;

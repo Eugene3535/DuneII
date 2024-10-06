@@ -22,8 +22,8 @@ Animation AnimationManager::createAnimation(const AnimationData& data) noexcept
 		auto& animation = it.first->second;
 		auto& frames    = m_frames.emplace_back();
 
-		animation.texture = data.texture;
-		animation.frames  = frames.data();
+		animation.texture  = data.texture;
+		animation.isLooped = data.isLooped;
 
 		switch (data.layout)
 		{
@@ -46,7 +46,7 @@ Animation AnimationManager::createAnimation(const AnimationData& data) noexcept
 
 				for (uint32_t i = 0; i < duration; ++i)
 				{
-					frame.left = i * offset;
+					frame.left += offset;
 					frames.emplace_back(frame);
 				}
 
@@ -65,19 +65,14 @@ Animation AnimationManager::createAnimation(const AnimationData& data) noexcept
 				const uint32_t duration = rows * columns;
 				frames.reserve(static_cast<size_t>(duration));
 
-				sf::IntRect    frame  = data.startFrame;
-				const uint32_t width  = frame.width;
-				const uint32_t height = frame.height;
+				const uint32_t left   = data.startFrame.left;
+				const uint32_t top    = data.startFrame.top;
+				const uint32_t width  = data.startFrame.width;
+				const uint32_t height = data.startFrame.height;
 
 				for (uint32_t y = 0; y < rows; ++y)
-				{
 					for (uint32_t x = 0; x < columns; ++x)
-					{
-						frame.left = x * width;
-						frame.top  = y * height;
-						frames.emplace_back(frame);
-					}
-				}
+						frames.emplace_back(left + x * width, top + y * height, width, height);
 
 				animation.duration = duration;
 				animation.delay    = data.delay;
@@ -85,8 +80,12 @@ Animation AnimationManager::createAnimation(const AnimationData& data) noexcept
 			break;
 		}
 
+		animation.frames = frames.data();
+
 		return animation;
 	}
+
+	assert(false && "already loaded");
 
 	return {};
 }

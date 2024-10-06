@@ -56,7 +56,7 @@ public:
 	};
 
 public:
-	TileMap(entt::registry& registry) noexcept;
+	TileMap(entt::registry& registry, class AnimationManager& animationManager) noexcept;
 
 	bool loadFromFile(const std::filesystem::path& file_path)                noexcept;
 	void unload()                                                            noexcept;
@@ -86,6 +86,7 @@ private:
 
 private:
 	std::unordered_map<int32_t, entt::entity> m_structuresById;
+	class AnimationManager&   m_animationManager;
 	entt::registry&           m_registry;
 	sf::VertexBuffer          m_vertices;
 	const sf::Texture*        m_texture;
