@@ -4,19 +4,23 @@
 #include <cstdint>
 
 #include <SFML/System/Time.hpp>
-#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 
-class Animation
+class Animation:
+    public sf::Sprite
 {
 public:
-    const sf::Texture* texture      = nullptr;
-    const sf::IntRect* frames       = nullptr;
-    uint32_t           duration     = 0;
-    uint32_t           currentFrame = 0;
+    Animation() noexcept;
+    Animation(const sf::Texture* texture) noexcept;
+    Animation(const sf::Texture* texture, const sf::IntRect& startFrame) noexcept;
+
+    const sf::IntRect* frames;
+    uint32_t           duration;
+    uint32_t           currentFrame;
     sf::Time           delay;
     sf::Time           timer;
-    bool               isLooped     = false;
-    bool               isOver       = false;
+    bool               isLooped;
+    bool               isOver;
 };
 
 #endif // !ANIMATION_HPP

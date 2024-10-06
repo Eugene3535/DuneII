@@ -87,21 +87,21 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 				}
 			}
 
-			auto flag_view = m_registry.view<Animation, sf::Sprite, sf::IntRect>();
+			auto flag_view = m_registry.view<Animation, sf::IntRect>();
 
-			for (auto [entity, animation, sprite, bounds] : flag_view.each())
+			for (auto [entity, animation, bounds] : flag_view.each())
 			{
 				if(bounds.intersects(atreides_area))
 				{
-					sprite.setColor(sf::Color::Blue);
+					animation.setColor(sf::Color::Blue);
 				}
 				else if(bounds.intersects(ordos_area))
 				{
-					sprite.setColor(sf::Color::Green);
+					animation.setColor(sf::Color::Green);
 				}
 				else if(bounds.intersects(harkonnen_area))
 				{
-					sprite.setColor(sf::Color::Red);
+					animation.setColor(sf::Color::Red);
 				}
 			}
 
@@ -247,17 +247,13 @@ bool TileMap::putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY
 
 		if(need_to_plant_a_flag)
 		{
-			const auto flag = m_registry.create();
-
-			auto animation = m_animationManager.getAnimation("Flag");
-			m_registry.emplace<Animation>(flag, animation);
-
-			auto& sprite = m_registry.emplace<sf::Sprite>(flag, *animation.texture, animation.frames[0]);
-
-			int32_t flagX = bounds.left;
-			int32_t flagY = bounds.top + bounds.height - sprite.getTextureRect().height;
-			sprite.setPosition(flagX, flagY);
-			m_registry.emplace<sf::IntRect>(flag, sf::IntRect(sf::Vector2i(flagX, flagY), sprite.getTextureRect().getSize()));
+			if(auto animation = m_animationManager.getAnimation("Flag"); animation != nullptr)
+			{
+				auto& sprite = m_registry.emplace<Animation>(entity, *animation);
+				int32_t flagX = bounds.left;
+				int32_t flagY = bounds.top + bounds.height - sprite.getTextureRect().height;
+				sprite.setPosition(flagX, flagY);
+			}
 		}
 
 		return true;

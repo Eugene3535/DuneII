@@ -86,21 +86,20 @@ void Mission::update(sf::Time dt) noexcept
 
         m_sprites.clear();
 
-        auto ecs_view = m_registry.view<sf::Sprite, sf::IntRect>();
+        auto structure_view = m_registry.view<sf::Sprite, sf::IntRect>();
 
-        for (auto [entity, sprite, bounds] : ecs_view.each())
+        for (auto [entity, sprite, bounds] : structure_view.each())
         {
             if(viewport.intersects(bounds))
                 m_sprites.push_back(&sprite);
         }
 
-        
-        auto anim_view = m_registry.view<sf::Sprite, sf::IntRect, Animation>();
+        auto anim_view = m_registry.view<sf::IntRect, Animation>();
 
-        for (auto [entity, sprite, bounds, animation] : anim_view.each())
+        for (auto [entity, bounds, animation] : anim_view.each())
         {
             if(viewport.intersects(bounds))
-                m_sprites.push_back(&sprite);
+                m_sprites.push_back(&animation);
         }
 
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::X))

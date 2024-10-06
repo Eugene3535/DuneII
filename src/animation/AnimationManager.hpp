@@ -17,8 +17,8 @@ public:
     AnimationManager() noexcept;
     ~AnimationManager();
 
-	Animation createAnimation(const AnimationData& data)  noexcept;
-    Animation getAnimation(const std::string& name) const noexcept;
+	const Animation* createAnimation(const AnimationData& data)  noexcept;
+    const Animation* getAnimation(const std::string& name) const noexcept;
 
 private:
 	std::unordered_map<std::string, Animation> m_animations;

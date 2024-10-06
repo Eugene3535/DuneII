@@ -1,5 +1,3 @@
-#include <cassert>
-
 #include "animation/AnimationManager.hpp"
 
 AnimationManager::AnimationManager() noexcept
@@ -9,20 +7,23 @@ AnimationManager::AnimationManager() noexcept
 
 AnimationManager::~AnimationManager() = default;
 
-Animation AnimationManager::createAnimation(const AnimationData& data) noexcept
+const Animation* AnimationManager::createAnimation(const AnimationData& data) noexcept
 {
-	assert(!data.name.empty());
+	if(data.name.empty())
+		return nullptr;
+
+	if(!data.texture)
+		return nullptr;
 
 	const std::string name(data.name);
 
 	if(auto it = m_animations.try_emplace(name); it.second)
 	{
-		assert(data.texture);
-
 		auto& animation = it.first->second;
 		auto& frames    = m_frames.emplace_back();
-
-		animation.texture  = data.texture;
+		animation.setTexture(*data.texture);
+		animation.setTextureRect(data.startFrame);
+		
 		animation.isLooped = data.isLooped;
 
 		switch (data.layout)
@@ -36,7 +37,8 @@ Animation AnimationManager::createAnimation(const AnimationData& data) noexcept
 
 			case AnimationData::LINEAR:
 			{
-				assert(data.duration);
+				if(!data.duration)
+					return nullptr;
 
 				const uint32_t duration = data.duration;
 				frames.reserve(static_cast<size_t>(duration));
@@ -57,8 +59,8 @@ Animation AnimationManager::createAnimation(const AnimationData& data) noexcept
 
 			case AnimationData::GRID:
 			{
-				assert(data.columns);
-				assert(data.rows);
+				if(data.columns == 0 || data.rows == 0)
+					return nullptr;
 
 				const uint32_t columns  = data.columns;
 				const uint32_t rows     = data.rows;
@@ -82,19 +84,15 @@ Animation AnimationManager::createAnimation(const AnimationData& data) noexcept
 
 		animation.frames = frames.data();
 
-		return animation;
+		return &animation;
 	}
 
-	assert(false && "already loaded");
-
-	return {};
+	return nullptr;
 }
 
-Animation AnimationManager::getAnimation(const std::string& name) const noexcept
+const Animation* AnimationManager::getAnimation(const std::string& name) const noexcept
 {
     auto found = m_animations.find(name);
 
-	assert(found != m_animations.end());
-
-    return found->second;
+    return (found != m_animations.end()) ? &found->second : nullptr;
 }

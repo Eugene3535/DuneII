@@ -13,9 +13,9 @@ AnimationController::~AnimationController() = default;
 
 void AnimationController::execute(sf::Time dt) noexcept
 {
-    auto view = m_registry.view<Animation, sf::Sprite>();
+    auto view = m_registry.view<Animation>();
 
-    for (auto [entity, animation, sprite] : view.each())
+    for (auto [entity, animation] : view.each())
     {
         if( ! animation.isOver )
         {
@@ -39,7 +39,7 @@ void AnimationController::execute(sf::Time dt) noexcept
                     }
                 }
 
-                sprite.setTextureRect(animation.frames[animation.currentFrame]);
+                animation.setTextureRect(animation.frames[animation.currentFrame]);
             }
         }
     }
