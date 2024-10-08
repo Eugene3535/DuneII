@@ -11,7 +11,6 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 
 #include "assets/AssetManager.hpp"
-
 #include "effects/ScreenBlackoutEffect.hpp"
 
 struct Game
@@ -34,4 +33,4 @@ public:
     bool sceneNeedToBeChanged { false };
 };
 
-#endif
+#endif // !GAME_HPP

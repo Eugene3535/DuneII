@@ -88,14 +88,12 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 
 			for (auto [entity, structure, bounds] : view.each())
 			{
-				auto type = structure.type;
-
-				bool need_to_plant_a_flag = ((type != StructureType::SLAB_1x1)      &&
-								             (type != StructureType::SLAB_2x2)      && 
-								             (type != StructureType::WALL)          && 
-								             (type != StructureType::TURRET)        && 
-								             (type != StructureType::ROCKET_TURRET) &&
-											  type < StructureType::MAX);
+				bool need_to_plant_a_flag = ((structure.type != StructureType::SLAB_1x1)      &&
+								             (structure.type != StructureType::SLAB_2x2)      && 
+								             (structure.type != StructureType::WALL)          && 
+								             (structure.type != StructureType::TURRET)        && 
+								             (structure.type != StructureType::ROCKET_TURRET) &&
+											  structure.type < StructureType::MAX);
 
 				if(harkonnen_area != sf::IntRect() && bounds.intersects(harkonnen_area))
 				{

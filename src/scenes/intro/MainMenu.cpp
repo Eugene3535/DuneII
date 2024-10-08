@@ -51,7 +51,7 @@ bool MainMenu::load(const std::string& info) noexcept
 
         m_isLoaded = true;
 
-        return true;
+        return m_isLoaded;
     }
         
     return false;
@@ -64,7 +64,7 @@ void MainMenu::update(sf::Time dt) noexcept
 
     sf::Vector2f mouse_pos { sf::Mouse::getPosition(m_game.window) };
 
-    auto isButtonPressed = [](sf::Text& text, const sf::Vector2f& mouse_pos) noexcept
+    auto is_button_pressed = [](sf::Text& text, const sf::Vector2f& mouse_pos) noexcept
     {
         if(text.getGlobalBounds().contains(mouse_pos))
         {
@@ -79,7 +79,7 @@ void MainMenu::update(sf::Time dt) noexcept
         return false;
     };
 
-    if(isButtonPressed(m_startGame, mouse_pos))
+    if(is_button_pressed(m_startGame, mouse_pos))
     {
         m_game.sceneNeedToBeChanged = true;
         m_game.next_scene = Game::GameScene::MISSION;
@@ -87,12 +87,12 @@ void MainMenu::update(sf::Time dt) noexcept
         return;
     }
 
-    if(isButtonPressed(m_settings, mouse_pos))
+    if(is_button_pressed(m_settings, mouse_pos))
     {
         return;
     }
 
-    if(isButtonPressed(m_tutorial, mouse_pos))
+    if(is_button_pressed(m_tutorial, mouse_pos))
     {
         return;
     }
@@ -100,8 +100,8 @@ void MainMenu::update(sf::Time dt) noexcept
 
 void MainMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    target.draw(m_planet);
-    target.draw(m_startGame);
-    target.draw(m_settings);
-    target.draw(m_tutorial);
+    target.draw(m_planet, states);
+    target.draw(m_startGame, states);
+    target.draw(m_settings, states);
+    target.draw(m_tutorial, states);
 }
