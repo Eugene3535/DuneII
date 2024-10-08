@@ -5,8 +5,10 @@
 #include <vector>
 #include <memory>
 
-#include <SFML/System.hpp>
-#include <SFML/Graphics.hpp>
+#include <SFML/System/Clock.hpp>
+#include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/View.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
 
 #include "assets/AssetManager.hpp"
 
@@ -15,7 +17,7 @@
 struct Game
 {
 public:
-    enum GameScene: std::uint32_t
+    enum GameScene: uint32_t
     {
         NONE,
         MAIN_MENU,

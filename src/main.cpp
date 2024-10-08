@@ -1,3 +1,7 @@
+#include <SFML/Window/Keyboard.hpp>
+#include <SFML/Window/Mouse.hpp>
+#include <SFML/Window/Event.hpp>
+
 #include "scenes/intro/MainMenu.hpp"
 #include "scenes/mission/Mission.hpp"
 #include "effects/ScreenBlackoutEffect.hpp"

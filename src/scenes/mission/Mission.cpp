@@ -1,3 +1,6 @@
+#include <SFML/Window/Keyboard.hpp>
+#include <SFML/Window/Mouse.hpp>
+
 #include "common/Defines.hpp"
 #include "common/FileProvider.hpp"
 #include "game/Game.hpp"

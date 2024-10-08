@@ -78,13 +78,12 @@ private:
 	char         convertTileNumToChar(int32_t index)                                           const noexcept;
 	void         draw(sf::RenderTarget& target, sf::RenderStates states)                       const override;
 	void         updateWall(int32_t origin, int32_t level)                                           noexcept;
-    WallCellType getWallType(bool left, bool top, bool right, bool bottom)                           noexcept;
+    WallCellType computeWallType(bool left, bool top, bool right, bool bottom)                       noexcept;
     sf::IntRect  getTexCoordsOf(WallCellType type)                                                   noexcept;
     sf::IntRect  getTexCoordsOf(StructureType type)                                            const noexcept;
 	sf::IntRect  getBoundsOf(StructureType type, int32_t coordX, int32_t coordY)               const noexcept;
 	int32_t      getHitPointsOf(StructureType type)                                            const noexcept;
 
-private:
 	std::unordered_map<int32_t, entt::entity> m_structuresById;
 	class AnimationManager&   m_animationManager;
 	entt::registry&           m_registry;

@@ -923,7 +923,7 @@ void TileMap::updateWall(int32_t origin, int32_t level) noexcept
 		bool c = (right < m_tileMask.size())  ? (field[right]  == 'W') : false;
 		bool d = (bottom < m_tileMask.size()) ? (field[bottom] == 'W') : false;
 
-		const auto tex_coords = getTexCoordsOf(getWallType(a, b, c, d));
+		const auto tex_coords = getTexCoordsOf(computeWallType(a, b, c, d));
 		const auto entity = m_structuresById[origin];
 
 		auto view = m_registry.view<sf::Sprite>();
@@ -937,7 +937,7 @@ void TileMap::updateWall(int32_t origin, int32_t level) noexcept
 	}
 }
 
-TileMap::WallCellType TileMap::getWallType(bool left, bool top, bool right, bool bottom) noexcept
+TileMap::WallCellType TileMap::computeWallType(bool left, bool top, bool right, bool bottom) noexcept
 {
     if(!left && !top && !right && !bottom) return WallCellType::DOT;
     if((left || right) && !top && !bottom) return WallCellType::LEFT_RIGHT;
