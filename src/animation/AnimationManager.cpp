@@ -48,8 +48,8 @@ const Animation* AnimationManager::createAnimation(const AnimationData& data) no
 
 				for (uint32_t i = 0; i < duration; ++i)
 				{
-					frame.left += offset;
 					frames.emplace_back(frame);
+					frame.left += offset;
 				}
 
 				animation.duration = duration;

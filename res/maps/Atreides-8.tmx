@@ -3,8 +3,8 @@
  <tileset firstgid="1" name="Landscape" tilewidth="32" tileheight="32" tilecount="110" columns="11">
   <image source="../textures/Landscape.png" width="352" height="320"/>
  </tileset>
- <tileset firstgid="111" name="Buildings" tilewidth="32" tileheight="32" tilecount="176" columns="16">
-  <image source="../textures/Buildings.png" width="512" height="352"/>
+ <tileset firstgid="111" name="Structures" tilewidth="32" tileheight="32" tilecount="176" columns="16">
+  <image source="../textures/Structures.png" width="512" height="352"/>
  </tileset>
  <layer id="1" name="Landscape" width="64" height="64">
   <data encoding="csv">
@@ -74,7 +74,7 @@
 18,18,18,18,18,18,18,18,18,18,13,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,33,34,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18
 </data>
  </layer>
- <layer id="2" name="Buildings" width="64" height="64">
+ <layer id="2" name="Structures" width="64" height="64">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,113,129,130,129,130,135,136,137,191,124,125,126,191,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -218,12 +218,12 @@
   </object>
   <object id="2" name="Area" x="1595" y="219.5" width="422" height="358">
    <properties>
-    <property name="House" type="int" value="2"/>
+    <property name="House" type="int" value="1"/>
    </properties>
   </object>
   <object id="3" name="Area" x="463" y="1243" width="332" height="310">
    <properties>
-    <property name="House" type="int" value="1"/>
+    <property name="House" type="int" value="2"/>
    </properties>
   </object>
  </objectgroup>

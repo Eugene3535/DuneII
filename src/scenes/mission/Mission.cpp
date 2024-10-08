@@ -20,16 +20,27 @@ bool Mission::load(const std::string& info) noexcept
 
     m_systems.addSystem<AnimationController>(m_registry);
 
-    AnimationData flagData;
-    flagData.name = "Flag";
-    flagData.layout = AnimationData::GRID;
-    flagData.texture = Assets->getResource<sf::Texture>("Buildings.png");
-    flagData.startFrame = { 352, 32, 14, 14 };
-    flagData.columns = 4u;
-    flagData.rows = 2u;
-    flagData.isLooped = true;
-    flagData.delay = sf::seconds(0.5f);
-    m_animationManager.createAnimation(flagData);
+    if(auto flag_texture = Assets->getResource<sf::Texture>("Flags.png"); flag_texture != nullptr)
+    {
+        AnimationData flagData;
+
+        flagData.name = "HarkonnenFlag";
+        flagData.layout = AnimationData::LINEAR;
+        flagData.texture = flag_texture;
+        flagData.startFrame = { 0, 0, 14, 14 };
+        flagData.duration = 8;
+        flagData.isLooped = true;
+        flagData.delay = sf::seconds(0.5f);
+        m_animationManager.createAnimation(flagData);
+
+        flagData.name = "OrdosFlag";
+        flagData.startFrame = { 0, 14, 14, 14 };
+        m_animationManager.createAnimation(flagData);
+
+        flagData.name = "AtreidesFlag";
+        flagData.startFrame = { 0, 28, 14, 14 };
+        m_animationManager.createAnimation(flagData);
+    }
 
     if(m_isLoaded = m_tilemap.loadFromFile(FileProvider().findPathToFile(info)); m_isLoaded)
     {       

@@ -1,7 +1,6 @@
 #include <sstream>
 #include <algorithm>
 #include <cstring>
-#include <cassert>
 
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/Sprite.hpp>
@@ -65,43 +64,59 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 				return sf::IntRect();
 			};
 
-			auto atreides_area  = get_area_of(HouseType::ATREIDES);
+			auto plant_a_flag = [this](const entt::entity entity, const Animation* flag, const sf::IntRect& bounds) -> void
+			{
+				auto& sprite = m_registry.emplace<Animation>(entity, *flag);
+				int32_t flagX = bounds.left;
+				int32_t flagY = bounds.top + bounds.height - sprite.getTextureRect().height;
+				sprite.setPosition(flagX, flagY);
+			};
+
+			auto harkonnen_area = get_area_of(HouseType::HARKONNEN);		
 			auto ordos_area     = get_area_of(HouseType::ORDOS);
-			auto harkonnen_area = get_area_of(HouseType::HARKONNEN);
+			auto atreides_area  = get_area_of(HouseType::ATREIDES);
+
+			auto harkonnen_flag = m_animationManager.getAnimation("HarkonnenFlag");
+			auto ordos_flag     = m_animationManager.getAnimation("OrdosFlag");
+			auto atreides_flag  = m_animationManager.getAnimation("AtreidesFlag");
+
+			if( ! harkonnen_flag ) return false;
+			if( ! ordos_flag )     return false;
+			if( ! atreides_flag )  return false;
 
 			auto view = m_registry.view<Structure, sf::IntRect>();
 
 			for (auto [entity, structure, bounds] : view.each())
 			{
-				if(bounds.intersects(atreides_area))
-				{
-					structure.owner = HouseType::ATREIDES;
-				}
-				else if(bounds.intersects(ordos_area))
-				{
-					structure.owner = HouseType::ORDOS;
-				}
-				else if(bounds.intersects(harkonnen_area))
+				auto type = structure.type;
+
+				bool need_to_plant_a_flag = ((type != StructureType::SLAB_1x1)      &&
+								             (type != StructureType::SLAB_2x2)      && 
+								             (type != StructureType::WALL)          && 
+								             (type != StructureType::TURRET)        && 
+								             (type != StructureType::ROCKET_TURRET) &&
+											  type < StructureType::MAX);
+
+				if(harkonnen_area != sf::IntRect() && bounds.intersects(harkonnen_area))
 				{
 					structure.owner = HouseType::HARKONNEN;
-				}
-			}
 
-			auto flag_view = m_registry.view<Animation, sf::IntRect>();
+					if(need_to_plant_a_flag)		
+						plant_a_flag(entity, harkonnen_flag, bounds);		
+				}
+				else if(ordos_area != sf::IntRect() && bounds.intersects(ordos_area))
+				{
+					structure.owner = HouseType::ORDOS;
 
-			for (auto [entity, animation, bounds] : flag_view.each())
-			{
-				if(bounds.intersects(atreides_area))
-				{
-					animation.setColor(sf::Color::Blue);
+					if(need_to_plant_a_flag)
+						plant_a_flag(entity, ordos_flag, bounds);
 				}
-				else if(bounds.intersects(ordos_area))
+				else if(atreides_area != sf::IntRect() && bounds.intersects(atreides_area))
 				{
-					animation.setColor(sf::Color::Green);
-				}
-				else if(bounds.intersects(harkonnen_area))
-				{
-					animation.setColor(sf::Color::Red);
+					structure.owner = HouseType::ATREIDES;
+
+					if(need_to_plant_a_flag)		
+						plant_a_flag(entity, atreides_flag, bounds);
 				}
 			}
 
@@ -127,7 +142,8 @@ void TileMap::unload() noexcept
 
 bool TileMap::putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY) noexcept
 {
-	assert((type != StructureType::INVALID) && (type != StructureType::MAX));
+	if(type >= StructureType::MAX)
+		return false;
 
 	int32_t coordX = cellX * m_tileSize.x;
 	int32_t coordY = cellY * m_tileSize.y;
@@ -188,7 +204,7 @@ bool TileMap::putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY
         }
     }
 
-	if(const auto texture = Assets->getResource<sf::Texture>("Buildings.png"); texture != nullptr)
+	if(const auto texture = Assets->getResource<sf::Texture>("Structures.png"); texture != nullptr)
 	{
 		const auto entity = m_registry.create();
 		m_registry.emplace<sf::IntRect>(entity, bounds);
@@ -239,23 +255,6 @@ bool TileMap::putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY
 		if(type == StructureType::WALL)
 			updateWall(origin, 2);
 
-		bool need_to_plant_a_flag = ((type != StructureType::SLAB_1x1) &&
-									 (type != StructureType::SLAB_2x2) && 
-									 (type != StructureType::WALL)     && 
-									 (type != StructureType::TURRET)   && 
-									 (type != StructureType::ROCKET_TURRET));
-
-		if(need_to_plant_a_flag)
-		{
-			if(auto animation = m_animationManager.getAnimation("Flag"); animation != nullptr)
-			{
-				auto& sprite = m_registry.emplace<Animation>(entity, *animation);
-				int32_t flagX = bounds.left;
-				int32_t flagY = bounds.top + bounds.height - sprite.getTextureRect().height;
-				sprite.setPosition(flagX, flagY);
-			}
-		}
-
 		return true;
 	}
 
@@ -264,6 +263,8 @@ bool TileMap::putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY
 
 void TileMap::removeStructureFromMap(int32_t structureId) noexcept
 {
+	return;
+
 	if(auto found = m_structuresById.find(structureId); found != m_structuresById.end())
 	{
 		auto view = m_registry.view<Structure>();
@@ -414,8 +415,8 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 				continue;
 			}	
 
-			if(layer_name == "Buildings")	
-				loadBuildings(*current_tileset, parsed_layer);
+			if(layer_name == "Structures")	
+				loadStructures(*current_tileset, parsed_layer);
 		}
 	}
 
@@ -560,9 +561,9 @@ void TileMap::loadLandscape(const Tileset& tileset, const std::vector<int>& pars
 	}
 }
 
-void TileMap::loadBuildings(const Tileset& tileset, const std::vector<int>& parsed_layer) noexcept
+void TileMap::loadStructures(const Tileset& tileset, const std::vector<int>& parsed_layer) noexcept
 {
-	auto get_building_type = [](int32_t tile_num)
+	auto get_structure_type = [](int32_t tile_num)
 	{
 		switch (tile_num)
 		{
@@ -611,9 +612,9 @@ void TileMap::loadBuildings(const Tileset& tileset, const std::vector<int>& pars
 			{
 				m_tileMask[index] = convertTileNumToChar(tile_id);
 
-				auto bld_type = get_building_type(tile_id);
+				auto bld_type = get_structure_type(tile_id);
 
-				if(bld_type != StructureType::MAX && bld_type != StructureType::INVALID)
+				if(bld_type < StructureType::MAX)
 				{
 					putStructureOnMap(bld_type, x, y);
 				}
@@ -788,7 +789,6 @@ char TileMap::convertTileNumToChar(int32_t index) const noexcept
 		case 107: return 'S';
 		case 108: return 'S';
 		case 109: return 'S';
-//      NOTE: Tiles occupied by buildings will be filled in later when loaded by the Builder class
 //      Wall
 		case 111: return 'R';
 		case 112: return 'R';
