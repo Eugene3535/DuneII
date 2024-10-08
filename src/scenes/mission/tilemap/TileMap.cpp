@@ -263,8 +263,6 @@ bool TileMap::putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY
 
 void TileMap::removeStructureFromMap(int32_t structureId) noexcept
 {
-	return;
-
 	if(auto found = m_structuresById.find(structureId); found != m_structuresById.end())
 	{
 		auto view = m_registry.view<Structure>();
