@@ -1,4 +1,11 @@
-cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.25.1 FATAL_ERROR)
+
+set(GPROF_PROFILING OFF)
+
+if(GPROF_PROFILING) # gprof ./DuneII.exe gmon.out -z > analysis.txt ( more info available at https://www.opennet.ru/docs/RUS/gprof/gprof-5.html )
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
+endif()
 
 project(DuneII LANGUAGES CXX)
 
@@ -27,6 +34,7 @@ set(_duneII_src_files
 	${SRC_DIR}/ecs/systems/base/System.cpp
 	${SRC_DIR}/ecs/components/Animation.cpp
 	${SRC_DIR}/ecs/systems/AnimationController.cpp
+	${SRC_DIR}/ecs/systems/ViewportController.cpp
 	${SRC_DIR}/ecs/SystemManager.cpp
 	${SRC_DIR}/scenes/base/Scene.cpp
 	${SRC_DIR}/scenes/intro/MainMenu.cpp

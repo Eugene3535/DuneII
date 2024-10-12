@@ -1,5 +1,3 @@
-#include <SFML/Graphics/Sprite.hpp>
-
 #include "ecs/components/Animation.hpp"
 #include "ecs/systems/AnimationController.hpp"
 

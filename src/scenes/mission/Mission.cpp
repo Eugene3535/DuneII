@@ -5,6 +5,7 @@
 #include "common/FileProvider.hpp"
 #include "game/Game.hpp"
 #include "ecs/systems/AnimationController.hpp"
+#include "ecs/systems/ViewportController.hpp"
 #include "scenes/mission/Mission.hpp"
 
 Mission::Mission(Game& game) noexcept:
@@ -21,38 +22,20 @@ bool Mission::load(const std::string& info) noexcept
     if(m_isLoaded)
         return true;
 
-    m_systems.addSystem<AnimationController>(m_registry);
+    if(!loadAnimations()) return false;
 
-    if(auto flag_texture = Assets->getResource<sf::Texture>("Flags.png"); flag_texture != nullptr)
+    if(!m_tilemap.loadFromFile(FileProvider().findPathToFile(info))) return false;
+
+    if(!m_systems.addSystem<AnimationController>(m_registry)) return false;
+    if(!m_systems.addSystem<ViewportController>(m_registry, m_game.window, m_game.viewport, m_tilemap)) return false;
+    
+    if(auto theme = Assets->getResource<sf::Music>("08 - Command Post.flac"); theme != nullptr)
     {
-        AnimationData flagData;
-
-        flagData.name = "HarkonnenFlag";
-        flagData.layout = AnimationData::LINEAR;
-        flagData.texture = flag_texture;
-        flagData.startFrame = { 0, 0, 14, 14 };
-        flagData.duration = 8;
-        flagData.isLooped = true;
-        flagData.delay = sf::seconds(0.5f);
-        m_animationManager.createAnimation(flagData);
-
-        flagData.name = "OrdosFlag";
-        flagData.startFrame = { 0, 14, 14, 14 };
-        m_animationManager.createAnimation(flagData);
-
-        flagData.name = "AtreidesFlag";
-        flagData.startFrame = { 0, 28, 14, 14 };
-        m_animationManager.createAnimation(flagData);
+        theme->setLoop(true);
+        theme->play();
     }
 
-    if(m_isLoaded = m_tilemap.loadFromFile(FileProvider().findPathToFile(info)); m_isLoaded)
-    {       
-        if(auto theme = Assets->getResource<sf::Music>("08 - Command Post.flac"); theme != nullptr)
-        {
-            theme->setLoop(true);
-            theme->play();
-        }
-    }
+    m_isLoaded = true;
 
     return m_isLoaded;
 }
@@ -61,42 +44,9 @@ void Mission::update(sf::Time dt) noexcept
 {
     if(m_isLoaded)
     {
-        auto seconds = dt.asSeconds();
-        float camera_velocity = seconds * CAMERA_VELOCITY;
+        m_systems.update(dt);
 
-        auto& render_target = m_game.window;
-        sf::Vector2i mouse_position = sf::Mouse::getPosition(render_target);
-        sf::Vector2i cursor_position = static_cast<sf::Vector2i>(render_target.mapPixelToCoords(mouse_position));
-
-        auto& view                   = m_game.viewport;
-        const sf::Vector2i view_size = static_cast<sf::Vector2i>(view.getSize());
-        const sf::Vector2i map_size  = m_tilemap.getMapSizeInPixels();
-
-        bool is_near_the_left_edge   = (mouse_position.x > 0 && mouse_position.x < SCREEN_MARGIN);
-        bool is_near_the_top_edge    = (mouse_position.y > 0 && mouse_position.y < SCREEN_MARGIN);
-        bool is_near_the_right_edge  = (mouse_position.x > (view_size.x - SCREEN_MARGIN) && mouse_position.x < view_size.x);
-        bool is_near_the_bottom_edge = (mouse_position.y > (view_size.y - SCREEN_MARGIN) && mouse_position.y < view_size.y);
-
-        if(is_near_the_left_edge)
-            m_viewPosition.x -= camera_velocity;
-        
-        if(is_near_the_top_edge)
-            m_viewPosition.y -= camera_velocity;
-        
-        if(is_near_the_right_edge)
-            m_viewPosition.x += camera_velocity;
-        
-        if(is_near_the_bottom_edge)
-            m_viewPosition.y += camera_velocity;            
-     
-        if(m_viewPosition.x < 0)                        m_viewPosition.x = 0;
-        if(m_viewPosition.y < 0)                        m_viewPosition.y = 0;
-        if(m_viewPosition.x + view_size.x > map_size.x) m_viewPosition.x = map_size.x - view_size.x;
-        if(m_viewPosition.y + view_size.y > map_size.y) m_viewPosition.y = map_size.y - view_size.y;
-
-        view.setCenter(static_cast<sf::Vector2f>(m_viewPosition + sf::Vector2i(view_size.x >> 1, view_size.y >> 1)));
-
-        sf::IntRect viewport = sf::IntRect(m_viewPosition.x, m_viewPosition.y, static_cast<int>(view_size.x), static_cast<int>(view_size.y));
+        sf::IntRect viewport = m_systems.getSystem<ViewportController>()->getViewport();
 
         m_sprites.clear();
 
@@ -126,9 +76,36 @@ void Mission::update(sf::Time dt) noexcept
                 theme->stop();
             }
         }
-
-        m_systems.update(dt);
     }
+}
+
+bool Mission::loadAnimations() noexcept
+{
+    if(auto flag_texture = Assets->getResource<sf::Texture>("Flags.png"); flag_texture != nullptr)
+    {
+        AnimationData flagData;
+
+        flagData.name = "HarkonnenFlag";
+        flagData.layout = AnimationData::LINEAR;
+        flagData.texture = flag_texture;
+        flagData.startFrame = { 0, 0, 14, 14 };
+        flagData.duration = 8;
+        flagData.isLooped = true;
+        flagData.delay = sf::seconds(0.5f);
+        m_animationManager.createAnimation(flagData);
+
+        flagData.name = "OrdosFlag";
+        flagData.startFrame = { 0, 14, 14, 14 };
+        m_animationManager.createAnimation(flagData);
+
+        flagData.name = "AtreidesFlag";
+        flagData.startFrame = { 0, 28, 14, 14 };
+        m_animationManager.createAnimation(flagData);
+
+        return true;
+    }
+
+    return false;
 }
 
 void Mission::draw(sf::RenderTarget& target, sf::RenderStates states) const

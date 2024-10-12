@@ -12,8 +12,14 @@ class BaseSystem
 public:
     BaseSystem(entt::registry& registry) noexcept;
     virtual ~BaseSystem() = default;
+
     virtual void execute(sf::Time dt) noexcept;
     static uint32_t getSystemCount() noexcept;
+
+    void enable() noexcept;
+    void disable() noexcept;
+
+    bool isEnabled() const noexcept;
 
 protected:
     template<class T> 
@@ -27,6 +33,7 @@ protected:
 
 protected:
     entt::registry& m_registry;
+    bool m_isEnabled;
 
 private:
     static uint32_t s_type;

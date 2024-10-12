@@ -126,6 +126,7 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 
 void TileMap::unload() noexcept
 {
+	m_structuresById.clear();
 	m_vertices.~VertexBuffer();
 	m_texture = nullptr;
 

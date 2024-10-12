@@ -20,6 +20,7 @@ public:
     void update(sf::Time dt)           noexcept override;
 
 private:
+    bool loadAnimations() noexcept;
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 private:
@@ -28,9 +29,6 @@ private:
     SystemManager            m_systems;
     AnimationManager         m_animationManager;
     std::vector<sf::Sprite*> m_sprites;
-
-    sf::Vector2i m_viewPosition;
-    sf::Vector2i m_previousCursorPosition;
 };
 
 #endif // !MISSION_HPP

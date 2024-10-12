@@ -4,9 +4,6 @@
 #define DEGTORAD 0.017453f
 #define RADTODEG 57.29577f
 
-#define CAMERA_VELOCITY 600
-#define SCREEN_MARGIN 150
-
 // Limit of production buildings on the map, excluding slabs and walls
 #define PRODUCTION_BUILDING_LIMIT 99
 
