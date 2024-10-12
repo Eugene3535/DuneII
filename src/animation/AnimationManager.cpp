@@ -1,3 +1,9 @@
+#include <memory>
+
+#include "RapidXML/rapidxml.hpp"
+#include "RapidXML/rapidxml_utils.hpp"
+
+#include "common/FileProvider.hpp"
 #include "animation/AnimationManager.hpp"
 
 AnimationManager::AnimationManager() noexcept
@@ -88,6 +94,58 @@ const Animation* AnimationManager::createAnimation(const AnimationData& data) no
 	}
 
 	return nullptr;
+}
+
+std::unordered_map<std::string, sf::IntRect> AnimationManager::loadFramesFromFile(const std::string& file_name) noexcept
+{
+	std::unordered_map<std::string, sf::IntRect> frames;
+
+	if(const auto file_path = FileProvider::findPathToFile(file_name); !file_path.empty())
+	{
+		auto document = std::make_unique<rapidxml::xml_document<char>>();
+		rapidxml::file<char> xmlFile(file_path.string().c_str());
+		document->parse<0>(xmlFile.data());
+
+		const auto sprite_node = document->first_node("sprites");
+		auto anim_node = sprite_node->first_node("animation");
+
+		while(anim_node)
+		{
+			auto title_attr = anim_node->first_attribute("title");
+
+			std::string title = title_attr ? title_attr->value() : std::string();
+
+			if (title.empty())
+				continue;
+
+			if(auto it = frames.try_emplace(title); it.second)
+			{
+				auto& frame   = it.first->second;
+				auto cut_node = anim_node->first_node("cut");
+
+				while(cut_node)
+				{
+					auto x = cut_node->first_attribute("x");
+					auto y = cut_node->first_attribute("y");
+					auto w = cut_node->first_attribute("w");
+					auto h = cut_node->first_attribute("h");
+
+					int left   = x ? atoi(x->value()) : 0;
+					int top    = y ? atoi(y->value()) : 0;
+					int width  = w ? atoi(w->value()) : 0;
+					int height = h ? atoi(h->value()) : 0;
+
+					frame = { left, top, width, height };
+
+					cut_node = cut_node->next_sibling();
+				}
+			}
+
+			anim_node = anim_node->next_sibling("animation");
+		}
+	}
+
+	return frames;
 }
 
 const Animation* AnimationManager::getAnimation(const std::string& name) const noexcept

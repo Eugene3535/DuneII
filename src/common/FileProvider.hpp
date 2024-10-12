@@ -6,7 +6,7 @@
 
 struct FileProvider
 {
-    std::filesystem::path findPathToFile(const std::string& name) noexcept;
+    static std::filesystem::path findPathToFile(const std::string& name) noexcept;
 };
 
 #endif // !FILE_PROVIDER_HPP

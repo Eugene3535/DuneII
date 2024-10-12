@@ -23,9 +23,7 @@ bool Mission::load(const std::string& info) noexcept
         return true;
 
     if(!loadAnimations()) return false;
-
-    if(!m_tilemap.loadFromFile(FileProvider().findPathToFile(info))) return false;
-
+    if(!m_tilemap.loadFromFile(FileProvider::findPathToFile(info))) return false;
     if(!m_systems.addSystem<AnimationController>(m_registry)) return false;
     if(!m_systems.addSystem<ViewportController>(m_registry, m_game.window, m_game.viewport, m_tilemap)) return false;
     

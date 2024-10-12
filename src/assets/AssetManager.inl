@@ -39,7 +39,7 @@ T* AssetManager::getResource(const std::string& filename) noexcept
 template<class T>
 T* AssetManager::tryLoadFromFile(const std::string& filename, std::unordered_map<std::string, T>& container) noexcept
 {
-    const auto filepath = FileProvider().findPathToFile(filename);
+    const auto filepath = FileProvider::findPathToFile(filename);
 
     if(filepath.empty())
         return nullptr;

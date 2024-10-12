@@ -18,6 +18,7 @@ public:
     ~AnimationManager();
 
 	const Animation* createAnimation(const AnimationData& data)  noexcept;
+    std::unordered_map<std::string, sf::IntRect> loadFramesFromFile(const std::string& file_name) noexcept;
     const Animation* getAnimation(const std::string& name) const noexcept;
 
 private:
