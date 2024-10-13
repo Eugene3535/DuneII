@@ -27,7 +27,7 @@ bool Mission::load(const std::string& info) noexcept
     if(!m_systems.addSystem<AnimationController>(m_registry)) return false;
     if(!m_systems.addSystem<ViewportController>(m_registry, m_game.window, m_game.viewport, m_tilemap)) return false;
     
-    if(auto theme = Assets->getResource<sf::Music>("08 - Command Post.flac"); theme != nullptr)
+    if(auto theme = Assets->getResource<sf::Music>(COMMAND_POST_MUSIC_FILE_NAME); theme != nullptr)
     {
         theme->setLoop(true);
         theme->play();
@@ -69,7 +69,7 @@ void Mission::update(sf::Time dt) noexcept
             m_game.sceneNeedToBeChanged = true;
             m_game.next_scene = Game::GameScene::MAIN_MENU;
 
-            if(auto theme = Assets->getResource<sf::Music>("08 - Command Post.flac"); theme != nullptr)
+            if(auto theme = Assets->getResource<sf::Music>(COMMAND_POST_MUSIC_FILE_NAME); theme != nullptr)
             {
                 theme->stop();
             }
@@ -79,7 +79,7 @@ void Mission::update(sf::Time dt) noexcept
 
 bool Mission::loadAnimations() noexcept
 {
-    if(auto flag_texture = Assets->getResource<sf::Texture>("Flags.png"); flag_texture != nullptr)
+    if(auto flag_texture = Assets->getResource<sf::Texture>(FLAGS_TEXTURE_FILE_NAME); flag_texture != nullptr)
     {
         AnimationData flagData;
 
