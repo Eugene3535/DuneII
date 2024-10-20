@@ -1,5 +1,5 @@
-#ifndef CURSOR_CONTROLLER_HPP
-#define CURSOR_CONTROLLER_HPP
+#ifndef VIEWPORT_CONTROLLER_HPP
+#define VIEWPORT_CONTROLLER_HPP
 
 #include <SFML/Graphics/Rect.hpp>
 
@@ -29,4 +29,4 @@ private:
     sf::Vector2i m_viewPosition;
 };
 
-#endif // !CURSOR_CONTROLLER_HPP
+#endif // !VIEWPORT_CONTROLLER_HPP

@@ -7,7 +7,7 @@ if(GPROF_PROFILING) # gprof ./DuneII.exe gmon.out -z > analysis.txt ( more info 
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
 endif()
 
-project(DuneII LANGUAGES CXX)
+project(DuneII LANGUAGES C CXX)
 
 set(EXTERNAL_DIR $ENV{external})
 set(BUILD_SHARED_LIBS ON)
@@ -17,38 +17,35 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 
 if(WIN32 AND NOT MINGW)
-	string(APPEND CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin")
-	string(APPEND CMAKE_LIBRARY_OUTPUT_DIRECTORY "lib")
-	string(APPEND CMAKE_ARCHIVE_OUTPUT_DIRECTORY "lib")
+	string(APPEND CMAKE_RUNTIME_OUTPUT_DIRECTORY "/bin")
+	string(APPEND CMAKE_LIBRARY_OUTPUT_DIRECTORY "/lib")
+	string(APPEND CMAKE_ARCHIVE_OUTPUT_DIRECTORY "/lib")
 endif()
 
-set(SRC_DIR ${PROJECT_SOURCE_DIR}/src)
+set(_src_dir ${PROJECT_SOURCE_DIR}/src)
 
 set(_duneII_src_files
-	${SRC_DIR}/main.cpp
-	${SRC_DIR}/common/FileProvider.cpp
-	${SRC_DIR}/common/MathUtils.cpp
-	${SRC_DIR}/effects/ScreenBlackoutEffect.cpp
-	${SRC_DIR}/assets/AssetManager.cpp
-	${SRC_DIR}/animation/AnimationManager.cpp
-	${SRC_DIR}/ecs/systems/base/System.cpp
-	${SRC_DIR}/ecs/components/Animation.cpp
-	${SRC_DIR}/ecs/systems/AnimationController.cpp
-	${SRC_DIR}/ecs/systems/ViewportController.cpp
-	${SRC_DIR}/ecs/SystemManager.cpp
-	${SRC_DIR}/scenes/base/Scene.cpp
-	${SRC_DIR}/scenes/intro/MainMenu.cpp
-	${SRC_DIR}/scenes/mission/Mission.cpp
-	${SRC_DIR}/scenes/mission/tilemap/TileMap.cpp
+	${_src_dir}/common/FileProvider.cpp
+	${_src_dir}/common/MathUtils.cpp
+	${_src_dir}/effects/ScreenBlackoutEffect.cpp
+	${_src_dir}/assets/AssetManager.cpp
+	${_src_dir}/animation/AnimationManager.cpp
+	${_src_dir}/ecs/systems/base/System.cpp
+	${_src_dir}/ecs/components/Animation.cpp
+	${_src_dir}/ecs/systems/AnimationController.cpp
+	${_src_dir}/ecs/systems/ViewportController.cpp
+	${_src_dir}/ecs/systems/CullingController.cpp
+	${_src_dir}/ecs/SystemManager.cpp
+	${_src_dir}/scenes/base/Scene.cpp
+	${_src_dir}/scenes/intro/MainMenu.cpp
+	${_src_dir}/scenes/mission/Mission.cpp
+	${_src_dir}/scenes/mission/tilemap/TileMap.cpp
+	${_src_dir}/main.cpp
 )
 
 add_executable(${PROJECT_NAME} ${_duneII_src_files})
 add_subdirectory(${EXTERNAL_DIR}/sfml sfml)
 add_subdirectory(${EXTERNAL_DIR}/entt entt)
-
-if(MSVC)
-	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
-endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE
 	${PROJECT_SOURCE_DIR}/src

@@ -6,6 +6,7 @@
 #include "game/Game.hpp"
 #include "ecs/systems/AnimationController.hpp"
 #include "ecs/systems/ViewportController.hpp"
+#include "ecs/systems/CullingController.hpp"
 #include "scenes/mission/Mission.hpp"
 
 Mission::Mission(Game& game) noexcept:
@@ -24,8 +25,13 @@ bool Mission::load(const std::string& info) noexcept
 
     if(!loadAnimations()) return false;
     if(!m_tilemap.loadFromFile(FileProvider::findPathToFile(info))) return false;
+
     if(!m_systems.addSystem<AnimationController>(m_registry)) return false;
-    if(!m_systems.addSystem<ViewportController>(m_registry, m_game.window, m_game.viewport, m_tilemap)) return false;
+
+    if(auto vc = m_systems.addSystem<ViewportController>(m_registry, m_game.window, m_game.viewport, m_tilemap); vc != nullptr)
+        m_systems.addSystem<CullingController>(m_registry, m_sprites, vc->getViewport());
+    else 
+        return false;
     
     if(auto theme = Assets->getResource<sf::Music>(COMMAND_POST_MUSIC_FILE_NAME); theme != nullptr)
     {
@@ -45,24 +51,6 @@ void Mission::update(sf::Time dt) noexcept
         m_systems.update(dt);
 
         sf::IntRect viewport = m_systems.getSystem<ViewportController>()->getViewport();
-
-        m_sprites.clear();
-
-        auto structure_view = m_registry.view<sf::Sprite, sf::IntRect>();
-
-        for (auto [entity, sprite, bounds] : structure_view.each())
-        {
-            if(viewport.intersects(bounds))
-                m_sprites.push_back(&sprite);
-        }
-
-        auto anim_view = m_registry.view<sf::IntRect, Animation>();
-
-        for (auto [entity, bounds, animation] : anim_view.each())
-        {
-            if(viewport.intersects(bounds))
-                m_sprites.push_back(&animation);
-        }
 
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::X))
         {

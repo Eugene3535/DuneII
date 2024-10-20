@@ -23,7 +23,6 @@ void ViewportController::execute(sf::Time dt) noexcept
     float camera_velocity = seconds * CAMERA_VELOCITY;
 
     sf::Vector2i mouse_position  = sf::Mouse::getPosition(m_window);
-    sf::Vector2i cursor_position = static_cast<sf::Vector2i>(m_window.mapPixelToCoords(mouse_position));
     const sf::Vector2i view_size = static_cast<sf::Vector2i>(m_view.getSize());
 
     bool is_near_the_left_edge   = (mouse_position.x > 0 && mouse_position.x < SCREEN_MARGIN);
@@ -50,7 +49,7 @@ void ViewportController::execute(sf::Time dt) noexcept
 
     m_view.setCenter(static_cast<sf::Vector2f>(m_viewPosition + sf::Vector2i(view_size.x >> 1, view_size.y >> 1)));
 
-    m_viewport = sf::IntRect(m_viewPosition.x, m_viewPosition.y, static_cast<int>(view_size.x), static_cast<int>(view_size.y));
+    m_viewport = sf::IntRect(m_viewPosition.x, m_viewPosition.y, view_size.x, view_size.y);
 }
 
 const sf::IntRect& ViewportController::getViewport() const noexcept

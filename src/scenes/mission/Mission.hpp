@@ -23,7 +23,6 @@ private:
     bool loadAnimations() noexcept;
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
-private:
     TileMap                  m_tilemap;
     entt::registry           m_registry;
     SystemManager            m_systems;
