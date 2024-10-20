@@ -203,7 +203,7 @@ bool TileMap::putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY
         }
     }
 
-	if(const auto texture = Assets->getResource<sf::Texture>(STRUCTURES_TEXTURE_FILE_NAME); texture != nullptr)
+	if(const auto texture = Assets->getResource<sf::Texture>(STRUCTURES_PNG); texture != nullptr)
 	{
 		const auto entity = m_registry.create();
 		m_registry.emplace<sf::IntRect>(entity, bounds);

@@ -24,22 +24,35 @@ endif()
 
 set(_src_dir ${PROJECT_SOURCE_DIR}/src)
 
-set(_duneII_src_files
-	${_src_dir}/common/FileProvider.cpp
-	${_src_dir}/common/MathUtils.cpp
-	${_src_dir}/effects/ScreenBlackoutEffect.cpp
+set(_manager_src_files
 	${_src_dir}/assets/AssetManager.cpp
 	${_src_dir}/animation/AnimationManager.cpp
+	${_src_dir}/ecs/SystemManager.cpp
+)
+
+set(_scenes_src_files
+	${_src_dir}/scenes/base/Scene.cpp
+	${_src_dir}/scenes/intro/MainMenu.cpp
+	${_src_dir}/scenes/mission/Mission.cpp
+	${_src_dir}/scenes/mission/tilemap/TileMap.cpp
+)
+
+set(_ecs_src_files
 	${_src_dir}/ecs/systems/base/System.cpp
 	${_src_dir}/ecs/components/Animation.cpp
 	${_src_dir}/ecs/systems/AnimationController.cpp
 	${_src_dir}/ecs/systems/ViewportController.cpp
 	${_src_dir}/ecs/systems/CullingController.cpp
-	${_src_dir}/ecs/SystemManager.cpp
-	${_src_dir}/scenes/base/Scene.cpp
-	${_src_dir}/scenes/intro/MainMenu.cpp
-	${_src_dir}/scenes/mission/Mission.cpp
-	${_src_dir}/scenes/mission/tilemap/TileMap.cpp
+)
+
+set(_duneII_src_files
+	${_src_dir}/common/FileProvider.cpp
+	${_src_dir}/common/MathUtils.cpp
+	${_src_dir}/effects/ScreenBlackoutEffect.cpp
+	${_src_dir}/ui/Cursor.cpp
+	${_scenes_src_files}
+	${_ecs_src_files}
+	${_manager_src_files}
 	${_src_dir}/main.cpp
 )
 

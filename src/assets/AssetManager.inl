@@ -44,9 +44,7 @@ T* AssetManager::tryLoadFromFile(const std::string& filename, std::unordered_map
     if(filepath.empty())
         return nullptr;
 
-    auto [iterator, result] = container.try_emplace(filename);
-
-    if(result)
+    if(auto [iterator, result] = container.try_emplace(filename); result)
     {
         bool sucsess = false;
 

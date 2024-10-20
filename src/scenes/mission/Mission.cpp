@@ -24,6 +24,7 @@ bool Mission::load(const std::string& info) noexcept
         return true;
 
     if(!loadAnimations()) return false;
+    if(!m_cursor.load(m_animationManager)) return false;
     if(!m_tilemap.loadFromFile(FileProvider::findPathToFile(info))) return false;
 
     if(!m_systems.addSystem<AnimationController>(m_registry)) return false;
@@ -33,7 +34,7 @@ bool Mission::load(const std::string& info) noexcept
     else 
         return false;
     
-    if(auto theme = Assets->getResource<sf::Music>(COMMAND_POST_MUSIC_FILE_NAME); theme != nullptr)
+    if(auto theme = Assets->getResource<sf::Music>(COMMAND_POST_FLAC); theme != nullptr)
     {
         theme->setLoop(true);
         theme->play();
@@ -50,14 +51,14 @@ void Mission::update(sf::Time dt) noexcept
     {
         m_systems.update(dt);
 
-        sf::IntRect viewport = m_systems.getSystem<ViewportController>()->getViewport();
+        // sf::IntRect viewport = m_systems.getSystem<ViewportController>()->getViewport();
 
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::X))
         {
             m_game.sceneNeedToBeChanged = true;
             m_game.next_scene = Game::GameScene::MAIN_MENU;
 
-            if(auto theme = Assets->getResource<sf::Music>(COMMAND_POST_MUSIC_FILE_NAME); theme != nullptr)
+            if(auto theme = Assets->getResource<sf::Music>(COMMAND_POST_FLAC); theme != nullptr)
             {
                 theme->stop();
             }
@@ -67,7 +68,7 @@ void Mission::update(sf::Time dt) noexcept
 
 bool Mission::loadAnimations() noexcept
 {
-    if(auto flag_texture = Assets->getResource<sf::Texture>(FLAGS_TEXTURE_FILE_NAME); flag_texture != nullptr)
+    if(auto flag_texture = Assets->getResource<sf::Texture>(FLAGS_PNG); flag_texture != nullptr)
     {
         AnimationData flagData;
 

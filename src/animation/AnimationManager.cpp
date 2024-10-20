@@ -15,10 +15,7 @@ AnimationManager::~AnimationManager() = default;
 
 const Animation* AnimationManager::createAnimation(const AnimationData& data) noexcept
 {
-	if(data.name.empty())
-		return nullptr;
-
-	if(!data.texture)
+	if(data.name.empty() || !data.texture)
 		return nullptr;
 
 	const std::string name(data.name);
@@ -68,18 +65,18 @@ const Animation* AnimationManager::createAnimation(const AnimationData& data) no
 				if(data.columns == 0 || data.rows == 0)
 					return nullptr;
 
-				const uint32_t columns  = data.columns;
-				const uint32_t rows     = data.rows;
-				const uint32_t duration = rows * columns;
+				const int32_t columns  = static_cast<int32_t>(data.columns);
+				const int32_t rows     = static_cast<int32_t>(data.rows);
+				const int32_t duration = static_cast<int32_t>(rows * columns);
 				frames.reserve(static_cast<size_t>(duration));
 
-				const uint32_t left   = data.startFrame.left;
-				const uint32_t top    = data.startFrame.top;
-				const uint32_t width  = data.startFrame.width;
-				const uint32_t height = data.startFrame.height;
+				const int32_t left   = data.startFrame.left;
+				const int32_t top    = data.startFrame.top;
+				const int32_t width  = data.startFrame.width;
+				const int32_t height = data.startFrame.height;
 
-				for (uint32_t y = 0; y < rows; ++y)
-					for (uint32_t x = 0; x < columns; ++x)
+				for (int32_t y = 0; y < rows; ++y)
+					for (int32_t x = 0; x < columns; ++x)
 						frames.emplace_back(left + x * width, top + y * height, width, height);
 
 				animation.duration = duration;
@@ -94,6 +91,13 @@ const Animation* AnimationManager::createAnimation(const AnimationData& data) no
 	}
 
 	return nullptr;
+}
+
+const Animation* AnimationManager::getAnimation(const std::string& name) const noexcept
+{
+    auto found = m_animations.find(name);
+
+    return (found != m_animations.end()) ? &found->second : nullptr;
 }
 
 std::unordered_map<std::string, sf::IntRect> AnimationManager::loadFramesFromFile(const std::string& file_name) noexcept
@@ -146,11 +150,4 @@ std::unordered_map<std::string, sf::IntRect> AnimationManager::loadFramesFromFil
 	}
 
 	return frames;
-}
-
-const Animation* AnimationManager::getAnimation(const std::string& name) const noexcept
-{
-    auto found = m_animations.find(name);
-
-    return (found != m_animations.end()) ? &found->second : nullptr;
 }

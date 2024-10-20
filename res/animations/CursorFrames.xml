@@ -1,0 +1,9 @@
+<!DOCTYPE SpriteDecomposer>
+<sprites image="crosshairs_tilesheet_mask.png" transparentColor="">
+ <animation title="Released" delay="150">
+  <cut w="56" x="73" y="280" h="56" row="1" col="1"/>
+ </animation>
+ <animation title="Captured" delay="150">
+  <cut w="40" x="150" y="564" h="40" row="1" col="1"/>
+ </animation>
+</sprites>

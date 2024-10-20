@@ -8,6 +8,7 @@
 #include "scenes/base/Scene.hpp"
 #include "ecs/SystemManager.hpp"
 #include "animation/AnimationManager.hpp"
+#include "ui/Cursor.hpp"
 
 class Mission:
     public Scene
@@ -28,6 +29,7 @@ private:
     SystemManager            m_systems;
     AnimationManager         m_animationManager;
     std::vector<sf::Sprite*> m_sprites;
+    Cursor                   m_cursor;
 };
 
 #endif // !MISSION_HPP
