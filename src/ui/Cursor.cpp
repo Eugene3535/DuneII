@@ -21,17 +21,31 @@ bool Cursor::load(AnimationManager& animator) noexcept
         if(auto found = m_frames.find(frame); found == m_frames.end())
             return false;
 
-    return true;
+    if(auto texture = Assets->getResource<sf::Texture>(CROSSHAIRS_TILESHEET_PNG); texture != nullptr)
+    {
+        setTexture(*texture);
+        release();
+
+        return true;
+    }
+
+    return false;
 }
 
 void Cursor::capture() noexcept
 {
+    const auto frame = m_frames[FRAME_CAPTURED];
+    setTextureRect(frame);
     m_isCaptured = true;
 }
 
 void Cursor::release() noexcept
 {
-    m_isCaptured = false;;
+    const auto frame = m_frames[FRAME_RELEASED];
+    setTextureRect(frame);
+    setOrigin(static_cast<float>(frame.width >> 1), static_cast<float>(frame.height >> 1));
+    setScale(0.5f, 0.5f);
+    m_isCaptured = false;
 }
 
 bool Cursor::isCaptured() const noexcept

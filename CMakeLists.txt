@@ -43,6 +43,7 @@ set(_ecs_src_files
 	${_src_dir}/ecs/systems/AnimationController.cpp
 	${_src_dir}/ecs/systems/ViewportController.cpp
 	${_src_dir}/ecs/systems/CullingController.cpp
+	${_src_dir}/ecs/systems/CursorController.cpp
 )
 
 set(_duneII_src_files

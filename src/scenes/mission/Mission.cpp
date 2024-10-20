@@ -7,6 +7,7 @@
 #include "ecs/systems/AnimationController.hpp"
 #include "ecs/systems/ViewportController.hpp"
 #include "ecs/systems/CullingController.hpp"
+#include "ecs/systems/CursorController.hpp"
 #include "scenes/mission/Mission.hpp"
 
 Mission::Mission(Game& game) noexcept:
@@ -33,6 +34,8 @@ bool Mission::load(const std::string& info) noexcept
         m_systems.addSystem<CullingController>(m_registry, m_sprites, vc->getViewport());
     else 
         return false;
+
+    if(!m_systems.addSystem<CursorController>(m_registry, m_game.window, m_cursor, m_tilemap)) return false;
     
     if(auto theme = Assets->getResource<sf::Music>(COMMAND_POST_FLAC); theme != nullptr)
     {
@@ -103,5 +106,7 @@ void Mission::draw(sf::RenderTarget& target, sf::RenderStates states) const
 
         for(auto sprite : m_sprites)
             target.draw(*sprite, states);
+
+        target.draw(m_cursor, states);
     }
 }
