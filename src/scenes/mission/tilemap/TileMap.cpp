@@ -214,16 +214,19 @@ bool TileMap::putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY
 		sprite.setPosition(coordX, coordY);
 		structure.hitPoints = structure.maxHitPoints = getHitPointsOf(type);
 
-		auto setup_tiles_on_mask = [this, origin](int32_t width, int32_t height, char symbol = 'B') -> void
+		auto setup_tiles_on_mask = [this, origin, entity](int32_t width, int32_t height, char symbol = 'B') -> void
 		{
 			char* mask = m_tileMask.data();
 			int32_t offset = origin;
 
 			for (int32_t i = 0; i < height; ++i)
 			{
-				for (int32_t j = 0; j < width; ++j)  
-					mask[offset + j] = symbol;    
-				
+				for (int32_t j = 0; j < width; ++j)			
+				{
+					mask[offset + j] = symbol;  
+					m_structuresById[offset + j] = entity;
+				}
+
 				offset += m_mapSizeInTiles.x;
 			}
 		};
@@ -248,8 +251,6 @@ bool TileMap::putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY
 
             default: break;
         }
-
-		m_structuresById[origin] = entity;
 
 		if(type == StructureType::WALL)
 			updateWall(origin, 2);
@@ -301,9 +302,12 @@ void TileMap::removeStructureFromMap(int32_t structureId) noexcept
 
 			for (int32_t i = 0; i < size.y; ++i)
 			{
-				for (int32_t j = 0; j < size.x; ++j)  
+				for (int32_t j = 0; j < size.x; ++j)
+				{
 					mask[offset + j] = 'R';
-				
+					m_structuresById.erase(offset + j);
+				}
+	
 				offset += m_mapSizeInTiles.x;
 			}
     	}
@@ -311,6 +315,25 @@ void TileMap::removeStructureFromMap(int32_t structureId) noexcept
 		m_registry.destroy(entity);
 		m_structuresById.erase(found);
 	}
+}
+
+std::optional<entt::entity> TileMap::getEntityUnderCursor(const sf::Vector2i& point) noexcept
+{
+//  check out of bounds
+	if(point.x < 1)                       return std::nullopt;
+	if(point.y < 1)                       return std::nullopt;
+	if(point.x > m_mapSizeInPixels.x - 1) return std::nullopt;
+	if(point.y > m_mapSizeInPixels.y - 1) return std::nullopt;
+//  cast to cell coords
+	int32_t cellX = point.x >> 5;
+	int32_t cellY = point.y >> 5;
+
+	const int32_t origin = cellY * m_mapSizeInTiles.x + cellX;
+
+	if(auto found = m_structuresById.find(origin); found != m_structuresById.end())
+		return std::make_optional<entt::entity>(found->second);
+
+	return std::nullopt;
 }
 
 const std::vector<TileMap::Object>& TileMap::getObjects() const noexcept

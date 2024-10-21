@@ -1,12 +1,13 @@
 #include "assets/AssetManager.hpp"
 #include "animation/AnimationManager.hpp"
+#include "scenes/mission/tilemap/TileMap.hpp"
 #include "ui/Cursor.hpp"
 
 #define FRAME_RELEASED "Released"
 #define FRAME_CAPTURED "Captured"
 
 Cursor::Cursor() noexcept:
-    m_isCaptured(false)
+    m_isCaptured(true)
 {
     
 }
@@ -25,6 +26,7 @@ bool Cursor::load(AnimationManager& animator) noexcept
     {
         setTexture(*texture);
         release();
+        setScale(0.5f, 0.5f);
 
         return true;
     }
@@ -34,18 +36,24 @@ bool Cursor::load(AnimationManager& animator) noexcept
 
 void Cursor::capture() noexcept
 {
-    const auto frame = m_frames[FRAME_CAPTURED];
-    setTextureRect(frame);
-    m_isCaptured = true;
+    if(!m_isCaptured)
+    {
+        const auto frame = m_frames[FRAME_CAPTURED];
+        setTextureRect(frame);
+        setOrigin(static_cast<float>(frame.width >> 1), static_cast<float>(frame.height >> 1));
+        m_isCaptured = true;
+    }
 }
 
 void Cursor::release() noexcept
 {
-    const auto frame = m_frames[FRAME_RELEASED];
-    setTextureRect(frame);
-    setOrigin(static_cast<float>(frame.width >> 1), static_cast<float>(frame.height >> 1));
-    setScale(0.5f, 0.5f);
-    m_isCaptured = false;
+    if(m_isCaptured)
+    {
+        const auto frame = m_frames[FRAME_RELEASED];
+        setTextureRect(frame);
+        setOrigin(static_cast<float>(frame.width >> 1), static_cast<float>(frame.height >> 1));
+        m_isCaptured = false;
+    }
 }
 
 bool Cursor::isCaptured() const noexcept

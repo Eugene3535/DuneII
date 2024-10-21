@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_map>
 #include <filesystem>
+#include <optional>
 
 #include <SFML/Graphics/VertexBuffer.hpp>
 #include "RapidXML/rapidxml.hpp"
@@ -63,6 +64,8 @@ public:
 	bool putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY) noexcept;
 	void removeStructureFromMap(int32_t structureId)                         noexcept;
 
+	std::optional<entt::entity> getEntityUnderCursor(const sf::Vector2i& point) noexcept;
+
 	const std::vector<Object>& getObjects()         const noexcept;
 	std::string_view           getTileMask()        const noexcept;
 	const sf::Vector2i&        getMapSizeInTiles()  const noexcept;
@@ -83,6 +86,7 @@ private:
     sf::IntRect  getTexCoordsOf(StructureType type)                                            const noexcept;
 	sf::IntRect  getBoundsOf(StructureType type, int32_t coordX, int32_t coordY)               const noexcept;
 	int32_t      getHitPointsOf(StructureType type)                                            const noexcept;
+
 
 	std::unordered_map<int32_t, entt::entity> m_structuresById;
 	class AnimationManager&   m_animationManager;
