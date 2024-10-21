@@ -2,6 +2,7 @@
 #include <SFML/Window/Mouse.hpp>
 
 #include "ui/Cursor.hpp"
+#include "ecs/components/Structure.hpp"
 #include "scenes/mission/tilemap/TileMap.hpp"
 #include "ecs/systems/CursorController.hpp"
 
@@ -21,30 +22,53 @@ CursorController::~CursorController()
 
 void CursorController::execute(sf::Time dt) noexcept
 {
+    static constexpr int32_t cooldown = 4;
+
     sf::Vector2i mouse_position  = sf::Mouse::getPosition(m_window);
     auto world_position = m_window.mapPixelToCoords(mouse_position);
 
     m_cursor.setPosition(world_position);
 
-    if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
+    if(m_timer > cooldown)
     {
-        if(auto entity = m_tilemap.getEntityUnderCursor(static_cast<sf::Vector2i>(world_position)); entity.has_value())
+        m_timer = 0;
+
+        if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
-            if(auto sprite = m_registry.try_get<sf::Sprite>(entity.value()); sprite != nullptr)
-                sprite->setColor(sf::Color::Red);
+            if(auto entity = m_tilemap.getEntityUnderCursor(static_cast<sf::Vector2i>(world_position)); entity.has_value())
+            {
+                if(auto [structure, bounds] = m_registry.try_get<Structure, sf::IntRect>(entity.value()); structure != nullptr)
+                {
+                    bool can_be_highlighted = 
+                                ((structure->type != StructureType::SLAB_1x1) &&
+                                ( structure->type != StructureType::SLAB_2x2) && 
+                                ( structure->type != StructureType::WALL)     && 
+                                  structure->type < StructureType::MAX);
+
+                    if(can_be_highlighted)
+                    {
+                        m_cursor.setVertexFrame(*bounds);
+                        m_cursor.select();
+                    }
+                    else
+                    {
+                        m_cursor.release();
+                    }
+                }
+            }
+            else
+            {
+                m_cursor.release();
+            }
+
+            //m_cursor.capture(); // for units
         }
 
-        m_cursor.capture();
-    }
-
-    if(sf::Mouse::isButtonPressed(sf::Mouse::Right))
-    {
-        if(auto entity = m_tilemap.getEntityUnderCursor(static_cast<sf::Vector2i>(world_position)); entity.has_value())
+        if(sf::Mouse::isButtonPressed(sf::Mouse::Right))
         {
-            if(auto sprite = m_registry.try_get<sf::Sprite>(entity.value()); sprite != nullptr)
-                sprite->setColor(sf::Color::White);
+            m_cursor.release();
         }
-
-        m_cursor.release();
     }
+
+    ++m_timer;
 }

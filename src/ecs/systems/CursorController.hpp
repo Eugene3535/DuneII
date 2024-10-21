@@ -20,6 +20,8 @@ private:
     class sf::RenderWindow& m_window;
     class Cursor& m_cursor;
     class TileMap& m_tilemap;
+
+    int32_t m_timer;
 };
 
 #endif // !CURSOR_CONTROLLER_HPP
