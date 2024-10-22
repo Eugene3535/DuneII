@@ -10,7 +10,8 @@ CursorController::CursorController(entt::registry& registry, sf::RenderWindow& r
     System(registry),
     m_window(rw),
     m_cursor(cursor),
-    m_tilemap(map)
+    m_tilemap(map),
+    m_timer(0)
 {
     m_window.setMouseCursorVisible(false);
 }

@@ -11,7 +11,8 @@ Cursor::Cursor() noexcept:
     m_sprite(),
     m_vertexFrame(sf::Lines, 16),
     m_isCaptured(true),
-    m_isSelected(false)
+    m_isSelected(false),
+    m_tick(0)
 {
 
 }
@@ -72,11 +73,14 @@ void Cursor::release() noexcept
 void Cursor::setPosition(const sf::Vector2f& position) noexcept
 {
     m_sprite.setPosition(position);
+
+    if(++m_tick > 16)
+        m_tick = 0;
 }
 
 void Cursor::setVertexFrame(const sf::IntRect& frame) noexcept
 {
-    static constexpr float offset = 16.f;
+    static constexpr float offset = 12.f;
 
     const auto leftBottom  = sf::Vector2f(frame.left, frame.top + frame.height);
     const auto leftTop     = sf::Vector2f(frame.left, frame.top);
@@ -119,5 +123,6 @@ void Cursor::draw(sf::RenderTarget& target, sf::RenderStates states) const
     target.draw(m_sprite, states);
 
     if(m_isSelected)
-        target.draw(m_vertexFrame, states);
+        if(m_tick < 8)
+            target.draw(m_vertexFrame, states);
 }

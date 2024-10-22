@@ -41,6 +41,8 @@ private:
 
     bool m_isCaptured;
     bool m_isSelected;
+
+    int32_t m_tick;
 };
 
 #endif // !CURSOR_HPP
