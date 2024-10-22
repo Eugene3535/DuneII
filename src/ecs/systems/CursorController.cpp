@@ -28,7 +28,7 @@ void CursorController::execute(sf::Time dt) noexcept
     sf::Vector2i mouse_position  = sf::Mouse::getPosition(m_window);
     auto world_position = m_window.mapPixelToCoords(mouse_position);
 
-    m_cursor.setPosition(world_position);
+    m_cursor.update(world_position, dt);
 
     if(m_timer > cooldown)
     {

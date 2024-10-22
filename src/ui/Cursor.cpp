@@ -12,7 +12,7 @@ Cursor::Cursor() noexcept:
     m_vertexFrame(sf::Lines, 16),
     m_isCaptured(true),
     m_isSelected(false),
-    m_tick(0)
+    m_tick()
 {
 
 }
@@ -70,12 +70,15 @@ void Cursor::release() noexcept
     }
 }
 
-void Cursor::setPosition(const sf::Vector2f& position) noexcept
+void Cursor::update(const sf::Vector2f& position, sf::Time dt) noexcept
 {
     m_sprite.setPosition(position);
 
-    if(++m_tick > 16)
-        m_tick = 0;
+    static const sf::Time delay = sf::milliseconds(250);
+    m_tick += dt;
+
+    if(m_tick > delay)
+        m_tick = sf::Time::Zero;
 }
 
 void Cursor::setVertexFrame(const sf::IntRect& frame) noexcept
@@ -122,7 +125,8 @@ void Cursor::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     target.draw(m_sprite, states);
 
-    if(m_isSelected)
-        if(m_tick < 8)
-            target.draw(m_vertexFrame, states);
+    static const sf::Time delay = sf::milliseconds(125);
+
+    if(m_isSelected && m_tick < delay)
+        target.draw(m_vertexFrame, states);
 }

@@ -25,7 +25,7 @@ public:
     void capture() noexcept;
     void release() noexcept;
 
-    void setPosition(const sf::Vector2f& position) noexcept;
+    void update(const sf::Vector2f& position, sf::Time dt) noexcept;
     void setVertexFrame(const sf::IntRect& frame) noexcept;
 
     bool isSelected() const noexcept;
@@ -42,7 +42,7 @@ private:
     bool m_isCaptured;
     bool m_isSelected;
 
-    int32_t m_tick;
+    sf::Time m_tick;
 };
 
 #endif // !CURSOR_HPP
