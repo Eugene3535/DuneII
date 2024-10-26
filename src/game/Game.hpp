@@ -11,6 +11,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 
 #include "assets/AssetManager.hpp"
+#include "animation/AnimationManager.hpp"
 #include "effects/ScreenBlackoutEffect.hpp"
 
 struct Game
@@ -27,6 +28,8 @@ public:
     sf::View         viewport;
     sf::FloatRect    visible_area;
     sf::Clock        clock;
+
+    AnimationManager animationManager;
 
     GameScene next_scene { NONE };
 

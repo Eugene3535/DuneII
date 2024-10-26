@@ -12,7 +12,7 @@
 
 Mission::Mission(Game& game) noexcept:
     Scene(game),
-    m_tilemap(m_registry, m_animationManager)
+    m_tilemap(m_registry, game.animationManager)
 {
 
 }
@@ -25,7 +25,7 @@ bool Mission::load(const std::string& info) noexcept
         return true;
 
     if(!loadAnimations()) return false;
-    if(!m_cursor.load(m_animationManager)) return false;
+    if(!m_cursor.load(m_game.animationManager)) return false;
     if(!m_tilemap.loadFromFile(FileProvider::findPathToFile(info))) return false;
 
     if(!m_systems.addSystem<AnimationController>(m_registry)) return false;
@@ -60,6 +60,7 @@ void Mission::update(sf::Time dt) noexcept
         {
             m_game.sceneNeedToBeChanged = true;
             m_game.next_scene = Game::GameScene::MAIN_MENU;
+            m_game.window.setMouseCursorVisible(true);
 
             if(auto theme = Assets->getResource<sf::Music>(COMMAND_POST_FLAC); theme != nullptr)
             {
@@ -82,15 +83,15 @@ bool Mission::loadAnimations() noexcept
         flagData.duration = 8;
         flagData.isLooped = true;
         flagData.delay = sf::seconds(0.5f);
-        m_animationManager.createAnimation(flagData);
+        m_game.animationManager.createAnimation(flagData);
 
         flagData.name = "OrdosFlag";
         flagData.startFrame = { 0, 14, 14, 14 };
-        m_animationManager.createAnimation(flagData);
+        m_game.animationManager.createAnimation(flagData);
 
         flagData.name = "AtreidesFlag";
         flagData.startFrame = { 0, 28, 14, 14 };
-        m_animationManager.createAnimation(flagData);
+        m_game.animationManager.createAnimation(flagData);
 
         return true;
     }

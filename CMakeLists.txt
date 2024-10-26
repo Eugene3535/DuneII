@@ -49,6 +49,7 @@ set(_ecs_src_files
 set(_duneII_src_files
 	${_src_dir}/common/FileProvider.cpp
 	${_src_dir}/common/MathUtils.cpp
+	${_src_dir}/common/GraphicsUtils.cpp
 	${_src_dir}/effects/ScreenBlackoutEffect.cpp
 	${_src_dir}/ui/Cursor.cpp
 	${_scenes_src_files}
