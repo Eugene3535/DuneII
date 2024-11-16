@@ -1,22 +1,16 @@
 cmake_minimum_required(VERSION 3.25.1 FATAL_ERROR)
 
-set(GPROF_PROFILING OFF)
-
-if(GPROF_PROFILING) # gprof ./DuneII.exe gmon.out -z > analysis.txt ( more info available at https://www.opennet.ru/docs/RUS/gprof/gprof-5.html )
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
-endif()
-
 project(DuneII LANGUAGES C CXX)
 
 set(EXTERNAL_DIR $ENV{external})
 set(BUILD_SHARED_LIBS ON)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 
-if(WIN32 AND NOT MINGW)
+if(WIN32 AND MSVC)
 	string(APPEND CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin")
 	string(APPEND CMAKE_LIBRARY_OUTPUT_DIRECTORY "lib")
 	string(APPEND CMAKE_ARCHIVE_OUTPUT_DIRECTORY "lib")
@@ -25,43 +19,60 @@ else()
 	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 endif()
 
-set(_src_dir ${PROJECT_SOURCE_DIR}/src)
-
-set(_manager_src_files
-	${_src_dir}/assets/AssetManager.cpp
-	${_src_dir}/animation/AnimationManager.cpp
-	${_src_dir}/ecs/SystemManager.cpp
-)
-
-set(_scenes_src_files
-	${_src_dir}/scenes/base/Scene.cpp
-	${_src_dir}/scenes/intro/MainMenu.cpp
-	${_src_dir}/scenes/mission/Mission.cpp
-	${_src_dir}/scenes/mission/tilemap/TileMap.cpp
-)
-
-set(_ecs_src_files
-	${_src_dir}/ecs/systems/base/System.cpp
-	${_src_dir}/ecs/components/Animation.cpp
-	${_src_dir}/ecs/systems/AnimationController.cpp
-	${_src_dir}/ecs/systems/ViewportController.cpp
-	${_src_dir}/ecs/systems/CullingController.cpp
-	${_src_dir}/ecs/systems/CursorController.cpp
-)
-
 set(_duneII_src_files
-	${_src_dir}/common/FileProvider.cpp
-	${_src_dir}/common/MathUtils.cpp
-	${_src_dir}/common/GraphicsUtils.cpp
-	${_src_dir}/effects/ScreenBlackoutEffect.cpp
-	${_src_dir}/ui/Cursor.cpp
-	${_scenes_src_files}
-	${_ecs_src_files}
-	${_manager_src_files}
-	${_src_dir}/main.cpp
+	src/animation/AnimationManager.cpp
+	src/assets/AssetManager.cpp
+	src/common/FileProvider.cpp
+	src/common/GraphicsUtils.cpp
+	src/common/MathUtils.cpp
+	src/ecs/SystemManager.cpp
+	src/ecs/components/Animation.cpp
+	src/ecs/systems/AnimationController.cpp
+	src/ecs/systems/CullingController.cpp
+	src/ecs/systems/CursorController.cpp
+	src/ecs/systems/ViewportController.cpp
+	src/ecs/systems/base/System.cpp
+	src/effects/ScreenBlackoutEffect.cpp
+	src/scenes/base/Scene.cpp
+	src/scenes/intro/MainMenu.cpp
+	src/scenes/mission/Mission.cpp
+	src/scenes/mission/tilemap/TileMap.cpp
+	src/ui/Cursor.cpp
+	src/main.cpp
 )
 
-add_executable(${PROJECT_NAME} ${_duneII_src_files})
+set(_duneII_hdr_files
+	src/animation/AnimationData.hpp
+	src/animation/AnimationManager.hpp
+	src/assets/AssetManager.hpp
+	src/common/Defines.hpp
+	src/common/Enums.hpp
+	src/common/FileProvider.hpp
+	src/common/GraphicsUtils.hpp
+	src/common/MathUtils.hpp
+	src/ecs/SystemManager.hpp
+	src/ecs/components/Animation.hpp
+	src/ecs/components/Structure.hpp
+	src/ecs/systems/AnimationController.hpp
+	src/ecs/systems/CullingController.hpp
+	src/ecs/systems/CursorController.hpp
+	src/ecs/systems/ViewportController.hpp
+	src/ecs/systems/base/System.hpp
+	src/effects/ScreenBlackoutEffect.hpp
+	src/game/Game.hpp
+	src/scenes/base/Scene.hpp
+	src/scenes/intro/MainMenu.hpp
+	src/scenes/mission/Mission.hpp
+	src/scenes/mission/tilemap/TileMap.hpp
+	src/ui/Cursor.hpp
+)
+
+set(_all_files 
+	${_duneII_src_files} 
+	${_duneII_hdr_files}
+)
+
+add_executable(${PROJECT_NAME} ${_all_files})
 add_subdirectory(${EXTERNAL_DIR}/sfml sfml)
 add_subdirectory(${EXTERNAL_DIR}/entt entt)
 
@@ -81,14 +92,23 @@ target_link_libraries(${PROJECT_NAME}
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG>)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
+if(MSVC)
+	set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
+	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${_all_files})
+endif()
+
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/res $<TARGET_FILE_DIR:${PROJECT_NAME}>/res
-	VERBATIM
+	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/res $<TARGET_FILE_DIR:${PROJECT_NAME}>/res VERBATIM
 )
 
 if(WIN32)
 	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EXTERNAL_DIR}/sfml/extlibs/bin/x64/openal32.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>/openal32.dll
-		VERBATIM
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EXTERNAL_DIR}/sfml/extlibs/bin/x64/openal32.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>/openal32.dll VERBATIM
 	)
+
+	if(MSVC)
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/res ${CMAKE_BINARY_DIR}/res VERBATIM
+		)
+	endif()
 endif()

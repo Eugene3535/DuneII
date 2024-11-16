@@ -25,7 +25,7 @@ int main()
     uint32_t width  = static_cast<uint32_t>(visible_area.width);
     uint32_t height = static_cast<uint32_t>(visible_area.height);
 
-    window.create(sf::VideoMode(width, height), "Dune: The Battle For Arrakis");
+    window.create(sf::VideoMode(width, height), "Dune II: The Battle For Arrakis");
     window.setVerticalSyncEnabled(true);
 
     auto main_menu = std::make_unique<MainMenu>(game);

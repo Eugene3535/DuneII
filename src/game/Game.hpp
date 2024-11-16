@@ -12,9 +12,8 @@
 
 #include "assets/AssetManager.hpp"
 #include "animation/AnimationManager.hpp"
-#include "effects/ScreenBlackoutEffect.hpp"
 
-struct Game
+class Game
 {
 public:
     enum GameScene: uint32_t
