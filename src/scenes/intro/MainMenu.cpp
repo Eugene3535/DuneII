@@ -61,9 +61,9 @@ bool MainMenu::load(const std::string& info) noexcept
         m_settings.setStyle(sf::Text::Bold);
         m_tutorial.setStyle(sf::Text::Bold);
 
-        m_startGame.setPosition(550, 400);
-        m_settings.setPosition(550, 450);
-        m_tutorial.setPosition(550, 500);
+        m_startGame.setPosition(920, 600);
+        m_settings.setPosition(920, 650);
+        m_tutorial.setPosition(920, 700);
 
         m_startGame.setScale(0.5f, 0.5f);
         m_settings.setScale(0.5f, 0.5f);

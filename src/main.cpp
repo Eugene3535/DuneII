@@ -20,12 +20,12 @@ int main()
     auto& visible_area = game.visible_area;
     auto& clock = game.clock;
 
-    visible_area = sf::FloatRect(0.f, 0.f, 800.0f, 600.0f);
+    visible_area = sf::FloatRect(0.f, 0.f, 1200.0f, 800.0f);
 
     uint32_t width  = static_cast<uint32_t>(visible_area.width);
     uint32_t height = static_cast<uint32_t>(visible_area.height);
 
-    window.create(sf::VideoMode(width, height), "Dune II: The Battle For Arrakis");
+    window.create(sf::VideoMode(width, height), "Dune II: The Battle For Arrakis", sf::Style::Close);
     window.setVerticalSyncEnabled(true);
 
     auto main_menu = std::make_unique<MainMenu>(game);
