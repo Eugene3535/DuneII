@@ -37,6 +37,7 @@ set(_duneII_src_files
 	src/scenes/intro/MainMenu.cpp
 	src/scenes/mission/Mission.cpp
 	src/scenes/mission/tilemap/TileMap.cpp
+	src/scenes/construction_mode/ConstructionMenu.cpp
 	src/ui/Cursor.cpp
 	src/main.cpp
 )
@@ -64,6 +65,7 @@ set(_duneII_hdr_files
 	src/scenes/intro/MainMenu.hpp
 	src/scenes/mission/Mission.hpp
 	src/scenes/mission/tilemap/TileMap.hpp
+	src/scenes/construction_mode/ConstructionMenu.hpp
 	src/ui/Cursor.hpp
 )
 

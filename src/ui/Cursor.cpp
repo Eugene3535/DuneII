@@ -17,7 +17,7 @@ Cursor::Cursor() noexcept:
 
 }
 
-Cursor::~Cursor() = default;
+Cursor::~Cursor() noexcept = default;
 
 bool Cursor::load(AnimationManager& animator) noexcept
 {

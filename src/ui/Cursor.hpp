@@ -18,7 +18,7 @@ class Cursor final:
 {
 public:
     Cursor() noexcept;
-    ~Cursor();
+    ~Cursor() noexcept;
 
     bool load(class AnimationManager& animator) noexcept;
     void select() noexcept;
