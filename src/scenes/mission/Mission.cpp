@@ -4,10 +4,7 @@
 #include "common/Defines.hpp"
 #include "common/FileProvider.hpp"
 #include "game/Game.hpp"
-#include "ecs/systems/AnimationController.hpp"
-#include "ecs/systems/ViewportController.hpp"
-#include "ecs/systems/CullingController.hpp"
-#include "ecs/systems/CursorController.hpp"
+#include "ecs/components/Structure.hpp"
 #include "scenes/mission/Mission.hpp"
 
 Mission::Mission(Game& game) noexcept:
@@ -28,14 +25,7 @@ bool Mission::load(const std::string& info) noexcept
     if(!m_cursor.load(m_game.animationManager)) return false;
     if(!m_tilemap.loadFromFile(FileProvider::findPathToFile(info))) return false;
 
-    if(!m_systems.addSystem<AnimationController>(m_registry)) return false;
-
-    if(auto vc = m_systems.addSystem<ViewportController>(m_registry, m_game.window, m_game.viewport, m_tilemap); vc != nullptr)
-        m_systems.addSystem<CullingController>(m_registry, m_sprites, vc->getViewport());
-    else 
-        return false;
-
-    if(!m_systems.addSystem<CursorController>(m_registry, m_game.window, m_cursor, m_tilemap)) return false;
+    createSystems();
     
     if(auto theme = Assets->getResource<sf::Music>(COMMAND_POST_FLAC); theme != nullptr)
     {
@@ -52,9 +42,8 @@ void Mission::update(sf::Time dt) noexcept
 {
     if(m_isLoaded)
     {
-        m_systems.update(dt);
-
-        // sf::IntRect viewport = m_systems.getSystem<ViewportController>()->getViewport();
+        for(auto& system : m_systems)
+            system(dt);
 
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::X))
         {
@@ -97,6 +86,177 @@ bool Mission::loadAnimations() noexcept
     }
 
     return false;
+}
+
+void Mission::createSystems() noexcept
+{
+//  Animation
+    m_systems.emplace_back([this](sf::Time dt)
+    {
+        auto view = m_registry.view<Animation>();
+
+        for (auto [entity, animation] : view.each())
+        {
+            if( ! animation.isOver )
+            {
+                animation.timer += dt;
+
+                if(animation.timer > animation.delay)
+                {
+                    animation.currentFrame++;
+                    animation.timer = sf::Time::Zero;
+
+                    if(animation.currentFrame == animation.duration)
+                    {
+                        if(animation.isLooped)
+                        {
+                            animation.currentFrame = 0;
+                        }
+                        else
+                        {
+                            animation.isOver = true;
+                            continue;
+                        }
+                    }
+
+                    animation.setTextureRect(animation.frames[animation.currentFrame]);
+                }
+            }
+        }
+    });
+
+
+//  ViewportController
+    m_systems.emplace_back([this](sf::Time dt)
+    {
+        constexpr int CAMERA_VELOCITY = 600;
+        constexpr int SCREEN_MARGIN = 150;
+
+        const sf::Vector2i& m_mapSize = m_tilemap.getMapSizeInPixels();
+        static sf::Vector2i m_viewPosition;
+
+        auto seconds = dt.asSeconds();
+        float camera_velocity = seconds * CAMERA_VELOCITY;
+
+        sf::Vector2i mouse_position  = sf::Mouse::getPosition(m_game.window);
+        const sf::Vector2i view_size = static_cast<sf::Vector2i>(m_game.viewport.getSize());
+
+        bool is_near_the_left_edge   = (mouse_position.x > 0 && mouse_position.x < SCREEN_MARGIN);
+        bool is_near_the_top_edge    = (mouse_position.y > 0 && mouse_position.y < SCREEN_MARGIN);
+        bool is_near_the_right_edge  = (mouse_position.x > (view_size.x - SCREEN_MARGIN) && mouse_position.x < view_size.x);
+        bool is_near_the_bottom_edge = (mouse_position.y > (view_size.y - SCREEN_MARGIN) && mouse_position.y < view_size.y);
+
+        if(is_near_the_left_edge)
+            m_viewPosition.x -= camera_velocity;
+        
+        if(is_near_the_top_edge)
+            m_viewPosition.y -= camera_velocity;
+        
+        if(is_near_the_right_edge)
+            m_viewPosition.x += camera_velocity;
+        
+        if(is_near_the_bottom_edge)
+            m_viewPosition.y += camera_velocity;            
+        
+        if(m_viewPosition.x < 0)                         m_viewPosition.x = 0;
+        if(m_viewPosition.y < 0)                         m_viewPosition.y = 0;
+        if(m_viewPosition.x + view_size.x > m_mapSize.x) m_viewPosition.x = m_mapSize.x - view_size.x;
+        if(m_viewPosition.y + view_size.y > m_mapSize.y) m_viewPosition.y = m_mapSize.y - view_size.y;
+
+        m_game.viewport.setCenter(static_cast<sf::Vector2f>(m_viewPosition + sf::Vector2i(view_size.x >> 1, view_size.y >> 1)));
+
+        m_viewport = sf::IntRect(m_viewPosition.x, m_viewPosition.y, view_size.x, view_size.y);
+    });
+
+
+//  CullingController
+    m_systems.emplace_back([this](sf::Time dt)
+    {
+        m_sprites.clear();
+
+        auto structure_view = m_registry.view<sf::Sprite, sf::IntRect>();
+
+        for (auto [entity, sprite, bounds] : structure_view.each())
+        {
+            if(m_viewport.intersects(bounds))
+                m_sprites.push_back(&sprite);
+        }
+
+        auto anim_view = m_registry.view<sf::IntRect, Animation>();
+
+        for (auto [entity, bounds, animation] : anim_view.each())
+        {
+            if(m_viewport.intersects(bounds))
+                m_sprites.push_back(&animation);
+        }
+
+#ifdef DEBUG
+        static sf::Time timer = sf::Time::Zero;
+
+        if(timer > sf::seconds(1.0f))
+        {
+            timer = sf::Time::Zero;
+            printf("Number of sprites on the screen: %zu\n", m_sprites.size());
+        }
+        timer += dt;
+#endif
+    });
+
+
+//  CursorController
+    m_systems.emplace_back([this](sf::Time dt)
+    {
+        static constexpr int32_t cooldown = 4;
+        static int timer = 0;
+
+        sf::Vector2i mouse_position  = sf::Mouse::getPosition(m_game.window);
+        auto world_position = m_game.window.mapPixelToCoords(mouse_position);
+
+        m_cursor.update(world_position, dt);
+
+        if(timer > cooldown)
+        {
+            timer = 0;
+
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
+            {
+                if(auto entity = m_tilemap.getEntityUnderCursor(static_cast<sf::Vector2i>(world_position)); entity.has_value())
+                {
+                    if(auto [structure, bounds] = m_registry.try_get<Structure, sf::IntRect>(entity.value()); structure != nullptr)
+                    {
+                        bool can_be_highlighted = 
+                                    ((structure->type != StructureType::SLAB_1x1) &&
+                                    ( structure->type != StructureType::SLAB_2x2) && 
+                                    ( structure->type != StructureType::WALL)     && 
+                                    structure->type < StructureType::MAX);
+
+                        if(can_be_highlighted)
+                        {
+                            m_cursor.setVertexFrame(*bounds);
+                            m_cursor.select();
+                        }
+                        else
+                        {
+                            m_cursor.release();
+                        }
+                    }
+                }
+                else
+                {
+                    m_cursor.release();
+                }
+
+                //m_cursor.capture(); // for units
+            }
+
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Right))
+            {
+                m_cursor.release();
+            }
+        }
+
+        ++timer;
+    });
 }
 
 void Mission::draw(sf::RenderTarget& target, sf::RenderStates states) const

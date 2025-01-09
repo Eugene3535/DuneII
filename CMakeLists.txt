@@ -25,13 +25,7 @@ set(_duneII_src_files
 	src/common/FileProvider.cpp
 	src/common/GraphicsUtils.cpp
 	src/common/MathUtils.cpp
-	src/ecs/SystemManager.cpp
 	src/ecs/components/Animation.cpp
-	src/ecs/systems/AnimationController.cpp
-	src/ecs/systems/CullingController.cpp
-	src/ecs/systems/CursorController.cpp
-	src/ecs/systems/ViewportController.cpp
-	src/ecs/systems/base/System.cpp
 	src/effects/ScreenBlackoutEffect.cpp
 	src/scenes/base/Scene.cpp
 	src/scenes/intro/MainMenu.cpp
@@ -51,14 +45,8 @@ set(_duneII_hdr_files
 	src/common/FileProvider.hpp
 	src/common/GraphicsUtils.hpp
 	src/common/MathUtils.hpp
-	src/ecs/SystemManager.hpp
 	src/ecs/components/Animation.hpp
 	src/ecs/components/Structure.hpp
-	src/ecs/systems/AnimationController.hpp
-	src/ecs/systems/CullingController.hpp
-	src/ecs/systems/CursorController.hpp
-	src/ecs/systems/ViewportController.hpp
-	src/ecs/systems/base/System.hpp
 	src/effects/ScreenBlackoutEffect.hpp
 	src/game/Game.hpp
 	src/scenes/base/Scene.hpp
@@ -75,7 +63,7 @@ set(_all_files
 )
 
 add_executable(${PROJECT_NAME} ${_all_files})
-add_subdirectory(${EXTERNAL_DIR}/sfml sfml)
+add_subdirectory(${EXTERNAL_DIR}/sfml/2.6.2 sfml)
 add_subdirectory(${EXTERNAL_DIR}/entt entt)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -105,7 +93,7 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 
 if(WIN32)
 	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EXTERNAL_DIR}/sfml/extlibs/bin/x64/openal32.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>/openal32.dll VERBATIM
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EXTERNAL_DIR}/sfml/2.6.2/extlibs/bin/x64/openal32.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>/openal32.dll VERBATIM
 	)
 
 	if(MSVC)

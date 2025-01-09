@@ -1,12 +1,13 @@
 #ifndef MISSION_HPP
 #define MISSION_HPP
 
+#include <functional>
+
 #include <SFML/Graphics/Sprite.hpp>
 #include <entt/entity/registry.hpp>
 
 #include "scenes/mission/tilemap/TileMap.hpp"
 #include "scenes/base/Scene.hpp"
-#include "ecs/SystemManager.hpp"
 #include "ui/Cursor.hpp"
 
 class Mission:
@@ -21,11 +22,14 @@ public:
 
 private:
     bool loadAnimations() noexcept;
+    void createSystems() noexcept;
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
+    std::vector<std::function<void(sf::Time)>> m_systems;
+
+    sf::IntRect              m_viewport;
     TileMap                  m_tilemap;
     entt::registry           m_registry;
-    SystemManager            m_systems;
     std::vector<sf::Sprite*> m_sprites;
     Cursor                   m_cursor;
 };
