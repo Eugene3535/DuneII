@@ -10,7 +10,6 @@ class Animation:
     public sf::Sprite
 {
 public:
-    Animation() noexcept;
     Animation(const sf::Texture* texture) noexcept;
     Animation(const sf::Texture* texture, const sf::IntRect& startFrame) noexcept;
 

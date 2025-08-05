@@ -1,6 +1,8 @@
 #ifndef MAIN_MENU_HPP
 #define MAIN_MENU_HPP
 
+#include <memory>
+
 #include <SFML/Graphics/Text.hpp>
 
 #include "ecs/components/Animation.hpp"
@@ -20,10 +22,10 @@ private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 private:
-    Animation m_titleScreen;
-    sf::Text  m_startGame;
-    sf::Text  m_settings;
-    sf::Text  m_tutorial;
+    std::unique_ptr<Animation> m_titleScreen;
+    std::unique_ptr<sf::Text>  m_startGame;
+    std::unique_ptr<sf::Text>  m_settings;
+    std::unique_ptr<sf::Text>  m_tutorial;
 };
 
 #endif // !MAIN_MENU_HPP

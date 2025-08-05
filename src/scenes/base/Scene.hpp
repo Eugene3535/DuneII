@@ -3,13 +3,11 @@
 
 #include <string>
 
-#include <SFML/System/NonCopyable.hpp>
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/Drawable.hpp>
 
 class Scene:
-    public sf::Drawable,
-    private sf::NonCopyable
+    public sf::Drawable
 {
 public:
 	Scene(struct Game& game) noexcept;

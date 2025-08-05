@@ -3,7 +3,6 @@
 
 #include <cstdint>
 
-#include <SFML/System/NonCopyable.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
@@ -12,8 +11,7 @@
 
 // The class is used to create a blackout effect when transitioning between scenes
 class ScreenBlackoutEffect:
-    public sf::Drawable,
-    private sf::NonCopyable
+    public sf::Drawable
 {
 public:
     ScreenBlackoutEffect() noexcept;

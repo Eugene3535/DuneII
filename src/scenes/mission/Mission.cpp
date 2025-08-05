@@ -29,7 +29,7 @@ bool Mission::load(const std::string& info) noexcept
     
     if(auto theme = Assets->getResource<sf::Music>(COMMAND_POST_FLAC); theme != nullptr)
     {
-        theme->setLoop(true);
+        theme->setLooping(true);
         theme->play();
     }
 
@@ -45,7 +45,7 @@ void Mission::update(sf::Time dt) noexcept
         for(auto& system : m_systems)
             system(dt);
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::X))
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::X))
         {
             m_game.sceneNeedToBeChanged = true;
             m_game.next_scene = Game::GameScene::MAIN_MENU;
@@ -68,18 +68,18 @@ bool Mission::loadAnimations() noexcept
         flagData.name = "HarkonnenFlag";
         flagData.layout = AnimationData::LINEAR;
         flagData.texture = flag_texture;
-        flagData.startFrame = { 0, 0, 14, 14 };
+        flagData.startFrame = sf::IntRect({0, 0}, {14, 14});
         flagData.duration = 8;
         flagData.isLooped = true;
         flagData.delay = sf::seconds(0.5f);
         m_game.animationManager.createAnimation(flagData);
 
         flagData.name = "OrdosFlag";
-        flagData.startFrame = { 0, 14, 14, 14 };
+        flagData.startFrame = sf::IntRect({0, 14}, {14, 14});
         m_game.animationManager.createAnimation(flagData);
 
         flagData.name = "AtreidesFlag";
-        flagData.startFrame = { 0, 28, 14, 14 };
+        flagData.startFrame = sf::IntRect({0, 28}, {14, 14});
         m_game.animationManager.createAnimation(flagData);
 
         return true;
@@ -165,7 +165,7 @@ void Mission::createSystems() noexcept
 
         m_game.viewport.setCenter(static_cast<sf::Vector2f>(m_viewPosition + sf::Vector2i(view_size.x >> 1, view_size.y >> 1)));
 
-        m_viewport = sf::IntRect(m_viewPosition.x, m_viewPosition.y, view_size.x, view_size.y);
+        m_viewport = sf::IntRect({m_viewPosition.x, m_viewPosition.y}, {view_size.x, view_size.y});
     });
 
 
@@ -178,7 +178,7 @@ void Mission::createSystems() noexcept
 
         for (auto [entity, sprite, bounds] : structure_view.each())
         {
-            if(m_viewport.intersects(bounds))
+            if(m_viewport.findIntersection(bounds))
                 m_sprites.push_back(&sprite);
         }
 
@@ -186,7 +186,7 @@ void Mission::createSystems() noexcept
 
         for (auto [entity, bounds, animation] : anim_view.each())
         {
-            if(m_viewport.intersects(bounds))
+            if(m_viewport.findIntersection(bounds))
                 m_sprites.push_back(&animation);
         }
 
@@ -218,7 +218,7 @@ void Mission::createSystems() noexcept
         {
             timer = 0;
 
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
             {
                 if(auto entity = m_tilemap.getEntityUnderCursor(static_cast<sf::Vector2i>(world_position)); entity.has_value())
                 {
@@ -249,7 +249,7 @@ void Mission::createSystems() noexcept
                 //m_cursor.capture(); // for units
             }
 
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Right))
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
             {
                 m_cursor.release();
             }

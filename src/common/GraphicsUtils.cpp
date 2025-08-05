@@ -4,11 +4,11 @@
 
 void GraphicsUtils::setSpriteSize(sf::Sprite& sprite, float width, float height) noexcept
 {
-	if (auto& rect = sprite.getTextureRect(); rect.width > 0 && rect.height > 0)
+	if (auto& rect = sprite.getTextureRect(); rect.size.x > 0 && rect.size.y > 0)
 	{
-		float dx = width / rect.width;
-		float dy = height / rect.height;
-		sprite.setScale(dx, dy);
+		float dx = width / rect.size.x;
+		float dy = height / rect.size.y;
+		sprite.setScale({dx, dy});
 	}
 }
 
@@ -22,8 +22,8 @@ sf::Vector2i GraphicsUtils::getSpriteSize(const sf::Sprite& sprite) noexcept
 	const auto& rect = sprite.getTextureRect();
 	const sf::Vector2f& current_scale = sprite.getScale();
 
-	int width  = static_cast<int>(rect.width * current_scale.x);
-	int height = static_cast<int>(rect.height * current_scale.y);
+	int width  = static_cast<int>(rect.size.x * current_scale.x);
+	int height = static_cast<int>(rect.size.y * current_scale.y);
 
 	return sf::Vector2i(width, height);
 }

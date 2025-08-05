@@ -8,8 +8,7 @@
 #define FRAME_CAPTURED "Captured"
 
 Cursor::Cursor() noexcept:
-    m_sprite(),
-    m_vertexFrame(sf::Lines, 16),
+    m_vertexFrame(sf::PrimitiveType::Lines, 16),
     m_isCaptured(true),
     m_isSelected(false),
     m_tick()
@@ -29,9 +28,9 @@ bool Cursor::load(AnimationManager& animator) noexcept
 
     if(auto texture = Assets->getResource<sf::Texture>(CROSSHAIRS_TILESHEET_PNG); texture != nullptr)
     {
-        m_sprite.setTexture(*texture);
+        m_sprite = std::make_unique<sf::Sprite>(*texture);
         release();
-        m_sprite.setScale(0.5f, 0.5f);
+        m_sprite->setScale({0.5f, 0.5f});
 
         return true;
     }
@@ -52,8 +51,8 @@ void Cursor::capture() noexcept
     if(!m_isCaptured)
     {
         const auto frame = m_frames[FRAME_CAPTURED];
-        m_sprite.setTextureRect(frame);
-        m_sprite.setOrigin(static_cast<float>(frame.width >> 1), static_cast<float>(frame.height >> 1));
+        m_sprite->setTextureRect(frame);
+        m_sprite->setOrigin({static_cast<float>(frame.size.x >> 1), static_cast<float>(frame.size.y >> 1)});
         m_isCaptured = true;
     }
 }
@@ -63,8 +62,8 @@ void Cursor::release() noexcept
     if(m_isCaptured || m_isSelected)
     {
         const auto frame = m_frames[FRAME_RELEASED];
-        m_sprite.setTextureRect(frame);
-        m_sprite.setOrigin(static_cast<float>(frame.width >> 1), static_cast<float>(frame.height >> 1));
+        m_sprite->setTextureRect(frame);
+        m_sprite->setOrigin({static_cast<float>(frame.size.x >> 1), static_cast<float>(frame.size.y >> 1)});
         m_isSelected = false;
         m_isCaptured = false;
     }
@@ -72,7 +71,7 @@ void Cursor::release() noexcept
 
 void Cursor::update(const sf::Vector2f& position, sf::Time dt) noexcept
 {
-    m_sprite.setPosition(position);
+    m_sprite->setPosition(position);
 
     static const sf::Time delay = sf::milliseconds(250);
     m_tick += dt;
@@ -85,10 +84,10 @@ void Cursor::setVertexFrame(const sf::IntRect& frame) noexcept
 {
     static constexpr float offset = 12.f;
 
-    const auto leftBottom  = sf::Vector2f(frame.left, frame.top + frame.height);
-    const auto leftTop     = sf::Vector2f(frame.left, frame.top);
-    const auto rightTop    = sf::Vector2f(frame.left + frame.width, frame.top);
-    const auto rightBottom = sf::Vector2f(frame.left + frame.width, frame.top + frame.height);
+    const auto leftBottom  = sf::Vector2f(frame.position.x, frame.position.y + frame.size.y);
+    const auto leftTop     = sf::Vector2f(frame.position.x, frame.position.y);
+    const auto rightTop    = sf::Vector2f(frame.position.x + frame.size.x, frame.position.y);
+    const auto rightBottom = sf::Vector2f(frame.position.x + frame.size.x, frame.position.y + frame.size.y);
 
     m_vertexFrame[0].position = sf::Vector2f(leftBottom.x, leftBottom.y - offset);
     m_vertexFrame[1].position = leftBottom;
@@ -123,7 +122,7 @@ bool Cursor::isCaptured() const noexcept
 
 void Cursor::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    target.draw(m_sprite, states);
+    target.draw(*m_sprite, states);
 
     static const sf::Time delay = sf::milliseconds(125);
 

@@ -20,7 +20,7 @@ const Animation* AnimationManager::createAnimation(const AnimationData& data) no
 
 	const std::string name(data.name);
 
-	if(auto it = m_animations.try_emplace(name); it.second)
+	if(auto it = m_animations.try_emplace(name, Animation(data.texture)); it.second)
 	{
 		auto& animation = it.first->second;
 		auto& frames    = m_frames.emplace_back();
@@ -47,12 +47,12 @@ const Animation* AnimationManager::createAnimation(const AnimationData& data) no
 				frames.reserve(static_cast<size_t>(duration));
 
 				sf::IntRect frame = data.startFrame;
-				const uint32_t offset = frame.width;
+				const uint32_t offset = frame.size.x;
 
 				for (uint32_t i = 0; i < duration; ++i)
 				{
 					frames.emplace_back(frame);
-					frame.left += offset;
+					frame.position.x += offset;
 				}
 
 				animation.duration = duration;
@@ -70,14 +70,14 @@ const Animation* AnimationManager::createAnimation(const AnimationData& data) no
 				const int32_t duration = static_cast<int32_t>(rows * columns);
 				frames.reserve(static_cast<size_t>(duration));
 
-				const int32_t left   = data.startFrame.left;
-				const int32_t top    = data.startFrame.top;
-				const int32_t width  = data.startFrame.width;
-				const int32_t height = data.startFrame.height;
+				const int32_t left   = data.startFrame.position.x;
+				const int32_t top    = data.startFrame.position.y;
+				const int32_t width  = data.startFrame.size.x;
+				const int32_t height = data.startFrame.size.y;
 
 				for (int32_t y = 0; y < rows; ++y)
 					for (int32_t x = 0; x < columns; ++x)
-						frames.emplace_back(left + x * width, top + y * height, width, height);
+						frames.emplace_back(sf::IntRect({left + x * width, top + y * height}, {width, height}));
 
 				animation.duration = duration;
 				animation.delay    = data.delay;
@@ -139,7 +139,7 @@ std::unordered_map<std::string, sf::IntRect> AnimationManager::loadFramesFromFil
 					int width  = w ? atoi(w->value()) : 0;
 					int height = h ? atoi(h->value()) : 0;
 
-					frame = { left, top, width, height };
+					frame = sf::IntRect({left, top}, {width, height});
 
 					cut_node = cut_node->next_sibling();
 				}

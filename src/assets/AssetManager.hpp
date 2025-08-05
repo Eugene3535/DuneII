@@ -4,7 +4,6 @@
 #include <unordered_map>
 #include <type_traits>
 
-#include <SFML/System/NonCopyable.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>
@@ -42,8 +41,7 @@
 #define CREDIT_ROLL_FLAC     "20-Credit-Roll.flac"
 
 
-class AssetManager final:
-    private sf::NonCopyable
+class AssetManager final
 {
 public:
     AssetManager() noexcept;

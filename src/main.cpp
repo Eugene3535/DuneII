@@ -20,12 +20,12 @@ int main()
     auto& visible_area = game.visible_area;
     auto& clock = game.clock;
 
-    visible_area = sf::FloatRect(0.f, 0.f, 1200.0f, 800.0f);
+    visible_area = sf::FloatRect({0.f, 0.f}, {1200.f, 800.f});
 
-    uint32_t width  = static_cast<uint32_t>(visible_area.width);
-    uint32_t height = static_cast<uint32_t>(visible_area.height);
+    uint32_t width  = static_cast<uint32_t>(visible_area.size.x);
+    uint32_t height = static_cast<uint32_t>(visible_area.size.y);
 
-    window.create(sf::VideoMode(width, height), "Dune II: The Battle For Arrakis", sf::Style::Close);
+    window.create(sf::VideoMode({ width, height }), "Dune II: The Battle For Arrakis", sf::Style::Close);
     window.setVerticalSyncEnabled(true);
 
     auto main_menu = std::make_unique<MainMenu>(game);
@@ -36,31 +36,36 @@ int main()
 
     Scene* current_scene = main_menu.get();
 
-    viewport.reset(visible_area);
+    viewport.setCenter({600.f, 400.f});
+    viewport.setSize({1200.f, 800.f});
     
     while (window.isOpen())
     {
-        sf::Event event;
-
         auto dt = clock.restart();
 
-        while (window.pollEvent(event))
+        while (const auto event = window.pollEvent())
         {
-            if (event.type == sf::Event::Resized)
+            if (event->is<sf::Event::Closed>())
+            {
+                window.close();
+            }
+            else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
+            {
+                if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
+                    window.close();
+            }
+
+            if (const auto* resized = event->getIf<sf::Event::Resized>())
             {
                 const auto& center = viewport.getCenter();
 
-                float x = center.x - event.size.width * 0.5f;
-                float y = center.y - event.size.height * 0.5f;
-                visible_area = sf::FloatRect(x, y, event.size.width, event.size.height);
-                viewport.reset(visible_area);
-            }
-
-            if (event.type == sf::Event::Closed || sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-            {
-                window.close();
-
-                return 0;
+                float x = center.x - resized->size.x * 0.5f;
+                float y = center.y - resized->size.y * 0.5f;
+                float w = static_cast<float>(resized->size.x);
+                float h = static_cast<float>(resized->size.y);
+                visible_area = sf::FloatRect({x, y}, {w, h});
+                viewport.setCenter({x, y});
+                viewport.setSize({w, h});
             }
         }
 
@@ -86,8 +91,8 @@ int main()
                 {
                     current_scene = main_menu.get();
                     const auto& size = viewport.getSize();
-                    visible_area = { 0, 0, size.x, size.y };
-                    viewport.reset(visible_area);
+                    visible_area = { {0, 0}, {size.x, size.y} };
+                    viewport.setViewport(visible_area);
                     break;
                 }
 

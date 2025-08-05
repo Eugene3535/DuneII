@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <memory>
 
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
@@ -34,7 +35,7 @@ public:
 private:
     void draw(class sf::RenderTarget& target, sf::RenderStates states) const override;
 
-    sf::Sprite m_sprite;
+    std::unique_ptr<sf::Sprite> m_sprite;
     sf::VertexArray m_vertexFrame;
 
     std::unordered_map<std::string, sf::IntRect> m_frames;

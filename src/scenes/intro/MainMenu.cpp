@@ -34,40 +34,44 @@ bool MainMenu::load(const std::string& info) noexcept
         animData.name = "TitleScreen";
         animData.layout = AnimationData::LINEAR;
         animData.texture = texture;
-        animData.startFrame = { 0, 0, 304, 120 };
+        animData.startFrame = { {0, 0}, {304, 120} };
         animData.duration = 50;
         animData.isLooped = false;
         animData.delay = sf::seconds(0.1f);
 
         if(auto anim = m_game.animationManager.createAnimation(animData); anim != nullptr)
-            memcpy(&m_titleScreen, anim, sizeof(Animation));
+            m_titleScreen = std::make_unique<Animation>(*anim);          
 
         sf::Vector2i screenSize = static_cast<sf::Vector2i>(m_game.window.getSize());
-        GraphicsUtils::setSpriteSize(m_titleScreen, screenSize);
+        GraphicsUtils::setSpriteSize(*m_titleScreen, screenSize);
 
-        m_startGame.setFont(*font);
-        m_settings.setFont(*font);
-        m_tutorial.setFont(*font);
+        m_startGame = std::make_unique<sf::Text>(*font);
+        m_settings = std::make_unique<sf::Text>(*font);
+        m_tutorial = std::make_unique<sf::Text>(*font);
 
-        const std::string textStart("Начать новую игру");
-        const std::string textSettings("Настройки");
-        const std::string textTutorial("Обучение");
+        m_startGame->setFont(*font);
+        m_settings->setFont(*font);
+        m_tutorial->setFont(*font);
 
-        m_startGame.setString(sf::String::fromUtf8(textStart.begin(), textStart.end()));
-        m_settings.setString(sf::String::fromUtf8(textSettings.begin(), textSettings.end()));
-        m_tutorial.setString(sf::String::fromUtf8(textTutorial.begin(), textTutorial.end()));
+        const std::string_view textStart("Начать новую игру");
+        const std::string_view textSettings("Настройки");
+        const std::string_view textTutorial("Обучение");
 
-        m_startGame.setStyle(sf::Text::Bold);
-        m_settings.setStyle(sf::Text::Bold);
-        m_tutorial.setStyle(sf::Text::Bold);
+        m_startGame->setString(sf::String::fromUtf8(textStart.begin(), textStart.end()));
+        m_settings->setString(sf::String::fromUtf8(textSettings.begin(), textSettings.end()));
+        m_tutorial->setString(sf::String::fromUtf8(textTutorial.begin(), textTutorial.end()));
 
-        m_startGame.setPosition(920, 600);
-        m_settings.setPosition(920, 650);
-        m_tutorial.setPosition(920, 700);
+        m_startGame->setStyle(sf::Text::Bold);
+        m_settings->setStyle(sf::Text::Bold);
+        m_tutorial->setStyle(sf::Text::Bold);
 
-        m_startGame.setScale(0.5f, 0.5f);
-        m_settings.setScale(0.5f, 0.5f);
-        m_tutorial.setScale(0.5f, 0.5f);
+        m_startGame->setPosition({ 920, 600 });
+        m_settings->setPosition({ 920, 650 });
+        m_tutorial->setPosition({ 920, 700 });
+
+        m_startGame->setScale({ 0.5f, 0.5f });
+        m_settings->setScale({ 0.5f, 0.5f });
+        m_tutorial->setScale({ 0.5f, 0.5f });
 
         m_isLoaded = true;
 
@@ -82,42 +86,42 @@ void MainMenu::update(sf::Time dt) noexcept
     if(m_game.sceneNeedToBeChanged)
         return;
 
-    if( ! m_titleScreen.isOver )
+    if( ! m_titleScreen->isOver )
     {
-        m_titleScreen.timer += dt;
+        m_titleScreen->timer += dt;
 
-        if(m_titleScreen.timer > m_titleScreen.delay)
+        if(m_titleScreen->timer > m_titleScreen->delay)
         {
-            m_titleScreen.currentFrame++;
-            m_titleScreen.timer = sf::Time::Zero;
+            m_titleScreen->currentFrame++;
+            m_titleScreen->timer = sf::Time::Zero;
 
-            if(m_titleScreen.currentFrame == m_titleScreen.duration)
+            if(m_titleScreen->currentFrame == m_titleScreen->duration)
             {
-                m_titleScreen.isOver = true;
+                m_titleScreen->isOver = true;
             }
-            if( ! m_titleScreen.isOver )
-                m_titleScreen.setTextureRect(m_titleScreen.frames[m_titleScreen.currentFrame]);
+            if( ! m_titleScreen->isOver )
+                m_titleScreen->setTextureRect(m_titleScreen->frames[m_titleScreen->currentFrame]);
         }
     }
 
     sf::Vector2f mouse_pos { sf::Mouse::getPosition(m_game.window) };
 
-    auto is_button_pressed = [](sf::Text& text, const sf::Vector2f& mouse_pos) -> bool
+    auto is_button_pressed = [](sf::Text* text, const sf::Vector2f& mouse_pos) -> bool
     {
-        if(text.getGlobalBounds().contains(mouse_pos))
+        if(text->getGlobalBounds().contains(mouse_pos))
         {
-            text.setFillColor(sf::Color::Red);
+            text->setFillColor(sf::Color::Red);
 
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Left))       
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))       
                 return true;   
         }
         else   
-            text.setFillColor(sf::Color::White);
+            text->setFillColor(sf::Color::White);
         
         return false;
     };
 
-    if(is_button_pressed(m_startGame, mouse_pos))
+    if(is_button_pressed(m_startGame.get(), mouse_pos))
     {
         m_game.sceneNeedToBeChanged = true;
         m_game.next_scene = Game::GameScene::MISSION;
@@ -125,22 +129,12 @@ void MainMenu::update(sf::Time dt) noexcept
 
         return;
     }
-
-    if(is_button_pressed(m_settings, mouse_pos))
-    {
-        return;
-    }
-
-    if(is_button_pressed(m_tutorial, mouse_pos))
-    {
-        return;
-    }
 }
 
 void MainMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    target.draw(m_titleScreen, states);
-    target.draw(m_startGame, states);
-    target.draw(m_settings, states);
-    target.draw(m_tutorial, states);
+    target.draw(*m_titleScreen, states);
+    target.draw(*m_startGame, states);
+    target.draw(*m_settings, states);
+    target.draw(*m_tutorial, states);
 }

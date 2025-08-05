@@ -10,7 +10,7 @@ ScreenBlackoutEffect::ScreenBlackoutEffect() noexcept:
     m_isOver(true)
 {
     auto video_mode = sf::VideoMode::getDesktopMode();
-    prepare({ 0.0f, 0.0f }, { video_mode.width, video_mode.height });
+    prepare( {}, video_mode.size );
 }
 
 ScreenBlackoutEffect::~ScreenBlackoutEffect()
@@ -19,7 +19,7 @@ ScreenBlackoutEffect::~ScreenBlackoutEffect()
 
 void ScreenBlackoutEffect::prepare(const sf::Vector2f& view_center, const sf::Vector2u& window_size) noexcept
 {
-    m_blackoutShape.setPosition(view_center.x - (window_size.x >> 1), view_center.y - (window_size.y >> 1));
+    m_blackoutShape.setPosition(sf::Vector2f(view_center.x - (window_size.x >> 1), view_center.y - (window_size.y >> 1)));
     m_blackoutShape.setSize(sf::Vector2f(window_size.x, window_size.y));
     m_alpha = 0;
     m_blackoutShape.setFillColor(sf::Color(0, 0, 0, m_alpha));

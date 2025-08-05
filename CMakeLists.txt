@@ -2,18 +2,18 @@ cmake_minimum_required(VERSION 3.25.1 FATAL_ERROR)
 
 project(DuneII LANGUAGES C CXX)
 
-set(EXTERNAL_DIR $ENV{external})
-set(BUILD_SHARED_LIBS ON)
+set(BUILD_SHARED_LIBS OFF)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+set(EXTERNAL_SOURCE_DIR $ENV{External})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 
-if(WIN32 AND MSVC)
-	string(APPEND CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin")
-	string(APPEND CMAKE_LIBRARY_OUTPUT_DIRECTORY "lib")
-	string(APPEND CMAKE_ARCHIVE_OUTPUT_DIRECTORY "lib")
+if(MSVC)
+	string(APPEND CMAKE_RUNTIME_OUTPUT_DIRECTORY "/bin")
+	string(APPEND CMAKE_LIBRARY_OUTPUT_DIRECTORY "/lib")
+	string(APPEND CMAKE_ARCHIVE_OUTPUT_DIRECTORY "/lib")
 else()
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -63,12 +63,12 @@ set(_all_files
 )
 
 add_executable(${PROJECT_NAME} ${_all_files})
-add_subdirectory(${EXTERNAL_DIR}/sfml/2.6.2 sfml)
-add_subdirectory(${EXTERNAL_DIR}/entt entt)
+add_subdirectory(${EXTERNAL_SOURCE_DIR}/sfml/3.0.1 sfml)
+add_subdirectory(${EXTERNAL_SOURCE_DIR}/entt entt)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
 	${PROJECT_SOURCE_DIR}/src
-	${EXTERNAL_DIR}/rapidxml
+	${EXTERNAL_SOURCE_DIR}/rapidxml
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -80,7 +80,7 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG>)
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
 if(MSVC)
 	set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
@@ -93,7 +93,7 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 
 if(WIN32)
 	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EXTERNAL_DIR}/sfml/2.6.2/extlibs/bin/x64/openal32.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>/openal32.dll VERBATIM
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EXTERNAL_SOURCE_DIR}/sfml/2.6.2/extlibs/bin/x64/openal32.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>/openal32.dll VERBATIM
 	)
 
 	if(MSVC)

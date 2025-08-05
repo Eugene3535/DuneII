@@ -67,9 +67,9 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 			auto plant_a_flag = [this](const entt::entity entity, const Animation* flag, const sf::IntRect& bounds) -> void
 			{
 				auto& sprite = m_registry.emplace<Animation>(entity, *flag);
-				int32_t flagX = bounds.left;
-				int32_t flagY = bounds.top + bounds.height - sprite.getTextureRect().height;
-				sprite.setPosition(flagX, flagY);
+				int32_t flagX = bounds.position.x;
+				int32_t flagY = bounds.position.y + bounds.size.y - sprite.getTextureRect().size.y;
+				sprite.setPosition(sf::Vector2f(flagX, flagY));
 			};
 
 			auto harkonnen_area = get_area_of(HouseType::HARKONNEN);		
@@ -95,21 +95,21 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 								             (structure.type != StructureType::ROCKET_TURRET) &&
 											  structure.type < StructureType::MAX);
 
-				if(harkonnen_area != sf::IntRect() && bounds.intersects(harkonnen_area))
+				if(harkonnen_area != sf::IntRect() && bounds.findIntersection(harkonnen_area))
 				{
 					structure.owner = HouseType::HARKONNEN;
 
 					if(need_to_plant_a_flag)		
 						plant_a_flag(entity, harkonnen_flag, bounds);		
 				}
-				else if(ordos_area != sf::IntRect() && bounds.intersects(ordos_area))
+				else if(ordos_area != sf::IntRect() && bounds.findIntersection(ordos_area))
 				{
 					structure.owner = HouseType::ORDOS;
 
 					if(need_to_plant_a_flag)
 						plant_a_flag(entity, ordos_flag, bounds);
 				}
-				else if(atreides_area != sf::IntRect() && bounds.intersects(atreides_area))
+				else if(atreides_area != sf::IntRect() && bounds.findIntersection(atreides_area))
 				{
 					structure.owner = HouseType::ATREIDES;
 
@@ -152,10 +152,10 @@ bool TileMap::putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY
         int32_t map_width  = m_mapSizeInTiles.x * m_tileSize.x;
         int32_t map_height = m_mapSizeInTiles.y * m_tileSize.y;
 
-        if(bounds.left < 0)                         return false;
-        if(bounds.top < 0)                          return false;
-        if(bounds.left + bounds.width > map_width)  return false;
-        if(bounds.top + bounds.height > map_height) return false;
+        if(bounds.position.x < 0)                          return false;
+        if(bounds.position.y < 0)                          return false;
+        if(bounds.position.x + bounds.size.x > map_width)  return false;
+        if(bounds.position.y + bounds.size.y > map_height) return false;
     }
 
     const int32_t origin = cellY * m_mapSizeInTiles.x + cellX;
@@ -211,7 +211,7 @@ bool TileMap::putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY
 		auto& structure = m_registry.emplace<Structure>(entity);
 
 		structure.type = type;
-		sprite.setPosition(coordX, coordY);
+		sprite.setPosition(sf::Vector2f(coordX, coordY));
 		structure.hitPoints = structure.maxHitPoints = getHitPointsOf(type);
 
 		auto setup_tiles_on_mask = [this, origin, entity](int32_t width, int32_t height, char symbol = 'B') -> void
@@ -457,10 +457,10 @@ bool TileMap::loadObjects(const rapidxml::xml_node<char>* map_node) noexcept
 
 			for (auto attr = objectNode->first_attribute(); attr != nullptr; attr = attr->next_attribute())
 			{
-				if (strcmp(attr->name(), "x")      == 0) { tme_object.bounds.left   = std::atoi(attr->value()); continue; }
-				if (strcmp(attr->name(), "y")      == 0) { tme_object.bounds.top    = std::atoi(attr->value()); continue; }
-				if (strcmp(attr->name(), "width")  == 0) { tme_object.bounds.width  = std::atoi(attr->value()); continue; }
-				if (strcmp(attr->name(), "height") == 0) { tme_object.bounds.height = std::atoi(attr->value()); continue; }
+				if (strcmp(attr->name(), "x")      == 0) { tme_object.bounds.position.x = std::atoi(attr->value()); continue; }
+				if (strcmp(attr->name(), "y")      == 0) { tme_object.bounds.position.y = std::atoi(attr->value()); continue; }
+				if (strcmp(attr->name(), "width")  == 0) { tme_object.bounds.size.x     = std::atoi(attr->value()); continue; }
+				if (strcmp(attr->name(), "height") == 0) { tme_object.bounds.size.y     = std::atoi(attr->value()); continue; }
 
 				if (strcmp(attr->name(), "name") == 0)  tme_object.name = attr->value();
 				if (strcmp(attr->name(), "class") == 0) tme_object.type = attr->value();
@@ -532,7 +532,7 @@ void TileMap::loadTilesets(const rapidxml::xml_node<>* map_node, std::vector<Til
 void TileMap::loadLandscape(const Tileset& tileset, const std::vector<int>& parsed_layer) noexcept
 {
 	std::vector<sf::Vertex> vertices;
-	vertices.reserve(parsed_layer.size());
+	vertices.reserve(parsed_layer.size() * 6);
 
 //  Cached variables
 	const int32_t map_width   = m_mapSizeInTiles.x;
@@ -561,21 +561,21 @@ void TileMap::loadLandscape(const Tileset& tileset, const std::vector<int>& pars
 			const sf::Vector2f point(left * tile_width, top * tile_height);
 
 //  First triangle
-			vertices.emplace_back(sf::Vector2f(vX, vY), point);
-			vertices.emplace_back(sf::Vector2f(vX + tile_width, vY), sf::Vector2f(point.x + tile_width, point.y));
-			vertices.emplace_back(sf::Vector2f(vX + tile_width, vY + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
+			vertices.emplace_back(sf::Vector2f(vX, vY), sf::Color::White, point);
+			vertices.emplace_back(sf::Vector2f(vX + tile_width, vY), sf::Color::White, sf::Vector2f(point.x + tile_width, point.y));
+			vertices.emplace_back(sf::Vector2f(vX + tile_width, vY + tile_height), sf::Color::White, sf::Vector2f(point.x + tile_width, point.y + tile_height));
 //  Second triangle
-			vertices.emplace_back(sf::Vector2f(vX, vY), point);
-			vertices.emplace_back(sf::Vector2f(vX + tile_width, vY + tile_height), sf::Vector2f(point.x + tile_width, point.y + tile_height));
-			vertices.emplace_back(sf::Vector2f(vX, vY + tile_height), sf::Vector2f(point.x, point.y + tile_height));
+			vertices.emplace_back(sf::Vector2f(vX, vY), sf::Color::White, point);
+			vertices.emplace_back(sf::Vector2f(vX + tile_width, vY + tile_height), sf::Color::White, sf::Vector2f(point.x + tile_width, point.y + tile_height));
+			vertices.emplace_back(sf::Vector2f(vX, vY + tile_height), sf::Color::White, sf::Vector2f(point.x, point.y + tile_height));
 		}
 
 //  Unload to VBO
 	if (!vertices.empty())
 	{
 		m_texture = tileset.texture;
-		m_vertices.setUsage(sf::VertexBuffer::Static);
-		m_vertices.setPrimitiveType(sf::Triangles);
+		m_vertices.setUsage(sf::VertexBuffer::Usage::Static);
+		m_vertices.setPrimitiveType(sf::PrimitiveType::Triangles);
 		m_vertices.create(vertices.size());
 		m_vertices.update(vertices.data());
 	}
@@ -980,20 +980,20 @@ sf::IntRect TileMap::getTexCoordsOf(TileMap::WallCellType type) noexcept
 {
     switch (type)
     {
-        case WallCellType::DOT:               return { 0,   0, 32, 32 }; 
-        case WallCellType::LEFT_RIGHT:        return { 32,  0, 32, 32 }; 
-        case WallCellType::BOTTOM_TOP:        return { 64,  0, 32, 32 }; 
-        case WallCellType::TOP_RIGHT:         return { 96,  0, 32, 32 }; 
-        case WallCellType::RIGHT_BOTTOM:      return { 128, 0, 32, 32 };
-        case WallCellType::BOTTOM_LEFT:       return { 160, 0, 32, 32 };
-        case WallCellType::LEFT_TOP:          return { 192, 0, 32, 32 };
-        case WallCellType::TOP_RIGHT_BOTTOM:  return { 224, 0, 32, 32 }; 
-        case WallCellType::RIGHT_BOTTOM_LEFT: return { 256, 0, 32, 32 }; 
-        case WallCellType::BOTTOM_LEFT_TOP:   return { 288, 0, 32, 32 };
-        case WallCellType::LEFT_TOP_RIGHT:    return { 320, 0, 32, 32 };
-        case WallCellType::CROSS:             return { 352, 0, 32, 32 };
+        case WallCellType::DOT:               return { {0,   0}, {32, 32} }; 
+        case WallCellType::LEFT_RIGHT:        return { {32,  0}, {32, 32} }; 
+        case WallCellType::BOTTOM_TOP:        return { {64,  0}, {32, 32} }; 
+        case WallCellType::TOP_RIGHT:         return { {96,  0}, {32, 32} }; 
+        case WallCellType::RIGHT_BOTTOM:      return { {128, 0}, {32, 32} };
+        case WallCellType::BOTTOM_LEFT:       return { {160, 0}, {32, 32} };
+        case WallCellType::LEFT_TOP:          return { {192, 0}, {32, 32} };
+        case WallCellType::TOP_RIGHT_BOTTOM:  return { {224, 0}, {32, 32} }; 
+        case WallCellType::RIGHT_BOTTOM_LEFT: return { {256, 0}, {32, 32} }; 
+        case WallCellType::BOTTOM_LEFT_TOP:   return { {288, 0}, {32, 32} };
+        case WallCellType::LEFT_TOP_RIGHT:    return { {320, 0}, {32, 32} };
+        case WallCellType::CROSS:             return { {352, 0}, {32, 32} };
     
-        default: return { 0, 0, 32, 32 };
+        default: return { {0, 0}, {32, 32} };
     }
 }
 
@@ -1001,21 +1001,21 @@ sf::IntRect TileMap::getTexCoordsOf(StructureType type) const noexcept
 {
 	switch (type)
 	{
-		case StructureType::SLAB_1x1:          return { 0, 160, 32, 32   };
-		case StructureType::PALACE:            return { 64, 96, 96, 96   };
-		case StructureType::VEHICLE:           return { 256, 32, 96, 64  };
-		case StructureType::HIGH_TECH:         return { 160, 96, 64, 64  };
-		case StructureType::CONSTRUCTION_YARD: return { 0, 32, 64, 64    };
-		case StructureType::WIND_TRAP:         return { 64, 32, 64, 64   };
-		case StructureType::BARRACKS:          return { 0, 96, 64, 64    };
-		case StructureType::STARPORT:          return { 0, 192, 96, 96   };
-		case StructureType::REFINERY:          return { 416, 0, 96, 64   };
-		case StructureType::REPAIR:            return { 224, 96, 96, 64  };
-		case StructureType::WALL:              return { 0, 0, 32, 32     };
-		case StructureType::TURRET:            return { 192, 288, 32, 32 };
-		case StructureType::ROCKET_TURRET:     return { 448, 288, 32, 32 };
-		case StructureType::SILO:              return { 192, 32, 64, 64  };
-		case StructureType::OUTPOST:           return { 128, 32, 64, 64  };
+		case StructureType::SLAB_1x1:          return { {0,   160}, {32, 32} };
+		case StructureType::PALACE:            return { {64,  96 }, {96, 96} };
+		case StructureType::VEHICLE:           return { {256, 32 }, {96, 64} };
+		case StructureType::HIGH_TECH:         return { {160, 96 }, {64, 64} };
+		case StructureType::CONSTRUCTION_YARD: return { {0,   32 }, {64, 64} };
+		case StructureType::WIND_TRAP:         return { {64,  32 }, {64, 64} };
+		case StructureType::BARRACKS:          return { {0,   96 }, {64, 64} };
+		case StructureType::STARPORT:          return { {0,   192}, {96, 96} };
+		case StructureType::REFINERY:          return { {416, 0  }, {96, 64} };
+		case StructureType::REPAIR:            return { {224, 96 }, {96, 64} };
+		case StructureType::WALL:              return { {0,   0  }, {32, 32} };
+		case StructureType::TURRET:            return { {192, 288}, {32, 32} };
+		case StructureType::ROCKET_TURRET:     return { {448, 288}, {32, 32} };
+		case StructureType::SILO:              return { {192, 32 }, {64, 64} };
+		case StructureType::OUTPOST:           return { {128, 32 }, {64, 64} };
 
 		default: return sf::IntRect();
 	}
@@ -1025,21 +1025,21 @@ sf::IntRect TileMap::getBoundsOf(StructureType type, int32_t coordX, int32_t coo
 {
 	switch (type)
 	{
-		case StructureType::SLAB_1x1:          return { coordX, coordY, 32, 32 };
-		case StructureType::PALACE:            return { coordX, coordY, 96, 96 };
-		case StructureType::VEHICLE:           return { coordX, coordY, 96, 64 };
-		case StructureType::HIGH_TECH:         return { coordX, coordY, 64, 64 };
-		case StructureType::CONSTRUCTION_YARD: return { coordX, coordY, 64, 64 };
-		case StructureType::WIND_TRAP:         return { coordX, coordY, 64, 64 };
-		case StructureType::BARRACKS:          return { coordX, coordY, 64, 64 };
-		case StructureType::STARPORT:          return { coordX, coordY, 96, 96 };
-		case StructureType::REFINERY:          return { coordX, coordY, 96, 64 };
-		case StructureType::REPAIR:            return { coordX, coordY, 96, 64 };
-		case StructureType::WALL:              return { coordX, coordY, 32, 32 };
-		case StructureType::TURRET:            return { coordX, coordY, 32, 32 };
-		case StructureType::ROCKET_TURRET:     return { coordX, coordY, 32, 32 };
-		case StructureType::SILO:              return { coordX, coordY, 64, 64 };
-		case StructureType::OUTPOST:           return { coordX, coordY, 64, 64 }; 
+		case StructureType::SLAB_1x1:          return { {coordX, coordY}, {32, 32} };
+		case StructureType::PALACE:            return { {coordX, coordY}, {96, 96} };
+		case StructureType::VEHICLE:           return { {coordX, coordY}, {96, 64} };
+		case StructureType::HIGH_TECH:         return { {coordX, coordY}, {64, 64} };
+		case StructureType::CONSTRUCTION_YARD: return { {coordX, coordY}, {64, 64} };
+		case StructureType::WIND_TRAP:         return { {coordX, coordY}, {64, 64} };
+		case StructureType::BARRACKS:          return { {coordX, coordY}, {64, 64} };
+		case StructureType::STARPORT:          return { {coordX, coordY}, {96, 96} };
+		case StructureType::REFINERY:          return { {coordX, coordY}, {96, 64} };
+		case StructureType::REPAIR:            return { {coordX, coordY}, {96, 64} };
+		case StructureType::WALL:              return { {coordX, coordY}, {32, 32} };
+		case StructureType::TURRET:            return { {coordX, coordY}, {32, 32} };
+		case StructureType::ROCKET_TURRET:     return { {coordX, coordY}, {32, 32} };
+		case StructureType::SILO:              return { {coordX, coordY}, {64, 64} };
+		case StructureType::OUTPOST:           return { {coordX, coordY}, {64, 64} }; 
 
 		default: return sf::IntRect();
 	}

@@ -18,8 +18,8 @@ bool ConstructionMenu::load(const std::string& info) noexcept
 	if (auto texBg = Assets->getResource<sf::Texture>("game_menu.jpg"); texBg != nullptr)
 	{
 		auto video_mode = sf::VideoMode::getDesktopMode();
-		float menu_width = static_cast<float>(video_mode.width) - 20;
-		float menu_height = static_cast<float>(video_mode.height) - 20;
+		float menu_width = static_cast<float>(video_mode.size.x) - 20;
+		float menu_height = static_cast<float>(video_mode.size.y) - 20;
 
 		sf::Color outline_color = sf::Color(88, 89, 120);
 

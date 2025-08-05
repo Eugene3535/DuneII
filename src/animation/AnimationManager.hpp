@@ -6,12 +6,9 @@
 #include <unordered_map>
 #include <string>
 
-#include <SFML/System/NonCopyable.hpp>
-
 #include "animation/AnimationData.hpp"
 
-class AnimationManager:
-	private sf::NonCopyable
+class AnimationManager
 {
 public:
     AnimationManager() noexcept;
