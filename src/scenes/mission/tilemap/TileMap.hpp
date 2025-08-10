@@ -76,7 +76,7 @@ private:
 	bool         loadLayers(const rapidxml::xml_node<>* map_node)                                    noexcept;
 	bool         loadObjects(const rapidxml::xml_node<>* map_node)                                   noexcept;
 	void         loadTilesets(const rapidxml::xml_node<>* map_node, std::vector<Tileset>& tilesets)  noexcept;
-	void         loadLandscape(const Tileset& tileset, const std::vector<int>& parsed_layer)         noexcept;
+	bool         loadLandscape(const Tileset& tileset, const std::vector<int>& parsed_layer)         noexcept;
 	void         loadStructures(const Tileset& tileset, const std::vector<int>& parsed_layer)        noexcept;
 	char         convertTileNumToChar(int32_t index)                                           const noexcept;
 	void         draw(sf::RenderTarget& target, sf::RenderStates states)                       const override;

@@ -431,7 +431,7 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 				
 			if(layer_name == "Landscape")
 			{
-				loadLandscape(*current_tileset, parsed_layer);
+				if( ! loadLandscape(*current_tileset, parsed_layer)) return false;
 				continue;
 			}	
 
@@ -529,7 +529,7 @@ void TileMap::loadTilesets(const rapidxml::xml_node<>* map_node, std::vector<Til
 	}
 }
 
-void TileMap::loadLandscape(const Tileset& tileset, const std::vector<int>& parsed_layer) noexcept
+bool TileMap::loadLandscape(const Tileset& tileset, const std::vector<int>& parsed_layer) noexcept
 {
 	std::vector<sf::Vertex> vertices;
 	vertices.reserve(parsed_layer.size() * 6);
@@ -576,9 +576,13 @@ void TileMap::loadLandscape(const Tileset& tileset, const std::vector<int>& pars
 		m_texture = tileset.texture;
 		m_vertices.setUsage(sf::VertexBuffer::Usage::Static);
 		m_vertices.setPrimitiveType(sf::PrimitiveType::Triangles);
-		m_vertices.create(vertices.size());
-		m_vertices.update(vertices.data());
+
+		if (m_vertices.create(vertices.size()))
+			if(m_vertices.update(vertices.data()))
+			return true;
 	}
+
+	return false;
 }
 
 void TileMap::loadStructures(const Tileset& tileset, const std::vector<int>& parsed_layer) noexcept

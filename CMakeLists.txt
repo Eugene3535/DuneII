@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.25.1 FATAL_ERROR)
 
 project(DuneII LANGUAGES C CXX)
 
-set(BUILD_SHARED_LIBS OFF)
+set(BUILD_SHARED_LIBS ON)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(EXTERNAL_SOURCE_DIR $ENV{External})
@@ -63,7 +63,7 @@ set(_all_files
 )
 
 add_executable(${PROJECT_NAME} ${_all_files})
-add_subdirectory(${EXTERNAL_SOURCE_DIR}/sfml/3.0.1 sfml)
+add_subdirectory(${EXTERNAL_SOURCE_DIR}/sfml sfml)
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/entt entt)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -88,17 +88,13 @@ if(MSVC)
 endif()
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/res $<TARGET_FILE_DIR:${PROJECT_NAME}>/res VERBATIM
+	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/res $<TARGET_FILE_DIR:${PROJECT_NAME}>/res 
+	COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_BINARY_DIR}/sfml/bin $<TARGET_FILE_DIR:${PROJECT_NAME}>
+	VERBATIM
 )
 
-if(WIN32)
+if(MSVC)
 	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EXTERNAL_SOURCE_DIR}/sfml/2.6.2/extlibs/bin/x64/openal32.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>/openal32.dll VERBATIM
+		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/res ${CMAKE_BINARY_DIR}/res VERBATIM
 	)
-
-	if(MSVC)
-		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/res ${CMAKE_BINARY_DIR}/res VERBATIM
-		)
-	endif()
 endif()

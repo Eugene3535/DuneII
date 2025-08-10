@@ -90,9 +90,6 @@ int main()
                 case Game::GameScene::MAIN_MENU:
                 {
                     current_scene = main_menu.get();
-                    const auto& size = viewport.getSize();
-                    visible_area = { {0, 0}, {size.x, size.y} };
-                    viewport.setViewport(visible_area);
                     break;
                 }
 
