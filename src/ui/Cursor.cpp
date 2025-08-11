@@ -1,5 +1,6 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 
+#include "common/Defines.hpp"
 #include "assets/AssetManager.hpp"
 #include "animation/AnimationManager.hpp"
 #include "ui/Cursor.hpp"

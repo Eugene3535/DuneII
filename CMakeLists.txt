@@ -19,7 +19,7 @@ else()
 	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 endif()
 
-set(_duneII_src_files
+set(DUNEII_SRC_FILES
 	src/animation/AnimationManager.cpp
 	src/assets/AssetManager.cpp
 	src/common/FileProvider.cpp
@@ -27,16 +27,17 @@ set(_duneII_src_files
 	src/common/MathUtils.cpp
 	src/ecs/components/Animation.cpp
 	src/effects/ScreenBlackoutEffect.cpp
-	src/scenes/base/Scene.cpp
+	src/scenes/Scene.cpp
 	src/scenes/intro/MainMenu.cpp
 	src/scenes/mission/Mission.cpp
 	src/scenes/mission/tilemap/TileMap.cpp
 	src/scenes/construction_mode/ConstructionMenu.cpp
 	src/ui/Cursor.cpp
+	src/game/DuneII.cpp
 	src/main.cpp
 )
 
-set(_duneII_hdr_files
+set(DUNEII_HDR_FILES
 	src/animation/AnimationData.hpp
 	src/animation/AnimationManager.hpp
 	src/assets/AssetManager.hpp
@@ -48,18 +49,18 @@ set(_duneII_hdr_files
 	src/ecs/components/Animation.hpp
 	src/ecs/components/Structure.hpp
 	src/effects/ScreenBlackoutEffect.hpp
-	src/game/Game.hpp
-	src/scenes/base/Scene.hpp
+	src/scenes/Scene.hpp
 	src/scenes/intro/MainMenu.hpp
 	src/scenes/mission/Mission.hpp
 	src/scenes/mission/tilemap/TileMap.hpp
 	src/scenes/construction_mode/ConstructionMenu.hpp
 	src/ui/Cursor.hpp
+	src/game/DuneII.hpp
 )
 
 set(_all_files 
-	${_duneII_src_files} 
-	${_duneII_hdr_files}
+	${DUNEII_SRC_FILES} 
+	${DUNEII_HDR_FILES}
 )
 
 add_executable(${PROJECT_NAME} ${_all_files})

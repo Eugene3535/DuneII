@@ -6,13 +6,13 @@
 #include <SFML/Graphics/Text.hpp>
 
 #include "ecs/components/Animation.hpp"
-#include "scenes/base/Scene.hpp"
+#include "scenes/Scene.hpp"
 
 class MainMenu:
     public Scene
 {
 public:
-    MainMenu(struct Game& game) noexcept;
+    MainMenu(class DuneII* game) noexcept;
     ~MainMenu();
 
     bool load(const std::string& info) noexcept override;

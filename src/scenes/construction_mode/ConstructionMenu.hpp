@@ -3,13 +3,13 @@
 
 #include <SFML/Graphics/RectangleShape.hpp>
 
-#include "scenes/base/Scene.hpp"
+#include "scenes/Scene.hpp"
 
 class ConstructionMenu:
 	public Scene
 {
 public:
-	ConstructionMenu(struct Game& game) noexcept;
+	ConstructionMenu(class DuneII* game) noexcept;
 	~ConstructionMenu() noexcept;
 
 	bool load(const std::string& info) noexcept override;

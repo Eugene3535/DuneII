@@ -3,13 +3,14 @@
 
 #include "common/Defines.hpp"
 #include "common/FileProvider.hpp"
-#include "game/Game.hpp"
+#include "assets/AssetManager.hpp"
+#include "game/DuneII.hpp"
 #include "ecs/components/Structure.hpp"
 #include "scenes/mission/Mission.hpp"
 
-Mission::Mission(Game& game) noexcept:
+Mission::Mission(DuneII* game) noexcept:
     Scene(game),
-    m_tilemap(m_registry, game.animationManager)
+    m_tilemap(m_registry, game->animationManager)
 {
 
 }
@@ -22,7 +23,7 @@ bool Mission::load(const std::string& info) noexcept
         return true;
 
     if(!loadAnimations()) return false;
-    if(!m_cursor.load(m_game.animationManager)) return false;
+    if(!m_cursor.load(m_game->animationManager)) return false;
     if(!m_tilemap.loadFromFile(FileProvider::findPathToFile(info))) return false;
 
     createSystems();
@@ -47,9 +48,9 @@ void Mission::update(sf::Time dt) noexcept
 
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::X))
         {
-            m_game.sceneNeedToBeChanged = true;
-            m_game.next_scene = Game::GameScene::MAIN_MENU;
-            m_game.window.setMouseCursorVisible(true);
+            m_game->sceneNeedToBeChanged = true;
+            m_game->next_scene = DuneII::GameScene::MAIN_MENU;
+            m_game->window.setMouseCursorVisible(true);
 
             if(auto theme = Assets->getResource<sf::Music>(COMMAND_POST_FLAC); theme != nullptr)
             {
@@ -72,15 +73,15 @@ bool Mission::loadAnimations() noexcept
         flagData.duration = 8;
         flagData.isLooped = true;
         flagData.delay = sf::seconds(0.5f);
-        m_game.animationManager.createAnimation(flagData);
+        m_game->animationManager.createAnimation(flagData);
 
         flagData.name = "OrdosFlag";
         flagData.startFrame = sf::IntRect({0, 14}, {14, 14});
-        m_game.animationManager.createAnimation(flagData);
+        m_game->animationManager.createAnimation(flagData);
 
         flagData.name = "AtreidesFlag";
         flagData.startFrame = sf::IntRect({0, 28}, {14, 14});
-        m_game.animationManager.createAnimation(flagData);
+        m_game->animationManager.createAnimation(flagData);
 
         return true;
     }
@@ -138,8 +139,8 @@ void Mission::createSystems() noexcept
         auto seconds = dt.asSeconds();
         float camera_velocity = seconds * CAMERA_VELOCITY;
 
-        sf::Vector2i mouse_position  = sf::Mouse::getPosition(m_game.window);
-        const sf::Vector2i view_size = static_cast<sf::Vector2i>(m_game.viewport.getSize());
+        sf::Vector2i mouse_position  = sf::Mouse::getPosition(m_game->window);
+        const sf::Vector2i view_size = static_cast<sf::Vector2i>(m_game->viewport.getSize());
 
         bool is_near_the_left_edge   = (mouse_position.x > 0 && mouse_position.x < SCREEN_MARGIN);
         bool is_near_the_top_edge    = (mouse_position.y > 0 && mouse_position.y < SCREEN_MARGIN);
@@ -163,7 +164,7 @@ void Mission::createSystems() noexcept
         if(m_viewPosition.x + view_size.x > m_mapSize.x) m_viewPosition.x = m_mapSize.x - view_size.x;
         if(m_viewPosition.y + view_size.y > m_mapSize.y) m_viewPosition.y = m_mapSize.y - view_size.y;
 
-        m_game.viewport.setCenter(static_cast<sf::Vector2f>(m_viewPosition + sf::Vector2i(view_size.x >> 1, view_size.y >> 1)));
+        m_game->viewport.setCenter(static_cast<sf::Vector2f>(m_viewPosition + sf::Vector2i(view_size.x >> 1, view_size.y >> 1)));
 
         m_viewport = sf::IntRect({m_viewPosition.x, m_viewPosition.y}, {view_size.x, view_size.y});
     });
@@ -209,8 +210,8 @@ void Mission::createSystems() noexcept
         static constexpr int32_t cooldown = 4;
         static int timer = 0;
 
-        sf::Vector2i mouse_position  = sf::Mouse::getPosition(m_game.window);
-        auto world_position = m_game.window.mapPixelToCoords(mouse_position);
+        sf::Vector2i mouse_position = sf::Mouse::getPosition(m_game->window);
+        auto world_position = m_game->window.mapPixelToCoords(mouse_position);
 
         m_cursor.update(world_position, dt);
 

@@ -7,14 +7,14 @@
 #include <entt/entity/registry.hpp>
 
 #include "scenes/mission/tilemap/TileMap.hpp"
-#include "scenes/base/Scene.hpp"
+#include "scenes/Scene.hpp"
 #include "ui/Cursor.hpp"
 
 class Mission:
     public Scene
 {
 public:
-    Mission(struct Game& game) noexcept;
+    Mission(class DuneII* game) noexcept;
     ~Mission();
 
     bool load(const std::string& info) noexcept override;

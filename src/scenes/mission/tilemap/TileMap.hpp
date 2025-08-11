@@ -8,7 +8,6 @@
 #include <optional>
 
 #include <SFML/Graphics/VertexBuffer.hpp>
-#include "RapidXML/rapidxml.hpp"
 #include <entt/entity/registry.hpp>
 
 #include "common/Enums.hpp"
@@ -73,9 +72,9 @@ public:
 	const sf::Vector2i&        getTileSize()        const noexcept;
 	
 private:
-	bool         loadLayers(const rapidxml::xml_node<>* map_node)                                    noexcept;
-	bool         loadObjects(const rapidxml::xml_node<>* map_node)                                   noexcept;
-	void         loadTilesets(const rapidxml::xml_node<>* map_node, std::vector<Tileset>& tilesets)  noexcept;
+	bool         loadLayers(const void* map_node)                                                    noexcept;
+	bool         loadObjects(const void* map_node)                                                   noexcept;
+	void         loadTilesets(const void* map_node, std::vector<Tileset>& tilesets)                  noexcept;
 	bool         loadLandscape(const Tileset& tileset, const std::vector<int>& parsed_layer)         noexcept;
 	void         loadStructures(const Tileset& tileset, const std::vector<int>& parsed_layer)        noexcept;
 	char         convertTileNumToChar(int32_t index)                                           const noexcept;

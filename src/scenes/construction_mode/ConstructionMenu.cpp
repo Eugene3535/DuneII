@@ -1,8 +1,8 @@
 #include "assets/AssetManager.hpp"
-#include "game/Game.hpp"
+#include "game/DuneII.hpp"
 #include "scenes/construction_mode/ConstructionMenu.hpp"
 
-ConstructionMenu::ConstructionMenu(Game& game) noexcept:
+ConstructionMenu::ConstructionMenu(DuneII* game) noexcept:
 	Scene(game)
 {
 

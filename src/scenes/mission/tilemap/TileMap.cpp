@@ -4,9 +4,10 @@
 
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/Sprite.hpp>
+#include "RapidXML/rapidxml.hpp"
 #include "RapidXML/rapidxml_utils.hpp"
 
-#include "common/FileProvider.hpp"
+#include "common/Defines.hpp"
 #include "assets/AssetManager.hpp"
 #include "ecs/components/Structure.hpp"
 #include "animation/AnimationManager.hpp"
@@ -42,8 +43,8 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 	if (!map_node)
 		return false;
 
-	if(loadLayers(map_node))
-		if(loadObjects(map_node))
+	if(loadLayers(static_cast<const void*>(map_node)))
+		if(loadObjects(static_cast<const void*>(map_node)))
 		{
 			auto get_area_of = [this](HouseType houseName) -> sf::IntRect
 			{
@@ -361,18 +362,20 @@ const sf::Vector2i& TileMap::getTileSize() const noexcept
 	return m_tileSize;
 }
 
-bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
+bool TileMap::loadLayers(const void* map_node) noexcept
 {
+	const auto xml_node = static_cast<const rapidxml::xml_node<char>*>(map_node);
+
 	std::vector<TileMap::Tileset> tilesets;
 	loadTilesets(map_node, tilesets);
 
 	if(tilesets.empty()) 
 		return false;
 
-	auto pMapW  = map_node->first_attribute("width");
-	auto pMapH  = map_node->first_attribute("height");
-	auto pTileW = map_node->first_attribute("tilewidth");
-	auto pTileH = map_node->first_attribute("tileheight");
+	auto pMapW  = xml_node->first_attribute("width");
+	auto pMapH  = xml_node->first_attribute("height");
+	auto pTileW = xml_node->first_attribute("tilewidth");
+	auto pTileH = xml_node->first_attribute("tileheight");
 
 	const int32_t map_width   = pMapW  ? std::atoi(pMapW->value())  : 0;
 	const int32_t map_height  = pMapH  ? std::atoi(pMapH->value())  : 0;
@@ -388,7 +391,7 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 
 	m_tileMask.resize(static_cast<size_t>(map_width * map_height), 'S');
 
-	for (auto layer_node = map_node->first_node("layer");
+	for (auto layer_node = xml_node->first_node("layer");
 		      layer_node != nullptr;
 		      layer_node = layer_node->next_sibling("layer"))
 	{
@@ -443,9 +446,11 @@ bool TileMap::loadLayers(const rapidxml::xml_node<char>* map_node) noexcept
 	return true;
 }
 
-bool TileMap::loadObjects(const rapidxml::xml_node<char>* map_node) noexcept
+bool TileMap::loadObjects(const void* map_node) noexcept
 {
-	for (auto objectGroupNode = map_node->first_node("objectgroup");
+	const auto xml_node = static_cast<const rapidxml::xml_node<char>*>(map_node);
+
+	for (auto objectGroupNode = xml_node->first_node("objectgroup");
 		      objectGroupNode != nullptr;
 		      objectGroupNode = objectGroupNode->next_sibling("objectgroup"))
 	{
@@ -491,9 +496,11 @@ bool TileMap::loadObjects(const rapidxml::xml_node<char>* map_node) noexcept
 	return false;
 }
 
-void TileMap::loadTilesets(const rapidxml::xml_node<>* map_node, std::vector<TileMap::Tileset>& tilesets) noexcept
+void TileMap::loadTilesets(const void* map_node, std::vector<TileMap::Tileset>& tilesets) noexcept
 {
-	for (auto tilesetNode = map_node->first_node("tileset");
+	const auto xml_node = static_cast<const rapidxml::xml_node<char>*>(map_node);
+
+	for (auto tilesetNode = xml_node->first_node("tileset");
 			  tilesetNode != nullptr;
 			  tilesetNode = tilesetNode->next_sibling("tileset"))
 	{

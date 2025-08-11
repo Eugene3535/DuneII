@@ -6,11 +6,12 @@
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/Drawable.hpp>
 
+
 class Scene:
     public sf::Drawable
 {
 public:
-	Scene(struct Game& game) noexcept;
+	Scene(class DuneII* game) noexcept;
 	virtual ~Scene();
     
     virtual bool load(const std::string& info) noexcept;
@@ -19,7 +20,7 @@ public:
     bool isLoaded() const noexcept;
 
 protected:
-    struct Game& m_game;
+    class DuneII* m_game;
 
 protected:
     bool m_isLoaded;

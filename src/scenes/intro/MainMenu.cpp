@@ -4,18 +4,20 @@
 #include <SFML/Window/Mouse.hpp>
 
 #include "common/GraphicsUtils.hpp"
-#include "game/Game.hpp"
+#include "assets/AssetManager.hpp"
+#include "game/DuneII.hpp"
 #include "scenes/intro/MainMenu.hpp"
 
-MainMenu::MainMenu(Game& game) noexcept:
+
+MainMenu::MainMenu(DuneII* game) noexcept:
     Scene(game)
 {
 
 }
 
-MainMenu::~MainMenu()
-{
-}
+
+MainMenu::~MainMenu() = default;
+
 
 bool MainMenu::load(const std::string& info) noexcept
 {
@@ -39,10 +41,10 @@ bool MainMenu::load(const std::string& info) noexcept
         animData.isLooped = false;
         animData.delay = sf::seconds(0.1f);
 
-        if(auto anim = m_game.animationManager.createAnimation(animData); anim != nullptr)
+        if(auto anim = m_game->animationManager.createAnimation(animData); anim != nullptr)
             m_titleScreen = std::make_unique<Animation>(*anim);          
 
-        sf::Vector2i screenSize = static_cast<sf::Vector2i>(m_game.window.getSize());
+        sf::Vector2i screenSize = static_cast<sf::Vector2i>(m_game->window.getSize());
         GraphicsUtils::setSpriteSize(*m_titleScreen, screenSize);
 
         m_startGame = std::make_unique<sf::Text>(*font);
@@ -65,6 +67,11 @@ bool MainMenu::load(const std::string& info) noexcept
         m_settings->setStyle(sf::Text::Bold);
         m_tutorial->setStyle(sf::Text::Bold);
 
+        constexpr uint32_t charSize = 60;
+        m_startGame->setCharacterSize(charSize);
+        m_settings->setCharacterSize(charSize);
+        m_tutorial->setCharacterSize(charSize);
+
         m_startGame->setPosition({ 920, 600 });
         m_settings->setPosition({ 920, 650 });
         m_tutorial->setPosition({ 920, 700 });
@@ -81,9 +88,10 @@ bool MainMenu::load(const std::string& info) noexcept
     return false;
 }
 
+
 void MainMenu::update(sf::Time dt) noexcept
 {
-    if(m_game.sceneNeedToBeChanged)
+    if(m_game->sceneNeedToBeChanged)
         return;
 
     if( ! m_titleScreen->isOver )
@@ -104,7 +112,7 @@ void MainMenu::update(sf::Time dt) noexcept
         }
     }
 
-    sf::Vector2f mouse_pos { sf::Mouse::getPosition(m_game.window) };
+    sf::Vector2f mouse_pos { sf::Mouse::getPosition(m_game->window) };
 
     auto is_button_pressed = [](sf::Text* text, const sf::Vector2f& mouse_pos) -> bool
     {
@@ -123,13 +131,14 @@ void MainMenu::update(sf::Time dt) noexcept
 
     if(is_button_pressed(m_startGame.get(), mouse_pos))
     {
-        m_game.sceneNeedToBeChanged = true;
-        m_game.next_scene = Game::GameScene::MISSION;
-        m_game.window.setMouseCursorVisible(false);
+        m_game->sceneNeedToBeChanged = true;
+        m_game->next_scene = DuneII::GameScene::MISSION;
+        m_game->window.setMouseCursorVisible(false);
 
         return;
     }
 }
+
 
 void MainMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {

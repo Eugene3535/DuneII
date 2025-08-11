@@ -4,12 +4,13 @@
 
 #include "scenes/intro/MainMenu.hpp"
 #include "scenes/mission/Mission.hpp"
+#include "assets/AssetManager.hpp"
 #include "effects/ScreenBlackoutEffect.hpp"
-#include "game/Game.hpp"
+#include "game/DuneII.hpp"
 
 int main()
 {
-    Game game;
+    DuneII game;
 
     AssetManager assets;
 
@@ -25,16 +26,20 @@ int main()
     uint32_t width  = static_cast<uint32_t>(visible_area.size.x);
     uint32_t height = static_cast<uint32_t>(visible_area.size.y);
 
-    window.create(sf::VideoMode({ width, height }), "Dune II: The Battle For Arrakis", sf::Style::Close);
+    window.create(sf::VideoMode({ width, height }), "Dune II: The Battle For Arrakis", sf::Style::Default);
     window.setVerticalSyncEnabled(true);
 
-    auto main_menu = std::make_unique<MainMenu>(game);
-    auto mission =  std::make_unique<Mission>(game); 
+    auto main_menu = game.load<MainMenu>({});
 
-    if(!main_menu->load(std::string()))
+    if(not main_menu)
         return -1;
 
-    Scene* current_scene = main_menu.get();
+    Mission* mission = nullptr; 
+
+    if(not main_menu->load(std::string()))
+        return -1;
+
+    Scene* current_scene = main_menu;
 
     viewport.setCenter({600.f, 400.f});
     viewport.setSize({1200.f, 800.f});
@@ -87,16 +92,17 @@ int main()
             
             switch (game.next_scene)
             {
-                case Game::GameScene::MAIN_MENU:
+                case DuneII::GameScene::MAIN_MENU:
                 {
-                    current_scene = main_menu.get();
+                    current_scene = main_menu;
                     break;
                 }
 
-                case Game::GameScene::MISSION:
+                case DuneII::GameScene::MISSION:
                 {
-                    mission->load("Atreides-8.tmx");
-                    current_scene = mission.get();
+                    if( mission = game.load<Mission>("Atreides-8.tmx"); mission)
+                        current_scene = mission;
+
                     break;
                 }
 
@@ -105,7 +111,7 @@ int main()
             }
 
             game.sceneNeedToBeChanged = false;
-            game.next_scene = Game::GameScene::NONE;
+            game.next_scene = DuneII::GameScene::MAIN_MENU;
         }
 
         window.setView(viewport);
