@@ -11,7 +11,9 @@
 #include "assets/AssetManager.hpp"
 #include "ecs/components/Structure.hpp"
 #include "animation/AnimationManager.hpp"
+#include "scenes/mission/tilemap/Tile.hpp"
 #include "scenes/mission/tilemap/TileMap.hpp"
+
 
 TileMap::TileMap(entt::registry& registry, AnimationManager& animationManager) noexcept:
 	m_registry(registry),
@@ -20,6 +22,7 @@ TileMap::TileMap(entt::registry& registry, AnimationManager& animationManager) n
 {
 
 }
+
 
 bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 {
@@ -125,6 +128,7 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 	return false;
 }
 
+
 void TileMap::unload() noexcept
 {
 	m_structuresById.clear();
@@ -139,6 +143,7 @@ void TileMap::unload() noexcept
 	m_mapSizeInPixels = { 0, 0 };
 	m_tileSize        = { 0, 0 };
 }
+
 
 bool TileMap::putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY) noexcept
 {
@@ -208,11 +213,11 @@ bool TileMap::putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY
 	{
 		const auto entity = m_registry.create();
 		m_registry.emplace<sf::IntRect>(entity, bounds);
-		auto& sprite = m_registry.emplace<sf::Sprite>(entity, *texture, getTexCoordsOf(type));
+		auto& tile = m_registry.emplace<Tile>(entity, texture, getTexCoordsOf(type));
 		auto& structure = m_registry.emplace<Structure>(entity);
 
 		structure.type = type;
-		sprite.setPosition(sf::Vector2f(coordX, coordY));
+		tile.setPosition(sf::Vector2f(coordX, coordY));
 		structure.hitPoints = structure.maxHitPoints = getHitPointsOf(type);
 
 		auto setup_tiles_on_mask = [this, origin, entity](int32_t width, int32_t height, char symbol = 'B') -> void
@@ -261,6 +266,7 @@ bool TileMap::putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY
 
     return false;
 }
+
 
 void TileMap::removeStructureFromMap(int32_t structureId) noexcept
 {
@@ -318,6 +324,7 @@ void TileMap::removeStructureFromMap(int32_t structureId) noexcept
 	}
 }
 
+
 std::optional<entt::entity> TileMap::getEntityUnderCursor(const sf::Vector2i& point) noexcept
 {
 //  check out of bounds
@@ -337,30 +344,36 @@ std::optional<entt::entity> TileMap::getEntityUnderCursor(const sf::Vector2i& po
 	return std::nullopt;
 }
 
+
 const std::vector<TileMap::Object>& TileMap::getObjects() const noexcept
 {
 	return m_objects;
 }
+
 
 std::string_view TileMap::getTileMask() const noexcept
 {
 	return m_tileMask;
 }
 
+
 const sf::Vector2i& TileMap::getMapSizeInTiles()  const noexcept
 {
 	return m_mapSizeInTiles;
 }
+
 
 const sf::Vector2i& TileMap::getMapSizeInPixels() const noexcept
 {
 	return m_mapSizeInPixels;
 }
 
+
 const sf::Vector2i& TileMap::getTileSize() const noexcept
 {
 	return m_tileSize;
 }
+
 
 bool TileMap::loadLayers(const void* map_node) noexcept
 {
@@ -446,6 +459,7 @@ bool TileMap::loadLayers(const void* map_node) noexcept
 	return true;
 }
 
+
 bool TileMap::loadObjects(const void* map_node) noexcept
 {
 	const auto xml_node = static_cast<const rapidxml::xml_node<char>*>(map_node);
@@ -496,6 +510,7 @@ bool TileMap::loadObjects(const void* map_node) noexcept
 	return false;
 }
 
+
 void TileMap::loadTilesets(const void* map_node, std::vector<TileMap::Tileset>& tilesets) noexcept
 {
 	const auto xml_node = static_cast<const rapidxml::xml_node<char>*>(map_node);
@@ -535,6 +550,7 @@ void TileMap::loadTilesets(const void* map_node, std::vector<TileMap::Tileset>& 
 		}
 	}
 }
+
 
 bool TileMap::loadLandscape(const Tileset& tileset, const std::vector<int>& parsed_layer) noexcept
 {
@@ -591,6 +607,7 @@ bool TileMap::loadLandscape(const Tileset& tileset, const std::vector<int>& pars
 
 	return false;
 }
+
 
 void TileMap::loadStructures(const Tileset& tileset, const std::vector<int>& parsed_layer) noexcept
 {
@@ -652,6 +669,7 @@ void TileMap::loadStructures(const Tileset& tileset, const std::vector<int>& par
 			}
 		}
 }
+
 
 char TileMap::convertTileNumToChar(int32_t index) const noexcept
 {
@@ -931,6 +949,7 @@ char TileMap::convertTileNumToChar(int32_t index) const noexcept
 #endif
 }
 
+
 void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	if(m_texture)
@@ -939,6 +958,7 @@ void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const
 		target.draw(m_vertices, states);
 	}
 }
+
 
 void TileMap::updateWall(int32_t origin, int32_t level) noexcept
 {
@@ -959,8 +979,8 @@ void TileMap::updateWall(int32_t origin, int32_t level) noexcept
 		const auto tex_coords = getTexCoordsOf(computeWallType(a, b, c, d));
 		const auto entity = m_structuresById[origin];
 
-		auto view = m_registry.view<sf::Sprite>();
-		auto& sprite = view.get<sf::Sprite>(entity);
+		auto view = m_registry.view<Tile>();
+		auto& sprite = view.get<Tile>(entity);
 		sprite.setTextureRect(tex_coords);
 
 		if(a) updateWall(left, level - 1);
@@ -969,6 +989,7 @@ void TileMap::updateWall(int32_t origin, int32_t level) noexcept
 		if(d) updateWall(bottom, level - 1);
 	}
 }
+
 
 TileMap::WallCellType TileMap::computeWallType(bool left, bool top, bool right, bool bottom) noexcept
 {
@@ -986,6 +1007,7 @@ TileMap::WallCellType TileMap::computeWallType(bool left, bool top, bool right, 
 
     return WallCellType::CROSS;
 }
+
 
 sf::IntRect TileMap::getTexCoordsOf(TileMap::WallCellType type) noexcept
 {
@@ -1007,6 +1029,7 @@ sf::IntRect TileMap::getTexCoordsOf(TileMap::WallCellType type) noexcept
         default: return { {0, 0}, {32, 32} };
     }
 }
+
 
 sf::IntRect TileMap::getTexCoordsOf(StructureType type) const noexcept
 {
@@ -1032,6 +1055,7 @@ sf::IntRect TileMap::getTexCoordsOf(StructureType type) const noexcept
 	}
 }
 
+
 sf::IntRect TileMap::getBoundsOf(StructureType type, int32_t coordX, int32_t coordY) const noexcept
 {
 	switch (type)
@@ -1055,6 +1079,7 @@ sf::IntRect TileMap::getBoundsOf(StructureType type, int32_t coordX, int32_t coo
 		default: return sf::IntRect();
 	}
 }
+
 
 int32_t TileMap::getHitPointsOf(StructureType type) const noexcept
 {

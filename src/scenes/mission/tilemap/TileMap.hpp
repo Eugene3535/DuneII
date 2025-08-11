@@ -17,7 +17,7 @@ class TileMap:
 {
 	struct Tileset
 	{
-		const sf::Texture* texture = nullptr ;
+		const sf::Texture* texture = nullptr;
 		int32_t columns   = 0;
 		int32_t tileCount = 0;
 		int32_t firstGID  = 1;
@@ -25,18 +25,18 @@ class TileMap:
 
 	enum WallCellType : uint32_t
     {
-        DOT = 1 << 1,
-        LEFT_RIGHT = 1 << 2,
-        BOTTOM_TOP = 1 << 3,
-        TOP_RIGHT = 1 << 4,
-        RIGHT_BOTTOM = 1 << 5,
-        BOTTOM_LEFT = 1 << 6,
-        LEFT_TOP = 1 << 7,
-        TOP_RIGHT_BOTTOM = 1 << 8,
+        DOT               = 1 << 1,
+        LEFT_RIGHT        = 1 << 2,
+        BOTTOM_TOP        = 1 << 3,
+        TOP_RIGHT         = 1 << 4,
+        RIGHT_BOTTOM      = 1 << 5,
+        BOTTOM_LEFT       = 1 << 6,
+        LEFT_TOP          = 1 << 7,
+        TOP_RIGHT_BOTTOM  = 1 << 8,
         RIGHT_BOTTOM_LEFT = 1 << 9,
-        BOTTOM_LEFT_TOP = 1 << 10,
-        LEFT_TOP_RIGHT = 1 << 11,
-        CROSS = 1 << 12
+        BOTTOM_LEFT_TOP   = 1 << 10,
+        LEFT_TOP_RIGHT    = 1 << 11,
+        CROSS             = 1 << 12
     };
 
 public:

@@ -30,6 +30,7 @@ set(DUNEII_SRC_FILES
 	src/scenes/Scene.cpp
 	src/scenes/intro/MainMenu.cpp
 	src/scenes/mission/Mission.cpp
+	src/scenes/mission/tilemap/Tile.cpp
 	src/scenes/mission/tilemap/TileMap.cpp
 	src/scenes/construction_mode/ConstructionMenu.cpp
 	src/ui/Cursor.cpp
@@ -52,6 +53,7 @@ set(DUNEII_HDR_FILES
 	src/scenes/Scene.hpp
 	src/scenes/intro/MainMenu.hpp
 	src/scenes/mission/Mission.hpp
+	src/scenes/mission/tilemap/Tile.hpp
 	src/scenes/mission/tilemap/TileMap.hpp
 	src/scenes/construction_mode/ConstructionMenu.hpp
 	src/ui/Cursor.hpp
@@ -86,16 +88,15 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 if(MSVC)
 	set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${_all_files})
-endif()
 
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/res $<TARGET_FILE_DIR:${PROJECT_NAME}>/res 
-	COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_BINARY_DIR}/sfml/bin $<TARGET_FILE_DIR:${PROJECT_NAME}>
-	VERBATIM
-)
-
-if(MSVC)
+#   Working directory fix 
 	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/res ${CMAKE_BINARY_DIR}/res VERBATIM
 	)
 endif()
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/res $<TARGET_FILE_DIR:${PROJECT_NAME}>/res 
+	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/sfml/bin/$<CONFIG> $<TARGET_FILE_DIR:${PROJECT_NAME}>
+	VERBATIM
+)

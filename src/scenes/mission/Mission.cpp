@@ -4,9 +4,11 @@
 #include "common/Defines.hpp"
 #include "common/FileProvider.hpp"
 #include "assets/AssetManager.hpp"
-#include "game/DuneII.hpp"
 #include "ecs/components/Structure.hpp"
+#include "scenes/mission/tilemap/Tile.hpp"
+#include "game/DuneII.hpp"
 #include "scenes/mission/Mission.hpp"
+
 
 Mission::Mission(DuneII* game) noexcept:
     Scene(game),
@@ -15,7 +17,9 @@ Mission::Mission(DuneII* game) noexcept:
 
 }
 
+
 Mission::~Mission() = default;
+
 
 bool Mission::load(const std::string& info) noexcept
 {
@@ -39,6 +43,7 @@ bool Mission::load(const std::string& info) noexcept
     return m_isLoaded;
 }
 
+
 void Mission::update(sf::Time dt) noexcept
 {
     if(m_isLoaded)
@@ -59,6 +64,7 @@ void Mission::update(sf::Time dt) noexcept
         }
     }
 }
+
 
 bool Mission::loadAnimations() noexcept
 {
@@ -88,6 +94,7 @@ bool Mission::loadAnimations() noexcept
 
     return false;
 }
+
 
 void Mission::createSystems() noexcept
 {
@@ -175,12 +182,12 @@ void Mission::createSystems() noexcept
     {
         m_sprites.clear();
 
-        auto structure_view = m_registry.view<sf::Sprite, sf::IntRect>();
+        auto structure_view = m_registry.view<Tile, sf::IntRect>();
 
-        for (auto [entity, sprite, bounds] : structure_view.each())
+        for (auto [entity, tile, bounds] : structure_view.each())
         {
             if(m_viewport.findIntersection(bounds))
-                m_sprites.push_back(&sprite);
+                m_sprites.push_back(&tile);
         }
 
         auto anim_view = m_registry.view<sf::IntRect, Animation>();
@@ -259,6 +266,7 @@ void Mission::createSystems() noexcept
         ++timer;
     });
 }
+
 
 void Mission::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {

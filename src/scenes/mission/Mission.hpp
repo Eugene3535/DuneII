@@ -3,7 +3,7 @@
 
 #include <functional>
 
-#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Drawable.hpp>
 #include <entt/entity/registry.hpp>
 
 #include "scenes/mission/tilemap/TileMap.hpp"
@@ -27,11 +27,11 @@ private:
 
     std::vector<std::function<void(sf::Time)>> m_systems;
 
-    sf::IntRect              m_viewport;
-    TileMap                  m_tilemap;
-    entt::registry           m_registry;
-    std::vector<sf::Sprite*> m_sprites;
-    Cursor                   m_cursor;
+    sf::IntRect                m_viewport;
+    TileMap                    m_tilemap;
+    entt::registry             m_registry;
+    std::vector<sf::Drawable*> m_sprites;
+    Cursor                     m_cursor;
 };
 
 #endif // !MISSION_HPP
