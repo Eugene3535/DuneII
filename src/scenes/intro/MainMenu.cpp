@@ -91,9 +91,6 @@ bool MainMenu::load(const std::string& info) noexcept
 
 void MainMenu::update(sf::Time dt) noexcept
 {
-    if(m_game->sceneNeedToBeChanged)
-        return;
-
     if( ! m_titleScreen->isOver )
     {
         m_titleScreen->timer += dt;
@@ -131,11 +128,8 @@ void MainMenu::update(sf::Time dt) noexcept
 
     if(is_button_pressed(m_startGame.get(), mouse_pos))
     {
-        m_game->sceneNeedToBeChanged = true;
-        m_game->next_scene = DuneII::GameScene::MISSION;
+        m_game->notifyChangeScene(this, DuneII::GameScene::MISSION);
         m_game->window.setMouseCursorVisible(false);
-
-        return;
     }
 }
 

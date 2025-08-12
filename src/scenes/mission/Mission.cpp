@@ -53,8 +53,7 @@ void Mission::update(sf::Time dt) noexcept
 
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::X))
         {
-            m_game->sceneNeedToBeChanged = true;
-            m_game->next_scene = DuneII::GameScene::MAIN_MENU;
+            m_game->notifyChangeScene(this, DuneII::GameScene::MAIN_MENU);
             m_game->window.setMouseCursorVisible(true);
 
             if(auto theme = Assets->getResource<sf::Music>(COMMAND_POST_FLAC); theme != nullptr)

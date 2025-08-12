@@ -76,21 +76,22 @@ int main()
 
         current_scene->update(dt);
 
-        if(game.sceneNeedToBeChanged)
+        if(auto request = game.isSceneNeedToBeChanged(); request.second)
         {
             fade_effect.prepare(viewport.getCenter(), window.getSize());
             
             while(!fade_effect.isOver())
             {     
                 fade_effect.update();
-
                 window.clear();
                 window.draw(*current_scene);
                 window.draw(fade_effect);
                 window.display();
             }
+
+            DuneII::GameScene requested_scene = request.first;
             
-            switch (game.next_scene)
+            switch (requested_scene)
             {
                 case DuneII::GameScene::MAIN_MENU:
                 {
@@ -110,8 +111,7 @@ int main()
                     break;
             }
 
-            game.sceneNeedToBeChanged = false;
-            game.next_scene = DuneII::GameScene::MAIN_MENU;
+            game.resetSceneChange();
         }
 
         window.setView(viewport);

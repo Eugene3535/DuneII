@@ -31,7 +31,8 @@ void ScreenBlackoutEffect::update() noexcept
     if(m_isOver)
         return;
 
-    constexpr uint32_t timeout = 210;
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    constexpr uint32_t timeout = 250;
     constexpr uint32_t step = 5;
  
     m_blackoutShape.setFillColor(sf::Color(0, 0, 0, m_alpha));

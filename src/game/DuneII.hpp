@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include <utility>
 #include <typeindex>
 
 #include <SFML/System/Clock.hpp>
@@ -19,6 +20,7 @@ class DuneII final
 public:
     enum GameScene: uint32_t
     {
+        NONE,
         MAIN_MENU,
         MISSION
     };
@@ -47,7 +49,11 @@ public:
         return nullptr;
     }
 
-    void changeScene(const class Scene* requester, GameScene nextScene) noexcept;
+//  Check if the scene requesting the change has sufficient rights
+//  (example: you can only start a new mission from the main menu or the previous mission)
+    void notifyChangeScene(const class Scene* requester, GameScene requested_scene) noexcept;
+    std::pair<GameScene, bool> isSceneNeedToBeChanged() const noexcept;
+    void resetSceneChange() noexcept;
 
     sf::RenderWindow window;
     sf::View         viewport;
@@ -55,10 +61,6 @@ public:
     sf::Clock        clock;
 
     AnimationManager animationManager;
-
-    GameScene next_scene { MAIN_MENU };
-
-    bool sceneNeedToBeChanged { false };
     
 private:
     std::shared_ptr<void> m_state;
