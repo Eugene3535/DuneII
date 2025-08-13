@@ -25,7 +25,7 @@ private:
     void createSystems() noexcept;
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
-    std::vector<std::function<void(sf::Time)>> m_systems;
+    std::vector<void(*)(Mission*, sf::Time)> m_systems;
 
     sf::IntRect                m_viewport;
     TileMap                    m_tilemap;

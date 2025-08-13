@@ -3,16 +3,16 @@
 #include "game/DuneII.hpp"
 
 
-struct GameState
+struct 
 {
     bool isSceneNeedToBeChanged = false;
     DuneII::GameScene nextScene = DuneII::NONE;
-};
+} game_state;
 
 
 DuneII::DuneII() noexcept
 {
-    m_state = std::make_shared<GameState>();
+
 }
 
 
@@ -21,9 +21,7 @@ DuneII::~DuneII() = default;
 
 void DuneII::notifyChangeScene(const Scene* requester, GameScene requested_scene) noexcept
 {
-    auto game_state = std::static_pointer_cast<GameState>(m_state);
-
-    if(game_state->nextScene == GameScene::NONE)
+    if(game_state.nextScene == GameScene::NONE)
     {
         switch (requested_scene)
         {
@@ -31,8 +29,8 @@ void DuneII::notifyChangeScene(const Scene* requester, GameScene requested_scene
 
                 if(dynamic_cast<const Mission*>(requester))
                 {
-                    game_state->isSceneNeedToBeChanged = true;
-                    game_state->nextScene = requested_scene;
+                    game_state.isSceneNeedToBeChanged = true;
+                    game_state.nextScene = requested_scene;
                 }
             
             break;
@@ -41,8 +39,8 @@ void DuneII::notifyChangeScene(const Scene* requester, GameScene requested_scene
 
                 if(dynamic_cast<const MainMenu*>(requester))
                 {
-                    game_state->isSceneNeedToBeChanged = true;
-                    game_state->nextScene = requested_scene;
+                    game_state.isSceneNeedToBeChanged = true;
+                    game_state.nextScene = requested_scene;
                 }
 
             break;
@@ -56,10 +54,8 @@ void DuneII::notifyChangeScene(const Scene* requester, GameScene requested_scene
 
 std::pair<DuneII::GameScene, bool> DuneII::isSceneNeedToBeChanged() const noexcept
 {
-    auto game_state = std::static_pointer_cast<GameState>(m_state);
-
-    if(game_state->isSceneNeedToBeChanged)
-        return { game_state->nextScene, true };
+    if(game_state.isSceneNeedToBeChanged)
+        return { game_state.nextScene, true };
 
     return { DuneII::GameScene::NONE, false };
 }
@@ -67,11 +63,9 @@ std::pair<DuneII::GameScene, bool> DuneII::isSceneNeedToBeChanged() const noexce
 
 void DuneII::resetSceneChange() noexcept
 {
-    auto game_state = std::static_pointer_cast<GameState>(m_state);
-
-    if(game_state->isSceneNeedToBeChanged)
+    if(game_state.isSceneNeedToBeChanged)
     {
-        game_state->isSceneNeedToBeChanged = false;
-        game_state->nextScene = GameScene::NONE;
+        game_state.isSceneNeedToBeChanged = false;
+        game_state.nextScene = GameScene::NONE;
     }
 }

@@ -49,7 +49,7 @@ void Mission::update(sf::Time dt) noexcept
     if(m_isLoaded)
     {
         for(auto& system : m_systems)
-            system(dt);
+            system(this, dt);
 
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::X))
         {
@@ -98,9 +98,9 @@ bool Mission::loadAnimations() noexcept
 void Mission::createSystems() noexcept
 {
 //  Animation
-    m_systems.emplace_back([this](sf::Time dt)
+    m_systems.emplace_back([](Mission* mission, sf::Time dt)
     {
-        auto view = m_registry.view<Animation>();
+        auto view = mission->m_registry.view<Animation>();
 
         for (auto [entity, animation] : view.each())
         {
@@ -113,7 +113,7 @@ void Mission::createSystems() noexcept
                     animation.currentFrame++;
                     animation.timer = sf::Time::Zero;
 
-                    if(animation.currentFrame == animation.duration)
+                    if(animation.currentFrame == animation.frames.size())
                     {
                         if(animation.isLooped)
                         {
@@ -134,19 +134,19 @@ void Mission::createSystems() noexcept
 
 
 //  ViewportController
-    m_systems.emplace_back([this](sf::Time dt)
+    m_systems.emplace_back([](Mission* mission, sf::Time dt)
     {
         constexpr int CAMERA_VELOCITY = 600;
         constexpr int SCREEN_MARGIN = 150;
 
-        const sf::Vector2i& m_mapSize = m_tilemap.getMapSizeInPixels();
+        const sf::Vector2i& m_mapSize = mission->m_tilemap.getMapSizeInPixels();
         static sf::Vector2i m_viewPosition;
 
         auto seconds = dt.asSeconds();
         float camera_velocity = seconds * CAMERA_VELOCITY;
 
-        sf::Vector2i mouse_position  = sf::Mouse::getPosition(m_game->window);
-        const sf::Vector2i view_size = static_cast<sf::Vector2i>(m_game->viewport.getSize());
+        sf::Vector2i mouse_position  = sf::Mouse::getPosition(mission->m_game->window);
+        const sf::Vector2i view_size = static_cast<sf::Vector2i>(mission->m_game->viewport.getSize());
 
         bool is_near_the_left_edge   = (mouse_position.x > 0 && mouse_position.x < SCREEN_MARGIN);
         bool is_near_the_top_edge    = (mouse_position.y > 0 && mouse_position.y < SCREEN_MARGIN);
@@ -170,31 +170,30 @@ void Mission::createSystems() noexcept
         if(m_viewPosition.x + view_size.x > m_mapSize.x) m_viewPosition.x = m_mapSize.x - view_size.x;
         if(m_viewPosition.y + view_size.y > m_mapSize.y) m_viewPosition.y = m_mapSize.y - view_size.y;
 
-        m_game->viewport.setCenter(static_cast<sf::Vector2f>(m_viewPosition + sf::Vector2i(view_size.x >> 1, view_size.y >> 1)));
-
-        m_viewport = sf::IntRect({m_viewPosition.x, m_viewPosition.y}, {view_size.x, view_size.y});
+        mission->m_game->viewport.setCenter(static_cast<sf::Vector2f>(m_viewPosition + sf::Vector2i(view_size.x >> 1, view_size.y >> 1)));
+        mission->m_viewport = sf::IntRect({m_viewPosition.x, m_viewPosition.y}, {view_size.x, view_size.y});
     });
 
 
 //  CullingController
-    m_systems.emplace_back([this](sf::Time dt)
+    m_systems.emplace_back([](Mission* mission, sf::Time dt)
     {
-        m_sprites.clear();
+        mission->m_sprites.clear();
 
-        auto structure_view = m_registry.view<Tile, sf::IntRect>();
+        auto structure_view = mission->m_registry.view<Tile, sf::IntRect>();
 
         for (auto [entity, tile, bounds] : structure_view.each())
         {
-            if(m_viewport.findIntersection(bounds))
-                m_sprites.push_back(&tile);
+            if(mission->m_viewport.findIntersection(bounds))
+                mission->m_sprites.push_back(&tile);
         }
 
-        auto anim_view = m_registry.view<sf::IntRect, Animation>();
+        auto anim_view = mission->m_registry.view<sf::IntRect, Animation>();
 
         for (auto [entity, bounds, animation] : anim_view.each())
         {
-            if(m_viewport.findIntersection(bounds))
-                m_sprites.push_back(&animation);
+            if(mission->m_viewport.findIntersection(bounds))
+                mission->m_sprites.push_back(&animation);
         }
 
 #ifdef DEBUG
@@ -203,7 +202,7 @@ void Mission::createSystems() noexcept
         if(timer > sf::seconds(1.0f))
         {
             timer = sf::Time::Zero;
-            printf("Number of sprites on the screen: %zu\n", m_sprites.size());
+            printf("Number of sprites on the screen: %zu\n", mission->m_sprites.size());
         }
         timer += dt;
 #endif
@@ -211,15 +210,15 @@ void Mission::createSystems() noexcept
 
 
 //  CursorController
-    m_systems.emplace_back([this](sf::Time dt)
+    m_systems.emplace_back([](Mission* mission, sf::Time dt)
     {
         static constexpr int32_t cooldown = 4;
         static int timer = 0;
 
-        sf::Vector2i mouse_position = sf::Mouse::getPosition(m_game->window);
-        auto world_position = m_game->window.mapPixelToCoords(mouse_position);
+        sf::Vector2i mouse_position = sf::Mouse::getPosition(mission->m_game->window);
+        auto world_position = mission->m_game->window.mapPixelToCoords(mouse_position);
 
-        m_cursor.update(world_position, dt);
+        mission->m_cursor.update(world_position, dt);
 
         if(timer > cooldown)
         {
@@ -227,9 +226,9 @@ void Mission::createSystems() noexcept
 
             if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
             {
-                if(auto entity = m_tilemap.getEntityUnderCursor(static_cast<sf::Vector2i>(world_position)); entity.has_value())
+                if(auto entity = mission->m_tilemap.getEntityUnderCursor(static_cast<sf::Vector2i>(world_position)); entity.has_value())
                 {
-                    if(auto [structure, bounds] = m_registry.try_get<Structure, sf::IntRect>(entity.value()); structure != nullptr)
+                    if(auto [structure, bounds] = mission->m_registry.try_get<Structure, sf::IntRect>(entity.value()); structure != nullptr)
                     {
                         bool can_be_highlighted = 
                                     ((structure->type != StructureType::SLAB_1x1) &&
@@ -239,18 +238,18 @@ void Mission::createSystems() noexcept
 
                         if(can_be_highlighted)
                         {
-                            m_cursor.setVertexFrame(*bounds);
-                            m_cursor.select();
+                            mission->m_cursor.setVertexFrame(*bounds);
+                            mission->m_cursor.select();
                         }
                         else
                         {
-                            m_cursor.release();
+                            mission->m_cursor.release();
                         }
                     }
                 }
                 else
                 {
-                    m_cursor.release();
+                    mission->m_cursor.release();
                 }
 
                 //m_cursor.capture(); // for units
@@ -258,7 +257,7 @@ void Mission::createSystems() noexcept
 
             if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
             {
-                m_cursor.release();
+                mission->m_cursor.release();
             }
         }
 

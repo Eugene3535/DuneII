@@ -3,8 +3,6 @@
 
 Animation::Animation(const sf::Texture* texture) noexcept:
     sf::Sprite(*texture),
-    frames(nullptr),
-    duration(0),
     currentFrame(0),
     delay(),
     timer(),
@@ -16,8 +14,6 @@ Animation::Animation(const sf::Texture* texture) noexcept:
 
 Animation::Animation(const sf::Texture* texture, const sf::IntRect& startFrame) noexcept:
     sf::Sprite(*texture, startFrame),
-    frames(nullptr),
-    duration(0),
     currentFrame(0),
     delay(),
     timer(),

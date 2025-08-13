@@ -100,7 +100,7 @@ void MainMenu::update(sf::Time dt) noexcept
             m_titleScreen->currentFrame++;
             m_titleScreen->timer = sf::Time::Zero;
 
-            if(m_titleScreen->currentFrame == m_titleScreen->duration)
+            if(m_titleScreen->currentFrame == m_titleScreen->frames.size())
             {
                 m_titleScreen->isOver = true;
             }

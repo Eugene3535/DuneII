@@ -6,12 +6,15 @@
 #include "common/FileProvider.hpp"
 #include "animation/AnimationManager.hpp"
 
+
 AnimationManager::AnimationManager() noexcept
 {
 
 }
 
+
 AnimationManager::~AnimationManager() = default;
+
 
 const Animation* AnimationManager::createAnimation(const AnimationData& data) noexcept
 {
@@ -34,7 +37,6 @@ const Animation* AnimationManager::createAnimation(const AnimationData& data) no
 			case AnimationData::SINGLE:
 			{
 				frames.push_back(data.startFrame);
-				animation.duration = 1u;
 			}
 			break;
 
@@ -55,8 +57,7 @@ const Animation* AnimationManager::createAnimation(const AnimationData& data) no
 					frame.position.x += offset;
 				}
 
-				animation.duration = duration;
-				animation.delay    = data.delay;
+				animation.delay  = data.delay;
 			}
 			break;
 
@@ -79,13 +80,12 @@ const Animation* AnimationManager::createAnimation(const AnimationData& data) no
 					for (int32_t x = 0; x < columns; ++x)
 						frames.emplace_back(sf::IntRect({left + x * width, top + y * height}, {width, height}));
 
-				animation.duration = duration;
-				animation.delay    = data.delay;
+				animation.delay  = data.delay;
 			}
 			break;
 		}
 
-		animation.frames = frames.data();
+		animation.frames = frames;
 
 		return &animation;
 	}
@@ -93,12 +93,14 @@ const Animation* AnimationManager::createAnimation(const AnimationData& data) no
 	return nullptr;
 }
 
+
 const Animation* AnimationManager::getAnimation(const std::string& name) const noexcept
 {
     auto found = m_animations.find(name);
 
     return (found != m_animations.end()) ? &found->second : nullptr;
 }
+
 
 std::unordered_map<std::string, sf::IntRect> AnimationManager::loadFramesFromFile(const std::string& file_name) noexcept
 {
