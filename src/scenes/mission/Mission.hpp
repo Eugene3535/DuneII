@@ -1,14 +1,13 @@
 #ifndef MISSION_HPP
 #define MISSION_HPP
 
-#include <functional>
-
 #include <SFML/Graphics/Drawable.hpp>
 #include <entt/entity/registry.hpp>
 
 #include "scenes/mission/tilemap/TileMap.hpp"
 #include "scenes/Scene.hpp"
 #include "ui/Cursor.hpp"
+
 
 class Mission:
     public Scene

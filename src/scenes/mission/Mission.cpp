@@ -4,6 +4,7 @@
 #include "common/Defines.hpp"
 #include "common/FileProvider.hpp"
 #include "assets/AssetManager.hpp"
+#include "animation/AnimationData.hpp"
 #include "ecs/components/Structure.hpp"
 #include "scenes/mission/tilemap/Tile.hpp"
 #include "game/DuneII.hpp"
@@ -67,42 +68,42 @@ void Mission::update(sf::Time dt) noexcept
 
 bool Mission::loadAnimations() noexcept
 {
-    if(auto flag_texture = Assets->getResource<sf::Texture>(FLAGS_PNG); flag_texture != nullptr)
-    {
-        AnimationData flagData;
+    AnimationData flagData;
 
-        flagData.name = "HarkonnenFlag";
-        flagData.layout = AnimationData::LINEAR;
-        flagData.texture = flag_texture;
-        flagData.startFrame = sf::IntRect({0, 0}, {14, 14});
-        flagData.duration = 8;
-        flagData.isLooped = true;
-        flagData.delay = sf::seconds(0.5f);
-        m_game->animationManager.createAnimation(flagData);
+    flagData.name = "HarkonnenFlag";
+    flagData.layout = AnimationData::LINEAR;
+    flagData.startFrame = {{ 0, 0 }, { 14, 14 }};
+    flagData.duration = 8;
+    flagData.isLooped = true;
+    flagData.delay = sf::seconds(0.5f);
 
-        flagData.name = "OrdosFlag";
-        flagData.startFrame = sf::IntRect({0, 14}, {14, 14});
-        m_game->animationManager.createAnimation(flagData);
+    if(!m_game->animationManager.createAnimation(flagData)) 
+        return false;
 
-        flagData.name = "AtreidesFlag";
-        flagData.startFrame = sf::IntRect({0, 28}, {14, 14});
-        m_game->animationManager.createAnimation(flagData);
+    flagData.name = "OrdosFlag";
+    flagData.startFrame = {{ 0, 14 }, { 14, 14 }};
 
-        return true;
-    }
+    if(!m_game->animationManager.createAnimation(flagData)) 
+        return false;
 
-    return false;
+    flagData.name = "AtreidesFlag";
+    flagData.startFrame = {{ 0, 28 }, { 14, 14 }};
+
+    if(!m_game->animationManager.createAnimation(flagData)) 
+        return false;
+
+    return true;
 }
 
 
 void Mission::createSystems() noexcept
 {
-//  Animation
+//  Animations
     m_systems.emplace_back([](Mission* mission, sf::Time dt)
     {
-        auto view = mission->m_registry.view<Animation>();
+        auto view = mission->m_registry.view<Animation, sf::Sprite>();
 
-        for (auto [entity, animation] : view.each())
+        for (auto [entity, animation, sprite] : view.each())
         {
             if( ! animation.isOver )
             {
@@ -126,7 +127,7 @@ void Mission::createSystems() noexcept
                         }
                     }
 
-                    animation.setTextureRect(animation.frames[animation.currentFrame]);
+                    sprite.setTextureRect(animation.frames[animation.currentFrame]);
                 }
             }
         }
@@ -188,12 +189,12 @@ void Mission::createSystems() noexcept
                 mission->m_sprites.push_back(&tile);
         }
 
-        auto anim_view = mission->m_registry.view<sf::IntRect, Animation>();
+        auto anim_view = mission->m_registry.view<sf::IntRect, Animation, sf::Sprite>();
 
-        for (auto [entity, bounds, animation] : anim_view.each())
+        for (auto [entity, bounds, animation, sprite] : anim_view.each())
         {
             if(mission->m_viewport.findIntersection(bounds))
-                mission->m_sprites.push_back(&animation);
+                mission->m_sprites.push_back(&sprite);
         }
 
 #ifdef DEBUG

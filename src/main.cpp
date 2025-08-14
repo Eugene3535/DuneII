@@ -35,10 +35,6 @@ int main()
         return -1;
 
     Mission* mission = nullptr; 
-
-    if(not main_menu->load(std::string()))
-        return -1;
-
     Scene* current_scene = main_menu;
 
     viewport.setCenter({600.f, 400.f});

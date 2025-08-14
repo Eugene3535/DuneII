@@ -25,7 +25,6 @@ set(DUNEII_SRC_FILES
 	src/common/FileProvider.cpp
 	src/common/GraphicsUtils.cpp
 	src/common/MathUtils.cpp
-	src/ecs/components/Animation.cpp
 	src/effects/ScreenBlackoutEffect.cpp
 	src/scenes/Scene.cpp
 	src/scenes/intro/MainMenu.cpp

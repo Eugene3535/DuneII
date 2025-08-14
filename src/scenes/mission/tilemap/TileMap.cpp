@@ -9,6 +9,7 @@
 
 #include "common/Defines.hpp"
 #include "assets/AssetManager.hpp"
+#include "ecs/components/Animation.hpp"
 #include "ecs/components/Structure.hpp"
 #include "animation/AnimationManager.hpp"
 #include "scenes/mission/tilemap/Tile.hpp"
@@ -68,13 +69,19 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 				return sf::IntRect();
 			};
 
-			auto plant_a_flag = [this](const entt::entity entity, const Animation* flag, const sf::IntRect& bounds) -> void
+			auto plant_a_flag = [this](const entt::entity entity, const sf::Texture* texture, const Animation* flag, const sf::IntRect& bounds) -> void
 			{
-				auto& sprite = m_registry.emplace<Animation>(entity, *flag);
+				m_registry.emplace<Animation>(entity, *flag);
+				auto& sprite = m_registry.emplace<sf::Sprite>(entity, *texture, flag->frames[0]);
 				int32_t flagX = bounds.position.x;
 				int32_t flagY = bounds.position.y + bounds.size.y - sprite.getTextureRect().size.y;
 				sprite.setPosition(sf::Vector2f(flagX, flagY));
 			};
+
+			const sf::Texture* flag_texture = Assets->getResource<sf::Texture>(FLAGS_PNG);
+
+			if(!flag_texture)
+				return false;
 
 			auto harkonnen_area = get_area_of(HouseType::HARKONNEN);		
 			auto ordos_area     = get_area_of(HouseType::ORDOS);
@@ -85,8 +92,8 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 			auto atreides_flag  = m_animationManager.getAnimation("AtreidesFlag");
 
 			if( ! harkonnen_flag ) return false;
-			if( ! ordos_flag )     return false;
-			if( ! atreides_flag )  return false;
+			if( ! ordos_flag     ) return false;
+			if( ! atreides_flag  ) return false;
 
 			auto view = m_registry.view<Structure, sf::IntRect>();
 
@@ -104,21 +111,21 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 					structure.owner = HouseType::HARKONNEN;
 
 					if(need_to_plant_a_flag)		
-						plant_a_flag(entity, harkonnen_flag, bounds);		
+						plant_a_flag(entity, flag_texture, harkonnen_flag, bounds);		
 				}
 				else if(ordos_area != sf::IntRect() && bounds.findIntersection(ordos_area))
 				{
 					structure.owner = HouseType::ORDOS;
 
 					if(need_to_plant_a_flag)
-						plant_a_flag(entity, ordos_flag, bounds);
+						plant_a_flag(entity, flag_texture, ordos_flag, bounds);
 				}
 				else if(atreides_area != sf::IntRect() && bounds.findIntersection(atreides_area))
 				{
 					structure.owner = HouseType::ATREIDES;
 
 					if(need_to_plant_a_flag)		
-						plant_a_flag(entity, atreides_flag, bounds);
+						plant_a_flag(entity, flag_texture, atreides_flag, bounds);
 				}
 			}
 

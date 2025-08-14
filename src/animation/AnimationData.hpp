@@ -18,14 +18,13 @@ public:
         GRID
     } layout;
 
-    const sf::Texture* texture    = nullptr;
-    sf::IntRect        startFrame;
-    std::string_view   name;
-    uint32_t           columns    = 0u;
-    uint32_t           rows       = 0u;
-    uint32_t           duration   = 0u;
-    sf::Time           delay;
-    bool               isLooped   = false;
+    sf::IntRect      startFrame;
+    std::string_view name;
+    uint32_t         columns    = 0u;
+    uint32_t         rows       = 0u;
+    uint32_t         duration   = 0u;
+    sf::Time         delay;
+    bool             isLooped   = false;
 };
 
 #endif //!ANIMATION_DATA_HPP

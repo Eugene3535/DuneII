@@ -5,21 +5,17 @@
 #include <span>
 
 #include <SFML/System/Time.hpp>
-#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Rect.hpp>
 
-class Animation:
-    public sf::Sprite
+
+struct Animation
 {
-public:
-    Animation(const sf::Texture* texture) noexcept;
-    Animation(const sf::Texture* texture, const sf::IntRect& startFrame) noexcept;
-
     std::span<const sf::IntRect> frames;
-    uint32_t currentFrame;
+    uint32_t currentFrame = 0;
     sf::Time delay;
     sf::Time timer;
-    bool isLooped;
-    bool isOver;
+    bool isLooped = false;
+    bool isOver = false;
 };
 
 #endif // !ANIMATION_HPP

@@ -2,9 +2,12 @@
 
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Text.hpp>
 
 #include "common/GraphicsUtils.hpp"
 #include "assets/AssetManager.hpp"
+#include "animation/AnimationData.hpp"
 #include "game/DuneII.hpp"
 #include "scenes/intro/MainMenu.hpp"
 
@@ -35,21 +38,24 @@ bool MainMenu::load(const std::string& info) noexcept
         AnimationData animData;
         animData.name = "TitleScreen";
         animData.layout = AnimationData::LINEAR;
-        animData.texture = texture;
-        animData.startFrame = { {0, 0}, {304, 120} };
+        animData.startFrame = { { 0, 0 }, { 304, 120 } };
         animData.duration = 50;
         animData.isLooped = false;
         animData.delay = sf::seconds(0.1f);
 
         if(auto anim = m_game->animationManager.createAnimation(animData); anim != nullptr)
-            m_titleScreen = std::make_unique<Animation>(*anim);          
+        {
+            m_titleScreen = std::make_unique<sf::Sprite>(*texture, anim->frames[0]);
+            memcpy(static_cast<void*>(&m_animation), anim, sizeof(Animation));
+        }
+        else return false;                 
 
         sf::Vector2i screenSize = static_cast<sf::Vector2i>(m_game->window.getSize());
         GraphicsUtils::setSpriteSize(*m_titleScreen, screenSize);
 
         m_startGame = std::make_unique<sf::Text>(*font);
-        m_settings = std::make_unique<sf::Text>(*font);
-        m_tutorial = std::make_unique<sf::Text>(*font);
+        m_settings  = std::make_unique<sf::Text>(*font);
+        m_tutorial  = std::make_unique<sf::Text>(*font);
 
         m_startGame->setFont(*font);
         m_settings->setFont(*font);
@@ -91,21 +97,21 @@ bool MainMenu::load(const std::string& info) noexcept
 
 void MainMenu::update(sf::Time dt) noexcept
 {
-    if( ! m_titleScreen->isOver )
+    if( ! m_animation.isOver )
     {
-        m_titleScreen->timer += dt;
+        m_animation.timer += dt;
 
-        if(m_titleScreen->timer > m_titleScreen->delay)
+        if(m_animation.timer > m_animation.delay)
         {
-            m_titleScreen->currentFrame++;
-            m_titleScreen->timer = sf::Time::Zero;
+            m_animation.currentFrame++;
+            m_animation.timer = sf::Time::Zero;
 
-            if(m_titleScreen->currentFrame == m_titleScreen->frames.size())
+            if(m_animation.currentFrame == m_animation.frames.size())
             {
-                m_titleScreen->isOver = true;
+                m_animation.isOver = true;
             }
-            if( ! m_titleScreen->isOver )
-                m_titleScreen->setTextureRect(m_titleScreen->frames[m_titleScreen->currentFrame]);
+            if( ! m_animation.isOver )
+                m_titleScreen->setTextureRect(m_animation.frames[m_animation.currentFrame]);
         }
     }
 

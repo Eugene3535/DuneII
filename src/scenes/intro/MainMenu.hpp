@@ -3,10 +3,16 @@
 
 #include <memory>
 
-#include <SFML/Graphics/Text.hpp>
-
 #include "ecs/components/Animation.hpp"
 #include "scenes/Scene.hpp"
+
+
+namespace sf
+{
+    class Sprite;
+    class Text;
+}
+
 
 class MainMenu:
     public Scene
@@ -22,10 +28,12 @@ private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 private:
-    std::unique_ptr<Animation> m_titleScreen;
-    std::unique_ptr<sf::Text>  m_startGame;
-    std::unique_ptr<sf::Text>  m_settings;
-    std::unique_ptr<sf::Text>  m_tutorial;
+    std::unique_ptr<class sf::Sprite> m_titleScreen;
+    Animation m_animation;
+
+    std::unique_ptr<class sf::Text> m_startGame;
+    std::unique_ptr<class sf::Text> m_settings;
+    std::unique_ptr<class sf::Text> m_tutorial;
 };
 
 #endif // !MAIN_MENU_HPP

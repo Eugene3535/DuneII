@@ -4,6 +4,7 @@
 #include "RapidXML/rapidxml_utils.hpp"
 
 #include "common/FileProvider.hpp"
+#include "animation/AnimationData.hpp"
 #include "animation/AnimationManager.hpp"
 
 
@@ -18,18 +19,15 @@ AnimationManager::~AnimationManager() = default;
 
 const Animation* AnimationManager::createAnimation(const AnimationData& data) noexcept
 {
-	if(data.name.empty() || !data.texture)
+	if(data.name.empty() || !data.duration)
 		return nullptr;
 
 	const std::string name(data.name);
 
-	if(auto it = m_animations.try_emplace(name, Animation(data.texture)); it.second)
+	if(auto it = m_animations.try_emplace(name); it.second)
 	{
-		auto& animation = it.first->second;
-		auto& frames    = m_frames.emplace_back();
-		animation.setTexture(*data.texture);
-		animation.setTextureRect(data.startFrame);
-		
+		auto& animation    = it.first->second;
+		auto& frames       = m_frames.emplace_back();
 		animation.isLooped = data.isLooped;
 
 		switch (data.layout)
@@ -42,9 +40,6 @@ const Animation* AnimationManager::createAnimation(const AnimationData& data) no
 
 			case AnimationData::LINEAR:
 			{
-				if(!data.duration)
-					return nullptr;
-
 				const uint32_t duration = data.duration;
 				frames.reserve(static_cast<size_t>(duration));
 
