@@ -19,6 +19,8 @@ else()
 	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 endif()
 
+set(SFML_BUILD_NETWORK OFF CACHE BOOL "" FORCE)
+
 set(DUNEII_SRC_FILES
 	src/animation/AnimationManager.cpp
 	src/assets/AssetManager.cpp

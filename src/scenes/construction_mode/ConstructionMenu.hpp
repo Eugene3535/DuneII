@@ -13,7 +13,7 @@ public:
 	~ConstructionMenu() noexcept;
 
 	bool load(const std::string& info) noexcept override;
-	void update(sf::Time dt)           noexcept override;
+	void update(const sf::Time dt)     noexcept override;
 
 private:
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;

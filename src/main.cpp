@@ -42,7 +42,7 @@ int main()
     
     while (window.isOpen())
     {
-        auto dt = clock.restart();
+        const auto dt = clock.restart();
 
         while (const auto event = window.pollEvent())
         {
@@ -58,15 +58,15 @@ int main()
 
             if (const auto* resized = event->getIf<sf::Event::Resized>())
             {
-                const auto& center = viewport.getCenter();
+                auto center = current_scene->resize({resized->size});
+                viewport.setSize(sf::Vector2f(resized->size));
+                viewport.setCenter(sf::Vector2f(center));
 
-                float x = center.x - resized->size.x * 0.5f;
-                float y = center.y - resized->size.y * 0.5f;
+                float x = static_cast<float>(center.x - (resized->size.x >> 1));
+                float y = static_cast<float>(center.y - (resized->size.y >> 1));
                 float w = static_cast<float>(resized->size.x);
                 float h = static_cast<float>(resized->size.y);
                 visible_area = sf::FloatRect({x, y}, {w, h});
-                viewport.setCenter({x, y});
-                viewport.setSize({w, h});
             }
         }
 
@@ -85,7 +85,7 @@ int main()
                 window.display();
             }
 
-            DuneII::GameScene requested_scene = request.first;
+            const DuneII::GameScene requested_scene = request.first;
             
             switch (requested_scene)
             {
@@ -107,6 +107,8 @@ int main()
                     break;
             }
 
+            auto center = current_scene->resize({window.getSize()});
+            viewport.setCenter(sf::Vector2f(center));
             game.resetSceneChange();
         }
 

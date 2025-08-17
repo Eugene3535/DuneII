@@ -15,7 +15,9 @@ public:
 	virtual ~Scene();
     
     virtual bool load(const std::string& info) noexcept;
-    virtual void update(sf::Time dt)           noexcept;
+    virtual void update(const sf::Time dt)     noexcept;
+
+    virtual sf::Vector2i resize(const sf::Vector2u& size) noexcept;
 
     bool isLoaded() const noexcept;
 

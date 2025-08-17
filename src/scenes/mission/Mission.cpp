@@ -45,11 +45,11 @@ bool Mission::load(const std::string& info) noexcept
 }
 
 
-void Mission::update(sf::Time dt) noexcept
+void Mission::update(const sf::Time dt) noexcept
 {
     if(m_isLoaded)
     {
-        for(auto& system : m_systems)
+        for(auto system : m_systems)
             system(this, dt);
 
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::X))
@@ -63,6 +63,12 @@ void Mission::update(sf::Time dt) noexcept
             }
         }
     }
+}
+
+
+sf::Vector2i Mission::resize(const sf::Vector2u& size) noexcept
+{
+    return m_viewPosition;
 }
 
 
@@ -141,7 +147,7 @@ void Mission::createSystems() noexcept
         constexpr int SCREEN_MARGIN = 150;
 
         const sf::Vector2i& m_mapSize = mission->m_tilemap.getMapSizeInPixels();
-        static sf::Vector2i m_viewPosition;
+        auto& viewPosition = mission->m_viewPosition;
 
         auto seconds = dt.asSeconds();
         float camera_velocity = seconds * CAMERA_VELOCITY;
@@ -155,24 +161,24 @@ void Mission::createSystems() noexcept
         bool is_near_the_bottom_edge = (mouse_position.y > (view_size.y - SCREEN_MARGIN) && mouse_position.y < view_size.y);
 
         if(is_near_the_left_edge)
-            m_viewPosition.x -= camera_velocity;
+            viewPosition.x -= camera_velocity;
         
         if(is_near_the_top_edge)
-            m_viewPosition.y -= camera_velocity;
+            viewPosition.y -= camera_velocity;
         
         if(is_near_the_right_edge)
-            m_viewPosition.x += camera_velocity;
+            viewPosition.x += camera_velocity;
         
         if(is_near_the_bottom_edge)
-            m_viewPosition.y += camera_velocity;            
+            viewPosition.y += camera_velocity;            
         
-        if(m_viewPosition.x < 0)                         m_viewPosition.x = 0;
-        if(m_viewPosition.y < 0)                         m_viewPosition.y = 0;
-        if(m_viewPosition.x + view_size.x > m_mapSize.x) m_viewPosition.x = m_mapSize.x - view_size.x;
-        if(m_viewPosition.y + view_size.y > m_mapSize.y) m_viewPosition.y = m_mapSize.y - view_size.y;
+        if(viewPosition.x < 0)                         viewPosition.x = 0;
+        if(viewPosition.y < 0)                         viewPosition.y = 0;
+        if(viewPosition.x + view_size.x > m_mapSize.x) viewPosition.x = m_mapSize.x - view_size.x;
+        if(viewPosition.y + view_size.y > m_mapSize.y) viewPosition.y = m_mapSize.y - view_size.y;
 
-        mission->m_game->viewport.setCenter(static_cast<sf::Vector2f>(m_viewPosition + sf::Vector2i(view_size.x >> 1, view_size.y >> 1)));
-        mission->m_viewport = sf::IntRect({m_viewPosition.x, m_viewPosition.y}, {view_size.x, view_size.y});
+        mission->m_game->viewport.setCenter(static_cast<sf::Vector2f>(viewPosition + sf::Vector2i(view_size.x >> 1, view_size.y >> 1)));
+        mission->m_viewport = sf::IntRect({viewPosition.x, viewPosition.y}, {view_size.x, view_size.y});
     });
 
 

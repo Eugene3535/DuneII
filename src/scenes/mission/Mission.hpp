@@ -17,7 +17,9 @@ public:
     ~Mission();
 
     bool load(const std::string& info) noexcept override;
-    void update(sf::Time dt)           noexcept override;
+    void update(const sf::Time dt)     noexcept override;
+
+    sf::Vector2i resize(const sf::Vector2u& size) noexcept override;
 
 private:
     bool loadAnimations() noexcept;
@@ -27,6 +29,7 @@ private:
     std::vector<void(*)(Mission*, sf::Time)> m_systems;
 
     sf::IntRect                m_viewport;
+    sf::Vector2i               m_viewPosition;
     TileMap                    m_tilemap;
     entt::registry             m_registry;
     std::vector<sf::Drawable*> m_sprites;
