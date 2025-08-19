@@ -64,7 +64,7 @@ int main()
                 float y = center.y - resized->size.y * 0.5f;
                 float w = static_cast<float>(resized->size.x);
                 float h = static_cast<float>(resized->size.y);
-                visible_area = sf::FloatRect({x, y}, {w, h});
+                visible_area = sf::FloatRect( { 0.f, 0.f }, { w, h } );
                 viewport.setCenter({x, y});
                 viewport.setSize({w, h});
             }

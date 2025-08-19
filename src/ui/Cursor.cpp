@@ -27,7 +27,7 @@ bool Cursor::load(AnimationManager& animator) noexcept
         if(auto found = m_frames.find(frame); found == m_frames.end())
             return false;
 
-    if(auto texture = Assets->getResource<sf::Texture>(CROSSHAIRS_TILESHEET_PNG); texture != nullptr)
+    if(auto texture = Assets->getResource<sf::Texture>(CROSSHAIRS_TILESHEET_PNG))
     {
         m_sprite = std::make_unique<sf::Sprite>(*texture);
         release();
@@ -42,9 +42,7 @@ bool Cursor::load(AnimationManager& animator) noexcept
 void Cursor::select() noexcept
 {
     if(!m_isSelected)
-    {
         m_isSelected = true;
-    }
 }
 
 void Cursor::capture() noexcept
