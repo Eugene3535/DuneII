@@ -95,7 +95,7 @@ bool MainMenu::load(const std::string& info) noexcept
 }
 
 
-void MainMenu::update(sf::Time dt) noexcept
+void MainMenu::update(const sf::Time dt) noexcept
 {
     if( ! m_animation.isOver )
     {
@@ -137,6 +137,15 @@ void MainMenu::update(sf::Time dt) noexcept
         m_game->notifyChangeScene(this, DuneII::GameScene::MISSION);
         m_game->window.setMouseCursorVisible(false);
     }
+}
+
+
+sf::Vector2i MainMenu::resize(const sf::Vector2u& size) noexcept
+{
+    sf::Vector2i screenSize = static_cast<sf::Vector2i>(size);
+    GraphicsUtils::setSpriteSize(*m_titleScreen, screenSize);
+
+    return { screenSize / 2 };
 }
 
 

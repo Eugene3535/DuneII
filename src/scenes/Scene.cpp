@@ -19,9 +19,15 @@ bool Scene::load(const std::string& info) noexcept
 }
 
 
-void Scene::update(sf::Time dt) noexcept
+void Scene::update(const sf::Time dt) noexcept
 {
 
+}
+
+
+sf::Vector2i Scene::resize(const sf::Vector2u& size) noexcept
+{
+    return { 0, 0 };
 }
 
 

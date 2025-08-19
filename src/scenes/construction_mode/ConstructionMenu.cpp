@@ -34,7 +34,7 @@ bool ConstructionMenu::load(const std::string& info) noexcept
 	return m_isLoaded;
 }
 
-void ConstructionMenu::update(sf::Time dt) noexcept
+void ConstructionMenu::update(const sf::Time dt) noexcept
 {
 
 }

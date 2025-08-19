@@ -22,7 +22,9 @@ public:
     ~MainMenu();
 
     bool load(const std::string& info) noexcept override;
-    void update(sf::Time dt)           noexcept override;
+    void update(const sf::Time dt)     noexcept override;
+
+    sf::Vector2i resize(const sf::Vector2u& size) noexcept override;
 
 private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
