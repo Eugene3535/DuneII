@@ -16,9 +16,10 @@
 #include "scenes/mission/tilemap/TileMap.hpp"
 
 
-TileMap::TileMap(entt::registry& registry, AnimationManager& animationManager) noexcept:
+TileMap::TileMap(entt::registry& registry, AnimationManager& animationManager, AssetManager& assets) noexcept:
 	m_registry(registry),
 	m_animationManager(animationManager),
+	m_assets(assets),
 	m_texture(nullptr)
 {
 
@@ -78,7 +79,7 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 				sprite.setPosition(sf::Vector2f(flagX, flagY));
 			};
 
-			const sf::Texture* flag_texture = Assets->getResource<sf::Texture>(FLAGS_PNG);
+			const sf::Texture* flag_texture = m_assets.getResource<sf::Texture>(FLAGS_PNG);
 
 			if(!flag_texture)
 				return false;
@@ -216,7 +217,7 @@ bool TileMap::putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY
         }
     }
 
-	if(const auto texture = Assets->getResource<sf::Texture>(STRUCTURES_PNG); texture != nullptr)
+	if(const auto texture = m_assets.getResource<sf::Texture>(STRUCTURES_PNG))
 	{
 		const auto entity = m_registry.create();
 		m_registry.emplace<sf::IntRect>(entity, bounds);
@@ -537,7 +538,7 @@ void TileMap::loadTilesets(const void* map_node, std::vector<TileMap::Tileset>& 
 		if (size_t last_slash_pos = tex_name.find_last_of('/'); last_slash_pos != std::string::npos)
 			tex_name.erase(0, last_slash_pos + 1);
 
-		sf::Texture* tileset = Assets->getResource<sf::Texture>(tex_name);
+		sf::Texture* tileset = m_assets.getResource<sf::Texture>(tex_name);
 
 		if (tileset == nullptr)
 			continue;

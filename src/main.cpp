@@ -1,3 +1,5 @@
+#include <thread>
+
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <SFML/Window/Event.hpp>
@@ -11,8 +13,6 @@
 int main()
 {
     DuneII game;
-
-    AssetManager assets;
 
     ScreenBlackoutEffect fade_effect;
 
@@ -74,22 +74,21 @@ int main()
 
         current_scene->update(dt);
 
-        if(auto request = game.isSceneNeedToBeChanged(); request.second)
+        if(auto [nextScene, NeedToBeChanged] = game.isSceneNeedToBeChanged(); NeedToBeChanged)
         {
             fade_effect.prepare(viewport.getCenter(), window.getSize());
             
             while(!fade_effect.isOver())
             {     
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 fade_effect.update();
                 window.clear();
                 window.draw(*current_scene);
                 window.draw(fade_effect);
                 window.display();
             }
-
-            const DuneII::GameScene requested_scene = request.first;
             
-            switch (requested_scene)
+            switch (nextScene)
             {
                 case DuneII::GameScene::MAIN_MENU:
                 {

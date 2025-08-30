@@ -27,69 +27,68 @@ bool MainMenu::load(const std::string& info) noexcept
     if(m_isLoaded)
         return true;
 
-    if(auto assets = Assets; assets != nullptr)
+    auto& assets = m_game->getAssets();
+    auto font = assets.getResource<sf::Font>("AvanteNrBook.ttf");
+    auto texture = assets.getResource<sf::Texture>("TitleScreen.png");
+
+    if(!(font && texture))
+        return false;
+
+    AnimationData animData;
+    animData.name = "TitleScreen";
+    animData.layout = AnimationData::LINEAR;
+    animData.startFrame = { { 0, 0 }, { 304, 120 } };
+    animData.duration = 50;
+    animData.isLooped = false;
+    animData.delay = sf::seconds(0.1f);
+
+    if(auto anim = m_game->animationManager.createAnimation(animData); anim != nullptr)
     {
-        auto font = assets->getResource<sf::Font>("AvanteNrBook.ttf");
-        auto texture = assets->getResource<sf::Texture>("TitleScreen.png");
-
-        if(!(font && texture))
-            return false;
-
-        AnimationData animData;
-        animData.name = "TitleScreen";
-        animData.layout = AnimationData::LINEAR;
-        animData.startFrame = { { 0, 0 }, { 304, 120 } };
-        animData.duration = 50;
-        animData.isLooped = false;
-        animData.delay = sf::seconds(0.1f);
-
-        if(auto anim = m_game->animationManager.createAnimation(animData); anim != nullptr)
-        {
-            m_titleScreen = std::make_unique<sf::Sprite>(*texture, anim->frames[0]);
-            memcpy(static_cast<void*>(&m_animation), anim, sizeof(Animation));
-        }
-        else return false;                 
-
-        sf::Vector2i screenSize = static_cast<sf::Vector2i>(m_game->window.getSize());
-        GraphicsUtils::setSpriteSize(*m_titleScreen, screenSize);
-
-        m_startGame = std::make_unique<sf::Text>(*font);
-        m_settings  = std::make_unique<sf::Text>(*font);
-        m_tutorial  = std::make_unique<sf::Text>(*font);
-
-        m_startGame->setFont(*font);
-        m_settings->setFont(*font);
-        m_tutorial->setFont(*font);
-
-        const std::string_view textStart("Начать новую игру");
-        const std::string_view textSettings("Настройки");
-        const std::string_view textTutorial("Обучение");
-
-        m_startGame->setString(sf::String::fromUtf8(textStart.begin(), textStart.end()));
-        m_settings->setString(sf::String::fromUtf8(textSettings.begin(), textSettings.end()));
-        m_tutorial->setString(sf::String::fromUtf8(textTutorial.begin(), textTutorial.end()));
-
-        m_startGame->setStyle(sf::Text::Bold);
-        m_settings->setStyle(sf::Text::Bold);
-        m_tutorial->setStyle(sf::Text::Bold);
-
-        constexpr uint32_t charSize = 60;
-        m_startGame->setCharacterSize(charSize);
-        m_settings->setCharacterSize(charSize);
-        m_tutorial->setCharacterSize(charSize);
-
-        m_startGame->setPosition({ 920, 600 });
-        m_settings->setPosition({ 920, 650 });
-        m_tutorial->setPosition({ 920, 700 });
-
-        m_startGame->setScale({ 0.5f, 0.5f });
-        m_settings->setScale({ 0.5f, 0.5f });
-        m_tutorial->setScale({ 0.5f, 0.5f });
-
-        m_isLoaded = true;
-
-        return m_isLoaded;
+        m_titleScreen = std::make_unique<sf::Sprite>(*texture, anim->frames[0]);
+        memcpy(static_cast<void*>(&m_animation), anim, sizeof(Animation));
     }
+    else return false;                 
+
+    sf::Vector2i screenSize = static_cast<sf::Vector2i>(m_game->window.getSize());
+    GraphicsUtils::setSpriteSize(*m_titleScreen, screenSize);
+
+    m_startGame = std::make_unique<sf::Text>(*font);
+    m_settings  = std::make_unique<sf::Text>(*font);
+    m_tutorial  = std::make_unique<sf::Text>(*font);
+
+    m_startGame->setFont(*font);
+    m_settings->setFont(*font);
+    m_tutorial->setFont(*font);
+
+    const std::string_view textStart("Начать новую игру");
+    const std::string_view textSettings("Настройки");
+    const std::string_view textTutorial("Обучение");
+
+    m_startGame->setString(sf::String::fromUtf8(textStart.begin(), textStart.end()));
+    m_settings->setString(sf::String::fromUtf8(textSettings.begin(), textSettings.end()));
+    m_tutorial->setString(sf::String::fromUtf8(textTutorial.begin(), textTutorial.end()));
+
+    m_startGame->setStyle(sf::Text::Bold);
+    m_settings->setStyle(sf::Text::Bold);
+    m_tutorial->setStyle(sf::Text::Bold);
+
+    constexpr uint32_t charSize = 60;
+    m_startGame->setCharacterSize(charSize);
+    m_settings->setCharacterSize(charSize);
+    m_tutorial->setCharacterSize(charSize);
+
+    m_startGame->setPosition({ 920, 600 });
+    m_settings->setPosition({ 920, 650 });
+    m_tutorial->setPosition({ 920, 700 });
+
+    m_startGame->setScale({ 0.5f, 0.5f });
+    m_settings->setScale({ 0.5f, 0.5f });
+    m_tutorial->setScale({ 0.5f, 0.5f });
+
+    m_isLoaded = true;
+
+    return m_isLoaded;
+
         
     return false;
 }

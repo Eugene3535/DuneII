@@ -21,7 +21,7 @@ public:
     Cursor() noexcept;
     ~Cursor() noexcept;
 
-    bool load(class AnimationManager& animator) noexcept;
+    bool load(class AnimationManager& animator, class AssetManager& assets) noexcept;
     void select() noexcept;
     void capture() noexcept;
     void release() noexcept;

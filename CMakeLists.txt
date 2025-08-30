@@ -21,19 +21,32 @@ endif()
 
 set(SFML_BUILD_NETWORK OFF CACHE BOOL "" FORCE)
 
+
+set(SCENE_SRC_FILES
+	src/scenes/Scene.cpp
+	src/scenes/intro/MainMenu.cpp
+	src/scenes/intro/TitleScreen.cpp
+	src/scenes/mission/Mission.cpp
+	src/scenes/mission/tilemap/Tile.cpp
+	src/scenes/mission/tilemap/TileMap.cpp
+)
+
+set(SCENE_HDR_FILES
+	src/scenes/Scene.hpp
+	src/scenes/intro/TitleScreen.hpp
+	src/scenes/intro/MainMenu.hpp
+	src/scenes/mission/Mission.hpp
+	src/scenes/mission/tilemap/Tile.hpp
+	src/scenes/mission/tilemap/TileMap.hpp
+)
+
 set(DUNEII_SRC_FILES
 	src/animation/AnimationManager.cpp
-	src/assets/AssetManager.cpp
 	src/common/FileProvider.cpp
 	src/common/GraphicsUtils.cpp
 	src/common/MathUtils.cpp
 	src/effects/ScreenBlackoutEffect.cpp
-	src/scenes/Scene.cpp
-	src/scenes/intro/MainMenu.cpp
-	src/scenes/mission/Mission.cpp
-	src/scenes/mission/tilemap/Tile.cpp
-	src/scenes/mission/tilemap/TileMap.cpp
-	src/scenes/construction_mode/ConstructionMenu.cpp
+	${SCENE_SRC_FILES}
 	src/ui/Cursor.cpp
 	src/game/DuneII.cpp
 	src/main.cpp
@@ -51,12 +64,7 @@ set(DUNEII_HDR_FILES
 	src/ecs/components/Animation.hpp
 	src/ecs/components/Structure.hpp
 	src/effects/ScreenBlackoutEffect.hpp
-	src/scenes/Scene.hpp
-	src/scenes/intro/MainMenu.hpp
-	src/scenes/mission/Mission.hpp
-	src/scenes/mission/tilemap/Tile.hpp
-	src/scenes/mission/tilemap/TileMap.hpp
-	src/scenes/construction_mode/ConstructionMenu.hpp
+	${SCENE_HDR_FILES}
 	src/ui/Cursor.hpp
 	src/game/DuneII.hpp
 )

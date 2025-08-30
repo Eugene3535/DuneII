@@ -15,10 +15,6 @@
 class AssetManager final
 {
 public:
-    AssetManager() noexcept;
-
-    static AssetManager* instance() noexcept;
-
     template<class T>
     T* getResource(const std::string& filename) noexcept;
 
@@ -31,13 +27,8 @@ private:
     std::unordered_map<std::string, sf::Font>        m_fonts;
     std::unordered_map<std::string, sf::SoundBuffer> m_soundBuffers;
     std::unordered_map<std::string, sf::Music>       m_musicBox;
-
-private:
-    static AssetManager* m_instance;
 };
 
 #include "assets/AssetManager.inl"
 
-#define Assets AssetManager::instance()
-
-#endif
+#endif // !ASSET_MANAGER_HPP

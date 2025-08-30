@@ -4,10 +4,9 @@
 #include <cstdint>
 
 #include <SFML/System/Vector2.hpp>
-#include <SFML/Graphics/Drawable.hpp>
-#include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
+
 
 // The class is used to create a blackout effect when transitioning between scenes
 class ScreenBlackoutEffect:
@@ -15,7 +14,6 @@ class ScreenBlackoutEffect:
 {
 public:
     ScreenBlackoutEffect() noexcept;
-    ~ScreenBlackoutEffect();
 
     void prepare(const sf::Vector2f& view_center, const sf::Vector2u& window_size) noexcept;
     void update() noexcept;
@@ -31,4 +29,4 @@ private:
     bool m_isOver;
 };
 
-#endif
+#endif // !SCREEN_BLACKOUT_EFFECT_HPP

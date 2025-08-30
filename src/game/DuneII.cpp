@@ -10,13 +10,10 @@ struct
 } game_state;
 
 
-DuneII::DuneII() noexcept
+AssetManager& DuneII::getAssets() noexcept
 {
-
+    return m_assets;
 }
-
-
-DuneII::~DuneII() = default;
 
 
 void DuneII::notifyChangeScene(const Scene* requester, GameScene requested_scene) noexcept

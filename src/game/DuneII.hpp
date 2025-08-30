@@ -12,6 +12,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 
 #include "scenes/Scene.hpp"
+#include "assets/AssetManager.hpp"
 #include "animation/AnimationManager.hpp"
 
 
@@ -26,8 +27,7 @@ public:
     };
 
 
-    DuneII() noexcept;
-    ~DuneII();
+    AssetManager& getAssets() noexcept;
 
     template<class T>
     T* load(const std::string& info) noexcept
@@ -51,6 +51,7 @@ public:
 
 //  Check if the scene requesting the change has sufficient rights
 //  (example: you can only start a new mission from the main menu or the previous mission)
+//  TODO: move to Scene class
     void notifyChangeScene(const class Scene* requester, GameScene requested_scene) noexcept;
     std::pair<GameScene, bool> isSceneNeedToBeChanged() const noexcept;
     void resetSceneChange() noexcept;
@@ -63,6 +64,7 @@ public:
     AnimationManager animationManager;
     
 private:
+    AssetManager m_assets;
     std::unordered_map<std::type_index, std::shared_ptr<void>> m_scenes;
 };
 

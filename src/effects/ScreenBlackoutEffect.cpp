@@ -1,9 +1,9 @@
 #include <limits>
-#include <thread>
 
 #include <SFML/Window/VideoMode.hpp>
 
 #include "effects/ScreenBlackoutEffect.hpp"
+
 
 ScreenBlackoutEffect::ScreenBlackoutEffect() noexcept:
     m_alpha(0),
@@ -13,9 +13,6 @@ ScreenBlackoutEffect::ScreenBlackoutEffect() noexcept:
     prepare( {}, video_mode.size );
 }
 
-ScreenBlackoutEffect::~ScreenBlackoutEffect()
-{
-}
 
 void ScreenBlackoutEffect::prepare(const sf::Vector2f& view_center, const sf::Vector2u& window_size) noexcept
 {
@@ -31,7 +28,6 @@ void ScreenBlackoutEffect::update() noexcept
     if(m_isOver)
         return;
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
     constexpr uint32_t timeout = 250;
     constexpr uint32_t step = 5;
  

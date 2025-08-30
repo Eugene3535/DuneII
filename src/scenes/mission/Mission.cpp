@@ -13,7 +13,7 @@
 
 Mission::Mission(DuneII* game) noexcept:
     Scene(game),
-    m_tilemap(m_registry, game->animationManager)
+    m_tilemap(m_registry, game->animationManager, game->getAssets())
 {
 
 }
@@ -28,12 +28,12 @@ bool Mission::load(const std::string& info) noexcept
         return true;
 
     if(!loadAnimations()) return false;
-    if(!m_cursor.load(m_game->animationManager)) return false;
+    if(!m_cursor.load(m_game->animationManager, m_game->getAssets())) return false;
     if(!m_tilemap.loadFromFile(FileProvider::findPathToFile(info))) return false;
 
     createSystems();
     
-    if(auto theme = Assets->getResource<sf::Music>(COMMAND_POST_FLAC); theme != nullptr)
+    if(auto theme = m_game->getAssets().getResource<sf::Music>(COMMAND_POST_FLAC))
     {
         theme->setLooping(true);
         theme->play();
@@ -57,7 +57,7 @@ void Mission::update(const sf::Time dt) noexcept
             m_game->notifyChangeScene(this, DuneII::GameScene::MAIN_MENU);
             m_game->window.setMouseCursorVisible(true);
 
-            if(auto theme = Assets->getResource<sf::Music>(COMMAND_POST_FLAC); theme != nullptr)
+            if(auto theme = m_game->getAssets().getResource<sf::Music>(COMMAND_POST_FLAC))
             {
                 theme->stop();
             }
