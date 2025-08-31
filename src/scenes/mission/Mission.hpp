@@ -19,8 +19,6 @@ public:
     bool load(const std::string& info) noexcept override;
     void update(const sf::Time dt)     noexcept override;
 
-    sf::Vector2i resize(const sf::Vector2u& size) noexcept override;
-
 private:
     bool loadAnimations() noexcept;
     void createSystems() noexcept;

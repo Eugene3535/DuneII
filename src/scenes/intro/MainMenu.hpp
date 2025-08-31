@@ -24,12 +24,9 @@ public:
     bool load(const std::string& info) noexcept override;
     void update(const sf::Time dt)     noexcept override;
 
-    sf::Vector2i resize(const sf::Vector2u& size) noexcept override;
-
 private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
-private:
     std::unique_ptr<class sf::Sprite> m_titleScreen;
     Animation m_animation;
 

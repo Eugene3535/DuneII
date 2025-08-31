@@ -16,7 +16,7 @@ class AssetManager final
 {
 public:
     template<class T>
-    T* getResource(const std::string& filename) noexcept;
+    T* get(const std::string& filename) noexcept;
 
 private:
     template<class T>

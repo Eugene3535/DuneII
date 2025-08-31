@@ -57,7 +57,6 @@ public:
     void resetSceneChange() noexcept;
 
     sf::RenderWindow window;
-    sf::View         viewport;
     sf::FloatRect    visible_area;
     sf::Clock        clock;
 

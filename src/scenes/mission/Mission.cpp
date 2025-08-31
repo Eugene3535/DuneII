@@ -33,7 +33,7 @@ bool Mission::load(const std::string& info) noexcept
 
     createSystems();
     
-    if(auto theme = m_game->getAssets().getResource<sf::Music>(COMMAND_POST_FLAC))
+    if(auto theme = m_game->getAssets().get<sf::Music>(COMMAND_POST_FLAC))
     {
         theme->setLooping(true);
         theme->play();
@@ -57,18 +57,12 @@ void Mission::update(const sf::Time dt) noexcept
             m_game->notifyChangeScene(this, DuneII::GameScene::MAIN_MENU);
             m_game->window.setMouseCursorVisible(true);
 
-            if(auto theme = m_game->getAssets().getResource<sf::Music>(COMMAND_POST_FLAC))
+            if(auto theme = m_game->getAssets().get<sf::Music>(COMMAND_POST_FLAC))
             {
                 theme->stop();
             }
         }
     }
-}
-
-
-sf::Vector2i Mission::resize(const sf::Vector2u& size) noexcept
-{
-    return m_viewPosition;
 }
 
 
@@ -153,7 +147,7 @@ void Mission::createSystems() noexcept
         float camera_velocity = seconds * CAMERA_VELOCITY;
 
         sf::Vector2i mouse_position  = sf::Mouse::getPosition(mission->m_game->window);
-        const sf::Vector2i view_size = static_cast<sf::Vector2i>(mission->m_game->viewport.getSize());
+        const sf::Vector2i view_size = static_cast<sf::Vector2i>(mission->m_view.getSize());
 
         bool is_near_the_left_edge   = (mouse_position.x > 0 && mouse_position.x < SCREEN_MARGIN);
         bool is_near_the_top_edge    = (mouse_position.y > 0 && mouse_position.y < SCREEN_MARGIN);
@@ -177,7 +171,7 @@ void Mission::createSystems() noexcept
         if(viewPosition.x + view_size.x > m_mapSize.x) viewPosition.x = m_mapSize.x - view_size.x;
         if(viewPosition.y + view_size.y > m_mapSize.y) viewPosition.y = m_mapSize.y - view_size.y;
 
-        mission->m_game->viewport.setCenter(static_cast<sf::Vector2f>(viewPosition + sf::Vector2i(view_size.x >> 1, view_size.y >> 1)));
+        mission->m_view.setCenter(static_cast<sf::Vector2f>(viewPosition + sf::Vector2i(view_size.x >> 1, view_size.y >> 1)));
         mission->m_viewport = sf::IntRect({viewPosition.x, viewPosition.y}, {view_size.x, view_size.y});
     });
 

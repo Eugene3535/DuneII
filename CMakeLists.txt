@@ -45,7 +45,8 @@ set(DUNEII_SRC_FILES
 	src/common/FileProvider.cpp
 	src/common/GraphicsUtils.cpp
 	src/common/MathUtils.cpp
-	src/effects/ScreenBlackoutEffect.cpp
+	src/effects/blackout/ScreenBlackoutEffect.cpp
+	src/effects/particles/ParticleSystem.cpp
 	${SCENE_SRC_FILES}
 	src/ui/Cursor.cpp
 	src/game/DuneII.cpp
@@ -63,7 +64,8 @@ set(DUNEII_HDR_FILES
 	src/common/MathUtils.hpp
 	src/ecs/components/Animation.hpp
 	src/ecs/components/Structure.hpp
-	src/effects/ScreenBlackoutEffect.hpp
+	src/effects/blackout/ScreenBlackoutEffect.hpp
+	src/effects/particles/ParticleSystem.hpp
 	${SCENE_HDR_FILES}
 	src/ui/Cursor.hpp
 	src/game/DuneII.hpp

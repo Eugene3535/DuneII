@@ -25,9 +25,10 @@ void Scene::update(const sf::Time dt) noexcept
 }
 
 
-sf::Vector2i Scene::resize(const sf::Vector2u& size) noexcept
+void Scene::resize(const sf::Vector2f& size) noexcept
 {
-    return { 0, 0 };
+    m_view.setCenter(size * 0.5f);
+    m_view.setSize(size);
 }
 
 
@@ -43,4 +44,10 @@ std::pair<Scene::Type, bool> Scene::getStatus() const noexcept
     //         return { game_state.nextScene, true };
 
     return { Scene::Type::NONE, false };
+}
+
+
+const sf::View& Scene::getView() const noexcept
+{
+    return m_view;
 }

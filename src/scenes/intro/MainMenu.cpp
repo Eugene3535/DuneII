@@ -28,8 +28,8 @@ bool MainMenu::load(const std::string& info) noexcept
         return true;
 
     auto& assets = m_game->getAssets();
-    auto font = assets.getResource<sf::Font>("AvanteNrBook.ttf");
-    auto texture = assets.getResource<sf::Texture>("TitleScreen.png");
+    auto font = assets.get<sf::Font>("AvanteNrBook.ttf");
+    auto texture = assets.get<sf::Texture>("TitleScreen.png");
 
     if(!(font && texture))
         return false;
@@ -77,9 +77,9 @@ bool MainMenu::load(const std::string& info) noexcept
     m_settings->setCharacterSize(charSize);
     m_tutorial->setCharacterSize(charSize);
 
-    m_startGame->setPosition({ 920, 600 });
-    m_settings->setPosition({ 920, 650 });
-    m_tutorial->setPosition({ 920, 700 });
+    m_startGame->setPosition({ 620, 400 });
+    m_settings->setPosition({ 620, 450 });
+    m_tutorial->setPosition({ 620, 400 });
 
     m_startGame->setScale({ 0.5f, 0.5f });
     m_settings->setScale({ 0.5f, 0.5f });
@@ -136,15 +136,6 @@ void MainMenu::update(const sf::Time dt) noexcept
         m_game->notifyChangeScene(this, DuneII::GameScene::MISSION);
         m_game->window.setMouseCursorVisible(false);
     }
-}
-
-
-sf::Vector2i MainMenu::resize(const sf::Vector2u& size) noexcept
-{
-    sf::Vector2i screenSize = static_cast<sf::Vector2i>(size);
-    GraphicsUtils::setSpriteSize(*m_titleScreen, screenSize);
-
-    return { screenSize / 2 };
 }
 
 

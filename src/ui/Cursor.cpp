@@ -27,7 +27,7 @@ bool Cursor::load(AnimationManager& animator, AssetManager& assets) noexcept
         if(auto found = m_frames.find(frame); found == m_frames.end())
             return false;
 
-    if(auto texture = assets.getResource<sf::Texture>(CROSSHAIRS_TILESHEET_PNG))
+    if(auto texture = assets.get<sf::Texture>(CROSSHAIRS_TILESHEET_PNG))
     {
         m_sprite = std::make_unique<sf::Sprite>(*texture);
         release();

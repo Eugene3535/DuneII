@@ -2,7 +2,7 @@
 
 #include <SFML/Window/VideoMode.hpp>
 
-#include "effects/ScreenBlackoutEffect.hpp"
+#include "effects/blackout/ScreenBlackoutEffect.hpp"
 
 
 ScreenBlackoutEffect::ScreenBlackoutEffect() noexcept:

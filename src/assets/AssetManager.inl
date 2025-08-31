@@ -1,5 +1,5 @@
 template<class T>
-T* AssetManager::getResource(const std::string& filename) noexcept
+T* AssetManager::get(const std::string& filename) noexcept
 {
     if constexpr(std::is_same_v<T, sf::Texture>)
     {
