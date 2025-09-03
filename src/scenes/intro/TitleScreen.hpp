@@ -6,6 +6,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 
 #include "scenes/Scene.hpp"
+#include "scenes/intro/Button.hpp"
 
 
 class TitleScreen:
@@ -23,9 +24,9 @@ private:
 
     std::unique_ptr<sf::Sprite> m_space;
     std::unique_ptr<sf::Sprite> m_planet;
-    std::unique_ptr<sf::Sprite> m_buttonPlay;
-    std::unique_ptr<sf::Sprite> m_buttonExit;
-    std::unique_ptr<sf::Sprite> m_buttonSettings;
+    std::unique_ptr<Button> m_play;
+    std::unique_ptr<Button> m_exit;
+    std::unique_ptr<Button> m_settings;
 
     bool m_isPresented;
 };

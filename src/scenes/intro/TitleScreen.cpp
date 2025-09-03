@@ -44,12 +44,14 @@ bool TitleScreen::load(const std::string& info) noexcept
         if(!(spaceTexture && duneTexture && playTexture && exitTexture && settingsTexture))
             return false;
 
-        m_space          = std::make_unique<sf::Sprite>(*spaceTexture);
-        m_planet         = std::make_unique<sf::Sprite>(*duneTexture);
-        m_buttonPlay     = std::make_unique<sf::Sprite>(*playTexture);
-        m_buttonExit     = std::make_unique<sf::Sprite>(*exitTexture);
-        m_buttonSettings = std::make_unique<sf::Sprite>(*settingsTexture);
+        m_space  = std::make_unique<sf::Sprite>(*spaceTexture);
+        m_planet = std::make_unique<sf::Sprite>(*duneTexture);
+        m_planet->setPosition({500, 0});
 
+        m_settings = std::make_unique<Button>(settingsTexture, sf::IntRect({128, 600}, {128, 64}));
+        m_play     = std::make_unique<Button>(playTexture, sf::IntRect({256, 600}, {128, 128}));
+        m_exit     = std::make_unique<Button>(exitTexture, sf::IntRect({384, 600}, {128, 64}));
+        
         const auto screenSize = m_game->window.getSize();
         resize(sf::Vector2f(screenSize));
 
@@ -81,11 +83,11 @@ void TitleScreen::draw(sf::RenderTarget& target, sf::RenderStates states) const
     states.blendMode = sf::BlendAlpha;
     target.draw(*m_space, states);
 
-    if(m_isPresented)
+    if(true) // m_isPresented
     {
         target.draw(*m_planet, states);
-        target.draw(*m_buttonPlay, states);
-        target.draw(*m_buttonExit, states);
-        target.draw(*m_buttonSettings, states);
+        target.draw(*m_exit, states);
+        target.draw(*m_settings, states);
+        target.draw(*m_play, states);
     }
 }

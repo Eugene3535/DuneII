@@ -25,6 +25,7 @@ set(SFML_BUILD_NETWORK OFF CACHE BOOL "" FORCE)
 set(SCENE_SRC_FILES
 	src/scenes/Scene.cpp
 	src/scenes/intro/MainMenu.cpp
+	src/scenes/intro/Button.cpp
 	src/scenes/intro/TitleScreen.cpp
 	src/scenes/mission/Mission.cpp
 	src/scenes/mission/tilemap/Tile.cpp
@@ -33,6 +34,7 @@ set(SCENE_SRC_FILES
 
 set(SCENE_HDR_FILES
 	src/scenes/Scene.hpp
+	src/scenes/intro/Button.hpp
 	src/scenes/intro/TitleScreen.hpp
 	src/scenes/intro/MainMenu.hpp
 	src/scenes/mission/Mission.hpp
