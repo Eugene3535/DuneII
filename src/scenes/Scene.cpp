@@ -38,12 +38,15 @@ bool Scene::isLoaded() const noexcept
 }
 
 
-std::pair<Scene::Type, bool> Scene::getStatus() const noexcept
+Scene::Status Scene::getStatus() const noexcept
 {
-    // if(game_state.isSceneNeedToBeChanged)
-    //         return { game_state.nextScene, true };
+    return m_status;
+}
 
-    return { Scene::Type::NONE, false };
+
+void Scene::reset() noexcept
+{
+    m_status = { Scene::Type::PROCESSING, false };
 }
 
 

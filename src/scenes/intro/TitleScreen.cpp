@@ -92,9 +92,7 @@ void TitleScreen::update(const sf::Time dt) noexcept
     m_exit->update(mousePosition, isClicked);
 
     if(m_play->isPressed())
-    {
-        m_game->notifyChangeScene(this, DuneII::GameScene::MISSION);
-    }
+        m_status = { Scene::Type::MISSION, true };
 }
 
 

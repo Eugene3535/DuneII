@@ -63,42 +63,45 @@ int main()
 
         current_scene->update(dt);
 
-        if(auto [nextScene, needToBeChanged] = game.isSceneNeedToBeChanged(); needToBeChanged)
+        if(auto [nextScene, needToBeChanged] = current_scene->getStatus(); needToBeChanged)
         {
-            fade_effect.prepare(current_scene->getView().getCenter(), window.getSize());
-            
-            while(!fade_effect.isOver())
-            {     
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                fade_effect.update();
-                window.clear();
-                window.draw(*current_scene);
-                window.draw(fade_effect);
-                window.display();
-            }
-            
-            switch (nextScene)
+            if(game.checkSceneRights(current_scene, nextScene))
             {
-                case DuneII::GameScene::MAIN_MENU:
+                current_scene->reset();
+
+                fade_effect.prepare(current_scene->getView().getCenter(), window.getSize());
+                
+                while(!fade_effect.isOver())
+                {     
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                    fade_effect.update();
+                    window.clear();
+                    window.draw(*current_scene);
+                    window.draw(fade_effect);
+                    window.display();
+                }
+                
+                switch (nextScene)
                 {
-                    current_scene = titleScreen;
+                    case Scene::Type::MAIN_MENU:
+                    {
+                        current_scene = titleScreen;
+                    }
                     break;
+
+                    case Scene::Type::MISSION:
+                    {
+                        if(mission = game.load<Mission>("Atreides-8.tmx"))
+                            current_scene = mission;
+                    }
+                    break;
+
+                    default:
+                        break;
                 }
 
-                case DuneII::GameScene::MISSION:
-                {
-                    if( mission = game.load<Mission>("Atreides-8.tmx"); mission)
-                        current_scene = mission;
-
-                    break;
-                }
-
-                default:
-                    break;
+                current_scene->resize(sf::Vector2f(window.getSize())); 
             }
-
-            current_scene->resize(sf::Vector2f(window.getSize())); 
-            game.resetSceneChange();
         }
 
         window.setView(current_scene->getView());

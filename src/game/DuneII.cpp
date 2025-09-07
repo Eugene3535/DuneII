@@ -6,7 +6,6 @@
 struct 
 {
     bool isSceneNeedToBeChanged = false;
-    DuneII::GameScene nextScene = DuneII::NONE;
 } game_state;
 
 
@@ -16,53 +15,22 @@ AssetManager& DuneII::getAssets() noexcept
 }
 
 
-void DuneII::notifyChangeScene(const Scene* requester, GameScene requested_scene) noexcept
+bool DuneII::checkSceneRights(const Scene* requester, Scene::Type requestedType) noexcept
 {
-    if(game_state.nextScene == GameScene::NONE)
+    switch (requestedType)
     {
-        switch (requested_scene)
-        {
-            case GameScene::MAIN_MENU:
+        case Scene::Type::MAIN_MENU:
 
-                if(dynamic_cast<const Mission*>(requester))
-                {
-                    game_state.isSceneNeedToBeChanged = true;
-                    game_state.nextScene = requested_scene;
-                }
+            if(dynamic_cast<const Mission*>(requester))
+                return true;
             
-            break;
+        case Scene::Type::MISSION:
 
-            case GameScene::MISSION:
-
-                if(dynamic_cast<const TitleScreen*>(requester))
-                {
-                    game_state.isSceneNeedToBeChanged = true;
-                    game_state.nextScene = requested_scene;
-                }
-
-            break;
-            
-            default:
-                break;
-        }
+            if(dynamic_cast<const TitleScreen*>(requester))
+                return true;
+        
+        default:
+            return false;
     }
-}
-
-
-std::pair<DuneII::GameScene, bool> DuneII::isSceneNeedToBeChanged() const noexcept
-{
-    if(game_state.isSceneNeedToBeChanged)
-        return { game_state.nextScene, true };
-
-    return { DuneII::GameScene::NONE, false };
-}
-
-
-void DuneII::resetSceneChange() noexcept
-{
-    if(game_state.isSceneNeedToBeChanged)
-    {
-        game_state.isSceneNeedToBeChanged = false;
-        game_state.nextScene = GameScene::NONE;
-    }
+    
 }

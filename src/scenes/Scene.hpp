@@ -14,10 +14,12 @@ class Scene:
 public:
     enum Type: uint32_t
     {
-        NONE,
+        PROCESSING = 0,
         MAIN_MENU,
         MISSION
     };
+
+    using Status = std::pair<Type, bool>;
 
 	Scene(class DuneII* game) noexcept;
 	virtual ~Scene();
@@ -27,7 +29,9 @@ public:
     virtual void resize(const sf::Vector2f& size) noexcept;
 
     bool isLoaded() const noexcept;
-    std::pair<Type, bool> getStatus() const noexcept;
+
+    Status getStatus() const noexcept;
+    void reset() noexcept;
 
     const sf::View& getView() const noexcept;
 
@@ -37,6 +41,8 @@ protected:
     bool m_isLoaded;
 
     sf::View m_view;
+
+    std::pair<Type, bool> m_status;
 };
 
 #endif // !SCENE_HPP

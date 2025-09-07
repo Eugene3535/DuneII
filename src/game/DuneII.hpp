@@ -19,14 +19,6 @@
 class DuneII final
 {
 public:
-    enum GameScene: uint32_t
-    {
-        NONE,
-        MAIN_MENU,
-        MISSION
-    };
-
-
     AssetManager& getAssets() noexcept;
 
     template<class T>
@@ -49,12 +41,8 @@ public:
         return nullptr;
     }
 
-//  Check if the scene requesting the change has sufficient rights
-//  (example: you can only start a new mission from the main menu or the previous mission)
-//  TODO: move to Scene class
-    void notifyChangeScene(const class Scene* requester, GameScene requested_scene) noexcept;
-    std::pair<GameScene, bool> isSceneNeedToBeChanged() const noexcept;
-    void resetSceneChange() noexcept;
+    bool checkSceneRights(const Scene* requester, Scene::Type requestedType) noexcept;
+
 
     sf::RenderWindow window;
     sf::FloatRect    visible_area;
