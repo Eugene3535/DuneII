@@ -7,22 +7,26 @@ class Button:
     public sf::Drawable
 {
 public:
-    Button(const sf::Texture* texture, const sf::IntRect& bounds) noexcept;
+    Button(const sf::Texture* texture) noexcept;
 
-    void update(const class sf::View& view, const sf::Vector2i& mousePosition) noexcept;
-    bool hasClicked() const noexcept;
+    void update(const sf::Vector2f& mousePosition, bool isClicked) noexcept;
+
+    void setPosition(const sf::Vector2f& position) noexcept;
+    void setSize(const sf::Vector2f& newSize) noexcept;
+
+    bool isPressed() const noexcept;
 
 private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
+    static constexpr sf::Color m_normalColor      { 150, 150, 150, 150 };
+    static constexpr sf::Color m_underCursorColor { 200, 200, 200, 200 };
+    static constexpr sf::Color m_clickedColor     { sf::Color::White   };
+
     sf::Sprite m_sprite;
-
-    sf::Vector2f m_relativePosition;
-    sf::Vector2f m_size;
-
-    const sf::Color s_normalColor      { 150, 150, 150, 150 };
-    const sf::Color s_underCursorColor { 200, 200, 200, 200 };
-    const sf::Color s_clickedColor     { sf::Color::White   };
+    sf::FloatRect m_bounds;
+    bool m_boundsNeedUpdate;
+    bool m_isPressed;
 };
 
 #endif // !BUTTON_HPP

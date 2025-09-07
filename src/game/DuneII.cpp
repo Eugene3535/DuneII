@@ -1,4 +1,4 @@
-#include "scenes/intro/MainMenu.hpp"
+#include "scenes/intro/TitleScreen.hpp"
 #include "scenes/mission/Mission.hpp"
 #include "game/DuneII.hpp"
 
@@ -34,7 +34,7 @@ void DuneII::notifyChangeScene(const Scene* requester, GameScene requested_scene
 
             case GameScene::MISSION:
 
-                if(dynamic_cast<const MainMenu*>(requester))
+                if(dynamic_cast<const TitleScreen*>(requester))
                 {
                     game_state.isSceneNeedToBeChanged = true;
                     game_state.nextScene = requested_scene;

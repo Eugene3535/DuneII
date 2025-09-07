@@ -10,6 +10,11 @@
 #include "effects/blackout/ScreenBlackoutEffect.hpp"
 #include "game/DuneII.hpp"
 
+
+#define DEFAULT_SCREEN_WIDTH 1200
+#define DEFAULT_SCREEN_HEIGHT 900
+
+
 int main()
 {
     DuneII game;
@@ -20,7 +25,7 @@ int main()
     auto& visible_area = game.visible_area;
     auto& clock = game.clock;
 
-    visible_area = sf::FloatRect({0.f, 0.f}, {1200.f, 720.f});
+    visible_area = sf::FloatRect({0.f, 0.f}, {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT});
 
     uint32_t width  = static_cast<uint32_t>(visible_area.size.x);
     uint32_t height = static_cast<uint32_t>(visible_area.size.y);
@@ -58,7 +63,7 @@ int main()
 
         current_scene->update(dt);
 
-        if(auto [nextScene, NeedToBeChanged] = game.isSceneNeedToBeChanged(); NeedToBeChanged)
+        if(auto [nextScene, needToBeChanged] = game.isSceneNeedToBeChanged(); needToBeChanged)
         {
             fade_effect.prepare(current_scene->getView().getCenter(), window.getSize());
             

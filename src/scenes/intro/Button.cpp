@@ -4,45 +4,69 @@
 #include "scenes/intro/Button.hpp"
 
 
-namespace
-{// set size in pixels
-    void set_button_size(sf::Sprite& button, const sf::Vector2f& newSize) noexcept
+Button::Button(const sf::Texture* texture) noexcept:
+    m_sprite(*texture),
+    m_boundsNeedUpdate(true),
+    m_isPressed(false)
+{
+    m_sprite.setOrigin(sf::Vector2f(texture->getSize()) * 0.5f);
+    m_sprite.setColor(m_normalColor);
+    m_bounds = m_sprite.getGlobalBounds();
+}
+
+
+void Button::update(const sf::Vector2f& mousePosition, bool isClicked) noexcept
+{
+    if(m_boundsNeedUpdate)
     {
-        if (auto& rect = button.getTextureRect(); rect.size.x > 0 && rect.size.y > 0)
+        m_bounds = m_sprite.getGlobalBounds();
+        m_boundsNeedUpdate = false;
+    }
+
+    sf::Color color { m_normalColor };
+    const bool isUnderCursor = m_bounds.contains(mousePosition);
+    m_isPressed = false;
+
+    if(isClicked)
+    {
+        if(isUnderCursor)
         {
-            float dx = newSize.x / rect.size.x;
-            float dy = newSize.y / rect.size.y;
-            button.setScale({dx, dy});
+            color = m_clickedColor;
+            m_isPressed = true;
         }
+    }
+    else
+    {
+        if(isUnderCursor)
+            color = m_underCursorColor;
+    }
+
+    m_sprite.setColor(color);
+}
+
+
+void Button::setPosition(const sf::Vector2f& position) noexcept
+{
+    m_sprite.setPosition(position);
+    m_boundsNeedUpdate = true;
+}
+
+
+void Button::setSize(const sf::Vector2f& newSize) noexcept
+{
+    if (auto& rect = m_sprite.getTextureRect(); rect.size.x > 0 && rect.size.y > 0)
+    {
+        float dx = newSize.x / rect.size.x;
+        float dy = newSize.y / rect.size.y;
+        m_sprite.setScale({dx, dy});
+        m_boundsNeedUpdate = true;
     }
 }
 
 
-Button::Button(const sf::Texture* texture, const sf::IntRect& bounds) noexcept:
-    m_sprite(*texture),
-    m_relativePosition(bounds.position),
-    m_size(bounds.size)
+bool Button::isPressed() const noexcept
 {
-    m_sprite.setOrigin(sf::Vector2f(texture->getSize()) * 0.5f);
-    m_sprite.setPosition(sf::Vector2f(bounds.position));
-    m_sprite.setColor(s_normalColor);
-    set_button_size(m_sprite, sf::Vector2f(bounds.size));
-}
-
-
-void Button::update(const sf::View& view, const sf::Vector2i& mousePosition) noexcept
-{
-    const auto position = m_sprite.getPosition();
-    const auto center   = view.getCenter();
-    const auto size     = view.getSize();
-
-    
-}
-
-
-bool Button::hasClicked() const noexcept
-{
-    return false;
+    return m_isPressed;
 }
 
 
