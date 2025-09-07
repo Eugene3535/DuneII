@@ -11,7 +11,6 @@ Button::Button(const sf::Texture* texture) noexcept:
 {
     m_sprite.setOrigin(sf::Vector2f(texture->getSize()) * 0.5f);
     m_sprite.setColor(m_normalColor);
-    m_bounds = m_sprite.getGlobalBounds();
 }
 
 
