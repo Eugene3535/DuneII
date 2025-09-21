@@ -2,6 +2,7 @@
 #define PARTICLE_SYSTEM_HPP
 
 #include <vector>
+#include <random>
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/Drawable.hpp>
@@ -13,9 +14,10 @@ class ParticleSystem:
     public sf::Drawable
 {
 public:
-    ParticleSystem(size_t count) noexcept;
+    ParticleSystem(size_t count, std::mt19937& rng) noexcept;
 
     void setEmitter(const sf::Vector2f& position) noexcept;
+    void setRespawnArea(const sf::Vector2i& area) noexcept;
 
     void update(const sf::Time elapsed) noexcept;
 
@@ -30,12 +32,15 @@ private:
 
     void resetParticle(size_t index) noexcept;
 
-    sf::Shader* m_shader;
+    std::mt19937& m_rng;
 
     std::vector<Particle> m_pointCloud;
     sf::VertexArray       m_vertices;
     sf::Time              m_lifetime{sf::seconds(3)};
-    sf::Vector2f          m_emitter;
+
+
+    sf::Vector2f m_emitter;
+    sf::Vector2i m_respawnArea;
 };
 
 #endif // !PARTICLE_SYSTEM_HPP

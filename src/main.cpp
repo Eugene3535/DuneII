@@ -1,13 +1,16 @@
 #include <thread>
+#include <random>
 
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <SFML/Window/Event.hpp>
+#include <SFML/Window/VideoMode.hpp>
 
 #include "scenes/intro/TitleScreen.hpp"
 #include "scenes/mission/Mission.hpp"
 #include "assets/AssetManager.hpp"
 #include "effects/blackout/ScreenBlackoutEffect.hpp"
+#include "effects/particles/ParticleSystem.hpp"
 #include "game/DuneII.hpp"
 
 
@@ -17,9 +20,15 @@
 
 int main()
 {
+    std::random_device rd;
+    std::mt19937       rng(rd());
+
     DuneII game;
 
     ScreenBlackoutEffect fade_effect;
+    ParticleSystem ps(200, rng);
+    ps.setEmitter({600.f, 450.f});
+    ps.setRespawnArea({DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT});
 
     auto& window = game.window;
     auto& visible_area = game.visible_area;
@@ -62,6 +71,7 @@ int main()
         }
 
         current_scene->update(dt);
+        ps.update(dt);
 
         if(auto [nextScene, needToBeChanged] = current_scene->getStatus(); needToBeChanged)
         {
@@ -106,7 +116,12 @@ int main()
 
         window.setView(current_scene->getView());
         window.clear();
+        
         window.draw(*current_scene);
+
+        if(dynamic_cast<TitleScreen*>(current_scene))
+            window.draw(ps);
+
         window.display();
     }
     
