@@ -1,6 +1,7 @@
 #include <SFML/Graphics/Text.hpp>
 
 #include "game/DuneII.hpp"
+#include "scenes/intro/interactive_elements/Button.hpp"
 #include "scenes/intro/TitleScreen.hpp"
 
 
@@ -66,7 +67,9 @@ TitleScreen::TitleScreen(DuneII* game) noexcept:
     m_theme(nullptr),
     m_memoryPool(nullptr)
 {
-
+#ifdef DEBUG
+    m_isPresented = true;
+#endif
 }
 
 
@@ -124,7 +127,9 @@ bool TitleScreen::load(const std::string& info) noexcept
             const auto screenSize = sf::Vector2f(m_game->window.getSize());
             resize(screenSize);
             m_planet->setPosition({ screenSize.x * PLANET_POSITION_FACTOR_X, screenSize.y / PLANET_POSITION_FACTOR_Y });
-
+#ifdef DEBUG
+            m_planet->setPosition({ screenSize.x / PLANET_POSITION_FACTOR_X, screenSize.y / PLANET_POSITION_FACTOR_Y });
+#endif
             m_theme->play();
         }
     }

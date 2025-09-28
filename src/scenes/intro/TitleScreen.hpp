@@ -2,12 +2,13 @@
 #define TITLE_SCREEN_HPP
 
 #include "scenes/Scene.hpp"
-#include "scenes/intro/Button.hpp"
+
 
 namespace sf
 {
     class Music;
     class Text;
+    class Sprite;
 }
 
 
@@ -25,11 +26,12 @@ public:
 private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
-    sf::Sprite* m_space;
-    sf::Sprite* m_planet;
-    Button*     m_play;
-    Button*     m_exit;
-    Button*     m_settings;
+    class sf::Sprite* m_space;
+    class sf::Sprite* m_planet;
+
+    class Button* m_play;
+    class Button* m_exit;
+    class Button* m_settings;
 
     class sf::Text*  m_info;
     class sf::Music* m_theme;

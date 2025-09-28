@@ -1,7 +1,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 
-#include "scenes/intro/Button.hpp"
+#include "scenes/intro/interactive_elements/Button.hpp"
 
 
 Button::Button(const sf::Texture* texture) noexcept:
