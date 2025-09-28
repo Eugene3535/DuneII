@@ -26,9 +26,13 @@ int main()
     DuneII game;
 
     ScreenBlackoutEffect fade_effect;
-    ParticleSystem ps(200, rng);
-    ps.setEmitter({600.f, 450.f});
-    ps.setRespawnArea({DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT});
+    ParticleSystem ps(1000, rng);
+    ps.setEmitter({ DEFAULT_SCREEN_WIDTH, (DEFAULT_SCREEN_HEIGHT >> 1) });
+    ps.setRespawnArea({0, DEFAULT_SCREEN_HEIGHT});
+    ps.setDirection(180);
+    ps.setMaxLifetime(sf::seconds(25));
+    ps.setDistribution({{ 0, 0 }, { DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT }});
+    ps.setFading(true);
 
     auto& window = game.window;
     auto& visible_area = game.visible_area;
@@ -119,7 +123,7 @@ int main()
         
         window.draw(*current_scene);
 
-        if(dynamic_cast<TitleScreen*>(current_scene))
+        if(dynamic_cast<TitleScreen*>(current_scene) == titleScreen)
             window.draw(ps);
 
         window.display();

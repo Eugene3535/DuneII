@@ -18,6 +18,11 @@ public:
 
     void setEmitter(const sf::Vector2f& position) noexcept;
     void setRespawnArea(const sf::Vector2i& area) noexcept;
+    void setDirection(float angle) noexcept;
+    void setSpraying(float angle) noexcept;
+    void setMaxLifetime(const sf::Time lifetime) noexcept;
+    void setDistribution(const sf::IntRect& area) noexcept;
+    void setFading(bool fading) noexcept;
 
     void update(const sf::Time elapsed) noexcept;
 
@@ -32,15 +37,19 @@ private:
 
     void resetParticle(size_t index) noexcept;
 
-    std::mt19937& m_rng;
-
     std::vector<Particle> m_pointCloud;
     sf::VertexArray       m_vertices;
-    sf::Time              m_lifetime{sf::seconds(3)};
 
+    std::mt19937& m_rng;
+    sf::Time m_lifetime{sf::seconds(3)};
 
     sf::Vector2f m_emitter;
     sf::Vector2i m_respawnArea;
+
+    float m_direction;
+    float m_spraying;
+
+    bool m_isFading;
 };
 
 #endif // !PARTICLE_SYSTEM_HPP

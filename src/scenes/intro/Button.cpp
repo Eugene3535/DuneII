@@ -69,6 +69,12 @@ bool Button::isPressed() const noexcept
 }
 
 
+sf::Sprite& Button::getSprite() noexcept
+{
+    return m_sprite;
+}
+
+
 void Button::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     states.blendMode = sf::BlendAlpha;

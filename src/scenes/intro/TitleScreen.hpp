@@ -1,12 +1,14 @@
 #ifndef TITLE_SCREEN_HPP
 #define TITLE_SCREEN_HPP
 
-#include <memory>
-
-#include <SFML/Graphics/Sprite.hpp>
-
 #include "scenes/Scene.hpp"
 #include "scenes/intro/Button.hpp"
+
+namespace sf
+{
+    class Music;
+    class Text;
+}
 
 
 class TitleScreen:
@@ -14,6 +16,7 @@ class TitleScreen:
 {
 public:
     TitleScreen(class DuneII* game) noexcept;
+    ~TitleScreen();
 
     bool load(const std::string& info) noexcept override;
     void update(const sf::Time dt)     noexcept override;
@@ -22,11 +25,16 @@ public:
 private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
-    std::unique_ptr<sf::Sprite> m_space;
-    std::unique_ptr<sf::Sprite> m_planet;
-    std::unique_ptr<Button> m_play;
-    std::unique_ptr<Button> m_exit;
-    std::unique_ptr<Button> m_settings;
+    sf::Sprite* m_space;
+    sf::Sprite* m_planet;
+    Button*     m_play;
+    Button*     m_exit;
+    Button*     m_settings;
+
+    class sf::Text*  m_info;
+    class sf::Music* m_theme;
+
+    void* m_memoryPool;
 
     bool m_isPresented;
 };
