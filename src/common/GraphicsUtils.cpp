@@ -4,7 +4,7 @@
 
 void GraphicsUtils::setSpriteSize(sf::Sprite& sprite, float width, float height) noexcept
 {
-	if (auto& rect = sprite.getTextureRect(); rect.size.x > 0 && rect.size.y > 0)
+	if (const auto& rect = sprite.getTextureRect(); rect.size.x > 0 && rect.size.y > 0)
 	{
 		float dx = width / rect.size.x;
 		float dy = height / rect.size.y;

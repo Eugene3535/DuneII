@@ -53,7 +53,7 @@ void Button::setPosition(const sf::Vector2f& position) noexcept
 
 void Button::setSize(const sf::Vector2f& newSize) noexcept
 {
-    if (auto& rect = m_sprite.getTextureRect(); rect.size.x > 0 && rect.size.y > 0)
+    if (const auto& rect = m_sprite.getTextureRect(); rect.size.x > 0 && rect.size.y > 0)
     {
         float dx = newSize.x / rect.size.x;
         float dy = newSize.y / rect.size.y;

@@ -552,9 +552,9 @@ void TileMap::loadTilesets(const void* map_node, std::vector<TileMap::Tileset>& 
 			Tileset& ts = tilesets.emplace_back();
 
 			ts.texture   = tileset;
-			ts.tileCount = tile_count ? std::atoi(tile_count->value()) : 0;
-			ts.columns   = columns ? std::atoi(columns->value()) : 0;
-			ts.firstGID  = firstGID ? std::atoi(firstGID->value()) : 0;
+			ts.tileCount = (tile_count != nullptr) ? std::atoi(tile_count->value()) : 0;
+			ts.columns   = (columns    != nullptr) ? std::atoi(columns->value())    : 0;
+			ts.firstGID  = (firstGID   != nullptr) ? std::atoi(firstGID->value())   : 0;
 		}
 	}
 }

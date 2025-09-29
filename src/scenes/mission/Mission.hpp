@@ -13,7 +13,7 @@ class Mission:
     public Scene
 {
 public:
-    Mission(class DuneII* game) noexcept;
+    explicit Mission(class DuneII* game) noexcept;
     ~Mission();
 
     bool load(const std::string& info) noexcept override;

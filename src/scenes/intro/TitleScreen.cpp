@@ -25,7 +25,7 @@ namespace
 {// set size in pixels
     void set_sprite_size(sf::Sprite* sprite, const sf::Vector2f& newSize) noexcept
     {
-        if (auto& rect = sprite->getTextureRect(); rect.size.x > 0 && rect.size.y > 0)
+        if (const auto& rect = sprite->getTextureRect(); rect.size.x > 0 && rect.size.y > 0)
         {
             float dx = newSize.x / rect.size.x;
             float dy = newSize.y / rect.size.y;
@@ -101,7 +101,7 @@ bool TitleScreen::load(const std::string& info) noexcept
 
         if(m_memoryPool = malloc(sizeof(sf::Sprite) * 2 + sizeof(Button) * 3 + sizeof(sf::Text)))
         {
-            char* offset = (char*)m_memoryPool;
+            char* offset = static_cast<char*>(m_memoryPool);
             m_space = new (offset) sf::Sprite(*spaceTexture);
             offset += sizeof(sf::Sprite);
 

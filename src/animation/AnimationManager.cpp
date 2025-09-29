@@ -121,7 +121,6 @@ std::unordered_map<std::string, sf::IntRect> AnimationManager::loadFramesFromFil
 
 			if(auto it = frames.try_emplace(title); it.second)
 			{
-				auto& frame   = it.first->second;
 				auto cut_node = anim_node->first_node("cut");
 
 				while(cut_node)
@@ -136,6 +135,7 @@ std::unordered_map<std::string, sf::IntRect> AnimationManager::loadFramesFromFil
 					int width  = w ? atoi(w->value()) : 0;
 					int height = h ? atoi(h->value()) : 0;
 
+					auto& frame = it.first->second;
 					frame = sf::IntRect({left, top}, {width, height});
 
 					cut_node = cut_node->next_sibling();
