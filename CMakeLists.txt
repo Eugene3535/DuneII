@@ -26,6 +26,7 @@ set(SCENE_SRC_FILES
 	src/scenes/Scene.cpp
 	src/scenes/intro/interactive_elements/Button.cpp
 	src/scenes/intro/TitleScreen.cpp
+	src/scenes/choosing_houses/Destiny.cpp
 	src/scenes/mission/Mission.cpp
 	src/scenes/mission/tilemap/Tile.cpp
 	src/scenes/mission/tilemap/TileMap.cpp
@@ -35,6 +36,7 @@ set(SCENE_HDR_FILES
 	src/scenes/Scene.hpp
 	src/scenes/intro/interactive_elements/Button.hpp
 	src/scenes/intro/TitleScreen.hpp
+	src/scenes/choosing_houses/Destiny.hpp
 	src/scenes/mission/Mission.hpp
 	src/scenes/mission/tilemap/Tile.hpp
 	src/scenes/mission/tilemap/TileMap.hpp

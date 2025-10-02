@@ -1,4 +1,5 @@
 #include "scenes/intro/TitleScreen.hpp"
+#include "scenes/choosing_houses/Destiny.hpp"
 #include "scenes/mission/Mission.hpp"
 #include "game/DuneII.hpp"
 
@@ -20,13 +21,15 @@ bool DuneII::checkSceneRights(const Scene* requester, Scene::Type requestedType)
     switch (requestedType)
     {
         case Scene::Type::MAIN_MENU:
-
             if(dynamic_cast<const Mission*>(requester))
+                return true;
+
+        case Scene::Type::CHOOSE_DESTINY:
+            if(dynamic_cast<const TitleScreen*>(requester))
                 return true;
             
         case Scene::Type::MISSION:
-
-            if(dynamic_cast<const TitleScreen*>(requester))
+            if(dynamic_cast<const Destiny*>(requester))
                 return true;
         
         default:

@@ -2,6 +2,7 @@
 
 #include "game/DuneII.hpp"
 #include "scenes/intro/interactive_elements/Button.hpp"
+#include "scenes/choosing_houses/Destiny.hpp"
 #include "scenes/intro/TitleScreen.hpp"
 
 
@@ -154,7 +155,7 @@ void TitleScreen::update(const sf::Time dt) noexcept
             if(m_play->isPressed())
             {
                 m_theme->stop();
-                m_status = { Scene::Type::MISSION, true };
+                m_status = { Scene::Type::CHOOSE_DESTINY, true };
             }
         }
         else

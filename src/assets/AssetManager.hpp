@@ -23,6 +23,7 @@
 #define BUTTON_PLAY_PNG          "button_play.png"
 #define BUTTON_EXIT_RU_PNG       "button_exit_ru.png"
 #define BUTTON_SETTINGS_RU_PNG   "button_settings_ru.png"
+#define HOUSES_PNG               "Houses.png"
 
 // Animation xml
 #define CURSOR_FRAME_XML "CursorFrames.xml"

@@ -16,6 +16,7 @@ public:
     {
         PROCESSING = 0,
         MAIN_MENU,
+        CHOOSE_DESTINY,
         MISSION
     };
 

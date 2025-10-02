@@ -7,6 +7,7 @@
 #include <SFML/Window/VideoMode.hpp>
 
 #include "scenes/intro/TitleScreen.hpp"
+#include "scenes/choosing_houses/Destiny.hpp"
 #include "scenes/mission/Mission.hpp"
 #include "assets/AssetManager.hpp"
 #include "effects/blackout/ScreenBlackoutEffect.hpp"
@@ -51,6 +52,7 @@ int main()
     if(!titleScreen)
         return -1;
 
+    Destiny* destiny = nullptr;
     Mission* mission = nullptr; 
     Scene* current_scene = titleScreen;
     
@@ -100,6 +102,13 @@ int main()
                     case Scene::Type::MAIN_MENU:
                     {
                         current_scene = titleScreen;
+                    }
+                    break;
+
+                    case Scene::Type::CHOOSE_DESTINY:
+                    {
+                        if(destiny = game.load<Destiny>({}))
+                            current_scene = destiny;
                     }
                     break;
 
