@@ -3,6 +3,8 @@
 
 #include <memory>
 
+#include <SFML/Graphics/RectangleShape.hpp>
+
 #include "scenes/Scene.hpp"
 
 namespace sf
@@ -24,6 +26,8 @@ public:
 
 private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+
+    sf::RectangleShape m_outline;
 
     std::unique_ptr<class sf::Sprite> m_sprite;
 

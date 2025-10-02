@@ -3,11 +3,11 @@
 
 enum class HouseType 
 {
-	HARKONNEN = 0,
-	ATREIDES,
-	ORDOS,
+    ATREIDES = 0,
+    ORDOS,
+	HARKONNEN,
+    SARDAUKAR,
 	FREMEN,
-	SARDAUKAR,
 	MERCENARY,
 	MAX,
 	INVALID = 0xFF
