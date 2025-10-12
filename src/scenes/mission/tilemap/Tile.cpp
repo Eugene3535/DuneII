@@ -26,9 +26,6 @@ Tile::Tile(const sf::Texture* texture, const sf::IntRect& rectangle) noexcept:
 }
 
 
-Tile::~Tile() = default;
-
-
 void Tile::setTexture(const sf::Texture* texture) noexcept
 {
 	m_texture = texture;
@@ -87,7 +84,7 @@ void Tile::setPosition(const sf::Vector2f& point) noexcept
 }
 
 
-const sf::Color& Tile::getColor() const noexcept
+sf::Color Tile::getColor() const noexcept
 {
 	return m_vertices[0].color;
 }

@@ -46,7 +46,7 @@ set(DUNEII_SRC_FILES
 	src/animation/AnimationManager.cpp
 	src/common/FileProvider.cpp
 	src/common/GraphicsUtils.cpp
-	src/common/MathUtils.cpp
+	src/common/ExternalMath.cpp
 	src/effects/blackout/ScreenBlackoutEffect.cpp
 	src/effects/particles/ParticleSystem.cpp
 	${SCENE_SRC_FILES}
@@ -63,7 +63,7 @@ set(DUNEII_HDR_FILES
 	src/common/Enums.hpp
 	src/common/FileProvider.hpp
 	src/common/GraphicsUtils.hpp
-	src/common/MathUtils.hpp
+	src/common/ExternalMath.hpp
 	src/ecs/components/Animation.hpp
 	src/ecs/components/Structure.hpp
 	src/effects/blackout/ScreenBlackoutEffect.hpp

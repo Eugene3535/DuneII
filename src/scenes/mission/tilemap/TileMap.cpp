@@ -55,7 +55,7 @@ bool TileMap::loadFromFile(const std::filesystem::path& file_path) noexcept
 			{
 				for(auto& object : m_objects)
 				{
-					if(object.name == "Area")
+					if(object.name == "Base")
 					{
 						auto found = std::find_if(object.properties.begin(), object.properties.end(), [houseName](const TileMap::Object::Property& property)
 						{
@@ -547,15 +547,12 @@ void TileMap::loadTilesets(const void* map_node, std::vector<TileMap::Tileset>& 
 		auto columns    = tilesetNode->first_attribute("columns");
 		auto firstGID   = tilesetNode->first_attribute("firstgid");
 
-		if(tile_count && columns && firstGID)
-		{
-			Tileset& ts = tilesets.emplace_back();
+		Tileset& ts = tilesets.emplace_back();
 
-			ts.texture   = tileset;
-			ts.tileCount = (tile_count != nullptr) ? std::atoi(tile_count->value()) : 0;
-			ts.columns   = (columns    != nullptr) ? std::atoi(columns->value())    : 0;
-			ts.firstGID  = (firstGID   != nullptr) ? std::atoi(firstGID->value())   : 0;
-		}
+		ts.texture   = tileset;
+		ts.tileCount = (tile_count != nullptr) ? std::atoi(tile_count->value()) : 0;
+		ts.columns   = (columns    != nullptr) ? std::atoi(columns->value())    : 0;
+		ts.firstGID  = (firstGID   != nullptr) ? std::atoi(firstGID->value())   : 0;
 	}
 }
 
@@ -610,7 +607,7 @@ bool TileMap::loadLandscape(const Tileset& tileset, const std::vector<int>& pars
 
 		if (m_vertices.create(vertices.size()))
 			if(m_vertices.update(vertices.data()))
-			return true;
+				return true;
 	}
 
 	return false;
