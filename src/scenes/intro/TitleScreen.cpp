@@ -1,7 +1,4 @@
-#include <SFML/Graphics/Text.hpp>
-
 #include "game/DuneII.hpp"
-#include "scenes/intro/interactive_elements/Button.hpp"
 #include "scenes/choosing_houses/Destiny.hpp"
 #include "scenes/intro/TitleScreen.hpp"
 
@@ -65,8 +62,7 @@ TitleScreen::TitleScreen(DuneII* game) noexcept:
     m_exit(nullptr),
     m_settings(nullptr),
     m_info(nullptr),
-    m_theme(nullptr),
-    m_memoryPool(nullptr)
+    m_theme(nullptr)
 {
 #ifdef DEBUG
     m_isPresented = true;
@@ -79,7 +75,6 @@ TitleScreen::~TitleScreen()
     if(m_memoryPool)
     {
         m_info->~Text();
-        free(m_memoryPool);
     }   
 }
 
@@ -100,39 +95,37 @@ bool TitleScreen::load(const std::string& info) noexcept
         if(!(spaceTexture && duneTexture && playTexture && exitTexture && settingsTexture && font && m_theme))
             return false;
 
-        if(m_memoryPool = malloc(sizeof(sf::Sprite) * 2 + sizeof(Button) * 3 + sizeof(sf::Text)))
-        {
-            char* offset = static_cast<char*>(m_memoryPool);
-            m_space = new (offset) sf::Sprite(*spaceTexture);
-            offset += sizeof(sf::Sprite);
+        char* offset = m_memoryPool;
+        m_space = new (offset) sf::Sprite(*spaceTexture);
+        offset += sizeof(sf::Sprite);
 
-            m_planet = new (offset) sf::Sprite(*duneTexture);
-            offset += sizeof(sf::Sprite);
-            m_planet->setOrigin(sf::Vector2f(duneTexture->getSize() / 2u));
+        m_planet = new (offset) sf::Sprite(*duneTexture);
+        offset += sizeof(sf::Sprite);
+        m_planet->setOrigin(sf::Vector2f(duneTexture->getSize() / 2u));
 
-            m_settings = new (offset) Button(settingsTexture); offset += sizeof(Button);
-            m_play     = new (offset) Button(playTexture);     offset += sizeof(Button);
-            m_exit     = new (offset) Button(exitTexture);     offset += sizeof(Button);
+        m_settings = new (offset) Button(settingsTexture); offset += sizeof(Button);
+        m_play     = new (offset) Button(playTexture);     offset += sizeof(Button);
+        m_exit     = new (offset) Button(exitTexture);     offset += sizeof(Button);
 
-            m_exit->getSprite().setColor(sf::Color(0, 0, 0, 0));
-            m_settings->getSprite().setColor(sf::Color(0, 0, 0, 0));
-            m_play->getSprite().setColor(sf::Color(0, 0, 0, 0));
+        m_exit->getSprite().setColor(sf::Color(0, 0, 0, 0));
+        m_settings->getSprite().setColor(sf::Color(0, 0, 0, 0));
+        m_play->getSprite().setColor(sf::Color(0, 0, 0, 0));
 
-            std::string info(INTRO_TEXT_PRESENTATION);
-            m_info = new (offset) sf::Text(*font, sf::String::fromUtf8(info.begin(), info.end()));
-            m_info->setFillColor({0, 0, 0, 0});
-            
-            m_isLoaded = true;
+        std::string info(INTRO_TEXT_PRESENTATION);
+        m_info = new (offset) sf::Text(*font, sf::String::fromUtf8(info.begin(), info.end()));
+        m_info->setFillColor({0, 0, 0, 0});
+        
+        m_isLoaded = true;
 
 //  IMPORTANT: Apply all transformations AFTER scene is loaded (is presented - later)
-            const auto screenSize = sf::Vector2f(m_game->window.getSize());
-            resize(screenSize);
-            m_planet->setPosition({ screenSize.x * PLANET_POSITION_FACTOR_X, screenSize.y / PLANET_POSITION_FACTOR_Y });
+        const auto screenSize = sf::Vector2f(m_game->window.getSize());
+        resize(screenSize);
+        m_planet->setPosition({ screenSize.x * PLANET_POSITION_FACTOR_X, screenSize.y / PLANET_POSITION_FACTOR_Y });
 #ifdef DEBUG
-            m_planet->setPosition({ screenSize.x / PLANET_POSITION_FACTOR_X, screenSize.y / PLANET_POSITION_FACTOR_Y });
+        m_planet->setPosition({ screenSize.x / PLANET_POSITION_FACTOR_X, screenSize.y / PLANET_POSITION_FACTOR_Y });
 #endif
-            m_theme->play();
-        }
+        m_theme->play();
+        
     }
 
     return m_isLoaded;

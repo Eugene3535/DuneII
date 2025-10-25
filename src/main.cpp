@@ -52,8 +52,6 @@ int main()
     if(!titleScreen)
         return -1;
 
-    Destiny* destiny = nullptr;
-    Mission* mission = nullptr; 
     Scene* current_scene = titleScreen;
     
     while (window.isOpen())
@@ -107,14 +105,14 @@ int main()
 
                     case Scene::Type::CHOOSE_DESTINY:
                     {
-                        if(destiny = game.load<Destiny>({}))
+                        if(auto destiny = game.load<Destiny>({}))
                             current_scene = destiny;
                     }
                     break;
 
                     case Scene::Type::MISSION:
                     {
-                        if(mission = game.load<Mission>("Atreides-8.tmx"))
+                        if(auto mission = game.load<Mission>("Atreides-8.tmx"))
                             current_scene = mission;
                     }
                     break;

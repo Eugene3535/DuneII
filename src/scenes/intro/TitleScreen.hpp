@@ -1,16 +1,11 @@
 #ifndef TITLE_SCREEN_HPP
 #define TITLE_SCREEN_HPP
 
+#include <SFML/Graphics/Text.hpp>
+#include <SFML/Audio/Music.hpp>
+
 #include "scenes/Scene.hpp"
-
-
-namespace sf
-{
-    class Music;
-    class Text;
-    class Sprite;
-}
-
+#include "scenes/intro/interactive_elements/Button.hpp"
 
 class TitleScreen:
     public Scene
@@ -26,17 +21,17 @@ public:
 private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
-    class sf::Sprite* m_space;
-    class sf::Sprite* m_planet;
+    sf::Sprite* m_space;
+    sf::Sprite* m_planet;
 
-    class Button* m_play;
-    class Button* m_exit;
-    class Button* m_settings;
+    Button* m_play;
+    Button* m_exit;
+    Button* m_settings;
 
-    class sf::Text*  m_info;
-    class sf::Music* m_theme;
+    sf::Text*  m_info;
+    sf::Music* m_theme;
 
-    void* m_memoryPool;
+    char m_memoryPool[sizeof(sf::Sprite) * 2 + sizeof(Button) * 3 + sizeof(sf::Text)];
 
     bool m_isPresented;
 };
