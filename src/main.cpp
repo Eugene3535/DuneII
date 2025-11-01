@@ -1,140 +1,68 @@
-#include <thread>
-#include <random>
+#ifdef DEBUG
+#include <cstdio>
+#endif
 
-#include <SFML/Window/Keyboard.hpp>
-#include <SFML/Window/Mouse.hpp>
-#include <SFML/Window/Event.hpp>
-#include <SFML/Window/VideoMode.hpp>
-
-#include "scenes/intro/TitleScreen.hpp"
-#include "scenes/choosing_houses/Destiny.hpp"
-#include "scenes/mission/Mission.hpp"
-#include "assets/AssetManager.hpp"
-#include "effects/blackout/ScreenBlackoutEffect.hpp"
-#include "effects/particles/ParticleSystem.hpp"
-#include "game/DuneII.hpp"
+#ifdef _WIN32
+#include <windows.h>
+__declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
+__declspec(dllexport) unsigned long AmdPowerXpressRequestHighPerformance = 0x00000001;
+#endif
 
 
-#define DEFAULT_SCREEN_WIDTH 1200
-#define DEFAULT_SCREEN_HEIGHT 900
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 
 int main()
 {
-    std::random_device rd;
-    std::mt19937       rng(rd());
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    DuneII game;
+    GLFWwindow* window = glfwCreateWindow(800, 600, "Dune II: The Battle For Arrakis", nullptr, nullptr);
 
-    ScreenBlackoutEffect fade_effect;
-    ParticleSystem ps(1000, rng);
-    ps.setEmitter({ DEFAULT_SCREEN_WIDTH, (DEFAULT_SCREEN_HEIGHT >> 1) });
-    ps.setRespawnArea({0, DEFAULT_SCREEN_HEIGHT});
-    ps.setDirection(180);
-    ps.setMaxLifetime(sf::seconds(25));
-    ps.setDistribution({{ 0, 0 }, { DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT }});
-    ps.setFading(true);
+    glfwMakeContextCurrent(window);
 
-    auto& window = game.window;
-    auto& visible_area = game.visible_area;
-    auto& clock = game.clock;
+    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height)
+    {
+        glViewport(0, 0, width, height);
+    });
 
-    visible_area = sf::FloatRect({0.f, 0.f}, {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT});
+    glfwSwapInterval(1);
 
-    uint32_t width  = static_cast<uint32_t>(visible_area.size.x);
-    uint32_t height = static_cast<uint32_t>(visible_area.size.y);
-
-    window.create(sf::VideoMode({ width, height }), "Dune II: The Battle For Arrakis", sf::Style::Default);
-    window.setVerticalSyncEnabled(true);
-
-    auto titleScreen = game.load<TitleScreen>({});
-
-    if(!titleScreen)
+    if (!gladLoadGL())
         return -1;
 
-    Scene* current_scene = titleScreen;
-    
-    while (window.isOpen())
+
+#ifdef DEBUG
+    printf("OpenGL Version: %s\n", glGetString(GL_VERSION));
+    printf("GLSL Version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+    printf("Vendor: %s\n", glGetString(GL_VENDOR));
+    printf("Renderer: %s\n", glGetString(GL_RENDERER));
+
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
+    glDebugMessageCallback([](GLenum source,
+        GLenum type,
+        GLuint id,
+        GLenum severity,
+        GLsizei length,
+        const GLchar* message,
+        const void* userParam)
+        {
+            fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n", (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
+        }, nullptr);
+#endif
+
+    while (!glfwWindowShouldClose(window))
     {
-        const auto dt = clock.restart();
-
-        while (const auto event = window.pollEvent())
-        {
-            if (event->is<sf::Event::Closed>())
-            {
-                window.close();
-            }
-            else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
-            {
-                if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
-                    window.close();
-            }
-
-            if (const auto* resized = event->getIf<sf::Event::Resized>())
-                current_scene->resize(sf::Vector2f(resized->size));    
-        }
-
-        current_scene->update(dt);
-        ps.update(dt);
-
-        if(auto [nextScene, needToBeChanged] = current_scene->getStatus(); needToBeChanged)
-        {
-            if(game.checkSceneRights(current_scene, nextScene))
-            {
-                current_scene->reset();
-
-                fade_effect.prepare(current_scene->getView().getCenter(), window.getSize());
-                
-                while(!fade_effect.isOver())
-                {     
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                    fade_effect.update();
-                    window.clear();
-                    window.draw(*current_scene);
-                    window.draw(fade_effect);
-                    window.display();
-                }
-                
-                switch (nextScene)
-                {
-                    case Scene::Type::MAIN_MENU:
-                    {
-                        current_scene = titleScreen;
-                    }
-                    break;
-
-                    case Scene::Type::CHOOSE_DESTINY:
-                    {
-                        if(auto destiny = game.load<Destiny>({}))
-                            current_scene = destiny;
-                    }
-                    break;
-
-                    case Scene::Type::MISSION:
-                    {
-                        if(auto mission = game.load<Mission>("Atreides-8.tmx"))
-                            current_scene = mission;
-                    }
-                    break;
-
-                    default:
-                        break;
-                }
-
-                current_scene->resize(sf::Vector2f(window.getSize())); 
-            }
-        }
-
-        window.setView(current_scene->getView());
-        window.clear();
-        
-        window.draw(*current_scene);
-
-        if(dynamic_cast<TitleScreen*>(current_scene) == titleScreen)
-            window.draw(ps);
-
-        window.display();
+        glfwPollEvents();
+        glfwSwapBuffers(window);
     }
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
     
     return 0;
 }
