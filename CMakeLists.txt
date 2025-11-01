@@ -55,7 +55,8 @@ set(DUNEII_SRC_FILES
 	# src/effects/particles/ParticleSystem.cpp
 	# ${SCENE_SRC_FILES}
 	# src/ui/Cursor.cpp
-	# src/game/DuneII.cpp
+	src/game/Application.cpp
+	src/game/DuneII.cpp
 	src/main.cpp
 )
 
@@ -74,12 +75,13 @@ set(DUNEII_HDR_FILES
 	# src/effects/particles/ParticleSystem.hpp
 	# ${SCENE_HDR_FILES}
 	# src/ui/Cursor.hpp
-	# src/game/DuneII.hpp
+	src/game/Application.hpp
+	src/game/DuneII.hpp
 )
 
 set(_all_files 
 	${DUNEII_SRC_FILES} 
-#	${DUNEII_HDR_FILES}
+	${DUNEII_HDR_FILES}
 )
 
 add_executable(${PROJECT_NAME} ${_all_files})
