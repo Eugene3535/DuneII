@@ -1,10 +1,46 @@
 #include "resources/ogl/holder/GlResourceHolder.hpp"
 
 
-GlResourceHolder::GlResourceHolder() noexcept
+namespace
 {
+    std::span<const GLuint> create_resources(GLsizei amount, std::vector<GLuint>* handles, void(*func)(GLsizei, GLuint*)) noexcept
+    {
+        handles->resize(handles->size() + static_cast<size_t>(amount));
+        func(amount, handles->data() + static_cast<size_t>(amount));
 
-}
+        return std::span(handles->data() + static_cast<size_t>(amount), static_cast<size_t>(amount));
+    }
+
+    void destroy_resources(std::span<const GLuint> objects, std::vector<GLuint>* handles, void(*func)(GLsizei, const GLuint*)) noexcept
+    {
+        if(func)
+        {
+            if(!objects.empty())
+            {
+//  Avoid deleting non-existent objects
+                std::vector<GLuint> tmp;
+                tmp.reserve(objects.size());
+
+                for(GLuint object : objects)
+                {
+                    for(size_t i = 0; i < handles->size(); ++i)
+                    {
+                        if(auto& handle = (*handles)[i]; handle == object)
+                        {
+                            tmp.push_back(object);
+                            std::swap(handle, handles->back());
+                            handles->pop_back();
+                            break;
+                        }
+                    }
+                }
+
+                if(!tmp.empty())
+                    func(static_cast<GLsizei>(tmp.size()), tmp.data());
+            }
+        }
+    }
+} 
 
 
 GlResourceHolder::~GlResourceHolder() noexcept
@@ -20,29 +56,45 @@ GlResourceHolder::~GlResourceHolder() noexcept
 }
 
 
-void GlResourceHolder::destroyResources(std::span<const GLuint> objects, std::vector<GLuint>& handles, void(*func)(GLint, const GLuint*)) noexcept
+std::span<const GLuint> GlResourceHolder::create(GLsizei amount, void(*func)(GLsizei, GLuint*)) noexcept
 {
-    if(!objects.empty())
+    if(func && amount > 0)
     {
-//      Avoid deleting non-existent objects
-        std::vector<GLuint> tmp;
-        tmp.reserve(objects.size());
+        std::vector<GLuint>* handles = nullptr;
 
-        for(GLuint object : objects)
-        {
-            for(size_t i = 0; i < handles.size(); ++i)
-            {
-                if(auto& handle = handles[i]; handle == object)
-                {
-                    tmp.push_back(object);
-                    std::swap(handle, handles.back());
-                    handles.pop_back();
-                    break;
-                }
-            }
-        }
+        if(func == glGenBuffers)
+            handles = &m_buffers;
+            
+        if(func == glGenVertexArrays)
+            handles = &m_arrays;
 
-        if(!tmp.empty())
-            func(static_cast<GLint>(tmp.size()), tmp.data());
+        if(func == glGenTextures)
+            handles = &m_textures;
+
+        if(handles)
+            return create_resources(amount, handles, func);
+    }
+
+    return {};
+}
+
+
+void GlResourceHolder::destroy(std::span<const GLuint> buffers, void(*func)(GLsizei, const GLuint*)) noexcept
+{
+    if( func && ( ! buffers.empty() ) )
+    {
+        std::vector<GLuint>* handles = nullptr;
+
+        if(func == glDeleteBuffers)
+            handles = &m_buffers;
+            
+        if(func == glDeleteVertexArrays)
+            handles = &m_arrays;
+
+        if(func == glDeleteTextures)
+            handles = &m_textures;
+
+        if(handles)
+            return destroy_resources(buffers, handles, func);
     }
 }
