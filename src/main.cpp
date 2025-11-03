@@ -5,7 +5,7 @@ __declspec(dllexport) unsigned long AmdPowerXpressRequestHighPerformance = 0x000
 #endif
 
 #include "game/DuneII.hpp"
-#include "game/Application.hpp"
+#include "app/Application.hpp"
 
 
 int main()

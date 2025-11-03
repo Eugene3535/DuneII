@@ -11,14 +11,12 @@ public:
 	bool init(const char* title, int width, int height) noexcept;
 	int run(class DuneII& game) noexcept;
 
-
 private:
-	bool initWindow(const char* title) noexcept;
+	bool initWindow(const char* title, int width, int height) noexcept;
 	void initCallbacks() noexcept;
 
 	struct GLFWwindow* m_window;
-	int m_width;
-	int m_height;
+	class DuneII* m_game;
 };
 
 #endif // !APPLICATION_HPP

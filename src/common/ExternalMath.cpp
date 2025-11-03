@@ -1,11 +1,14 @@
+#include <glm/trigonometric.hpp>
+
 #include "common/ExternalMath.hpp"
+
 
 
 TrigTable::TrigTable() noexcept
 {
 	for (size_t i = 0; i < TABLE_SIZE; ++i) 
 	{
-		float radians = i * DEGTORAD;
+		float radians = glm::radians(static_cast<float>(i));
 		m_sinTable[i] = std::sin(radians);
 		m_cosTable[i] = std::cos(radians);
 	}

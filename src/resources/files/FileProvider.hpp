@@ -4,9 +4,9 @@
 #include <string>
 #include <filesystem>
 
-struct FileProvider
+struct  FileProvider
 {
-    static std::filesystem::path findPathToFile(const std::string& name) noexcept;
+    std::filesystem::path findPathToFile(const std::string& filename) noexcept;
 };
 
 #endif // !FILE_PROVIDER_HPP

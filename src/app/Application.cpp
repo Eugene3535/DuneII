@@ -6,13 +6,14 @@
 #include <GLFW/glfw3.h>
 
 #include "game/DuneII.hpp"
-#include "game/Application.hpp"
+#include "game/scenes/intro/TitleScreen.hpp"
+
+#include "app/Application.hpp"
 
 
 Application::Application() noexcept:
 	m_window(nullptr),
-	m_width(0),
-	m_height(0)
+	m_game(nullptr)
 {
 
 }
@@ -27,10 +28,7 @@ Application::~Application()
 
 bool Application::init(const char* title, int width, int height) noexcept
 {
-	m_width = width;
-	m_height = height;
-
-	if (!initWindow(title))
+	if (!initWindow(title, width, height))
 		return false;
 
 	initCallbacks();
@@ -44,12 +42,61 @@ int Application::run(DuneII& game) noexcept
 	if (!m_window)
 		return -1;
 
+	m_game = &game;
+
+	auto titleScreen = game.load<TitleScreen>({});
+
+	if (!titleScreen)
+		return -1;
+
+	game.m_currentScene = titleScreen;
+
+	float deltaTime = 0.f;
+	float lastFrame = 0.f;
+
 	while (!glfwWindowShouldClose(m_window))
 	{
+		float currentFrame = static_cast<float>(glfwGetTime());
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
+		game.m_currentScene->update(deltaTime);
+
+		if (game.m_isSceneNeedToBeChanged)
+		{
+			game.m_isSceneNeedToBeChanged = false;
+			game.m_nextSceneType = Scene::NONE;
+
+			switch (game.m_nextSceneType)
+			{
+				case Scene::Type::MAIN_MENU:
+				{
+					game.m_currentScene = titleScreen;
+				}
+				break;
+
+				case Scene::Type::CHOOSE_DESTINY:
+				{
+					
+				}
+				break;
+
+				case Scene::Type::MISSION:
+				{
+					
+				}
+				break;
+
+				default:
+					break;
+			}
+
+			int width, height;
+			glfwGetWindowSize(m_window, &width, &height);
+			game.m_currentScene->resize({ width, height });
+		}
+
 		glfwPollEvents();
-
-		// update game
-
 		glfwSwapBuffers(m_window);
 	}
 
@@ -57,7 +104,7 @@ int Application::run(DuneII& game) noexcept
 }
 
 
-bool Application::initWindow(const char* title) noexcept
+bool Application::initWindow(const char* title, int width, int height) noexcept
 {
 	if (glfwInit() == GLFW_TRUE)
 	{
@@ -65,7 +112,7 @@ bool Application::initWindow(const char* title) noexcept
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-		if (m_window = glfwCreateWindow(m_width, m_height, title, nullptr, nullptr))
+		if (m_window = glfwCreateWindow(width, height, title, nullptr, nullptr))
 		{
 			glfwMakeContextCurrent(m_window);
 			glfwSwapInterval(1);
@@ -109,9 +156,6 @@ void Application::initCallbacks() noexcept
 		glViewport(0, 0, width, height);
 
 		if (auto app = static_cast<Application*>(glfwGetWindowUserPointer(window)))
-		{
-			app->m_width = width;
-			app->m_height = height;
-		}
+			app->m_game->m_windowSize = { width, height };
 	});
 }

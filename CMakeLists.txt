@@ -27,56 +27,50 @@ set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 set(GLM_BUILD_LIBRARY OFF CACHE BOOL "" FORCE)
 
 set(SCENE_SRC_FILES
-	src/scenes/Scene.cpp
-	src/scenes/intro/interactive_elements/Button.cpp
-	src/scenes/intro/TitleScreen.cpp
-	src/scenes/choosing_houses/Destiny.cpp
-	src/scenes/mission/Mission.cpp
-	src/scenes/mission/tilemap/Tile.cpp
-	src/scenes/mission/tilemap/TileMap.cpp
+	src/game/scenes/Scene.cpp
+	# src/game/scenes/intro/interactive_elements/Button.cpp
+	src/game/scenes/intro/TitleScreen.cpp
+	# src/game/scenes/choosing_houses/Destiny.cpp
+	# src/game/scenes/mission/Mission.cpp
+	# src/game/scenes/mission/tilemap/Tile.cpp
+	# src/game/scenes/mission/tilemap/TileMap.cpp
 )
 
 set(SCENE_HDR_FILES
-	src/scenes/Scene.hpp
-	src/scenes/intro/interactive_elements/Button.hpp
-	src/scenes/intro/TitleScreen.hpp
-	src/scenes/choosing_houses/Destiny.hpp
-	src/scenes/mission/Mission.hpp
-	src/scenes/mission/tilemap/Tile.hpp
-	src/scenes/mission/tilemap/TileMap.hpp
+	src/game/scenes/Scene.hpp
+	# src/game/scenes/intro/interactive_elements/Button.hpp
+	src/game/scenes/intro/TitleScreen.hpp
+	# src/game/scenes/choosing_houses/Destiny.hpp
+	# src/game/scenes/mission/Mission.hpp
+	# src/game/scenes/mission/tilemap/Tile.hpp
+	# src/game/scenes/mission/tilemap/TileMap.hpp
 )
 
 set(DUNEII_SRC_FILES
-	# src/animation/AnimationManager.cpp
-	# src/common/FileProvider.cpp
-	# src/common/GraphicsUtils.cpp
-	# src/common/ExternalMath.cpp
+	src/common/ExternalMath.cpp
+	src/resources/files/FileProvider.cpp
+	# src/resources/files/Font.cpp
+	src/resources/files/Shader.cpp
+	src/resources/files/StbImage.cpp
 	# src/effects/blackout/ScreenBlackoutEffect.cpp
-	# src/effects/particles/ParticleSystem.cpp
-	# ${SCENE_SRC_FILES}
-	# src/ui/Cursor.cpp
-	src/game/Application.cpp
+	${SCENE_SRC_FILES}
+	src/app/Application.cpp
 	src/game/DuneII.cpp
 	src/main.cpp
 )
 
 set(DUNEII_HDR_FILES
-	# src/animation/AnimationData.hpp
-	# src/animation/AnimationManager.hpp
-	# src/assets/AssetManager.hpp
-	# src/common/Defines.hpp
-	# src/common/Enums.hpp
-	# src/common/FileProvider.hpp
-	# src/common/GraphicsUtils.hpp
-	# src/common/ExternalMath.hpp
-	# src/ecs/components/Animation.hpp
-	# src/ecs/components/Structure.hpp
+	src/common/Enums.hpp
+	src/common/ExternalMath.hpp
+	src/resources/files/FileProvider.hpp
+	# src/resources/files/Font.hpp
+	src/resources/files/Shader.hpp
+	src/resources/files/StbImage.hpp
 	# src/effects/blackout/ScreenBlackoutEffect.hpp
-	# src/effects/particles/ParticleSystem.hpp
-	# ${SCENE_HDR_FILES}
-	# src/ui/Cursor.hpp
-	src/game/Application.hpp
+	${SCENE_HDR_FILES}
+	src/app/Application.hpp
 	src/game/DuneII.hpp
+	src/game/DuneII.inl
 )
 
 set(_all_files 
