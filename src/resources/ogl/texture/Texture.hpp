@@ -4,6 +4,8 @@
 #include <array>
 #include <filesystem>
 
+#include <glad/glad.h>
+
 // There are a number of different types of textures. These are:
 
 // GL_TEXTURE_1D:                   Images in this texture all are 1-dimensional. They have width, but no height or depth.
@@ -29,12 +31,12 @@ struct Texture
 	void setSmooth(bool smooth)    noexcept;
 	void setRepeated(bool repeate) noexcept;
 
-	uint32_t handle = 0;
-	uint32_t type   = 0;
-	int32_t format  = 0;
-	int32_t width   = 0;
-    int32_t height  = 0;
-	int32_t depth   = 0;
+	GLuint handle = 0;
+	GLuint type   = 0;
+	GLint format  = 0;
+	GLint width   = 0;
+    GLint height  = 0;
+	GLint depth   = 0;
 
 	bool isSmooth   = false;
 	bool isRepeated = false;

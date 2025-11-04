@@ -3,6 +3,8 @@
 
 #include <span>
 
+#include <glad/glad.h>
+
 class ShaderProgram final
 {
 public:

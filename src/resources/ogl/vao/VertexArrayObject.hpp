@@ -4,7 +4,6 @@
 #include "resources/ogl/buffers/GlBuffer.hpp"
 #include "resources/ogl/vao/attributes/VertexBufferLayout.hpp"
 
-
 class VertexArrayObject final
 {
 public:
