@@ -1,8 +1,9 @@
 #ifndef TITLE_SCREEN_HPP
 #define TITLE_SCREEN_HPP
 
-#include "game/scenes/Scene.hpp"
+#include <vector>
 
+#include "game/scenes/Scene.hpp"
 
 
 class TitleScreen:
@@ -17,6 +18,8 @@ public:
     void resize(const glm::ivec2& size) noexcept override;
 
 private:
+    std::vector<uint32_t> m_textures;
+
     bool m_isPresented;
 };
 

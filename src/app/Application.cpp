@@ -2,6 +2,8 @@
 #include <cstdio>
 #endif
 
+#include <type_traits>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -31,6 +33,7 @@ bool Application::init(const char* title, int width, int height) noexcept
 	if (!initWindow(title, width, height))
 		return false;
 
+	checkOpenglTypes();
 	initCallbacks();
 
 	return true;
@@ -43,6 +46,7 @@ int Application::run(DuneII& game) noexcept
 		return -1;
 
 	m_game = &game;
+	loadGame(m_game);
 
 	auto titleScreen = game.load<TitleScreen>({});
 
@@ -128,6 +132,23 @@ bool Application::initWindow(const char* title, int width, int height) noexcept
 }
 
 
+void Application::checkOpenglTypes() noexcept
+{
+    static_assert(std::is_same_v<GLbyte, int8_t>, "GLbyte mismatch");
+    static_assert(std::is_same_v<GLubyte, uint8_t>, "GLubyte mismatch");
+    static_assert(std::is_same_v<GLshort, int16_t>, "GLshort mismatch");
+    static_assert(std::is_same_v<GLushort, uint16_t>, "GLushort mismatch");
+    static_assert(std::is_same_v<GLint, int32_t>, "GLint mismatch");
+    static_assert(std::is_same_v<GLuint, uint32_t>, "GLuint mismatch");
+    static_assert(std::is_same_v<GLfloat, float>, "GLfloat mismatch");
+    static_assert(std::is_same_v<GLdouble, double>, "GLdouble mismatch");
+
+#ifdef DEBUG
+    printf("All OpenGL types match expected types\n");
+#endif
+}
+
+
 void Application::initCallbacks() noexcept
 {
 #ifdef DEBUG
@@ -158,4 +179,10 @@ void Application::initCallbacks() noexcept
 		if (auto app = static_cast<Application*>(glfwGetWindowUserPointer(window)))
 			app->m_game->m_windowSize = { width, height };
 	});
+}
+
+
+void Application::loadGame(DuneII* game) noexcept
+{
+	game->glResourceHolder = std::make_unique<GlResourceHolder>();
 }

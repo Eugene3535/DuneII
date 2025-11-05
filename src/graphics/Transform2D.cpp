@@ -19,7 +19,6 @@ Transform2D::Transform2D() noexcept:
 Transform2D::~Transform2D() = default;
 
 
-
 void Transform2D::loadIdentity() noexcept
 {
     *this = Transform2D();

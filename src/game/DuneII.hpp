@@ -8,8 +8,8 @@
 
 #include <glm/vec2.hpp>
 
+#include "resources/ogl/holder/GlResourceHolder.hpp"
 #include "game/scenes/Scene.hpp"
-
 
 
 class DuneII final
@@ -17,12 +17,13 @@ class DuneII final
     friend class Application;
 
 public:
-
     DuneII() noexcept;
 
     void switchScene(const Scene* requester, Scene::Type nextScene) noexcept;
 
-    const glm::ivec2& getWindowSize() noexcept;
+    const glm::ivec2& getWindowSize() const noexcept;
+
+    std::unique_ptr<GlResourceHolder> glResourceHolder;
     
 private:
     template<class T>
@@ -34,6 +35,8 @@ private:
     Scene* m_currentScene;
     Scene::Type m_nextSceneType;
     bool m_isSceneNeedToBeChanged;
+
+
 };
 
 #include "game/DuneII.inl"

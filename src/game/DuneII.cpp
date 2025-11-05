@@ -1,7 +1,6 @@
 #include "game/DuneII.hpp"
 
 
-
 DuneII::DuneII() noexcept:
     m_windowSize(0, 0),
     m_currentScene(nullptr),
@@ -32,12 +31,10 @@ void DuneII::switchScene(const Scene* requester, Scene::Type nextScene) noexcept
             m_isSceneNeedToBeChanged = false;
         break;
     }
-
 }
 
 
-const glm::ivec2& DuneII::getWindowSize() noexcept
+const glm::ivec2& DuneII::getWindowSize() const noexcept
 {
 	return m_windowSize;
 }
-

@@ -22,10 +22,10 @@ public:
     void setScale(const glm::vec2& factors)     noexcept;
     void setOrigin(const glm::vec2& origin)     noexcept;
 
-    const glm::vec2&  getPosition() const noexcept;
-    float             getRotation() const noexcept;
-    const glm::vec2&  getScale()    const noexcept;
-    const glm::vec2&  getOrigin()   const noexcept;
+    const glm::vec2& getPosition() const noexcept;
+    float            getRotation() const noexcept;
+    const glm::vec2& getScale()    const noexcept;
+    const glm::vec2& getOrigin()   const noexcept;
 
     void move(const glm::vec2& offset) noexcept;
     void rotate(float angle)     noexcept;

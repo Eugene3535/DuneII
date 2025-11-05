@@ -4,28 +4,23 @@
 #include "resources/ogl/texture/Texture.hpp"
 
 
-bool Texture::loadFromImage(const StbImage& image, bool repeat, bool smooth) noexcept
+bool Texture::loadFromImage(const StbImage& image) noexcept
 {
     if(handle)
     {
         width  = image.width;
         height = image.height;
-        type   = GL_TEXTURE_2D;
+        type   = GL_TEXTURE_2D; // TODO -> type move to arguments
 
         format = GL_RGBA;
         if(image.bytePerPixel == 1) format = GL_RED;
         if(image.bytePerPixel == 3) format = GL_RGB;
 
-        GLint wrapMode = repeat ? GL_REPEAT : GL_CLAMP_TO_BORDER;
-        GLint filterMode = smooth  ? GL_LINEAR : GL_NEAREST;
-        isRepeated = repeat;
-        isSmooth   = smooth;
-
         glBindTexture(GL_TEXTURE_2D, handle);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterMode);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterMode);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexImage2D(GL_TEXTURE_2D, 0, format, static_cast<GLsizei>(width), static_cast<GLsizei>(height), 0, format, GL_UNSIGNED_BYTE, static_cast<const void*>(image.pixels.get()));
         glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -36,12 +31,12 @@ bool Texture::loadFromImage(const StbImage& image, bool repeat, bool smooth) noe
 }
 
 
-bool Texture::loadFromFile(const std::filesystem::path& filePath, bool repeat, bool smooth) noexcept
+bool Texture::loadFromFile(const std::filesystem::path& filePath) noexcept
 {
     StbImage image;
 
     if (image.loadFromFile(filePath))
-        return loadFromImage(image, repeat, smooth);
+        return loadFromImage(image);
     
     return false;
 }

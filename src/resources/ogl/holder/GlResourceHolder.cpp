@@ -5,10 +5,11 @@ namespace
 {
     std::span<const GLuint> create_resources(GLsizei amount, std::vector<GLuint>* handles, void(*func)(GLsizei, GLuint*)) noexcept
     {
-        handles->resize(handles->size() + static_cast<size_t>(amount));
-        func(amount, handles->data() + static_cast<size_t>(amount));
+        size_t oldSize = handles->size();
+        handles->resize(oldSize + static_cast<size_t>(amount));
+        func(amount, handles->data() + oldSize);
 
-        return std::span(handles->data() + static_cast<size_t>(amount), static_cast<size_t>(amount));
+        return std::span(handles->data() + oldSize, static_cast<size_t>(amount));
     }
 
     void destroy_resources(std::span<const GLuint> objects, std::vector<GLuint>* handles, void(*func)(GLsizei, const GLuint*)) noexcept
