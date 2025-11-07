@@ -1,39 +1,40 @@
-#include "scenes/intro/TitleScreen.hpp"
-#include "scenes/choosing_houses/Destiny.hpp"
-#include "scenes/mission/Mission.hpp"
 #include "game/DuneII.hpp"
 
 
-struct 
+DuneII::DuneII() noexcept:
+    m_windowSize(0, 0),
+    m_currentScene(nullptr),
+    m_nextSceneType(Scene::NONE),
+    m_isSceneNeedToBeChanged(false)
 {
-    bool isSceneNeedToBeChanged = false;
-} game_state;
 
-
-AssetManager& DuneII::getAssets() noexcept
-{
-    return m_assets;
 }
 
 
-bool DuneII::checkSceneRights(const Scene* requester, Scene::Type requestedType) noexcept
+void DuneII::switchScene(const Scene* requester, Scene::Type nextScene) noexcept
 {
-    switch (requestedType)
+    switch (nextScene)
     {
         case Scene::Type::MAIN_MENU:
-            if(dynamic_cast<const Mission*>(requester))
-                return true;
+            m_isSceneNeedToBeChanged = true;
+        break;
 
         case Scene::Type::CHOOSE_DESTINY:
-            if(dynamic_cast<const TitleScreen*>(requester))
-                return true;
-            
+            m_isSceneNeedToBeChanged = true;
+        break;
+
         case Scene::Type::MISSION:
-            if(dynamic_cast<const Destiny*>(requester))
-                return true;
-        
+            m_isSceneNeedToBeChanged = true;
+        break;
+
         default:
-            return false;
+            m_isSceneNeedToBeChanged = false;
+        break;
     }
-    
+}
+
+
+const glm::ivec2& DuneII::getWindowSize() const noexcept
+{
+	return m_windowSize;
 }

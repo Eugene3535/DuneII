@@ -1,58 +1,44 @@
-#ifndef DUNEII_HPP
-#define DUNEII_HPP
+#ifndef DUNE_II_HPP
+#define DUNE_II_HPP
 
-#include <vector>
+#include <string_view>
+#include <unordered_map>
 #include <memory>
-#include <utility>
 #include <typeindex>
 
-#include <SFML/System/Clock.hpp>
-#include <SFML/Graphics/Rect.hpp>
-#include <SFML/Graphics/View.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
+#include <glm/vec2.hpp>
 
-#include "scenes/Scene.hpp"
-#include "assets/AssetManager.hpp"
-#include "animation/AnimationManager.hpp"
+#include "resources/ogl/holder/GlResourceHolder.hpp"
+#include "game/scenes/Scene.hpp"
 
 
 class DuneII final
 {
+    friend class Application;
+
 public:
-    AssetManager& getAssets() noexcept;
+    DuneII() noexcept;
 
-    template<class T>
-    T* load(const std::string& info) noexcept
-    {
-        static_assert(std::is_base_of_v<Scene, T>, "A class of type T must inherit base class Scene");
+    void switchScene(const Scene* requester, Scene::Type nextScene) noexcept;
 
-        if(auto it = m_scenes.find(typeid(T)); it != m_scenes.end())
-            return static_cast<T*>(it->second.get());
+    const glm::ivec2& getWindowSize() const noexcept;
 
-        auto scene = std::make_shared<T>(this);
-
-        if(scene->load(info))
-        {
-            m_scenes[typeid(T)] = scene;
-
-            return scene.get();
-        }
-            
-        return nullptr;
-    }
-
-    bool checkSceneRights(const Scene* requester, Scene::Type requestedType) noexcept;
-
-
-    sf::RenderWindow window;
-    sf::FloatRect    visible_area;
-    sf::Clock        clock;
-
-    AnimationManager animationManager;
+    std::unique_ptr<GlResourceHolder> glResourceHolder;
     
 private:
-    AssetManager m_assets;
+    template<class T>
+    T* load(std::string_view info) noexcept;
+
+    glm::ivec2 m_windowSize;
+
     std::unordered_map<std::type_index, std::shared_ptr<void>> m_scenes;
+    Scene* m_currentScene;
+    Scene::Type m_nextSceneType;
+    bool m_isSceneNeedToBeChanged;
+
+
 };
 
-#endif // !DUNEII_HPP
+#include "game/DuneII.inl"
+
+#endif // !DUNE_II_HPP

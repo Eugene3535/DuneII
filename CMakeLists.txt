@@ -26,63 +26,9 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 set(GLM_BUILD_LIBRARY OFF CACHE BOOL "" FORCE)
 
-set(SCENE_SRC_FILES
-	src/scenes/Scene.cpp
-	src/scenes/intro/interactive_elements/Button.cpp
-	src/scenes/intro/TitleScreen.cpp
-	src/scenes/choosing_houses/Destiny.cpp
-	src/scenes/mission/Mission.cpp
-	src/scenes/mission/tilemap/Tile.cpp
-	src/scenes/mission/tilemap/TileMap.cpp
-)
+include(src/sources.cmake)
 
-set(SCENE_HDR_FILES
-	src/scenes/Scene.hpp
-	src/scenes/intro/interactive_elements/Button.hpp
-	src/scenes/intro/TitleScreen.hpp
-	src/scenes/choosing_houses/Destiny.hpp
-	src/scenes/mission/Mission.hpp
-	src/scenes/mission/tilemap/Tile.hpp
-	src/scenes/mission/tilemap/TileMap.hpp
-)
-
-set(DUNEII_SRC_FILES
-	# src/animation/AnimationManager.cpp
-	# src/common/FileProvider.cpp
-	# src/common/GraphicsUtils.cpp
-	# src/common/ExternalMath.cpp
-	# src/effects/blackout/ScreenBlackoutEffect.cpp
-	# src/effects/particles/ParticleSystem.cpp
-	# ${SCENE_SRC_FILES}
-	# src/ui/Cursor.cpp
-	# src/game/DuneII.cpp
-	src/main.cpp
-)
-
-set(DUNEII_HDR_FILES
-	# src/animation/AnimationData.hpp
-	# src/animation/AnimationManager.hpp
-	# src/assets/AssetManager.hpp
-	# src/common/Defines.hpp
-	# src/common/Enums.hpp
-	# src/common/FileProvider.hpp
-	# src/common/GraphicsUtils.hpp
-	# src/common/ExternalMath.hpp
-	# src/ecs/components/Animation.hpp
-	# src/ecs/components/Structure.hpp
-	# src/effects/blackout/ScreenBlackoutEffect.hpp
-	# src/effects/particles/ParticleSystem.hpp
-	# ${SCENE_HDR_FILES}
-	# src/ui/Cursor.hpp
-	# src/game/DuneII.hpp
-)
-
-set(_all_files 
-	${DUNEII_SRC_FILES} 
-#	${DUNEII_HDR_FILES}
-)
-
-add_executable(${PROJECT_NAME} ${_all_files})
+add_executable(${PROJECT_NAME} ${DUNEII_ALL_FILES})
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/glfw glfw)
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/glad/core glad)
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/glm glm)

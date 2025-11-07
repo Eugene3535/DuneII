@@ -1,13 +1,9 @@
 #ifndef EXTERNAL_MATH_HPP
 #define EXTERNAL_MATH_HPP
 
-#define _USE_MATH_DEFINES
-#include <cmath>
-#include <cstdint>
 #include <array>
 
-#include <SFML/System/Vector2.hpp>
-
+// #include <glm/gtc/constants.hpp> // glm::pi() and other
 
 class TrigTable
 {
@@ -19,7 +15,6 @@ public:
 
 private:
     static constexpr size_t TABLE_SIZE = 360;
-    static constexpr float DEGTORAD = M_PI / 180.0f;
 
     std::array<float, TABLE_SIZE> m_sinTable;
     std::array<float, TABLE_SIZE> m_cosTable;
