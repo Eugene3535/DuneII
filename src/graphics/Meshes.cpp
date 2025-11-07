@@ -1,6 +1,8 @@
 #include <cassert>
 
-#include "graphics/Mesh.hpp"
+#include <glad/glad.h>
+
+#include "graphics/Meshes.hpp"
 
 
 void Sprite::draw() noexcept
@@ -11,17 +13,12 @@ void Sprite::draw() noexcept
 }
 
 
-void SpriteSheet::draw() noexcept
+void Animation::draw() noexcept
 {
-    assert((currentFrame < frames.size()));
-
-    if( ! frames.empty() )
-    {
-        GLuint frame = frames[currentFrame];
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glDrawArrays(GL_TRIANGLE_FAN, frame, 4);
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
+    assert( (currentFrame < end) && "Frame is out of range" );
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glDrawArrays(GL_TRIANGLE_FAN, currentFrame, 4);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 

@@ -25,6 +25,7 @@ set(RESOURCE_HDR_FILES
 	src/resources/ogl/vao/VertexArrayObject.hpp
 )
 
+
 # Game scenes
 set(SCENE_SRC_FILES
 	src/game/scenes/Scene.cpp
@@ -46,11 +47,13 @@ set(SCENE_HDR_FILES
 	# src/game/scenes/mission/tilemap/TileMap.hpp
 )
 
+
 # Common
 set(DUNEII_SRC_FILES
 	src/common/ExternalMath.cpp
-	src/graphics/Mesh.cpp
+	src/graphics/Meshes.cpp
 	src/graphics/Transform2D.cpp
+	src/graphics/sprites/SpriteManager.cpp
 	${RESOURCE_SRC_FILES}
 	# src/effects/blackout/ScreenBlackoutEffect.cpp
 	${SCENE_SRC_FILES}
@@ -62,8 +65,9 @@ set(DUNEII_SRC_FILES
 set(DUNEII_HDR_FILES
 	src/common/Enums.hpp
 	src/common/ExternalMath.hpp
-	src/graphics/Mesh.hpp
+	src/graphics/Meshes.hpp
 	src/graphics/Transform2D.hpp
+	src/graphics/sprites/SpriteManager.hpp
 	${RESOURCE_HDR_FILES}
 	# src/effects/blackout/ScreenBlackoutEffect.hpp
 	${SCENE_HDR_FILES}
@@ -72,10 +76,12 @@ set(DUNEII_HDR_FILES
 	src/game/DuneII.inl
 )
 
+
 set(DUNEII_ALL_FILES 
 	${DUNEII_SRC_FILES} 
 	${DUNEII_HDR_FILES}
 )
+
 
 unset(RESOURCE_SRC_FILES)
 unset(RESOURCE_HDR_FILES)
