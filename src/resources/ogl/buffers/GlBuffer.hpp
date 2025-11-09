@@ -31,7 +31,7 @@ class GLBuffer final
 public:
     GLBuffer() noexcept;
     GLBuffer(GLuint handle, GLenum target) noexcept;
-
+    
     void create(size_t elementSize, size_t elementCount, const void* data, GLenum usage) noexcept;
     void update(size_t offset, size_t elementSize, size_t elementCount, const void* data) noexcept;
 

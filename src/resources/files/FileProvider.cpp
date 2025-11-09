@@ -1,5 +1,6 @@
 #include "resources/files/FileProvider.hpp"
 
+
 std::filesystem::path FileProvider::findPathToFile(const std::string& filename) noexcept
 {
     std::filesystem::path resFolder = std::filesystem::current_path() / "res";

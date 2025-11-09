@@ -46,7 +46,11 @@ int Application::run(DuneII& game) noexcept
 		return -1;
 
 	m_game = &game;
-	loadGame(m_game);
+	{
+		int width, height;
+		glfwGetWindowSize(m_window, &width, &height);
+		game.m_windowSize = { width, height };
+	}
 
 	auto titleScreen = game.load<TitleScreen>({});
 
@@ -60,6 +64,8 @@ int Application::run(DuneII& game) noexcept
 
 	while (!glfwWindowShouldClose(m_window))
 	{
+		glfwPollEvents();
+
 		float currentFrame = static_cast<float>(glfwGetTime());
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
@@ -100,7 +106,7 @@ int Application::run(DuneII& game) noexcept
 			game.m_currentScene->resize({ width, height });
 		}
 
-		glfwPollEvents();
+		game.m_currentScene->draw();
 		glfwSwapBuffers(m_window);
 	}
 
@@ -179,10 +185,4 @@ void Application::initCallbacks() noexcept
 		if (auto app = static_cast<Application*>(glfwGetWindowUserPointer(window)))
 			app->m_game->m_windowSize = { width, height };
 	});
-}
-
-
-void Application::loadGame(DuneII* game) noexcept
-{
-	game->glResourceHolder = std::make_unique<GlResourceHolder>();
 }

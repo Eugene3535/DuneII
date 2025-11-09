@@ -5,7 +5,7 @@ set(RESOURCE_SRC_FILES
 	src/resources/files/Shader.cpp
 	src/resources/files/StbImage.cpp
 	src/resources/ogl/buffers/GlBuffer.cpp
-	src/resources/ogl/holder/GlResourceHolder.cpp
+	src/resources/ogl/holder/GlResourceManager.cpp
 	src/resources/ogl/shaders/ShaderProgram.cpp
 	src/resources/ogl/texture/Texture.cpp
 	src/resources/ogl/vao/attributes/VertexBufferLayout.cpp
@@ -18,7 +18,7 @@ set(RESOURCE_HDR_FILES
 	src/resources/files/Shader.hpp
 	src/resources/files/StbImage.hpp
 	src/resources/ogl/buffers/GlBuffer.hpp
-	src/resources/ogl/holder/GlResourceHolder.hpp
+	src/resources/ogl/holder/GlResourceManager.hpp
 	src/resources/ogl/shaders/ShaderProgram.hpp
 	src/resources/ogl/texture/Texture.hpp
 	src/resources/ogl/vao/attributes/VertexBufferLayout.hpp
@@ -51,8 +51,8 @@ set(SCENE_HDR_FILES
 # Common
 set(DUNEII_SRC_FILES
 	src/common/ExternalMath.cpp
-	src/graphics/Meshes.cpp
 	src/graphics/Transform2D.cpp
+	src/graphics/camera/OrthogonalCamera.cpp
 	src/graphics/sprites/SpriteManager.cpp
 	${RESOURCE_SRC_FILES}
 	# src/effects/blackout/ScreenBlackoutEffect.cpp
@@ -67,6 +67,7 @@ set(DUNEII_HDR_FILES
 	src/common/ExternalMath.hpp
 	src/graphics/Meshes.hpp
 	src/graphics/Transform2D.hpp
+	src/graphics/camera/OrthogonalCamera.hpp
 	src/graphics/sprites/SpriteManager.hpp
 	${RESOURCE_HDR_FILES}
 	# src/effects/blackout/ScreenBlackoutEffect.hpp
@@ -75,6 +76,14 @@ set(DUNEII_HDR_FILES
 	src/game/DuneII.hpp
 	src/game/DuneII.inl
 )
+
+
+set(SHADER_FILES
+	${PROJECT_SOURCE_DIR}/src/shaders/sprite.vert
+	${PROJECT_SOURCE_DIR}/src/shaders/sprite.frag
+)
+
+source_group("shaders" FILES ${SHADER_FILES})
 
 
 set(DUNEII_ALL_FILES 

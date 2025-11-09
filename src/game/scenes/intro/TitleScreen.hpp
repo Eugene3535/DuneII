@@ -1,8 +1,14 @@
 #ifndef TITLE_SCREEN_HPP
 #define TITLE_SCREEN_HPP
 
-#include <vector>
+#include <memory>
 
+#include "resources/ogl/texture/Texture.hpp"
+#include "resources/ogl/vao/VertexArrayObject.hpp"
+#include "resources/ogl/shaders/ShaderProgram.hpp"
+#include "graphics/sprites/SpriteManager.hpp"
+#include "graphics/camera/OrthogonalCamera.hpp"
+#include "graphics/Meshes.hpp"
 #include "game/scenes/Scene.hpp"
 
 
@@ -15,10 +21,19 @@ public:
 
     bool load(std::string_view info)    noexcept override;
     void update(float dt)               noexcept override;
+    void draw()                         noexcept override;
     void resize(const glm::ivec2& size) noexcept override;
 
 private:
-    std::vector<uint32_t> m_textures;
+    std::unique_ptr<SpriteManager> m_sprites;
+
+    GLBuffer m_uniformBuffer;
+    OrthogonalCamera m_camera;
+
+    Texture m_spaceTexture;
+    VertexArrayObject m_vao;
+    ShaderProgram m_spriteProgram;
+    Sprite m_space;
 
     bool m_isPresented;
 };

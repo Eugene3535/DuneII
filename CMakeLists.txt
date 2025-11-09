@@ -33,6 +33,8 @@ add_subdirectory(${EXTERNAL_SOURCE_DIR}/glfw glfw)
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/glad/core glad)
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/glm glm)
 
+target_sources(${PROJECT_NAME} PRIVATE ${SHADER_FILES})
+
 target_include_directories(${PROJECT_NAME} PRIVATE
 	${PROJECT_SOURCE_DIR}/src
 	${EXTERNAL_SOURCE_DIR}/rapidxml
@@ -56,6 +58,7 @@ if(MSVC)
 endif()
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/res $<TARGET_FILE_DIR:${PROJECT_NAME}>/res 
+	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/res $<TARGET_FILE_DIR:${PROJECT_NAME}>/res
+	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/src/shaders $<TARGET_FILE_DIR:${PROJECT_NAME}>/res/shaders
 	VERBATIM
 )
