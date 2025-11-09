@@ -19,6 +19,14 @@ VertexArrayObject::VertexArrayObject(GLuint handle) noexcept:
 }
 
 
+void VertexArrayObject::setup(GLuint handle) noexcept
+{
+	m_handle = handle;
+	m_attributeCount = 0;
+	m_indexCount = 0;
+}
+
+
 void VertexArrayObject::addVertexBuffer(const GLBuffer& buffer, std::span<const VertexBufferLayout::Attribute> attributes) noexcept
 {
 	if(m_handle)

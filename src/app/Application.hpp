@@ -15,7 +15,6 @@ private:
 	bool initWindow(const char* title, int width, int height) noexcept;
 	void checkOpenglTypes() noexcept;
 	void initCallbacks() noexcept;
-	void loadGame(class DuneII* game) noexcept;
 
 	struct GLFWwindow* m_window;
 	class DuneII* m_game;

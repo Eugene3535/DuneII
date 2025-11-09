@@ -8,7 +8,7 @@
 
 #include <glm/vec2.hpp>
 
-#include "resources/ogl/holder/GlResourceHolder.hpp"
+#include "resources/ogl/holder/GlResourceManager.hpp"
 #include "game/scenes/Scene.hpp"
 
 
@@ -23,7 +23,7 @@ public:
 
     const glm::ivec2& getWindowSize() const noexcept;
 
-    std::unique_ptr<GlResourceHolder> glResourceHolder;
+    GlResourceManager glResources;
     
 private:
     template<class T>
@@ -35,8 +35,6 @@ private:
     Scene* m_currentScene;
     Scene::Type m_nextSceneType;
     bool m_isSceneNeedToBeChanged;
-
-
 };
 
 #include "game/DuneII.inl"

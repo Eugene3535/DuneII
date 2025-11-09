@@ -10,6 +10,8 @@ public:
     VertexArrayObject() noexcept;
     VertexArrayObject(GLuint handle) noexcept;
 
+    void setup(GLuint handle) noexcept;
+
     void addVertexBuffer(const GLBuffer& buffer, std::span<const VertexBufferLayout::Attribute> attributes) noexcept;
     void setElementBuffer(const GLBuffer& buffer) noexcept;
 

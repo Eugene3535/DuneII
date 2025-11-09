@@ -1,4 +1,10 @@
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "resources/files/FileProvider.hpp"
+#include "resources/files/Shader.hpp"
 #include "resources/ogl/texture/Texture.hpp"
+#include "graphics/sprites/SpriteManager.hpp"
 #include "game/DuneII.hpp"
 #include "game/scenes/intro/TitleScreen.hpp"
 
@@ -22,6 +28,7 @@
 
 TitleScreen::TitleScreen(DuneII* game) noexcept:
     Scene(game),
+    m_spaceTexture(0),
     m_isPresented(false)
 {
 #ifdef DEBUG
@@ -32,9 +39,7 @@ TitleScreen::TitleScreen(DuneII* game) noexcept:
 
 TitleScreen::~TitleScreen()
 {
-    auto glResources = m_game->glResourceHolder.get();
-
-    glResources->destroy(m_textures, glDeleteTextures);
+    // auto& glResources = m_game->glResources;
 }
 
 
@@ -42,18 +47,52 @@ bool TitleScreen::load(std::string_view info) noexcept
 {
     if(!m_isLoaded)
     {
-        auto glResources = m_game->glResourceHolder.get();
-        auto textureHandles = glResources->create(5, glGenTextures);
+        auto windowSize = m_game->getWindowSize();
 
-        if(textureHandles.empty())
-            return false;
+        FileProvider provider;
+        auto& glResources = m_game->glResources;
 
-        std::array<Texture, 5> textures;
+        auto vboHandles     = glResources.create<GLBuffer, 2>();
+        auto textureHandles = glResources.create<Texture, 1>();
+        auto vaoHandles     = glResources.create<VertexArrayObject, 1>();
 
-        for(size_t i = 0; i < textureHandles.size(); ++i)
-        {
-            textures[i].handle = textureHandles[i];
-            m_textures.push_back(textureHandles[i]);
+        m_uniformBuffer = GLBuffer(vboHandles[0], GL_UNIFORM_BUFFER);
+        m_uniformBuffer.create(sizeof(glm::mat4), 1, nullptr, GL_DYNAMIC_DRAW);
+        m_uniformBuffer.bindBufferRange(0, 0, sizeof(glm::mat4));
+        m_camera.setupProjectionMatrix(windowSize.x, windowSize.y);
+
+        m_sprites = std::make_unique<SpriteManager>(vboHandles[1]);
+        
+        {// Space
+            m_spaceTexture.handle = textureHandles[0];
+
+            if(!m_spaceTexture.loadFromFile(provider.findPathToFile(SPACE_JPG)))
+                return false;
+
+            m_vao.setup(vaoHandles[0]);
+        
+            const std::array<VertexBufferLayout::Attribute, 1> spriteAttributes
+            {
+                VertexBufferLayout::Attribute::Float4
+            };
+
+            m_vao.addVertexBuffer(m_sprites->getVertexBuffer(), spriteAttributes);
+
+            std::array<Shader, 2> shaders;
+
+            if (!shaders[0].loadFromFile(provider.findPathToFile("sprite.vert"), GL_VERTEX_SHADER))   
+                return false;
+
+            if (!shaders[1].loadFromFile(provider.findPathToFile("sprite.frag"), GL_FRAGMENT_SHADER)) 
+                return false;
+
+            if (!m_spriteProgram.link(shaders)) 
+                return false;
+
+            m_sprites->createSprite("space", m_spaceTexture);
+
+            if(auto spriteList = m_sprites->getSprites("space"); !spriteList.empty())
+                m_space = spriteList[0];
         }
 
 
@@ -67,6 +106,23 @@ bool TitleScreen::load(std::string_view info) noexcept
 void TitleScreen::update(float dt) noexcept
 {
 
+}
+
+
+void TitleScreen::draw() noexcept
+{
+    glm::mat4 mvp = m_camera.getModelViewProjectionMatrix();
+    m_uniformBuffer.update(0, sizeof(glm::mat4), 1, static_cast<const void*>(glm::value_ptr(mvp)));
+
+    glUseProgram(m_spriteProgram.getHandle());
+    glBindVertexArray(m_vao.getHandle());
+
+    glBindTexture(GL_TEXTURE_2D, m_space.texture);
+    glDrawArrays(GL_TRIANGLE_FAN, m_space.frame, 4);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glBindVertexArray(m_vao.getHandle());
+    glUseProgram(0);
 }
 
 
