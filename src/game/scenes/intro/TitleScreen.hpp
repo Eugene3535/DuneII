@@ -34,6 +34,7 @@ private:
     VertexArrayObject m_vao;
     ShaderProgram m_spriteProgram;
     Sprite m_space;
+    Transform2D m_spaceTransform;
 
     bool m_isPresented;
 };

@@ -111,7 +111,7 @@ void TitleScreen::update(float dt) noexcept
 
 void TitleScreen::draw() noexcept
 {
-    glm::mat4 mvp = m_camera.getModelViewProjectionMatrix();
+    glm::mat4 mvp = m_camera.getModelViewProjectionMatrix() * m_spaceTransform.getMatrix();
     m_uniformBuffer.update(0, sizeof(glm::mat4), 1, static_cast<const void*>(glm::value_ptr(mvp)));
 
     glUseProgram(m_spriteProgram.getHandle());
@@ -128,5 +128,6 @@ void TitleScreen::draw() noexcept
 
 void TitleScreen::resize(const glm::ivec2& size) noexcept
 {
-
+    m_camera.setupProjectionMatrix(size.x, size.y);
+    setSpriteSizeInPixels(m_space, glm::vec2(size), m_spaceTransform);
 }

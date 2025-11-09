@@ -46,16 +46,17 @@ int Application::run(DuneII& game) noexcept
 		return -1;
 
 	m_game = &game;
-	{
-		int width, height;
-		glfwGetWindowSize(m_window, &width, &height);
-		game.m_windowSize = { width, height };
-	}
+	
+	int width, height;
+	glfwGetWindowSize(m_window, &width, &height);
+	game.m_windowSize = { width, height };
 
 	auto titleScreen = game.load<TitleScreen>({});
 
 	if (!titleScreen)
 		return -1;
+
+	titleScreen->resize(game.m_windowSize);
 
 	game.m_currentScene = titleScreen;
 
@@ -101,7 +102,6 @@ int Application::run(DuneII& game) noexcept
 					break;
 			}
 
-			int width, height;
 			glfwGetWindowSize(m_window, &width, &height);
 			game.m_currentScene->resize({ width, height });
 		}
@@ -183,6 +183,9 @@ void Application::initCallbacks() noexcept
 		glViewport(0, 0, width, height);
 
 		if (auto app = static_cast<Application*>(glfwGetWindowUserPointer(window)))
+		{
 			app->m_game->m_windowSize = { width, height };
+			app->m_game->m_currentScene->resize({width, height});
+		}
 	});
 }
