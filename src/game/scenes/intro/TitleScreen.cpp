@@ -47,7 +47,7 @@ bool TitleScreen::load(std::string_view info) noexcept
 {
     if(!m_isLoaded)
     {
-        auto windowSize = m_game->getWindowSize();
+        const auto windowSize = m_game->getWindowSize();
 
         FileProvider provider;
         auto& glResources = m_game->glResources;
@@ -59,7 +59,11 @@ bool TitleScreen::load(std::string_view info) noexcept
         m_uniformBuffer = GLBuffer(vboHandles[0], GL_UNIFORM_BUFFER);
         m_uniformBuffer.create(sizeof(glm::mat4), 1, nullptr, GL_DYNAMIC_DRAW);
         m_uniformBuffer.bindBufferRange(0, 0, sizeof(glm::mat4));
-        m_camera.setupProjectionMatrix(windowSize.x, windowSize.y);
+
+        auto& registry = m_game->registry; 
+        auto camera = m_game->camera;
+        auto& projection = registry.get<glm::mat4>(camera);
+        projection = glm::ortho(0.f, static_cast<float>(windowSize.x), 0.f, static_cast<float>(windowSize.y));
 
         m_sprites = std::make_unique<SpriteManager>(vboHandles[1]);
         
@@ -111,8 +115,14 @@ void TitleScreen::update(float dt) noexcept
 
 void TitleScreen::draw() noexcept
 {
-    glm::mat4 mvp = m_camera.getModelViewProjectionMatrix() * m_spaceTransform.getMatrix();
-    m_uniformBuffer.update(0, sizeof(glm::mat4), 1, static_cast<const void*>(glm::value_ptr(mvp)));
+    auto& registry = m_game->registry; 
+    const auto camera = m_game->camera;
+    const auto& projection = registry.get<glm::mat4>(camera);
+    const auto& view = registry.get<Transform2D>(camera);
+    const glm::mat4 mvp = projection * view.getMatrix();
+
+    glm::mat4 spaceTransform = mvp * m_spaceTransform.getMatrix();
+    m_uniformBuffer.update(0, sizeof(glm::mat4), 1, static_cast<const void*>(glm::value_ptr(spaceTransform)));
 
     glUseProgram(m_spriteProgram.getHandle());
     glBindVertexArray(m_vao.getHandle());
@@ -128,6 +138,10 @@ void TitleScreen::draw() noexcept
 
 void TitleScreen::resize(const glm::ivec2& size) noexcept
 {
-    m_camera.setupProjectionMatrix(size.x, size.y);
+    auto& registry = m_game->registry; 
+    const auto camera = m_game->camera;
+    auto& projection = registry.get<glm::mat4>(camera);
+    projection = glm::ortho(0.f, static_cast<float>(size.x), 0.f, static_cast<float>(size.y));
+
     setSpriteSizeInPixels(m_space, glm::vec2(size), m_spaceTransform);
 }

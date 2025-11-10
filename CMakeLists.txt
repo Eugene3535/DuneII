@@ -25,6 +25,7 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 set(GLM_BUILD_LIBRARY OFF CACHE BOOL "" FORCE)
+set(GLM_ENABLE_SIMD_SSE4_1 ON CACHE BOOL "" FORCE)
 
 include(src/sources.cmake)
 
@@ -32,6 +33,7 @@ add_executable(${PROJECT_NAME} ${DUNEII_ALL_FILES})
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/glfw glfw)
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/glad/core glad)
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/glm glm)
+add_subdirectory(${EXTERNAL_SOURCE_DIR}/entt entt)
 
 target_sources(${PROJECT_NAME} PRIVATE ${SHADER_FILES})
 
@@ -45,15 +47,15 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	glfw
 	glad
 	glm
+	EnTT::EnTT
 )
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG=$<CONFIG:Debug> GLM_FORCE_INTRINSICS GLM_FORCE_EXPLICIT_CTOR)
+target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG=$<CONFIG:Debug>)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
 if(MSVC)
 	set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
-	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${_all_files})
-
+	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${DUNEII_ALL_FILES})
 	set_target_properties(${PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 endif()
 

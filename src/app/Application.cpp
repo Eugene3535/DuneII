@@ -50,6 +50,7 @@ int Application::run(DuneII& game) noexcept
 	int width, height;
 	glfwGetWindowSize(m_window, &width, &height);
 	game.m_windowSize = { width, height };
+	createOrthoCamera();
 
 	auto titleScreen = game.load<TitleScreen>({});
 
@@ -188,4 +189,15 @@ void Application::initCallbacks() noexcept
 			app->m_game->m_currentScene->resize({width, height});
 		}
 	});
+}
+
+
+void Application::createOrthoCamera() noexcept
+{
+	auto& camera = m_game->camera;
+	auto& registry = m_game->registry;
+
+	camera = registry.create();
+	registry.emplace<glm::mat4>(camera);
+	registry.emplace<Transform2D>(camera);
 }

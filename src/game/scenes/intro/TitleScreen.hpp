@@ -6,9 +6,9 @@
 #include "resources/ogl/texture/Texture.hpp"
 #include "resources/ogl/vao/VertexArrayObject.hpp"
 #include "resources/ogl/shaders/ShaderProgram.hpp"
-#include "graphics/sprites/SpriteManager.hpp"
-#include "graphics/camera/OrthogonalCamera.hpp"
 #include "graphics/Meshes.hpp"
+#include "graphics/Transform2D.hpp"
+#include "graphics/sprites/SpriteManager.hpp"
 #include "game/scenes/Scene.hpp"
 
 
@@ -28,7 +28,6 @@ private:
     std::unique_ptr<SpriteManager> m_sprites;
 
     GLBuffer m_uniformBuffer;
-    OrthogonalCamera m_camera;
 
     Texture m_spaceTexture;
     VertexArrayObject m_vao;

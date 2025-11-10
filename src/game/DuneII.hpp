@@ -7,6 +7,7 @@
 #include <typeindex>
 
 #include <glm/vec2.hpp>
+#include <entt/entity/registry.hpp>
 
 #include "resources/ogl/holder/GlResourceManager.hpp"
 #include "game/scenes/Scene.hpp"
@@ -23,7 +24,12 @@ public:
 
     const glm::ivec2& getWindowSize() const noexcept;
 
+//  Resources
     GlResourceManager glResources;
+
+//  ECS
+    entt::registry registry;
+    entt::entity camera;
     
 private:
     template<class T>
