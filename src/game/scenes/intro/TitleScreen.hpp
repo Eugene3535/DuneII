@@ -3,12 +3,10 @@
 
 #include <memory>
 
-#include "resources/ogl/texture/Texture.hpp"
 #include "resources/ogl/vao/VertexArrayObject.hpp"
 #include "resources/ogl/shaders/ShaderProgram.hpp"
-#include "graphics/Meshes.hpp"
-#include "graphics/Transform2D.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
+#include "game/scenes/intro/interactive_elements/Button.hpp"
 #include "game/scenes/Scene.hpp"
 
 
@@ -26,16 +24,20 @@ public:
 
 private:
     std::unique_ptr<SpriteManager> m_sprites;
-
     GLBuffer m_uniformBuffer;
-
-    Texture m_spaceTexture;
     VertexArrayObject m_vao;
+
     ShaderProgram m_spriteProgram;
     Sprite m_space;
     Transform2D m_spaceTransform;
+    Sprite m_planet;
+    Transform2D m_planetTransform;
 
-    bool m_isPresented;
+    Button* m_playButton;
+    Button* m_exitButton;
+    Button* m_settingsButton;
+
+    char m_memoryPool[sizeof(Button) * 3];
 };
 
 #endif // !TITLE_SCREEN_HPP

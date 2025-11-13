@@ -32,6 +32,7 @@ public:
 	void loadSpriteSheet(const std::filesystem::path& filePath, const class Texture& texture) noexcept;
 
 	const GLBuffer& getVertexBuffer() const noexcept;
+	Sprite getSprite(const std::string& name) const noexcept;
 	std::span<const Sprite> getSprites(const std::string& name) const noexcept;
 
 private:

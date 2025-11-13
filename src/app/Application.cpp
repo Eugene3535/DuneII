@@ -9,7 +9,6 @@
 
 #include "game/DuneII.hpp"
 #include "game/scenes/intro/TitleScreen.hpp"
-
 #include "app/Application.hpp"
 
 
@@ -64,6 +63,8 @@ int Application::run(DuneII& game) noexcept
 	float deltaTime = 0.f;
 	float lastFrame = 0.f;
 
+	glClearColor(0.f, 0.f, 0.f, 1.f);
+    
 	while (!glfwWindowShouldClose(m_window))
 	{
 		glfwPollEvents();
@@ -107,7 +108,9 @@ int Application::run(DuneII& game) noexcept
 			game.m_currentScene->resize({ width, height });
 		}
 
+		glClear(GL_COLOR_BUFFER_BIT);
 		game.m_currentScene->draw();
+
 		glfwSwapBuffers(m_window);
 	}
 

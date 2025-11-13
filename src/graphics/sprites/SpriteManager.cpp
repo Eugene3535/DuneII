@@ -167,6 +167,20 @@ const GLBuffer& SpriteManager::getVertexBuffer() const noexcept
 }
 
 
+Sprite SpriteManager::getSprite(const std::string& name) const noexcept
+{
+	if(auto it = m_animations.find(name); it != m_animations.end())
+	{
+		const auto sprites = m_sprites.data();
+		const auto sprite = sprites + static_cast<ptrdiff_t>(it->second.first);
+
+		return *sprite;
+	}
+
+	return {};
+}
+
+
 std::span<const Sprite> SpriteManager::getSprites(const std::string& name) const noexcept
 {
 	if(auto it = m_animations.find(name); it != m_animations.end())

@@ -1,5 +1,7 @@
 #include <cassert>
 
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "graphics/Meshes.hpp"
 #include "graphics/Transform2D.hpp"
 #include "game/DuneII.hpp"
@@ -37,7 +39,10 @@ void Scene::draw() noexcept
 
 void Scene::resize(const glm::ivec2& size) noexcept
 {
-    
+    auto& registry    = m_game->registry; 
+    const auto camera = m_game->camera;
+    auto& projection  = registry.get<glm::mat4>(camera);
+    projection = glm::ortho(0.f, static_cast<float>(size.x), static_cast<float>(size.y), 0.f);
 }
 
 

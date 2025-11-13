@@ -29,7 +29,7 @@ set(RESOURCE_HDR_FILES
 # Game scenes
 set(SCENE_SRC_FILES
 	src/game/scenes/Scene.cpp
-	# src/game/scenes/intro/interactive_elements/Button.cpp
+	src/game/scenes/intro/interactive_elements/Button.cpp
 	src/game/scenes/intro/TitleScreen.cpp
 	# src/game/scenes/choosing_houses/Destiny.cpp
 	# src/game/scenes/mission/Mission.cpp
@@ -39,7 +39,7 @@ set(SCENE_SRC_FILES
 
 set(SCENE_HDR_FILES
 	src/game/scenes/Scene.hpp
-	# src/game/scenes/intro/interactive_elements/Button.hpp
+	src/game/scenes/intro/interactive_elements/Button.hpp
 	src/game/scenes/intro/TitleScreen.hpp
 	# src/game/scenes/choosing_houses/Destiny.hpp
 	# src/game/scenes/mission/Mission.hpp
@@ -62,6 +62,7 @@ set(DUNEII_SRC_FILES
 )
 
 set(DUNEII_HDR_FILES
+	src/common/Assets.hpp
 	src/common/Enums.hpp
 	src/common/ExternalMath.hpp
 	src/graphics/Meshes.hpp
