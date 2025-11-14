@@ -10,35 +10,50 @@
 
 
 // Sprite scaling and position factors when changing window size
-#define PLANET_SCALE_FACTOR_WIDTH 2.f
+#define PLANET_SCALE_FACTOR_WIDTH  2.f
 #define PLANET_SCALE_FACTOR_HEIGHT 1.5f
-#define PLANET_POSITION_FACTOR_X 1.3f
-#define PLANET_POSITION_FACTOR_Y 3.f
+#define PLANET_POSITION_FACTOR_X   1.3f
+#define PLANET_POSITION_FACTOR_Y   3.f
 
-#define BUTTON_SCALE_FACTOR_WIDTH 10.f
+#define BUTTON_SCALE_FACTOR_WIDTH  10.f
 #define BUTTON_SCALE_FACTOR_HEIGHT 15.f
-#define BUTTON_POSITION_FACTOR_X 2.f
-#define BUTTON_POSITION_FACTOR_Y 1.2f
+#define BUTTON_POSITION_FACTOR_X   2.f
+#define BUTTON_POSITION_FACTOR_Y   1.2f
 
-#define TEXT_INFO_SCALE_FACTOR_WIDTH 3.f
+#define TEXT_INFO_SCALE_FACTOR_WIDTH  3.f
 #define TEXT_INFO_SCALE_FACTOR_HEIGHT 20.f
 
 #define INTRO_TEXT_PRESENTATION "Какие-то компании представляют"
+
+// Stages in seconds
+#define INTRO_TEXT_PRESENT_START_TIME   5.f;
+#define INTRO_TEXT_PRESENT_END_TIME     15.f;
+#define INTRO_TITLE_SCREEN_PRESENT_TIME 20.f;
+
+static bool is_moving_planet_begin;
+static bool is_moving_planet_end;
+static bool is_show_planet;
+static bool is_intro_active_phase_end;
 
 
 TitleScreen::TitleScreen(DuneII* game) noexcept:
     Scene(game),
     m_playButton(nullptr),
     m_exitButton(nullptr),
-    m_settingsButton(nullptr)
+    m_settingsButton(nullptr),
+    m_isPresented(false)
 {
-
+#ifdef DEBUG
+    m_isPresented = true;
+#endif
 }
 
 
 TitleScreen::~TitleScreen()
 {
-    // auto& glResources = m_game->glResources;
+    m_playButton->~Button();
+    m_exitButton->~Button();
+    m_settingsButton->~Button();
 }
 
 
@@ -101,6 +116,7 @@ bool TitleScreen::load(std::string_view info) noexcept
 
         m_space = m_sprites->getSprite("space");
         m_planet = m_sprites->getSprite("planet");
+        m_planetTransform.setOrigin(planetTexture.width * 0.5f, planetTexture.height * 0.5f);
 
 //  Buttons
         char* offset = m_memoryPool;
@@ -110,12 +126,11 @@ bool TitleScreen::load(std::string_view info) noexcept
             Sprite sprite = m_sprites->getSprite(btn);
             Button* button = new (offset) Button(sprite);
             offset += sizeof(Button);
-        }
 
-        offset = m_memoryPool;
-        m_playButton = reinterpret_cast<Button*>(offset); offset += sizeof(Button);
-        m_exitButton = reinterpret_cast<Button*>(offset); offset += sizeof(Button);
-        m_settingsButton = reinterpret_cast<Button*>(offset);
+            if(strcmp(btn, "play") == 0)     m_playButton = button;
+            if(strcmp(btn, "exit") == 0)     m_exitButton = button;
+            if(strcmp(btn, "settings") == 0) m_settingsButton = button;
+        }
 
         m_playButton->setPosition({ 100, 100 });
         m_exitButton->setPosition({ 350, 300 });
@@ -142,7 +157,22 @@ bool TitleScreen::load(std::string_view info) noexcept
 
 void TitleScreen::update(float dt) noexcept
 {
+    if(!m_isLoaded)
+        return;
 
+    if(m_isPresented)
+    {
+        const auto mousePosition = m_game->getCursorPosition();
+        const bool isClicked = false; // sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
+
+        m_settingsButton->update(mousePosition, isClicked);
+        m_playButton->update(mousePosition, isClicked);
+        m_exitButton->update(mousePosition, isClicked);
+    }
+    else
+    {
+
+    }
 }
 
 
@@ -171,15 +201,15 @@ void TitleScreen::draw() noexcept
     glDrawArrays(GL_TRIANGLE_FAN, m_planet.frame, 4);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    modelTransform = mvp * m_playButton->getTransform().getMatrix();
+    modelTransform = mvp * m_playButton->getMatrix();
     m_uniformBuffer.update(0, sizeof(glm::mat4), 1, static_cast<const void*>(glm::value_ptr(modelTransform)));
     m_playButton->draw();
 
-    modelTransform = mvp * m_exitButton->getTransform().getMatrix();
+    modelTransform = mvp * m_exitButton->getMatrix();
     m_uniformBuffer.update(0, sizeof(glm::mat4), 1, static_cast<const void*>(glm::value_ptr(modelTransform)));
     m_exitButton->draw();
 
-    modelTransform = mvp * m_settingsButton->getTransform().getMatrix();
+    modelTransform = mvp * m_settingsButton->getMatrix();
     m_uniformBuffer.update(0, sizeof(glm::mat4), 1, static_cast<const void*>(glm::value_ptr(modelTransform))); 
     m_settingsButton->draw();
 
@@ -190,7 +220,36 @@ void TitleScreen::draw() noexcept
 
 void TitleScreen::resize(const glm::ivec2& size) noexcept
 {
+    if(!m_isLoaded)
+        return;
+    
     Scene::resize(size);
-
     setSpriteSizeInPixels(m_space, glm::vec2(size), m_spaceTransform);
+
+    if(m_isPresented)
+    {
+        {// space and planet
+            setSpriteSizeInPixels(m_planet, { size.x / PLANET_SCALE_FACTOR_WIDTH, size.y / PLANET_SCALE_FACTOR_HEIGHT }, m_planetTransform);
+            m_planetTransform.setPosition({ size.x / PLANET_POSITION_FACTOR_X, size.y / PLANET_POSITION_FACTOR_Y });
+        }
+
+        {// buttons (size)
+            const float width = size.x / BUTTON_SCALE_FACTOR_WIDTH;
+            const float height = size.y / BUTTON_SCALE_FACTOR_HEIGHT;
+
+            m_settingsButton->resize({ width, height });
+            m_playButton->resize({ width, width }); // <- this is not a typo
+            m_exitButton->resize({ width, height });
+        }
+
+        {// buttons (positions)
+            const float centerX = size.x / BUTTON_POSITION_FACTOR_X;
+            const float centerY = size.y / BUTTON_POSITION_FACTOR_Y;
+            const float offset = size.x / BUTTON_SCALE_FACTOR_WIDTH * PLANET_POSITION_FACTOR_X;
+
+            m_settingsButton->setPosition({ centerX - offset, centerY });
+            m_playButton->setPosition({ centerX, centerY });
+            m_exitButton->setPosition({ centerX + offset, centerY });
+        }
+    }
 }

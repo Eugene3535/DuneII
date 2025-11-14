@@ -21,22 +21,15 @@ static bool contains(const glm::vec2& point, const glm::vec4& rect) noexcept
 
 
 Button::Button(const Sprite& sprite) noexcept:
+    Transform2D(),
     m_sprite(sprite),
-    m_transform(),
     m_bounds(),
     m_currentColor(nullptr),
     m_boundsNeedUpdate(true),
     m_isPressed(false)
 {
-    m_transform.setOrigin(glm::vec2(sprite.width / 2, sprite.height / 2));
+    setOrigin(glm::vec2(sprite.width / 2, sprite.height / 2));
     m_currentColor = button_colors;
-}
-
-
-void Button::setPosition(const glm::vec2& position) noexcept
-{
-    m_transform.setPosition(position);
-    m_boundsNeedUpdate = true;
 }
 
 
@@ -47,7 +40,9 @@ void Button::resize(const glm::vec2& newSize) noexcept
 
     float dx = newSize.x / m_sprite.width;
     float dy = newSize.y / m_sprite.height;
-    m_transform.setScale(dx, dy);
+    setScale(dx, dy);
+
+    m_boundsNeedUpdate = true;
 }
 
 
@@ -55,8 +50,8 @@ void Button::update(const glm::ivec2& mousePosition, bool isClicked) noexcept
 {
     if(m_boundsNeedUpdate)
     {
-        const glm::vec2 position = m_transform.getPosition();
-        const glm::vec2 scale = m_transform.getScale();
+        const glm::vec2 position = getPosition();
+        const glm::vec2 scale = getScale();
         const glm::vec2 size = { static_cast<float>(m_sprite.width) * scale.x, static_cast<float>(m_sprite.height) * scale.y };
 
         m_bounds = { position, size };
@@ -88,12 +83,6 @@ void Button::draw() noexcept
     glBindTexture(GL_TEXTURE_2D, m_sprite.texture);
     glDrawArrays(GL_TRIANGLE_FAN, m_sprite.frame, 4);
     glBindTexture(GL_TEXTURE_2D, 0);
-}
-
-
-const Transform2D& Button::getTransform() const noexcept
-{
-    return m_transform;
 }
 
 

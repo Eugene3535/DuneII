@@ -192,6 +192,14 @@ void Application::initCallbacks() noexcept
 			app->m_game->m_currentScene->resize({width, height});
 		}
 	});
+
+	glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double xpos, double ypos)
+	{
+		if (auto app = static_cast<Application*>(glfwGetWindowUserPointer(window)))
+		{
+			app->m_game->m_cursorPosition = { static_cast<float>(xpos), static_cast<float>(ypos) };
+		}
+	});
 }
 
 

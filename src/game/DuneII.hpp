@@ -23,6 +23,7 @@ public:
     void switchScene(const Scene* requester, Scene::Type nextScene) noexcept;
 
     const glm::ivec2& getWindowSize() const noexcept;
+    const glm::vec2& getCursorPosition() const noexcept;
 
 //  Resources
     GlResourceManager glResources;
@@ -36,6 +37,7 @@ private:
     T* load(std::string_view info) noexcept;
 
     glm::ivec2 m_windowSize;
+    glm::vec2 m_cursorPosition;
 
     std::unordered_map<std::type_index, std::shared_ptr<void>> m_scenes;
     Scene* m_currentScene;

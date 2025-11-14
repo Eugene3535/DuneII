@@ -38,6 +38,7 @@ private:
     Button* m_settingsButton;
 
     char m_memoryPool[sizeof(Button) * 3];
+    bool m_isPresented;
 };
 
 #endif // !TITLE_SCREEN_HPP

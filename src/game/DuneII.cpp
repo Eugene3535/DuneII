@@ -3,6 +3,7 @@
 
 DuneII::DuneII() noexcept:
     m_windowSize(0, 0),
+    m_cursorPosition(0, 0),
     m_currentScene(nullptr),
     m_nextSceneType(Scene::NONE),
     m_isSceneNeedToBeChanged(false)
@@ -37,4 +38,10 @@ void DuneII::switchScene(const Scene* requester, Scene::Type nextScene) noexcept
 const glm::ivec2& DuneII::getWindowSize() const noexcept
 {
 	return m_windowSize;
+}
+
+
+const glm::vec2& DuneII::getCursorPosition() const noexcept
+{
+    return m_cursorPosition;
 }
