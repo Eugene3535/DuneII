@@ -8,13 +8,11 @@
 #include <GLFW/glfw3.h>
 
 #include "game/DuneII.hpp"
-#include "game/scenes/intro/TitleScreen.hpp"
 #include "app/Application.hpp"
 
 
 Application::Application() noexcept:
-	m_window(nullptr),
-	m_game(nullptr)
+	m_window(nullptr)
 {
 
 }
@@ -44,21 +42,16 @@ int Application::run(DuneII& game) noexcept
 	if (!m_window)
 		return -1;
 
-	m_game = &game;
+	glfwSetWindowUserPointer(m_window, static_cast<void*>(&game));
 	
 	int width, height;
 	glfwGetWindowSize(m_window, &width, &height);
-	game.m_windowSize = { width, height };
-	createOrthoCamera();
+	game.camera.setupProjectionMatrix(width, height);
 
-	auto titleScreen = game.load<TitleScreen>({});
+	if(!game.init())
+		return 1;
 
-	if (!titleScreen)
-		return -1;
-
-	titleScreen->resize(game.m_windowSize);
-
-	game.m_currentScene = titleScreen;
+	game.resize(width, height);
 
 	float deltaTime = 0.f;
 	float lastFrame = 0.f;
@@ -95,8 +88,6 @@ bool Application::initWindow(const char* title, int width, int height) noexcept
 		{
 			glfwMakeContextCurrent(m_window);
 			glfwSwapInterval(1);
-
-			glfwSetWindowUserPointer(m_window, static_cast<void*>(this));
 
 			if (gladLoadGL())
 				return true;
@@ -151,36 +142,22 @@ void Application::initCallbacks() noexcept
 	{
 		glViewport(0, 0, width, height);
 
-		if (auto app = static_cast<Application*>(glfwGetWindowUserPointer(window)))
-		{
-			app->m_game->m_windowSize = { width, height };
-			app->m_game->m_currentScene->resize({width, height});
-		}
+		if (auto game = static_cast<DuneII*>(glfwGetWindowUserPointer(window)))
+			game->resize(width, height);
 	});
 
 	glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double xpos, double ypos)
 	{
-		if (auto app = static_cast<Application*>(glfwGetWindowUserPointer(window)))
-			app->m_game->m_cursorPosition = { static_cast<float>(xpos), static_cast<float>(ypos) };	
+		if (auto game = static_cast<DuneII*>(glfwGetWindowUserPointer(window)))
+			game->setCursorPosition(static_cast<float>(xpos), static_cast<float>(ypos));	
 	});
 
 	glfwSetMouseButtonCallback(m_window, [](GLFWwindow* window, int button, int action, int mods)
 	{
 		if(action == GLFW_PRESS)
 		{
-			if (auto app = static_cast<Application*>(glfwGetWindowUserPointer(window)))
-				app->m_game->click(button);
+			if (auto game = static_cast<DuneII*>(glfwGetWindowUserPointer(window)))
+				game->click(button);
 		}
 	});
-}
-
-
-void Application::createOrthoCamera() noexcept
-{
-	auto& camera = m_game->camera;
-	auto& registry = m_game->registry;
-
-	camera = registry.create();
-	registry.emplace<glm::mat4>(camera);
-	registry.emplace<Transform2D>(camera);
 }

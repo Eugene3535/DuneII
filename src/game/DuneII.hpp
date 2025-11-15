@@ -6,9 +6,9 @@
 #include <memory>
 #include <typeindex>
 
-#include <glm/vec2.hpp>
 #include <entt/entity/registry.hpp>
 
+#include "graphics/OrthogonalCamera.hpp"
 #include "resources/ogl/holder/GlResourceManager.hpp"
 #include "game/scenes/Scene.hpp"
 
@@ -20,29 +20,26 @@ class DuneII final
 public:
     DuneII() noexcept;
 
+    bool init() noexcept;
+    void update(float dt) noexcept;
+    void draw() noexcept;
+
     void click(int button) noexcept;
+    void setCursorPosition(float x, float y) noexcept;
+    void resize(int width, int height) noexcept;
 
     void switchScene(const Scene* requester, Scene::Type nextScene) noexcept;
-
-    const glm::ivec2& getWindowSize() const noexcept;
-    const glm::vec2& getCursorPosition() const noexcept;
 
 //  Resources
     GlResourceManager glResources;
 
 //  ECS
     entt::registry registry;
-    entt::entity camera;
+    OrthogonalCamera camera;
     
 private:
     template<class T>
     T* load(std::string_view info) noexcept;
-
-    void update(float dt) noexcept;
-    void draw() noexcept;
-
-    glm::ivec2 m_windowSize;
-    glm::vec2 m_cursorPosition;
 
     std::unordered_map<std::type_index, std::shared_ptr<void>> m_scenes;
     Scene* m_currentScene;

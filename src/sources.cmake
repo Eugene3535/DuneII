@@ -52,6 +52,7 @@ set(SCENE_HDR_FILES
 set(DUNEII_SRC_FILES
 	src/common/ExternalMath.cpp
 	src/graphics/Transform2D.cpp
+	src/graphics/OrthogonalCamera.cpp
 	src/graphics/sprites/SpriteManager.cpp
 	${RESOURCE_SRC_FILES}
 	# src/effects/blackout/ScreenBlackoutEffect.cpp
@@ -67,6 +68,7 @@ set(DUNEII_HDR_FILES
 	src/common/ExternalMath.hpp
 	src/graphics/Meshes.hpp
 	src/graphics/Transform2D.hpp
+	src/graphics/OrthogonalCamera.hpp
 	src/graphics/sprites/SpriteManager.hpp
 	${RESOURCE_HDR_FILES}
 	# src/effects/blackout/ScreenBlackoutEffect.hpp

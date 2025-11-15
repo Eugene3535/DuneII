@@ -3,8 +3,6 @@
 
 #include <array>
 
-// #include <glm/gtc/constants.hpp> // glm::pi() and other
-
 class TrigTable
 {
 public:

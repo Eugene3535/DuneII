@@ -17,11 +17,12 @@ public:
     explicit TitleScreen(class DuneII* game) noexcept;
     ~TitleScreen();
 
-    bool load(std::string_view info)    noexcept override;
-    void update(float dt)               noexcept override;
-    void draw()                         noexcept override;
-    void resize(const glm::ivec2& size) noexcept override;
-    void click(int button)              noexcept override;
+    bool load(std::string_view info)         noexcept override;
+    void update(float dt)                    noexcept override;
+    void draw()                              noexcept override;
+    void resize(int width, int height)       noexcept override;
+    void click(int button)                   noexcept override;
+    void setCursorPosition(float x, float y) noexcept override;
 
 private:
     std::unique_ptr<SpriteManager> m_sprites;
@@ -43,7 +44,6 @@ private:
     char m_memoryPool[sizeof(Button) * 3];
 
     bool m_isPresented;
-    bool m_isMouseClicked;
 };
 
 #endif // !TITLE_SCREEN_HPP

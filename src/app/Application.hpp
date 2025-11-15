@@ -15,10 +15,8 @@ private:
 	bool initWindow(const char* title, int width, int height) noexcept;
 	void checkOpenglTypes()  noexcept;
 	void initCallbacks()     noexcept;
-	void createOrthoCamera() noexcept;
 
 	struct GLFWwindow* m_window;
-	class DuneII* m_game;
 };
 
 #endif // !APPLICATION_HPP

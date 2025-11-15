@@ -1,9 +1,6 @@
 #ifndef BUTTON_HPP
 #define BUTTON_HPP
 
-#include <glm/vec2.hpp>
-#include <glm/vec4.hpp>
-
 #include "graphics/Meshes.hpp"
 #include "graphics/Transform2D.hpp"
 
@@ -13,18 +10,21 @@ class Button:
 public:
     Button(const Sprite& sprite) noexcept;
 
-    void resize(const glm::vec2& newSize) noexcept;
-
-    void update(const glm::ivec2& mousePosition, bool isClicked) noexcept;
+    void update(vec2 mousePosition) noexcept;
     void draw() noexcept;
+
+    void resize(int width, int height) noexcept;
+    void click() noexcept;
 
     const float* getColor() const noexcept;
 
 private:
     const Sprite m_sprite;
-    glm::vec4    m_bounds;
+    vec2         m_bounds[2];
     const float* m_currentColor;
-    bool         m_boundsNeedUpdate;
+
+    bool m_boundsNeedUpdate;
+    bool m_isClicked;
 };
 
 #endif // !BUTTON_HPP

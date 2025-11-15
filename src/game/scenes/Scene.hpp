@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <string_view>
 
-#include <glm/vec2.hpp>
+#include <cglm/call/vec2.h>
 
 
 class Scene
@@ -21,16 +21,17 @@ public:
 	Scene(class DuneII* game) noexcept;
 	virtual ~Scene();
     
-    virtual bool load(std::string_view info)    noexcept;
-    virtual void update(float dt)               noexcept;
-    virtual void draw()                         noexcept;
-    virtual void resize(const glm::ivec2& size) noexcept;
-    virtual void click(int mouseButton)         noexcept;
+    virtual bool load(std::string_view info)         noexcept;
+    virtual void update(float dt)                    noexcept;
+    virtual void draw()                              noexcept;
+    virtual void resize(int width, int height)       noexcept;
+    virtual void click(int mouseButton)              noexcept;
+    virtual void setCursorPosition(float x, float y) noexcept;
 
     bool isLoaded() const noexcept;
 
 protected:
-    void setSpriteSizeInPixels(const class Sprite& sprite, const glm::vec2& newSize, class Transform2D& transform) noexcept;
+    void setSpriteSizeInPixels(const class Sprite& sprite, vec2 newSize, class Transform2D& transform) noexcept;
 
     class DuneII* m_game;
 

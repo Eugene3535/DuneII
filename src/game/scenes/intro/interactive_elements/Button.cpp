@@ -1,6 +1,8 @@
 #include <cassert>
 
 #include <glad/glad.h>
+#include <cglm/call/vec2.h>
+#include <cglm/call/aabb2d.h>
 
 #include "game/scenes/intro/interactive_elements/Button.hpp"
 
@@ -15,52 +17,40 @@ Button::Button(const Sprite& sprite) noexcept:
     m_sprite(sprite),
     m_bounds(),
     m_currentColor(normal_color),
-    m_boundsNeedUpdate(true)
+    m_boundsNeedUpdate(true),
+    m_isClicked(false)
 {
     setOrigin(sprite.width * 0.5f, sprite.height * 0.5f);
 }
 
 
-void Button::resize(const glm::vec2& newSize) noexcept
-{
-    assert(m_sprite.width > 0);
-    assert(m_sprite.height > 0);
-
-    float dx = newSize.x / m_sprite.width;
-    float dy = newSize.y / m_sprite.height;
-    setScale(dx, dy);
-
-    m_boundsNeedUpdate = true;
-}
-
-
-void Button::update(const glm::ivec2& mousePosition, bool isClicked) noexcept
+void Button::update(vec2 mousePosition) noexcept
 {
     if(m_boundsNeedUpdate)
     {
-        const glm::vec2 position = getPosition();
-        const glm::vec2 scale = getScale();
-        const glm::vec2 size = { static_cast<float>(m_sprite.width) * scale.x, static_cast<float>(m_sprite.height) * scale.y };
+        vec2 position, scale;  
+        getPosition(position);
+        getScale(scale);
+        vec2 size = { static_cast<float>(m_sprite.width) * scale[0], static_cast<float>(m_sprite.height) * scale[1] };
 
-        m_bounds = { position - size * 0.5f, position + size };
+        position[0] -= size[0] * 0.5f;
+        position[1] -= size[1] * 0.5f;
+        glmc_vec2_copy(position, m_bounds[0]);
+
+        position[0] += size[0];
+        position[1] += size[1];
+        glmc_vec2_copy(position, m_bounds[1]);
+
         m_boundsNeedUpdate = false;
     }
 
-    auto contains = [](const glm::vec2& point, const glm::vec4& rect) noexcept -> bool
-    {
-        return ((point.x > rect.x) && (point.x < rect.z) && (point.y > rect.y) && (point.y < rect.w));
-    };
-
     m_currentColor = normal_color;
-    const bool isUnderCursor = contains(glm::vec2(mousePosition), m_bounds);
+    const bool isUnderCursor = glmc_aabb2d_point(m_bounds, mousePosition);
 
     if(isUnderCursor)
-    {
-        if(isClicked)
-            m_currentColor = is_clicked_color;      
-        else
-            m_currentColor = under_cursor_color;
-    }
+        m_currentColor = m_isClicked ? is_clicked_color : under_cursor_color;
+
+    m_isClicked = false;
 }
 
 
@@ -69,6 +59,25 @@ void Button::draw() noexcept
     glBindTexture(GL_TEXTURE_2D, m_sprite.texture);
     glDrawArrays(GL_TRIANGLE_FAN, m_sprite.frame, 4);
     glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+
+void Button::resize(int width, int height) noexcept
+{
+    assert(m_sprite.width > 0);
+    assert(m_sprite.height > 0);
+
+    float dx = static_cast<float>(width) / m_sprite.width;
+    float dy = static_cast<float>(height) / m_sprite.height;
+    setScale(dx, dy);
+
+    m_boundsNeedUpdate = true;
+}
+
+
+void Button::click() noexcept
+{
+    m_isClicked = true;
 }
 
 

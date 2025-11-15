@@ -1,5 +1,4 @@
-#include <glm/ext/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+
 
 #include "resources/files/FileProvider.hpp"
 #include "resources/files/Shader.hpp"
@@ -7,6 +6,8 @@
 #include "graphics/sprites/SpriteManager.hpp"
 #include "game/DuneII.hpp"
 #include "game/scenes/intro/TitleScreen.hpp"
+
+#include <GLFW/glfw3.h>
 
 
 // Sprite scaling and position factors when changing window size
@@ -41,8 +42,7 @@ TitleScreen::TitleScreen(DuneII* game) noexcept:
     m_playButton(nullptr),
     m_exitButton(nullptr),
     m_settingsButton(nullptr),
-    m_isPresented(false),
-    m_isMouseClicked(false)
+    m_isPresented(false)
 {
 #ifdef DEBUG
     m_isPresented = true;
@@ -62,8 +62,6 @@ bool TitleScreen::load(std::string_view info) noexcept
 {
     if(!m_isLoaded)
     {
-        const auto windowSize = m_game->getWindowSize();
-
         FileProvider provider;
         auto& glResources = m_game->glResources;
 
@@ -73,8 +71,8 @@ bool TitleScreen::load(std::string_view info) noexcept
 
 //  TODO: move uniform buffer to Game
         m_uniformBuffer = GLBuffer(vboHandles[0], GL_UNIFORM_BUFFER);
-        m_uniformBuffer.create(sizeof(glm::mat4), 1, nullptr, GL_DYNAMIC_DRAW);
-        m_uniformBuffer.bindBufferRange(0, 0, sizeof(glm::mat4));
+        m_uniformBuffer.create(sizeof(mat4), 1, nullptr, GL_DYNAMIC_DRAW);
+        m_uniformBuffer.bindBufferRange(0, 0, sizeof(mat4));
 
 //  Textures
         Texture spaceTexture;    spaceTexture.handle    = textureHandles[0];
@@ -168,11 +166,7 @@ void TitleScreen::update(float dt) noexcept
 
     if(m_isPresented)
     {
-        const auto mousePosition = m_game->getCursorPosition();
-        m_settingsButton->update(mousePosition, m_isMouseClicked);
-        m_playButton->update(mousePosition, m_isMouseClicked);
-        m_exitButton->update(mousePosition, m_isMouseClicked);
-        m_isMouseClicked = false;
+
     }
     else
     {
@@ -183,24 +177,24 @@ void TitleScreen::update(float dt) noexcept
 
 void TitleScreen::draw() noexcept
 {
-    auto& registry         = m_game->registry; 
-    const auto camera      = m_game->camera;
-    const auto& projection = registry.get<glm::mat4>(camera);
-    const auto& modelView  = registry.get<Transform2D>(camera);
-    const auto mvp         = projection * modelView.getMatrix();
+    auto& camera = m_game->camera;
+    mat4 MVP, modelView, model;
+    camera.getModelViewProjectionMatrix(MVP);
 
     glUseProgram(m_spriteProgram.getHandle());
     glBindVertexArray(m_vao.getHandle());
 
-    glm::mat4 modelTransform = mvp * m_spaceTransform.getMatrix();
-    m_uniformBuffer.update(0, sizeof(glm::mat4), 1, static_cast<const void*>(glm::value_ptr(modelTransform)));
+    m_spaceTransform.getMatrix(model);
+    glmc_mat4_mul(MVP, model, modelView);
+    m_uniformBuffer.update(0, sizeof(mat4), 1, static_cast<const void*>(modelView));
 
     glBindTexture(GL_TEXTURE_2D, m_space.texture);
     glDrawArrays(GL_TRIANGLE_FAN, m_space.frame, 4);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    modelTransform = mvp * m_planetTransform.getMatrix();
-    m_uniformBuffer.update(0, sizeof(glm::mat4), 1, static_cast<const void*>(glm::value_ptr(modelTransform)));
+    m_planetTransform.getMatrix(model);
+    glmc_mat4_mul(MVP, model, modelView);
+    m_uniformBuffer.update(0, sizeof(mat4), 1, static_cast<const void*>(modelView));
 
     glBindTexture(GL_TEXTURE_2D, m_planet.texture);
     glDrawArrays(GL_TRIANGLE_FAN, m_planet.frame, 4);
@@ -208,67 +202,71 @@ void TitleScreen::draw() noexcept
 
     glUseProgram(m_colorSpriteProgram.getHandle());
 
-    modelTransform = mvp * m_playButton->getMatrix();
-    m_uniformBuffer.update(0, sizeof(glm::mat4), 1, static_cast<const void*>(glm::value_ptr(modelTransform)));
+    m_playButton->getMatrix(model);
+    glmc_mat4_mul(MVP, model, modelView);
+    m_uniformBuffer.update(0, sizeof(mat4), 1, static_cast<const void*>(modelView));
 
     if(int uniform = m_colorSpriteProgram.getUniformLocation("buttonColor"); uniform != -1)
         glUniform4fv(uniform, 1, m_playButton->getColor());
 
     m_playButton->draw();
 
-    modelTransform = mvp * m_exitButton->getMatrix();
-    m_uniformBuffer.update(0, sizeof(glm::mat4), 1, static_cast<const void*>(glm::value_ptr(modelTransform)));
+    m_exitButton->getMatrix(model);
+    glmc_mat4_mul(MVP, model, modelView);
+    m_uniformBuffer.update(0, sizeof(mat4), 1, static_cast<const void*>(modelView));
 
     if(int uniform = m_colorSpriteProgram.getUniformLocation("buttonColor"); uniform != -1)
         glUniform4fv(uniform, 1, m_exitButton->getColor());
 
     m_exitButton->draw();
 
-    modelTransform = mvp * m_settingsButton->getMatrix();
-    m_uniformBuffer.update(0, sizeof(glm::mat4), 1, static_cast<const void*>(glm::value_ptr(modelTransform))); 
+    m_settingsButton->getMatrix(model);
+    glmc_mat4_mul(MVP, model, modelView);
+    m_uniformBuffer.update(0, sizeof(mat4), 1, static_cast<const void*>(modelView)); 
 
     if(int uniform = m_colorSpriteProgram.getUniformLocation("buttonColor"); uniform != -1)
         glUniform4fv(uniform, 1, m_settingsButton->getColor());
 
     m_settingsButton->draw();
 
-    glBindVertexArray(m_vao.getHandle());
+    glBindVertexArray(0);
     glUseProgram(0);
 }
 
 
-void TitleScreen::resize(const glm::ivec2& size) noexcept
+void TitleScreen::resize(int width, int height) noexcept
 {
     if(!m_isLoaded)
         return;
     
-    Scene::resize(size);
-    setSpriteSizeInPixels(m_space, glm::vec2(size), m_spaceTransform);
+    vec2 size = { static_cast<float>(width), static_cast<float>(height) };
+    setSpriteSizeInPixels(m_space, size, m_spaceTransform);
 
     if(m_isPresented)
     {
         {// space and planet
-            setSpriteSizeInPixels(m_planet, { size.x / PLANET_SCALE_FACTOR_WIDTH, size.y / PLANET_SCALE_FACTOR_HEIGHT }, m_planetTransform);
-            m_planetTransform.setPosition({ size.x / PLANET_POSITION_FACTOR_X, size.y / PLANET_POSITION_FACTOR_Y });
+            vec2 planetScale = { size[0] / PLANET_SCALE_FACTOR_WIDTH, size[1] / PLANET_SCALE_FACTOR_HEIGHT };
+            setSpriteSizeInPixels(m_planet, planetScale, m_planetTransform);
+            m_planetTransform.setPosition(size[0] / PLANET_POSITION_FACTOR_X, size[1] / PLANET_POSITION_FACTOR_Y);
         }
 
         {// buttons (size)
-            const float width = size.x / BUTTON_SCALE_FACTOR_WIDTH;
-            const float height = size.y / BUTTON_SCALE_FACTOR_HEIGHT;
+            const float width = size[0] / BUTTON_SCALE_FACTOR_WIDTH;
+            const float height = size[1] / BUTTON_SCALE_FACTOR_HEIGHT;
 
-            m_settingsButton->resize({ width, height });
-            m_playButton->resize({ width, width }); // <- this is not a typo
-            m_exitButton->resize({ width, height });
+            m_settingsButton->resize(width, height);
+            m_playButton->resize(width, width); // <- this is not a typo
+            m_exitButton->resize(width, height);
         }
 
         {// buttons (positions)
-            const float centerX = size.x / BUTTON_POSITION_FACTOR_X;
-            const float centerY = size.y / BUTTON_POSITION_FACTOR_Y;
-            const float offset = size.x / BUTTON_SCALE_FACTOR_WIDTH * PLANET_POSITION_FACTOR_X;
+            const float centerX = size[0] / BUTTON_POSITION_FACTOR_X;
+            const float centerY = size[1] / BUTTON_POSITION_FACTOR_Y;
+            const float offset = size[0] / BUTTON_SCALE_FACTOR_WIDTH * PLANET_POSITION_FACTOR_X;
 
-            m_settingsButton->setPosition({ centerX - offset, centerY });
-            m_playButton->setPosition({ centerX, centerY });
-            m_exitButton->setPosition({ centerX + offset, centerY });
+            m_settingsButton->setPosition(centerX - offset, centerY);
+            m_playButton->setPosition(centerX, centerY);
+            m_exitButton->setPosition(centerX + offset, centerY);
         }
     }
 }
@@ -276,5 +274,19 @@ void TitleScreen::resize(const glm::ivec2& size) noexcept
 
 void TitleScreen::click(int button) noexcept
 {
-    m_isMouseClicked = true;
+    if(button == GLFW_MOUSE_BUTTON_RIGHT)
+    {
+        m_settingsButton->click();
+        m_playButton->click();
+        m_exitButton->click();
+    }
+}
+
+
+void TitleScreen::setCursorPosition(float x, float y) noexcept
+{
+    vec2 mousePosition = { x, y };
+    m_settingsButton->update(mousePosition);
+    m_playButton->update(mousePosition);
+    m_exitButton->update(mousePosition);
 }

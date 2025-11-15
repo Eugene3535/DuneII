@@ -1,6 +1,6 @@
 #include <cassert>
 
-#include <glm/gtc/matrix_transform.hpp>
+#include <cglm/call/cam.h>
 
 #include "graphics/Meshes.hpp"
 #include "graphics/Transform2D.hpp"
@@ -37,16 +37,19 @@ void Scene::draw() noexcept
 }
 
 
-void Scene::resize(const glm::ivec2& size) noexcept
+void Scene::resize(int width, int height) noexcept
 {
-    auto& registry    = m_game->registry; 
-    const auto camera = m_game->camera;
-    auto& projection  = registry.get<glm::mat4>(camera);
-    projection = glm::ortho(0.f, static_cast<float>(size.x), static_cast<float>(size.y), 0.f);
+
 }
 
 
 void Scene::click(int mouseButton) noexcept
+{
+
+}
+
+
+void Scene::setCursorPosition(float x, float y) noexcept
 {
 
 }
@@ -58,12 +61,12 @@ bool Scene::isLoaded() const noexcept
 }
 
 
-void Scene::setSpriteSizeInPixels(const Sprite& sprite, const glm::vec2& newSize, Transform2D& transform) noexcept
+void Scene::setSpriteSizeInPixels(const Sprite& sprite, vec2 newSize, Transform2D& transform) noexcept
 {
     assert(sprite.width > 0);
     assert(sprite.height > 0);
 
-    float dx = newSize.x / sprite.width;
-    float dy = newSize.y / sprite.height;
+    float dx = newSize[0] / sprite.width;
+    float dy = newSize[1] / sprite.height;
     transform.setScale(dx, dy);
 }

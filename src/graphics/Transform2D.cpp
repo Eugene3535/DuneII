@@ -1,22 +1,21 @@
-#include <glm/ext/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <cglm/call/vec2.h>
 
 #include "graphics/Transform2D.hpp"
 
 
 Transform2D::Transform2D() noexcept:
-    m_matrix(glm::identity<glm::mat4>()),
-    m_origin(0, 0),
-    m_position(0, 0),         
-    m_scale(1, 1),
     m_rotation(0),
     m_transformNeedUpdate(true)
 {
-
+    glmc_vec2_zero(m_origin);
+    glmc_vec2_zero(m_position);
+    glmc_vec2_one(m_scale);
+    glmc_mat4_identity(m_matrix);
 }
 
 
 Transform2D::~Transform2D() = default;
+
 
 
 void Transform2D::loadIdentity() noexcept
@@ -27,7 +26,8 @@ void Transform2D::loadIdentity() noexcept
 
 void Transform2D::setPosition(float x, float y) noexcept
 {
-    m_position = { x, y };
+    m_position[0] = x;
+    m_position[1] = y;
     m_transformNeedUpdate = true;
 }
 
@@ -42,14 +42,16 @@ void Transform2D::setScale(float x, float y) noexcept
 
 void Transform2D::setOrigin(float x, float y) noexcept
 {
-    m_origin = { x, y };
+    m_origin[0] = x;
+    m_origin[1] = y;
     m_transformNeedUpdate = true;
 }
 
 
-void Transform2D::setPosition(const glm::vec2& position) noexcept
+void Transform2D::setPosition(const vec2 position) noexcept
 {
-    m_position = position;
+    m_position[0] = position[0];
+    m_position[1] = position[1];
     m_transformNeedUpdate = true;
 }
 
@@ -65,23 +67,26 @@ void Transform2D::setRotation(float angle) noexcept
 }
 
 
-void Transform2D::setScale(const glm::vec2& factors) noexcept
+void Transform2D::setScale(const vec2 factors) noexcept
 {
-    m_scale = factors;
+    m_scale[0] = factors[0];
+    m_scale[1] = factors[1];
     m_transformNeedUpdate = true;
 }
 
 
-void Transform2D::setOrigin(const glm::vec2& origin) noexcept
+void Transform2D::setOrigin(const vec2 origin) noexcept
 {
-    m_origin = origin;
+    m_origin[0] = origin[0];
+    m_origin[1] = origin[1];
     m_transformNeedUpdate = true;
 }
 
 
-const glm::vec2& Transform2D::getPosition() const noexcept
+void Transform2D::getPosition(vec2 position) const noexcept
 {
-    return m_position;
+    position[0] = m_position[0];
+    position[1] = m_position[1];
 }
 
 
@@ -91,38 +96,39 @@ float Transform2D::getRotation() const noexcept
 }
 
 
-const glm::vec2& Transform2D::getScale() const noexcept
+void Transform2D::getScale(vec2 scale) const noexcept
 {
-    return m_scale;
+    scale[0] = m_scale[0];
+    scale[1] = m_scale[1];
 }
 
 
-const glm::vec2& Transform2D::getOrigin() const noexcept
+void Transform2D::getOrigin(vec2 origin) const noexcept
 {
-    return m_origin;
+    origin[0] = m_origin[0];
+    origin[1] = m_origin[1];
 }
 
 
-void Transform2D::move(const glm::vec2& offset) noexcept
+void Transform2D::move(const vec2 offset) noexcept
 {
-    m_position += offset;
-    m_transformNeedUpdate = true;
+    vec2 position = { m_position[0] + offset[0], m_position[1] + offset[1] };
+    setPosition(position);
 }
 
 
 void Transform2D::rotate(float angle) noexcept
 {
     setRotation(m_rotation + angle);
-    m_transformNeedUpdate = true;
 }
 
 
-const glm::mat4& Transform2D::getMatrix() const noexcept
+void Transform2D::getMatrix(mat4 result) const noexcept
 {  
     // Recompute the matrix if needed
     if (m_transformNeedUpdate)
     {
-        float angle  = glm::radians(-m_rotation);
+        float angle  = glm_rad(-m_rotation);
         float cosine = cos(angle);
         float sine   = sin(angle);
         float sxc    = m_scale[0] * cosine;
@@ -132,7 +138,7 @@ const glm::mat4& Transform2D::getMatrix() const noexcept
         float tx     = -m_origin[0] * sxc - m_origin[1] * sys + m_position[0];
         float ty     =  m_origin[0] * sxs - m_origin[1] * syc + m_position[1];
 
-        auto m = static_cast<float*>(glm::value_ptr(m_matrix));
+        auto m = static_cast<float*>(&m_matrix[0][0]);
 
         m[0] = sxc;  m[4] = sys; m[8] = 0.f;  m[12] = tx;
         m[1] = -sxs; m[5] = syc; m[9] = 0.f;  m[13] = ty;
@@ -142,5 +148,5 @@ const glm::mat4& Transform2D::getMatrix() const noexcept
         m_transformNeedUpdate = false;
     }
 
-    return m_matrix;
+    glmc_mat4_copy(m_matrix, result);
 }
