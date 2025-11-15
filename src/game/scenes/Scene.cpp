@@ -46,6 +46,12 @@ void Scene::resize(const glm::ivec2& size) noexcept
 }
 
 
+void Scene::click(int mouseButton) noexcept
+{
+
+}
+
+
 bool Scene::isLoaded() const noexcept
 {
     return m_isLoaded;

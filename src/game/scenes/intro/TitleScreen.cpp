@@ -41,7 +41,8 @@ TitleScreen::TitleScreen(DuneII* game) noexcept:
     m_playButton(nullptr),
     m_exitButton(nullptr),
     m_settingsButton(nullptr),
-    m_isPresented(false)
+    m_isPresented(false),
+    m_isMouseClicked(false)
 {
 #ifdef DEBUG
     m_isPresented = true;
@@ -131,10 +132,6 @@ bool TitleScreen::load(std::string_view info) noexcept
             if(strcmp(btn, "exit") == 0)     m_exitButton = button;
             if(strcmp(btn, "settings") == 0) m_settingsButton = button;
         }
-
-        m_playButton->setPosition({ 100, 100 });
-        m_exitButton->setPosition({ 350, 300 });
-        m_settingsButton->setPosition({ 650, 500 });
         
 //  Shaders
         std::array<Shader, 2> shaders;
@@ -146,6 +143,15 @@ bool TitleScreen::load(std::string_view info) noexcept
             return false;
 
         if (!m_spriteProgram.link(shaders)) 
+            return false;
+
+        if (!shaders[0].loadFromFile(provider.findPathToFile("color_sprite.vert"), GL_VERTEX_SHADER))   
+            return false;
+
+        if (!shaders[1].loadFromFile(provider.findPathToFile("color_sprite.frag"), GL_FRAGMENT_SHADER)) 
+            return false;
+
+        if (!m_colorSpriteProgram.link(shaders)) 
             return false;
         
         m_isLoaded = true;
@@ -163,11 +169,10 @@ void TitleScreen::update(float dt) noexcept
     if(m_isPresented)
     {
         const auto mousePosition = m_game->getCursorPosition();
-        const bool isClicked = false; // sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
-
-        m_settingsButton->update(mousePosition, isClicked);
-        m_playButton->update(mousePosition, isClicked);
-        m_exitButton->update(mousePosition, isClicked);
+        m_settingsButton->update(mousePosition, m_isMouseClicked);
+        m_playButton->update(mousePosition, m_isMouseClicked);
+        m_exitButton->update(mousePosition, m_isMouseClicked);
+        m_isMouseClicked = false;
     }
     else
     {
@@ -201,16 +206,30 @@ void TitleScreen::draw() noexcept
     glDrawArrays(GL_TRIANGLE_FAN, m_planet.frame, 4);
     glBindTexture(GL_TEXTURE_2D, 0);
 
+    glUseProgram(m_colorSpriteProgram.getHandle());
+
     modelTransform = mvp * m_playButton->getMatrix();
     m_uniformBuffer.update(0, sizeof(glm::mat4), 1, static_cast<const void*>(glm::value_ptr(modelTransform)));
+
+    if(int uniform = m_colorSpriteProgram.getUniformLocation("buttonColor"); uniform != -1)
+        glUniform4fv(uniform, 1, m_playButton->getColor());
+
     m_playButton->draw();
 
     modelTransform = mvp * m_exitButton->getMatrix();
     m_uniformBuffer.update(0, sizeof(glm::mat4), 1, static_cast<const void*>(glm::value_ptr(modelTransform)));
+
+    if(int uniform = m_colorSpriteProgram.getUniformLocation("buttonColor"); uniform != -1)
+        glUniform4fv(uniform, 1, m_exitButton->getColor());
+
     m_exitButton->draw();
 
     modelTransform = mvp * m_settingsButton->getMatrix();
     m_uniformBuffer.update(0, sizeof(glm::mat4), 1, static_cast<const void*>(glm::value_ptr(modelTransform))); 
+
+    if(int uniform = m_colorSpriteProgram.getUniformLocation("buttonColor"); uniform != -1)
+        glUniform4fv(uniform, 1, m_settingsButton->getColor());
+
     m_settingsButton->draw();
 
     glBindVertexArray(m_vao.getHandle());
@@ -252,4 +271,10 @@ void TitleScreen::resize(const glm::ivec2& size) noexcept
             m_exitButton->setPosition({ centerX + offset, centerY });
         }
     }
+}
+
+
+void TitleScreen::click(int button) noexcept
+{
+    m_isMouseClicked = true;
 }

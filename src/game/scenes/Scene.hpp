@@ -25,6 +25,7 @@ public:
     virtual void update(float dt)               noexcept;
     virtual void draw()                         noexcept;
     virtual void resize(const glm::ivec2& size) noexcept;
+    virtual void click(int mouseButton)         noexcept;
 
     bool isLoaded() const noexcept;
 

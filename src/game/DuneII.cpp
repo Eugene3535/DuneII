@@ -1,3 +1,4 @@
+#include "game/scenes/intro/TitleScreen.hpp"
 #include "game/DuneII.hpp"
 
 
@@ -9,6 +10,13 @@ DuneII::DuneII() noexcept:
     m_isSceneNeedToBeChanged(false)
 {
 
+}
+
+
+void DuneII::click(int button) noexcept
+{
+    if(m_currentScene)
+        m_currentScene->click(button);
 }
 
 
@@ -44,4 +52,51 @@ const glm::ivec2& DuneII::getWindowSize() const noexcept
 const glm::vec2& DuneII::getCursorPosition() const noexcept
 {
     return m_cursorPosition;
+}
+
+
+void DuneII::update(float dt) noexcept
+{
+    m_currentScene->update(dt);
+
+    if (m_isSceneNeedToBeChanged)
+    {
+        switch (m_nextSceneType)
+        {
+            case Scene::Type::MAIN_MENU:
+            {
+                if (auto titleScene = load<TitleScreen>({}))
+                    m_currentScene = titleScene;
+            }
+            break;
+
+            case Scene::Type::CHOOSE_DESTINY:
+            {
+                
+            }
+            break;
+
+            case Scene::Type::MISSION:
+            {
+                
+            }
+            break;
+
+            default:
+                break;
+        }
+
+        m_isSceneNeedToBeChanged = false;
+        m_nextSceneType = Scene::NONE;
+        m_currentScene->resize(m_windowSize);
+    }
+}
+
+
+void DuneII::draw() noexcept
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    if(m_currentScene)
+        m_currentScene->draw();
 }

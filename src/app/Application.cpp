@@ -73,43 +73,8 @@ int Application::run(DuneII& game) noexcept
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		game.m_currentScene->update(deltaTime);
-
-		if (game.m_isSceneNeedToBeChanged)
-		{
-			game.m_isSceneNeedToBeChanged = false;
-			game.m_nextSceneType = Scene::NONE;
-
-			switch (game.m_nextSceneType)
-			{
-				case Scene::Type::MAIN_MENU:
-				{
-					game.m_currentScene = titleScreen;
-				}
-				break;
-
-				case Scene::Type::CHOOSE_DESTINY:
-				{
-					
-				}
-				break;
-
-				case Scene::Type::MISSION:
-				{
-					
-				}
-				break;
-
-				default:
-					break;
-			}
-
-			glfwGetWindowSize(m_window, &width, &height);
-			game.m_currentScene->resize({ width, height });
-		}
-
-		glClear(GL_COLOR_BUFFER_BIT);
-		game.m_currentScene->draw();
+		game.update(deltaTime);
+		game.draw();
 
 		glfwSwapBuffers(m_window);
 	}
@@ -196,8 +161,15 @@ void Application::initCallbacks() noexcept
 	glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double xpos, double ypos)
 	{
 		if (auto app = static_cast<Application*>(glfwGetWindowUserPointer(window)))
+			app->m_game->m_cursorPosition = { static_cast<float>(xpos), static_cast<float>(ypos) };	
+	});
+
+	glfwSetMouseButtonCallback(m_window, [](GLFWwindow* window, int button, int action, int mods)
+	{
+		if(action == GLFW_PRESS)
 		{
-			app->m_game->m_cursorPosition = { static_cast<float>(xpos), static_cast<float>(ypos) };
+			if (auto app = static_cast<Application*>(glfwGetWindowUserPointer(window)))
+				app->m_game->click(button);
 		}
 	});
 }

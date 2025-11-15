@@ -21,6 +21,7 @@ public:
     void update(float dt)               noexcept override;
     void draw()                         noexcept override;
     void resize(const glm::ivec2& size) noexcept override;
+    void click(int button)              noexcept override;
 
 private:
     std::unique_ptr<SpriteManager> m_sprites;
@@ -28,6 +29,8 @@ private:
     VertexArrayObject m_vao;
 
     ShaderProgram m_spriteProgram;
+    ShaderProgram m_colorSpriteProgram;
+
     Sprite m_space;
     Transform2D m_spaceTransform;
     Sprite m_planet;
@@ -38,7 +41,9 @@ private:
     Button* m_settingsButton;
 
     char m_memoryPool[sizeof(Button) * 3];
+
     bool m_isPresented;
+    bool m_isMouseClicked;
 };
 
 #endif // !TITLE_SCREEN_HPP

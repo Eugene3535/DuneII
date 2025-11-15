@@ -20,6 +20,8 @@ class DuneII final
 public:
     DuneII() noexcept;
 
+    void click(int button) noexcept;
+
     void switchScene(const Scene* requester, Scene::Type nextScene) noexcept;
 
     const glm::ivec2& getWindowSize() const noexcept;
@@ -35,6 +37,9 @@ public:
 private:
     template<class T>
     T* load(std::string_view info) noexcept;
+
+    void update(float dt) noexcept;
+    void draw() noexcept;
 
     glm::ivec2 m_windowSize;
     glm::vec2 m_cursorPosition;

@@ -11,8 +11,8 @@ __declspec(dllexport) unsigned long AmdPowerXpressRequestHighPerformance = 0x000
 int main()
 {
     const char title[] = "Dune II: The Battle For Arrakis";
-    int width = 1200;
-    int height = 900;
+    int width = 800;
+    int height = 600;
 
     Application app;
     DuneII game;

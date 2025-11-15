@@ -18,14 +18,13 @@ public:
     void update(const glm::ivec2& mousePosition, bool isClicked) noexcept;
     void draw() noexcept;
 
-    bool isPressed() const noexcept;
+    const float* getColor() const noexcept;
 
 private:
     const Sprite m_sprite;
     glm::vec4    m_bounds;
     const float* m_currentColor;
     bool         m_boundsNeedUpdate;
-    bool         m_isPressed;
 };
 
 #endif // !BUTTON_HPP
