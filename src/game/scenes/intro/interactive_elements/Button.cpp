@@ -7,24 +7,24 @@
 #include "game/scenes/intro/interactive_elements/Button.hpp"
 
 
-static constexpr float normal_color[] = { 150.f / 255.f, 150.f / 255.f, 150.f / 255.f, 150.f / 255.f };
+static constexpr float normal_color[]       = { 150.f / 255.f, 150.f / 255.f, 150.f / 255.f, 150.f / 255.f };
 static constexpr float under_cursor_color[] = { 200.f / 255.f, 200.f / 255.f, 200.f / 255.f, 200.f / 255.f };
-static constexpr float is_clicked_color[] = { 255.f / 255.f, 255.f / 255.f, 255.f / 255.f, 255.f / 255.f };
+static constexpr float is_clicked_color[]   = { 255.f / 255.f, 255.f / 255.f, 255.f / 255.f, 255.f / 255.f };
 
 
-Button::Button(const Sprite& sprite) noexcept:
+Button::Button(const Sprite& sprite, const int32_t uniformLocation) noexcept:
     Transform2D(),
     m_sprite(sprite),
+    m_uniform(uniformLocation),
     m_bounds(),
     m_currentColor(normal_color),
-    m_boundsNeedUpdate(true),
-    m_isClicked(false)
+    m_boundsNeedUpdate(true)
 {
     setOrigin(sprite.width * 0.5f, sprite.height * 0.5f);
 }
 
 
-void Button::update(vec2 mousePosition) noexcept
+void Button::update(vec2 mousePosition, bool isClicked) noexcept
 {
     if(m_boundsNeedUpdate)
     {
@@ -48,14 +48,15 @@ void Button::update(vec2 mousePosition) noexcept
     const bool isUnderCursor = glmc_aabb2d_point(m_bounds, mousePosition);
 
     if(isUnderCursor)
-        m_currentColor = m_isClicked ? is_clicked_color : under_cursor_color;
-
-    m_isClicked = false;
+        m_currentColor = isClicked ? is_clicked_color : under_cursor_color;
 }
 
 
 void Button::draw() noexcept
 {
+    assert(m_uniform != -1);
+
+    glUniform4fv(m_uniform, 1, m_currentColor);
     glBindTexture(GL_TEXTURE_2D, m_sprite.texture);
     glDrawArrays(GL_TRIANGLE_FAN, m_sprite.frame, 4);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -72,16 +73,4 @@ void Button::resize(int width, int height) noexcept
     setScale(dx, dy);
 
     m_boundsNeedUpdate = true;
-}
-
-
-void Button::click() noexcept
-{
-    m_isClicked = true;
-}
-
-
-const float* Button::getColor() const noexcept
-{
-    return m_currentColor;
 }

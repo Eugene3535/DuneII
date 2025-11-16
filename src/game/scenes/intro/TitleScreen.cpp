@@ -1,4 +1,5 @@
-
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 #include "resources/files/FileProvider.hpp"
 #include "resources/files/Shader.hpp"
@@ -6,8 +7,6 @@
 #include "graphics/sprites/SpriteManager.hpp"
 #include "game/DuneII.hpp"
 #include "game/scenes/intro/TitleScreen.hpp"
-
-#include <GLFW/glfw3.h>
 
 
 // Sprite scaling and position factors when changing window size
@@ -42,6 +41,7 @@ TitleScreen::TitleScreen(DuneII* game) noexcept:
     m_playButton(nullptr),
     m_exitButton(nullptr),
     m_settingsButton(nullptr),
+    m_isMouseButtonPressed(false),
     m_isPresented(false)
 {
 #ifdef DEBUG
@@ -75,11 +75,11 @@ bool TitleScreen::load(std::string_view info) noexcept
         m_uniformBuffer.bindBufferRange(0, 0, sizeof(mat4));
 
 //  Textures
-        Texture spaceTexture;    spaceTexture.handle    = textureHandles[0];
-        Texture planetTexture;   planetTexture.handle   = textureHandles[1];
-        Texture playTexture;     playTexture.handle     = textureHandles[2];
-        Texture exitTexture;     exitTexture.handle     = textureHandles[3];
-        Texture settingsTexture; settingsTexture.handle = textureHandles[4];
+        Texture spaceTexture    = {.handle = textureHandles[0] };
+        Texture planetTexture   = {.handle = textureHandles[1] };  
+        Texture playTexture     = {.handle = textureHandles[2] }; 
+        Texture exitTexture     = {.handle = textureHandles[3] };
+        Texture settingsTexture = {.handle = textureHandles[4] };
     
         if(!spaceTexture.loadFromFile(provider.findPathToFile(SPACE_JPG)))
             return false;
@@ -94,6 +94,27 @@ bool TitleScreen::load(std::string_view info) noexcept
             return false;
 
         if(!settingsTexture.loadFromFile(provider.findPathToFile(BUTTON_SETTINGS_RU_PNG)))
+            return false;
+
+//  Shaders
+        std::array<Shader, 2> shaders;
+
+        if (!shaders[0].loadFromFile(provider.findPathToFile("title_screen.vert"), GL_VERTEX_SHADER))   
+            return false;
+
+        if (!shaders[1].loadFromFile(provider.findPathToFile("title_screen.frag"), GL_FRAGMENT_SHADER)) 
+            return false;
+
+        if (!m_spriteProgram.link(shaders)) 
+            return false;
+
+        if (!shaders[0].loadFromFile(provider.findPathToFile("title_screen_button.vert"), GL_VERTEX_SHADER))   
+            return false;
+
+        if (!shaders[1].loadFromFile(provider.findPathToFile("title_screen_button.frag"), GL_FRAGMENT_SHADER)) 
+            return false;
+
+        if (!m_colorSpriteProgram.link(shaders)) 
             return false;
         
 //  Sprites
@@ -118,39 +139,23 @@ bool TitleScreen::load(std::string_view info) noexcept
         m_planetTransform.setOrigin(planetTexture.width * 0.5f, planetTexture.height * 0.5f);
 
 //  Buttons
+        int32_t uniform = m_colorSpriteProgram.getUniformLocation("buttonColor");
+
+        if(uniform == -1)
+            return false;
+
         char* offset = m_memoryPool;
 
         for(const auto btn : { "play", "exit", "settings" })
         {
             Sprite sprite = m_sprites->getSprite(btn);
-            Button* button = new (offset) Button(sprite);
+            Button* button = new (offset) Button(sprite, uniform);
             offset += sizeof(Button);
 
             if(strcmp(btn, "play") == 0)     m_playButton = button;
             if(strcmp(btn, "exit") == 0)     m_exitButton = button;
             if(strcmp(btn, "settings") == 0) m_settingsButton = button;
         }
-        
-//  Shaders
-        std::array<Shader, 2> shaders;
-
-        if (!shaders[0].loadFromFile(provider.findPathToFile("sprite.vert"), GL_VERTEX_SHADER))   
-            return false;
-
-        if (!shaders[1].loadFromFile(provider.findPathToFile("sprite.frag"), GL_FRAGMENT_SHADER)) 
-            return false;
-
-        if (!m_spriteProgram.link(shaders)) 
-            return false;
-
-        if (!shaders[0].loadFromFile(provider.findPathToFile("color_sprite.vert"), GL_VERTEX_SHADER))   
-            return false;
-
-        if (!shaders[1].loadFromFile(provider.findPathToFile("color_sprite.frag"), GL_FRAGMENT_SHADER)) 
-            return false;
-
-        if (!m_colorSpriteProgram.link(shaders)) 
-            return false;
         
         m_isLoaded = true;
     }
@@ -166,7 +171,11 @@ void TitleScreen::update(float dt) noexcept
 
     if(m_isPresented)
     {
+        m_settingsButton->update(m_mousePosition, m_isMouseButtonPressed);
+        m_playButton->update(m_mousePosition, m_isMouseButtonPressed);
+        m_exitButton->update(m_mousePosition, m_isMouseButtonPressed);
 
+        m_isMouseButtonPressed = false;
     }
     else
     {
@@ -200,33 +209,22 @@ void TitleScreen::draw() noexcept
     glDrawArrays(GL_TRIANGLE_FAN, m_planet.frame, 4);
     glBindTexture(GL_TEXTURE_2D, 0);
 
+//  Draw buttons
     glUseProgram(m_colorSpriteProgram.getHandle());
 
     m_playButton->getMatrix(model);
     glmc_mat4_mul(MVP, model, modelView);
     m_uniformBuffer.update(0, sizeof(mat4), 1, static_cast<const void*>(modelView));
-
-    if(int uniform = m_colorSpriteProgram.getUniformLocation("buttonColor"); uniform != -1)
-        glUniform4fv(uniform, 1, m_playButton->getColor());
-
     m_playButton->draw();
 
     m_exitButton->getMatrix(model);
     glmc_mat4_mul(MVP, model, modelView);
     m_uniformBuffer.update(0, sizeof(mat4), 1, static_cast<const void*>(modelView));
-
-    if(int uniform = m_colorSpriteProgram.getUniformLocation("buttonColor"); uniform != -1)
-        glUniform4fv(uniform, 1, m_exitButton->getColor());
-
     m_exitButton->draw();
 
     m_settingsButton->getMatrix(model);
     glmc_mat4_mul(MVP, model, modelView);
     m_uniformBuffer.update(0, sizeof(mat4), 1, static_cast<const void*>(modelView)); 
-
-    if(int uniform = m_colorSpriteProgram.getUniformLocation("buttonColor"); uniform != -1)
-        glUniform4fv(uniform, 1, m_settingsButton->getColor());
-
     m_settingsButton->draw();
 
     glBindVertexArray(0);
@@ -274,19 +272,13 @@ void TitleScreen::resize(int width, int height) noexcept
 
 void TitleScreen::click(int button) noexcept
 {
-    if(button == GLFW_MOUSE_BUTTON_RIGHT)
-    {
-        m_settingsButton->click();
-        m_playButton->click();
-        m_exitButton->click();
-    }
+    if(button == GLFW_MOUSE_BUTTON_LEFT)
+        m_isMouseButtonPressed = true;
 }
 
 
 void TitleScreen::setCursorPosition(float x, float y) noexcept
 {
-    vec2 mousePosition = { x, y };
-    m_settingsButton->update(mousePosition);
-    m_playButton->update(mousePosition);
-    m_exitButton->update(mousePosition);
+    m_mousePosition[0] = x;
+    m_mousePosition[1] = y;
 }

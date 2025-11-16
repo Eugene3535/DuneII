@@ -40,6 +40,8 @@ private:
     Button* m_playButton;
     Button* m_exitButton;
     Button* m_settingsButton;
+    vec2    m_mousePosition;
+    bool    m_isMouseButtonPressed;
 
     char m_memoryPool[sizeof(Button) * 3];
 

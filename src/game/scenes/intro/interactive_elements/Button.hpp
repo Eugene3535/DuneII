@@ -8,23 +8,21 @@ class Button:
     public Transform2D
 {
 public:
-    Button(const Sprite& sprite) noexcept;
+    Button(const Sprite& sprite, const int32_t uniformLocation) noexcept;
 
-    void update(vec2 mousePosition) noexcept;
+    void update(vec2 mousePosition, bool isClicked) noexcept;
     void draw() noexcept;
 
     void resize(int width, int height) noexcept;
-    void click() noexcept;
-
-    const float* getColor() const noexcept;
 
 private:
-    const Sprite m_sprite;
-    vec2         m_bounds[2];
+    const Sprite  m_sprite;
+    const int32_t m_uniform;
+
+    vec2 m_bounds[2];
     const float* m_currentColor;
 
     bool m_boundsNeedUpdate;
-    bool m_isClicked;
 };
 
 #endif // !BUTTON_HPP
