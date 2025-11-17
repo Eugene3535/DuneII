@@ -31,15 +31,13 @@ public:
     void move(const vec2 offset) noexcept;
     void rotate(float angle)     noexcept;
 
-    void getMatrix(mat4 result) const noexcept;
+    void calculate(mat4 result) const noexcept;
 
 private:
-    mutable mat4 m_matrix;
-    vec2         m_origin;
-    vec2         m_position;         
-    vec2         m_scale;
-    float        m_rotation;      
-    mutable bool m_transformNeedUpdate;       
+    vec2  m_origin;
+    vec2  m_position;       
+    vec2  m_scale;
+    float m_rotation;   
 };
 
 #endif 

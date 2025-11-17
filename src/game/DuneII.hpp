@@ -8,8 +8,10 @@
 
 #include <entt/entity/registry.hpp>
 
-#include "graphics/OrthogonalCamera.hpp"
+#include "resources/files/FileProvider.hpp"
 #include "resources/ogl/holder/GlResourceManager.hpp"
+#include "graphics/OrthogonalCamera.hpp"
+
 #include "game/scenes/Scene.hpp"
 
 
@@ -33,6 +35,7 @@ public:
     void switchScene(const Scene* requester, Scene::Type nextScene) noexcept;
 
 //  Resources
+    FileProvider fileProvider;
     GlResourceManager glResources;
 
 //  ECS

@@ -30,7 +30,7 @@ void OrthogonalCamera::flipVertically(bool flip) noexcept
 void OrthogonalCamera::getModelViewProjectionMatrix(mat4 mvp) noexcept
 {
     mat4 model_view;
-    getMatrix(model_view);
+    calculate(model_view);
     glmc_mat4_mul(m_projection, model_view, mvp);
 }
 

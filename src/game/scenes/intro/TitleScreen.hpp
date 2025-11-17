@@ -1,8 +1,6 @@
 #ifndef TITLE_SCREEN_HPP
 #define TITLE_SCREEN_HPP
 
-#include <memory>
-
 #include "resources/ogl/vao/VertexArrayObject.hpp"
 #include "resources/ogl/shaders/ShaderProgram.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
@@ -30,9 +28,9 @@ private:
     ShaderProgram m_spriteProgram;
     ShaderProgram m_buttonSpriteProgram;
 
-    Sprite m_space;
+    Sprite      m_space;
     Transform2D m_spaceTransform;
-    Sprite m_planet;
+    Sprite      m_planet;
     Transform2D m_planetTransform;
 
     SpriteManager* m_sprites;

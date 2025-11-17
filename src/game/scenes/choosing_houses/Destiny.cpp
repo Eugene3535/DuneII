@@ -21,10 +21,10 @@ Destiny::Destiny(DuneII* game) noexcept:
 
 bool Destiny::load(std::string_view info) noexcept
 {
-    if(!m_isLoaded)
-    {
+    if(m_isLoaded)
+        return true;
 
-    }
+
 
     return m_isLoaded;
 }

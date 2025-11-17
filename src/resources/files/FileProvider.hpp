@@ -3,6 +3,7 @@
 
 #include <string>
 #include <filesystem>
+#include <unordered_map>
 
 #include "common/Assets.hpp"
 
@@ -10,6 +11,9 @@
 struct FileProvider
 {
     std::filesystem::path findPathToFile(const std::string& filename) noexcept;
+
+private:
+    std::unordered_map<std::string, std::filesystem::path> m_cachedPaths;
 };
 
 #endif // !FILE_PROVIDER_HPP

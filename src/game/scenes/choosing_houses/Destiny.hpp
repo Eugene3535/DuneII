@@ -1,6 +1,7 @@
 #ifndef DESTINY_HPP
 #define DESTINY_HPP
 
+#include "graphics/Meshes.hpp"
 #include "game/scenes/Scene.hpp"
 
 
@@ -16,7 +17,8 @@ public:
     void resize(int width, int height) noexcept override;
 
 private:
-
+    Sprite m_houses;
+    Transform2D m_spaceTransform;
 };
 
 #endif // !DESTINY_HPP

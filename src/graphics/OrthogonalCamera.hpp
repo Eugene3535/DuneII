@@ -16,7 +16,7 @@ public:
     bool isUpsideDown() const noexcept;
 
 private:
-    mat4 m_projection;
+    alignas(16) mat4 m_projection;
     bool m_modelViewNeedUpdate;
     bool m_flipVertically;
 };
