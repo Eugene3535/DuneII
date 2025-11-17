@@ -55,8 +55,6 @@ int Application::run(DuneII& game) noexcept
 
 	float deltaTime = 0.f;
 	float lastFrame = 0.f;
-
-	glClearColor(0.f, 0.f, 0.f, 1.f);
     
 	while (!glfwWindowShouldClose(m_window))
 	{

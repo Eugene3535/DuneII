@@ -38,6 +38,7 @@ static bool is_intro_active_phase_end;
 
 TitleScreen::TitleScreen(DuneII* game) noexcept:
     Scene(game),
+    m_sprites(nullptr),
     m_playButton(nullptr),
     m_exitButton(nullptr),
     m_settingsButton(nullptr),
@@ -52,9 +53,17 @@ TitleScreen::TitleScreen(DuneII* game) noexcept:
 
 TitleScreen::~TitleScreen()
 {
-    m_playButton->~Button();
-    m_exitButton->~Button();
-    m_settingsButton->~Button();
+    if(m_sprites)
+        m_sprites->~SpriteManager();
+
+    if(m_playButton)
+        m_playButton->~Button();
+
+    if(m_exitButton)
+        m_exitButton->~Button();
+
+    if(m_settingsButton)
+        m_settingsButton->~Button();
 }
 
 
@@ -65,14 +74,9 @@ bool TitleScreen::load(std::string_view info) noexcept
         FileProvider provider;
         auto& glResources = m_game->glResources;
 
-        auto vboHandles     = glResources.create<GLBuffer, 2>();
+        auto vboHandles     = glResources.create<GLBuffer, 1>();
         auto textureHandles = glResources.create<Texture, 5>();
         auto vaoHandles     = glResources.create<VertexArrayObject, 1>();
-
-//  TODO: move uniform buffer to Game
-        m_uniformBuffer = GLBuffer(vboHandles[0], GL_UNIFORM_BUFFER);
-        m_uniformBuffer.create(sizeof(mat4), 1, nullptr, GL_DYNAMIC_DRAW);
-        m_uniformBuffer.bindBufferRange(0, 0, sizeof(mat4));
 
 //  Textures
         Texture spaceTexture    = {.handle = textureHandles[0] };
@@ -114,12 +118,15 @@ bool TitleScreen::load(std::string_view info) noexcept
         if (!shaders[1].loadFromFile(provider.findPathToFile("title_screen_button.frag"), GL_FRAGMENT_SHADER)) 
             return false;
 
-        if (!m_colorSpriteProgram.link(shaders)) 
+        if (!m_buttonSpriteProgram.link(shaders)) 
             return false;
         
 //  Sprites
         m_vao.setup(vaoHandles[0]);
-        m_sprites = std::make_unique<SpriteManager>(vboHandles[1]);
+
+        char* offset = m_memoryPool;
+        m_sprites = new(offset) SpriteManager(vboHandles[0]);
+        offset += sizeof(SpriteManager);
 
         const std::array<VertexBufferLayout::Attribute, 1> spriteAttributes
         {
@@ -139,17 +146,15 @@ bool TitleScreen::load(std::string_view info) noexcept
         m_planetTransform.setOrigin(planetTexture.width * 0.5f, planetTexture.height * 0.5f);
 
 //  Buttons
-        int32_t uniform = m_colorSpriteProgram.getUniformLocation("buttonColor");
+        int32_t uniform = m_buttonSpriteProgram.getUniformLocation("buttonColor");
 
         if(uniform == -1)
             return false;
 
-        char* offset = m_memoryPool;
-
         for(const auto btn : { "play", "exit", "settings" })
         {
             Sprite sprite = m_sprites->getSprite(btn);
-            Button* button = new (offset) Button(sprite, uniform);
+            Button* button = new(offset) Button(sprite, uniform);
             offset += sizeof(Button);
 
             if(strcmp(btn, "play") == 0)     m_playButton = button;
@@ -186,6 +191,9 @@ void TitleScreen::update(float dt) noexcept
 
 void TitleScreen::draw() noexcept
 {
+    if(!m_isLoaded)
+        return;
+
     auto& camera = m_game->camera;
     mat4 MVP, modelView, model;
     camera.getModelViewProjectionMatrix(MVP);
@@ -195,7 +203,7 @@ void TitleScreen::draw() noexcept
 
     m_spaceTransform.getMatrix(model);
     glmc_mat4_mul(MVP, model, modelView);
-    m_uniformBuffer.update(0, sizeof(mat4), 1, static_cast<const void*>(modelView));
+    m_game->updateUniformBuffer(modelView);
 
     glBindTexture(GL_TEXTURE_2D, m_space.texture);
     glDrawArrays(GL_TRIANGLE_FAN, m_space.frame, 4);
@@ -203,29 +211,32 @@ void TitleScreen::draw() noexcept
 
     m_planetTransform.getMatrix(model);
     glmc_mat4_mul(MVP, model, modelView);
-    m_uniformBuffer.update(0, sizeof(mat4), 1, static_cast<const void*>(modelView));
+    m_game->updateUniformBuffer(modelView);
 
     glBindTexture(GL_TEXTURE_2D, m_planet.texture);
     glDrawArrays(GL_TRIANGLE_FAN, m_planet.frame, 4);
     glBindTexture(GL_TEXTURE_2D, 0);
 
 //  Draw buttons
-    glUseProgram(m_colorSpriteProgram.getHandle());
+    if(m_isPresented)
+    {
+        glUseProgram(m_buttonSpriteProgram.getHandle());
 
-    m_playButton->getMatrix(model);
-    glmc_mat4_mul(MVP, model, modelView);
-    m_uniformBuffer.update(0, sizeof(mat4), 1, static_cast<const void*>(modelView));
-    m_playButton->draw();
+        m_playButton->getMatrix(model);
+        glmc_mat4_mul(MVP, model, modelView);
+        m_game->updateUniformBuffer(modelView);
+        m_playButton->draw();
 
-    m_exitButton->getMatrix(model);
-    glmc_mat4_mul(MVP, model, modelView);
-    m_uniformBuffer.update(0, sizeof(mat4), 1, static_cast<const void*>(modelView));
-    m_exitButton->draw();
+        m_exitButton->getMatrix(model);
+        glmc_mat4_mul(MVP, model, modelView);
+        m_game->updateUniformBuffer(modelView);
+        m_exitButton->draw();
 
-    m_settingsButton->getMatrix(model);
-    glmc_mat4_mul(MVP, model, modelView);
-    m_uniformBuffer.update(0, sizeof(mat4), 1, static_cast<const void*>(modelView)); 
-    m_settingsButton->draw();
+        m_settingsButton->getMatrix(model);
+        glmc_mat4_mul(MVP, model, modelView);
+        m_game->updateUniformBuffer(modelView); 
+        m_settingsButton->draw();
+    }
 
     glBindVertexArray(0);
     glUseProgram(0);

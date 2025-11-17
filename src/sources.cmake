@@ -31,7 +31,7 @@ set(SCENE_SRC_FILES
 	src/game/scenes/Scene.cpp
 	src/game/scenes/intro/interactive_elements/Button.cpp
 	src/game/scenes/intro/TitleScreen.cpp
-	# src/game/scenes/choosing_houses/Destiny.cpp
+	src/game/scenes/choosing_houses/Destiny.cpp
 	# src/game/scenes/mission/Mission.cpp
 	# src/game/scenes/mission/tilemap/Tile.cpp
 	# src/game/scenes/mission/tilemap/TileMap.cpp
@@ -41,7 +41,7 @@ set(SCENE_HDR_FILES
 	src/game/scenes/Scene.hpp
 	src/game/scenes/intro/interactive_elements/Button.hpp
 	src/game/scenes/intro/TitleScreen.hpp
-	# src/game/scenes/choosing_houses/Destiny.hpp
+	src/game/scenes/choosing_houses/Destiny.hpp
 	# src/game/scenes/mission/Mission.hpp
 	# src/game/scenes/mission/tilemap/Tile.hpp
 	# src/game/scenes/mission/tilemap/TileMap.hpp
@@ -80,8 +80,10 @@ set(DUNEII_HDR_FILES
 
 
 set(SHADER_FILES
-	${PROJECT_SOURCE_DIR}/src/shaders/sprite.vert
-	${PROJECT_SOURCE_DIR}/src/shaders/sprite.frag
+	${PROJECT_SOURCE_DIR}/src/shaders/title_screen.vert
+	${PROJECT_SOURCE_DIR}/src/shaders/title_screen.frag
+	${PROJECT_SOURCE_DIR}/src/shaders/title_screen_button.vert
+	${PROJECT_SOURCE_DIR}/src/shaders/title_screen_button.frag
 )
 
 source_group("shaders" FILES ${SHADER_FILES})

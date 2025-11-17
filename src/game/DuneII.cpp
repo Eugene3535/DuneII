@@ -14,8 +14,17 @@ DuneII::DuneII() noexcept:
 bool DuneII::init() noexcept
 {
     if (!m_currentScene)
-	    m_currentScene = load<TitleScreen>({});
+    {
+        glClearColor(0.f, 0.f, 0.f, 1.f);
 
+        auto vbo = glResources.create<GLBuffer, 1>();
+        m_uniformBuffer = GLBuffer(vbo[0], GL_UNIFORM_BUFFER);
+        m_uniformBuffer.create(sizeof(mat4), 1, nullptr, GL_DYNAMIC_DRAW);
+        m_uniformBuffer.bindBufferRange(0, 0, sizeof(mat4));
+
+        m_currentScene = load<TitleScreen>({});
+    }
+	    
     return m_currentScene ? true : false;
 }
 
@@ -66,6 +75,12 @@ void DuneII::draw() noexcept
 
     if(m_currentScene)
         m_currentScene->draw();
+}
+
+
+void DuneII::updateUniformBuffer(mat4 modelViewProjection) noexcept
+{
+    m_uniformBuffer.update(0, sizeof(mat4), 1, static_cast<const void*>(modelViewProjection));
 }
 
 

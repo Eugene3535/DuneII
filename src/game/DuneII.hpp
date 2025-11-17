@@ -24,6 +24,8 @@ public:
     void update(float dt) noexcept;
     void draw() noexcept;
 
+    void updateUniformBuffer(mat4 modelViewProjection) noexcept;
+
     void click(int button) noexcept;
     void setCursorPosition(float x, float y) noexcept;
     void resize(int width, int height) noexcept;
@@ -45,6 +47,8 @@ private:
     Scene* m_currentScene;
     Scene::Type m_nextSceneType;
     bool m_isSceneNeedToBeChanged;
+
+    GLBuffer m_uniformBuffer;
 };
 
 #include "game/DuneII.inl"

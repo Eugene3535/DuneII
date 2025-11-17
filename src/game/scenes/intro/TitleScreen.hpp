@@ -25,25 +25,24 @@ public:
     void setCursorPosition(float x, float y) noexcept override;
 
 private:
-    std::unique_ptr<SpriteManager> m_sprites;
-    GLBuffer m_uniformBuffer;
     VertexArrayObject m_vao;
 
     ShaderProgram m_spriteProgram;
-    ShaderProgram m_colorSpriteProgram;
+    ShaderProgram m_buttonSpriteProgram;
 
     Sprite m_space;
     Transform2D m_spaceTransform;
     Sprite m_planet;
     Transform2D m_planetTransform;
 
-    Button* m_playButton;
-    Button* m_exitButton;
-    Button* m_settingsButton;
-    vec2    m_mousePosition;
-    bool    m_isMouseButtonPressed;
+    SpriteManager* m_sprites;
+    Button*        m_playButton;
+    Button*        m_exitButton;
+    Button*        m_settingsButton;
+    char m_memoryPool[sizeof(SpriteManager) + sizeof(Button) * 3];
 
-    char m_memoryPool[sizeof(Button) * 3];
+    vec2 m_mousePosition;
+    bool m_isMouseButtonPressed;
 
     bool m_isPresented;
 };
