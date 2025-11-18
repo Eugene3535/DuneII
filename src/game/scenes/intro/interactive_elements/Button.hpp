@@ -12,8 +12,8 @@ public:
 
     void update(vec2 mousePosition, bool isClicked) noexcept;
     void draw() noexcept;
-
     void resize(int width, int height) noexcept;
+    bool isSelected() const noexcept;
 
 private:
     const Sprite  m_sprite;
@@ -23,6 +23,7 @@ private:
     const float* m_currentColor;
 
     bool m_boundsNeedUpdate;
+    bool m_isSelected;
 };
 
 #endif // !BUTTON_HPP

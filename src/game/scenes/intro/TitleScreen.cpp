@@ -39,6 +39,8 @@ static bool is_intro_active_phase_end;
 
 TitleScreen::TitleScreen(DuneII* game) noexcept:
     Scene(game),
+    m_spriteProgram(0),
+    m_buttonSpriteProgram(0),
     m_sprites(nullptr),
     m_playButton(nullptr),
     m_exitButton(nullptr),
@@ -103,24 +105,10 @@ bool TitleScreen::load(std::string_view info) noexcept
         return false;
 
 //  Shaders
-    std::array<Shader, 2> shaders;
-
-    if (!shaders[0].loadFromFile(provider.findPathToFile("title_screen.vert"), GL_VERTEX_SHADER))   
+    if(m_spriteProgram = glResources.getShaderProgram("title_screen"); m_spriteProgram == 0)
         return false;
 
-    if (!shaders[1].loadFromFile(provider.findPathToFile("title_screen.frag"), GL_FRAGMENT_SHADER)) 
-        return false;
-
-    if (!m_spriteProgram.link(shaders)) 
-        return false;
-
-    if (!shaders[0].loadFromFile(provider.findPathToFile("title_screen_button.vert"), GL_VERTEX_SHADER))   
-        return false;
-
-    if (!shaders[1].loadFromFile(provider.findPathToFile("title_screen_button.frag"), GL_FRAGMENT_SHADER)) 
-        return false;
-
-    if (!m_buttonSpriteProgram.link(shaders)) 
+    if(m_buttonSpriteProgram = glResources.getShaderProgram("title_screen_button"); m_buttonSpriteProgram == 0)
         return false;
     
 //  Sprites
@@ -148,7 +136,7 @@ bool TitleScreen::load(std::string_view info) noexcept
     m_planetTransform.setOrigin(planetTexture.width * 0.5f, planetTexture.height * 0.5f);
 
 //  Buttons
-    int32_t uniform = m_buttonSpriteProgram.getUniformLocation("buttonColor");
+    int32_t uniform = glGetUniformLocation(m_buttonSpriteProgram, "buttonColor");
 
     if(uniform == -1)
         return false;
@@ -182,6 +170,9 @@ void TitleScreen::update(float dt) noexcept
         m_exitButton->update(m_mousePosition, m_isMouseButtonPressed);
 
         m_isMouseButtonPressed = false;
+
+        if(m_playButton->isSelected())
+            m_game->switchScene(this, Scene::CHOOSE_DESTINY);
     }
     else
     {
@@ -202,7 +193,7 @@ void TitleScreen::draw() noexcept
     auto& camera = m_game->camera;
     camera.getModelViewProjectionMatrix(MVP);
 
-    glUseProgram(m_spriteProgram.getHandle());
+    glUseProgram(m_spriteProgram);
     glBindVertexArray(m_vao.getHandle());
 
     m_spaceTransform.calculate(model);
@@ -224,7 +215,7 @@ void TitleScreen::draw() noexcept
 //  Draw buttons
     if(m_isPresented)
     {
-        glUseProgram(m_buttonSpriteProgram.getHandle());
+        glUseProgram(m_buttonSpriteProgram);
 
         m_playButton->calculate(model);
         glmc_mat4_mul(MVP, model, modelView);

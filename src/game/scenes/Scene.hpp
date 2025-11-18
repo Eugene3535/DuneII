@@ -6,6 +6,8 @@
 
 #include <cglm/call/vec2.h>
 
+#include "graphics/Meshes.hpp"
+#include "graphics/Transform2D.hpp"
 
 class Scene
 {
@@ -31,7 +33,7 @@ public:
     bool isLoaded() const noexcept;
 
 protected:
-    void setSpriteSizeInPixels(const class Sprite& sprite, vec2 newSize, class Transform2D& transform) noexcept;
+    void setSpriteSizeInPixels(const Sprite& sprite, vec2 newSize, Transform2D& transform) noexcept;
 
     class DuneII* m_game;
 

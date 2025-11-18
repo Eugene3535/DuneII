@@ -18,7 +18,8 @@ Button::Button(const Sprite& sprite, const int32_t uniformLocation) noexcept:
     m_uniform(uniformLocation),
     m_bounds(),
     m_currentColor(normal_color),
-    m_boundsNeedUpdate(true)
+    m_boundsNeedUpdate(true),
+    m_isSelected(false)
 {
     setOrigin(sprite.width * 0.5f, sprite.height * 0.5f);
 }
@@ -44,11 +45,16 @@ void Button::update(vec2 mousePosition, bool isClicked) noexcept
         m_boundsNeedUpdate = false;
     }
 
+    m_isSelected = false;
+
     m_currentColor = normal_color;
     const bool isUnderCursor = glmc_aabb2d_point(m_bounds, mousePosition);
 
     if(isUnderCursor)
         m_currentColor = isClicked ? is_clicked_color : under_cursor_color;
+
+    if(isClicked && isUnderCursor)
+        m_isSelected = true;
 }
 
 
@@ -73,4 +79,10 @@ void Button::resize(int width, int height) noexcept
     setScale(dx, dy);
 
     m_boundsNeedUpdate = true;
+}
+
+
+bool Button::isSelected() const noexcept
+{
+    return m_isSelected;
 }

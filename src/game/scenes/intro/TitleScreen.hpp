@@ -2,7 +2,6 @@
 #define TITLE_SCREEN_HPP
 
 #include "resources/ogl/vao/VertexArrayObject.hpp"
-#include "resources/ogl/shaders/ShaderProgram.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
 #include "game/scenes/intro/interactive_elements/Button.hpp"
 #include "game/scenes/Scene.hpp"
@@ -25,8 +24,8 @@ public:
 private:
     VertexArrayObject m_vao;
 
-    ShaderProgram m_spriteProgram;
-    ShaderProgram m_buttonSpriteProgram;
+    GLuint m_spriteProgram;
+    GLuint m_buttonSpriteProgram;
 
     Sprite      m_space;
     Transform2D m_spaceTransform;

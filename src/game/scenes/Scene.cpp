@@ -2,8 +2,6 @@
 
 #include <cglm/call/cam.h>
 
-#include "graphics/Meshes.hpp"
-#include "graphics/Transform2D.hpp"
 #include "game/DuneII.hpp"
 #include "game/scenes/Scene.hpp"
 

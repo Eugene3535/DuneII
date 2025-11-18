@@ -1,4 +1,5 @@
 #include "game/scenes/intro/TitleScreen.hpp"
+#include "game/scenes/choosing_houses/Destiny.hpp"
 #include "game/DuneII.hpp"
 
 
@@ -49,7 +50,8 @@ void DuneII::update(float dt) noexcept
 
             case Scene::Type::CHOOSE_DESTINY:
             {
-                
+                if (auto destinyScene = load<Destiny>({}))
+                    m_currentScene = destinyScene;
             }
             break;
 
@@ -116,7 +118,11 @@ void DuneII::switchScene(const Scene* requester, Scene::Type nextScene) noexcept
         break;
 
         case Scene::Type::CHOOSE_DESTINY:
-            m_isSceneNeedToBeChanged = true;
+            if(dynamic_cast<const TitleScreen*>(requester) != nullptr)
+            {
+                m_isSceneNeedToBeChanged = true;
+                m_nextSceneType = Scene::Type::CHOOSE_DESTINY;
+            }
         break;
 
         case Scene::Type::MISSION:
