@@ -23,7 +23,7 @@ private:
     GLuint m_spriteProgram;
 
     Sprite m_houses;
-    Transform2D m_housesTransform;
+    Transform2D m_transform;
 
     SpriteManager* m_sprites;
     char m_memoryPool[sizeof(SpriteManager)];

@@ -91,7 +91,7 @@ void Destiny::draw() noexcept
     glUseProgram(m_spriteProgram);
     glBindVertexArray(m_vao.getHandle());
 
-    m_housesTransform.calculate(modelView);
+    m_transform.calculate(modelView);
     glmc_mat4_mul(MVP, modelView, result);
     m_game->updateUniformBuffer(result);
 
@@ -106,5 +106,6 @@ void Destiny::draw() noexcept
 
 void Destiny::resize(int width, int height) noexcept
 {
-
+    vec2 size = { static_cast<float>(width), static_cast<float>(height) };
+    setSpriteSizeInPixels(m_houses, size, m_transform);
 }

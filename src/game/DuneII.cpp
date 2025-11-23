@@ -1,9 +1,13 @@
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+
 #include "game/scenes/intro/TitleScreen.hpp"
 #include "game/scenes/choosing_houses/Destiny.hpp"
 #include "game/DuneII.hpp"
 
 
 DuneII::DuneII() noexcept:
+    m_window(nullptr),
     m_currentScene(nullptr),
     m_nextSceneType(Scene::NONE),
     m_isSceneNeedToBeChanged(false)
@@ -12,10 +16,12 @@ DuneII::DuneII() noexcept:
 }
 
 
-bool DuneII::init() noexcept
+bool DuneII::init(GLFWwindow* window) noexcept
 {
     if (!m_currentScene)
     {
+        m_window = window;
+
         glClearColor(0.f, 0.f, 0.f, 1.f);
 
         auto vbo = glResources.create<GLBuffer, 1>();
@@ -64,6 +70,11 @@ void DuneII::update(float dt) noexcept
             default:
                 break;
         }
+
+        	
+        int width, height;
+        glfwGetWindowSize(m_window, &width, &height);
+        m_currentScene->resize(width, height);
 
         m_isSceneNeedToBeChanged = false;
         m_nextSceneType = Scene::NONE;

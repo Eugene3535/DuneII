@@ -7,7 +7,7 @@
 #include <cglm/call/vec2.h>
 
 #include "graphics/Meshes.hpp"
-#include "graphics/Transform2D.hpp"
+#include "graphics/transform/Transform2D.hpp"
 
 class Scene
 {

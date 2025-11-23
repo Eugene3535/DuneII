@@ -2,7 +2,7 @@
 #define BUTTON_HPP
 
 #include "graphics/Meshes.hpp"
-#include "graphics/Transform2D.hpp"
+#include "graphics/transform/Transform2D.hpp"
 
 class Button:
     public Transform2D

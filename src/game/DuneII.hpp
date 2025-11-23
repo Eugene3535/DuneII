@@ -6,11 +6,9 @@
 #include <memory>
 #include <typeindex>
 
-#include <entt/entity/registry.hpp>
-
 #include "resources/files/FileProvider.hpp"
 #include "resources/ogl/holder/GlResourceManager.hpp"
-#include "graphics/OrthogonalCamera.hpp"
+#include "graphics/camera/OrthogonalCamera.hpp"
 
 #include "game/scenes/Scene.hpp"
 
@@ -22,7 +20,7 @@ class DuneII final
 public:
     DuneII() noexcept;
 
-    bool init() noexcept;
+    bool init(struct GLFWwindow* window) noexcept;
     void update(float dt) noexcept;
     void draw() noexcept;
 
@@ -38,13 +36,13 @@ public:
     FileProvider fileProvider;
     GlResourceManager glResources;
 
-//  ECS
-    entt::registry registry;
     OrthogonalCamera camera;
     
 private:
     template<class T>
     T* load(std::string_view info) noexcept;
+
+    struct GLFWwindow* m_window;
 
     std::unordered_map<std::type_index, std::shared_ptr<void>> m_scenes;
     Scene* m_currentScene;

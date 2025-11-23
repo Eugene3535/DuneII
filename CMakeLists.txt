@@ -32,7 +32,6 @@ add_executable(${PROJECT_NAME} ${DUNEII_ALL_FILES})
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/glfw glfw)
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/glad/core glad)
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/cglm cglm)
-add_subdirectory(${EXTERNAL_SOURCE_DIR}/entt entt)
 
 target_sources(${PROJECT_NAME} PRIVATE ${SHADER_FILES})
 
@@ -46,16 +45,15 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	glfw
 	glad
 	cglm
-	EnTT::EnTT
 )
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG=$<CONFIG:Debug> CGLM_USE_ANONYMOUS_STRUCT)
+target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG> CGLM_USE_ANONYMOUS_STRUCT)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
 if(MSVC)
 	set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${DUNEII_ALL_FILES})
-	set_target_properties(${PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+	set_target_properties(${PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/$<CONFIG>)
 endif()
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

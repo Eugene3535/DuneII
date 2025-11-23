@@ -1,7 +1,7 @@
 #ifndef ORTHOGONAL_CAMERA_HPP
 #define ORTHOGONAL_CAMERA_HPP
 
-#include "graphics/Transform2D.hpp"
+#include "graphics/transform/Transform2D.hpp"
 
 class OrthogonalCamera final:
     public Transform2D

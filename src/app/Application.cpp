@@ -48,7 +48,7 @@ int Application::run(DuneII& game) noexcept
 	glfwGetWindowSize(m_window, &width, &height);
 	game.camera.setupProjectionMatrix(width, height);
 
-	if(!game.init())
+	if(!game.init(m_window))
 		return 1;
 
 	game.resize(width, height);

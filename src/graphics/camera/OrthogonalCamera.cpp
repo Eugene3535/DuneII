@@ -1,6 +1,6 @@
 #include <cglm/call/cam.h>
 
-#include "graphics/OrthogonalCamera.hpp"
+#include "graphics/camera/OrthogonalCamera.hpp"
 
 
 OrthogonalCamera::OrthogonalCamera() noexcept:
