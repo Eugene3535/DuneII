@@ -19,14 +19,11 @@ public:
     void resize(int width, int height) noexcept override;
 
 private:
-    VertexArrayObject m_vao;
     GLuint m_spriteProgram;
+    SpriteManager m_sprites;
 
     Sprite m_houses;
     Transform2D m_transform;
-
-    SpriteManager* m_sprites;
-    char m_memoryPool[sizeof(SpriteManager)];
 };
 
 #endif // !DESTINY_HPP

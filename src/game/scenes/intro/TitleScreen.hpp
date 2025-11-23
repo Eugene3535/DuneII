@@ -1,7 +1,6 @@
 #ifndef TITLE_SCREEN_HPP
 #define TITLE_SCREEN_HPP
 
-#include "resources/ogl/vao/VertexArrayObject.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
 #include "game/scenes/intro/interactive_elements/Button.hpp"
 #include "game/scenes/Scene.hpp"
@@ -22,8 +21,6 @@ public:
     void setCursorPosition(float x, float y) noexcept override;
 
 private:
-    VertexArrayObject m_vao;
-
     GLuint m_spriteProgram;
     GLuint m_buttonSpriteProgram;
 
@@ -32,11 +29,11 @@ private:
     Sprite      m_planet;
     Transform2D m_planetTransform;
 
-    SpriteManager* m_sprites;
-    Button*        m_playButton;
-    Button*        m_exitButton;
-    Button*        m_settingsButton;
-    char m_memoryPool[sizeof(SpriteManager) + sizeof(Button) * 3];
+    SpriteManager m_sprites;
+    Button*       m_playButton;
+    Button*       m_exitButton;
+    Button*       m_settingsButton;
+    char m_memoryPool[sizeof(Button) * 3];
 
     vec2 m_mousePosition;
     bool m_isMouseButtonPressed;

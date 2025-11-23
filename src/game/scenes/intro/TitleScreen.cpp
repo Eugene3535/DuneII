@@ -41,7 +41,7 @@ TitleScreen::TitleScreen(DuneII* game) noexcept:
     Scene(game),
     m_spriteProgram(0),
     m_buttonSpriteProgram(0),
-    m_sprites(nullptr),
+    m_sprites(game->glResources),
     m_playButton(nullptr),
     m_exitButton(nullptr),
     m_settingsButton(nullptr),
@@ -56,9 +56,6 @@ TitleScreen::TitleScreen(DuneII* game) noexcept:
 
 TitleScreen::~TitleScreen()
 {
-    if(m_sprites)
-        m_sprites->~SpriteManager();
-
     if(m_playButton)
         m_playButton->~Button();
 
@@ -77,10 +74,8 @@ bool TitleScreen::load(std::string_view info) noexcept
     
     auto& provider = m_game->fileProvider;
     auto& glResources = m_game->glResources;
-
-    auto vboHandles     = glResources.create<GLBuffer, 1>();
+    
     auto textureHandles = glResources.create<Texture, 5>();
-    auto vaoHandles     = glResources.create<VertexArrayObject, 1>();
 
 //  Textures
     Texture spaceTexture    = {.handle = textureHandles[0] };
@@ -112,27 +107,14 @@ bool TitleScreen::load(std::string_view info) noexcept
         return false;
     
 //  Sprites
-    m_vao.setup(vaoHandles[0]);
+    m_sprites.createSprite("space", spaceTexture);
+    m_sprites.createSprite("planet", planetTexture);
+    m_sprites.createSprite("play", playTexture);
+    m_sprites.createSprite("exit", exitTexture);
+    m_sprites.createSprite("settings", settingsTexture);
 
-    char* offset = m_memoryPool;
-    m_sprites = new(offset) SpriteManager(vboHandles[0]);
-    offset += sizeof(SpriteManager);
-
-    const std::array<VertexBufferLayout::Attribute, 1> spriteAttributes
-    {
-        VertexBufferLayout::Attribute::Float4
-    };
-
-    m_vao.addVertexBuffer(m_sprites->getVertexBuffer(), spriteAttributes);
-
-    m_sprites->createSprite("space", spaceTexture);
-    m_sprites->createSprite("planet", planetTexture);
-    m_sprites->createSprite("play", playTexture);
-    m_sprites->createSprite("exit", exitTexture);
-    m_sprites->createSprite("settings", settingsTexture);
-
-    m_space = m_sprites->getSprite("space");
-    m_planet = m_sprites->getSprite("planet");
+    m_space = m_sprites.getSprite("space");
+    m_planet = m_sprites.getSprite("planet");
     m_planetTransform.setOrigin(planetTexture.width * 0.5f, planetTexture.height * 0.5f);
 
 //  Buttons
@@ -141,9 +123,11 @@ bool TitleScreen::load(std::string_view info) noexcept
     if(uniform == -1)
         return false;
 
+    char* offset = m_memoryPool;
+
     for(const auto btn : { "play", "exit", "settings" })
     {
-        Sprite sprite = m_sprites->getSprite(btn);
+        Sprite sprite = m_sprites.getSprite(btn);
         Button* button = new(offset) Button(sprite, uniform);
         offset += sizeof(Button);
 
@@ -194,7 +178,7 @@ void TitleScreen::draw() noexcept
     camera.getModelViewProjectionMatrix(MVP);
 
     glUseProgram(m_spriteProgram);
-    glBindVertexArray(m_vao.getHandle());
+    m_sprites.bind(true);
 
     m_spaceTransform.calculate(model);
     glmc_mat4_mul(MVP, model, modelView);

@@ -71,7 +71,6 @@ void DuneII::update(float dt) noexcept
                 break;
         }
 
-        	
         int width, height;
         glfwGetWindowSize(m_window, &width, &height);
         m_currentScene->resize(width, height);

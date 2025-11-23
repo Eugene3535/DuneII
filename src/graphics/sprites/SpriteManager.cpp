@@ -2,14 +2,22 @@
 
 #include "RapidXML/rapidxml_utils.hpp"
 
-#include "resources/ogl/texture/Texture.hpp"
+#include "resources/ogl/holder/GlResourceManager.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
 
 
-SpriteManager::SpriteManager(const GLuint bufferHandle) noexcept:
-	m_vbo(bufferHandle, GL_ARRAY_BUFFER)
+SpriteManager::SpriteManager(GlResourceManager& holder) noexcept
 {
+	auto vboHandles = holder.create<GLBuffer, 1>();
+    auto vaoHandles = holder.create<VertexArrayObject, 1>();
+	m_vbo = GLBuffer(vboHandles[0], GL_ARRAY_BUFFER);
 	m_vbo.create(sizeof(float), 0, nullptr, GL_STATIC_DRAW);
+
+    VertexArrayObject vao(vaoHandles[0]);
+    const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
+    vao.addVertexBuffer(m_vbo, attributes);
+
+	m_vao = vao.getHandle();
 }
 
 
@@ -193,6 +201,12 @@ std::span<const Sprite> SpriteManager::getSprites(const std::string& name) const
 	}
 
 	return std::span<const Sprite>();
+}
+
+
+void SpriteManager::bind(bool toBind) const noexcept
+{
+	glBindVertexArray(toBind ? m_vao : 0);
 }
 
 

@@ -15,17 +15,13 @@
 Destiny::Destiny(DuneII* game) noexcept:
     Scene(game),
     m_spriteProgram(0),
-    m_sprites(nullptr)
+    m_sprites(game->glResources)
 {
 
 }
 
 
-Destiny::~Destiny()
-{
-    if(m_sprites)
-        m_sprites->~SpriteManager();
-}
+Destiny::~Destiny() = default;
 
 
 bool Destiny::load(std::string_view info) noexcept
@@ -51,18 +47,8 @@ bool Destiny::load(std::string_view info) noexcept
         return false;
 
 //  Sprites
-    m_vao.setup(vaoHandles[0]);
-    m_sprites = new(m_memoryPool) SpriteManager(vboHandles[0]);
-
-    const std::array<VertexBufferLayout::Attribute, 1> spriteAttributes
-    {
-        VertexBufferLayout::Attribute::Float4
-    };
-
-    m_vao.addVertexBuffer(m_sprites->getVertexBuffer(), spriteAttributes);
-
-    m_sprites->createSprite("houses", housesTexture);
-    m_houses = m_sprites->getSprite("houses");
+    m_sprites.createSprite("houses", housesTexture);
+    m_houses = m_sprites.getSprite("houses");
 
     m_isLoaded = true;
 
@@ -89,7 +75,7 @@ void Destiny::draw() noexcept
     camera.getModelViewProjectionMatrix(MVP);
 
     glUseProgram(m_spriteProgram);
-    glBindVertexArray(m_vao.getHandle());
+    m_sprites.bind(true);
 
     m_transform.calculate(modelView);
     glmc_mat4_mul(MVP, modelView, result);
