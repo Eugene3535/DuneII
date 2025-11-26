@@ -12,6 +12,7 @@
 #define BUTTON_EXIT_RU_PNG       "button_exit_ru.png"
 #define BUTTON_SETTINGS_RU_PNG   "button_settings_ru.png"
 #define HOUSES_PNG               "Houses.png"
+#define OUTLINE_PNG              "Outline.png"
 
 
 // Fonts

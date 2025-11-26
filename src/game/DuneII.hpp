@@ -40,12 +40,12 @@ public:
     
 private:
     template<class T>
-    T* load(std::string_view info) noexcept;
+    std::shared_ptr<T> load(std::string_view info) noexcept;
 
     struct GLFWwindow* m_window;
 
     std::unordered_map<std::type_index, std::shared_ptr<void>> m_scenes;
-    Scene* m_currentScene;
+    std::shared_ptr<Scene> m_currentScene;
     Scene::Type m_nextSceneType;
     bool m_isSceneNeedToBeChanged;
 

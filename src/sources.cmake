@@ -51,6 +51,7 @@ set(SCENE_HDR_FILES
 # Common
 set(DUNEII_SRC_FILES
 	src/common/ExternalMath.cpp
+	src/graphics/outline/Outline.cpp
 	src/graphics/transform/Transform2D.cpp
 	src/graphics/camera/OrthogonalCamera.cpp
 	src/graphics/sprites/SpriteManager.cpp
@@ -67,6 +68,7 @@ set(DUNEII_HDR_FILES
 	src/common/Enums.hpp
 	src/common/ExternalMath.hpp
 	src/graphics/Meshes.hpp
+	src/graphics/outline/Outline.hpp
 	src/graphics/transform/Transform2D.hpp
 	src/graphics/camera/OrthogonalCamera.hpp
 	src/graphics/sprites/SpriteManager.hpp
@@ -80,10 +82,12 @@ set(DUNEII_HDR_FILES
 
 
 set(SHADER_FILES
-	${PROJECT_SOURCE_DIR}/src/shaders/title_screen.vert
-	${PROJECT_SOURCE_DIR}/src/shaders/title_screen.frag
-	${PROJECT_SOURCE_DIR}/src/shaders/title_screen_button.vert
-	${PROJECT_SOURCE_DIR}/src/shaders/title_screen_button.frag
+	${PROJECT_SOURCE_DIR}/src/shaders/color_outline.vert
+	${PROJECT_SOURCE_DIR}/src/shaders/color_outline.frag
+	${PROJECT_SOURCE_DIR}/src/shaders/color_sprite.vert
+	${PROJECT_SOURCE_DIR}/src/shaders/color_sprite.frag
+	${PROJECT_SOURCE_DIR}/src/shaders/sprite.vert
+	${PROJECT_SOURCE_DIR}/src/shaders/sprite.frag
 )
 
 source_group("shaders" FILES ${SHADER_FILES})

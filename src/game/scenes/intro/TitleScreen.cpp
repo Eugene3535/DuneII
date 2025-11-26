@@ -100,10 +100,10 @@ bool TitleScreen::load(std::string_view info) noexcept
         return false;
 
 //  Shaders
-    if(m_spriteProgram = glResources.getShaderProgram("title_screen"); m_spriteProgram == 0)
+    if(m_spriteProgram = glResources.getShaderProgram("sprite"); m_spriteProgram == 0)
         return false;
 
-    if(m_buttonSpriteProgram = glResources.getShaderProgram("title_screen_button"); m_buttonSpriteProgram == 0)
+    if(m_buttonSpriteProgram = glResources.getShaderProgram("color_sprite"); m_buttonSpriteProgram == 0)
         return false;
     
 //  Sprites
@@ -118,7 +118,7 @@ bool TitleScreen::load(std::string_view info) noexcept
     m_planetTransform.setOrigin(planetTexture.width * 0.5f, planetTexture.height * 0.5f);
 
 //  Buttons
-    int32_t uniform = glGetUniformLocation(m_buttonSpriteProgram, "buttonColor");
+    int32_t uniform = glGetUniformLocation(m_buttonSpriteProgram, "spriteColor");
 
     if(uniform == -1)
         return false;
