@@ -41,7 +41,13 @@ void Scene::resize(int width, int height) noexcept
 }
 
 
-void Scene::click(int mouseButton) noexcept
+void Scene::press(int key) noexcept
+{
+
+}
+
+
+void Scene::click(int button) noexcept
 {
 
 }

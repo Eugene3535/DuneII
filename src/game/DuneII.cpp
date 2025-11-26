@@ -96,6 +96,13 @@ void DuneII::updateUniformBuffer(mat4 modelViewProjection) noexcept
 }
 
 
+void DuneII::press(int key) noexcept
+{
+    if(m_currentScene)
+        m_currentScene->press(key);
+}
+
+
 void DuneII::click(int button) noexcept
 {
     if(m_currentScene)
@@ -143,4 +150,16 @@ void DuneII::switchScene(const Scene* requester, Scene::Type nextScene) noexcept
             m_isSceneNeedToBeChanged = false;
         break;
     }
+}
+
+
+ivec2s DuneII::getWindowsSize() const noexcept
+{
+    int width = 0;
+    int height = 0;
+
+    if(m_window)
+        glfwGetWindowSize(m_window, &width, &height);
+
+    return { width, height };
 }

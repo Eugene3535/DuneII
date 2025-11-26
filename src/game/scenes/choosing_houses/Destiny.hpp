@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "common/Enums.hpp"
 #include "resources/ogl/vao/VertexArrayObject.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
 #include "graphics/outline/Outline.hpp"
@@ -20,6 +21,8 @@ public:
     void draw()                        noexcept override;
     void resize(int width, int height) noexcept override;
 
+    void press(int key) noexcept override;
+
 private:
     GLuint m_spriteProgram;
     GLuint m_outlineProgram;
@@ -30,6 +33,10 @@ private:
 
     std::unique_ptr<Outline> m_outline;
     Transform2D m_outlineTransform;
+
+    HouseType m_selectedHouse;
+    float m_timer;
+    bool m_outlineNeedUpdate;
 };
 
 #endif // !DESTINY_HPP

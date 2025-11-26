@@ -1,6 +1,8 @@
 #include <cstring>
 
-#include "common/Enums.hpp"
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+
 #include "game/DuneII.hpp"
 #include "game/scenes/choosing_houses/Destiny.hpp"
 
@@ -12,37 +14,7 @@
 
 #define DEFAULT_OUTLINE_WIDTH 80.f
 #define DEFAULT_OUTLINE_HEIGHT 16.f
-
-HouseType current_house = HouseType::ATREIDES;
-
-static void set_outline_params(const Sprite& background, vec2 newSize, Transform2D& transform) noexcept
-{
-    float dx = newSize[0] / background.width;
-    float dy = newSize[1] / background.height;
-    float outlinePositionX = 0;
-
-    switch (current_house)
-    {
-        case HouseType::ATREIDES:
-            outlinePositionX = ATREIDES_OUTLINE_POSITION_X * dx;
-        break;
-
-        case HouseType::ORDOS:
-            outlinePositionX = ORDOS_OUTLINE_POSITION_X * dx;
-        break;
-
-        case HouseType::HARKONNEN:
-            outlinePositionX = HARKONNEN_OUTLINE_POSITION_X * dx;
-        break;
-        
-        default:
-            break;
-    }
-
-    transform.setPosition(outlinePositionX, OUTLINE_POSITION_Y * dy);
-    transform.setScale(dx, dy);
-}
-
+#define SWITCH_HOUSE_OUTLINE_DELAY 0.3f
 
 Destiny::Destiny(DuneII* game) noexcept:
     Scene(game),
@@ -50,7 +22,10 @@ Destiny::Destiny(DuneII* game) noexcept:
     m_outlineProgram(0),
     m_sprites(game->glResources),
     m_backgroundTransform(),
-    m_outlineTransform()
+    m_outlineTransform(),
+    m_selectedHouse(HouseType::ATREIDES),
+    m_timer(0.f),
+    m_outlineNeedUpdate(true)
 {
     
 }
@@ -118,7 +93,38 @@ bool Destiny::load(std::string_view info) noexcept
 
 void Destiny::update(float dt) noexcept
 {
+    m_timer += dt;
 
+    if(m_outlineNeedUpdate)
+    {
+        auto windowSize = m_game->getWindowsSize();
+        vec2 size = { static_cast<float>(windowSize.x), static_cast<float>(windowSize.y) };
+
+        float dx = size[0] / m_background.width;
+        float dy = size[1] / m_background.height;
+        float outlinePositionX = 0;
+
+        switch (m_selectedHouse)
+        {
+            case HouseType::ATREIDES:
+                outlinePositionX = ATREIDES_OUTLINE_POSITION_X * dx;
+            break;
+
+            case HouseType::ORDOS:
+                outlinePositionX = ORDOS_OUTLINE_POSITION_X * dx;
+            break;
+
+            case HouseType::HARKONNEN:
+                outlinePositionX = HARKONNEN_OUTLINE_POSITION_X * dx;
+            break;
+            
+            default:
+                break;
+        }
+
+        m_outlineTransform.setPosition(outlinePositionX, OUTLINE_POSITION_Y * dy);
+        m_outlineNeedUpdate = false;
+    }
 }
 
 
@@ -160,5 +166,63 @@ void Destiny::resize(int width, int height) noexcept
 {
     vec2 size = { static_cast<float>(width), static_cast<float>(height) };
     setSpriteSizeInPixels(m_background, size, m_backgroundTransform);
-    set_outline_params(m_background, size, m_outlineTransform);
+
+    float dx = size[0] / m_background.width;
+    float dy = size[1] / m_background.height;
+    float outlinePositionX = 0;
+
+    switch (m_selectedHouse)
+    {
+        case HouseType::ATREIDES:
+            outlinePositionX = ATREIDES_OUTLINE_POSITION_X * dx;
+        break;
+
+        case HouseType::ORDOS:
+            outlinePositionX = ORDOS_OUTLINE_POSITION_X * dx;
+        break;
+
+        case HouseType::HARKONNEN:
+            outlinePositionX = HARKONNEN_OUTLINE_POSITION_X * dx;
+        break;
+        
+        default:
+            break;
+    }
+
+    m_outlineTransform.setPosition(outlinePositionX, OUTLINE_POSITION_Y * dy);
+    m_outlineTransform.setScale(dx, dy);
+}
+
+
+void Destiny::press(int key) noexcept
+{
+    if(m_timer > SWITCH_HOUSE_OUTLINE_DELAY)
+    {
+        m_timer = 0;
+        m_outlineNeedUpdate = true;
+
+        switch (m_selectedHouse)
+        {
+            case HouseType::ATREIDES:
+                if(key == GLFW_KEY_RIGHT)
+                    m_selectedHouse = HouseType::ORDOS;      
+            break;
+
+            case HouseType::ORDOS:
+                if(key == GLFW_KEY_LEFT)
+                    m_selectedHouse = HouseType::ATREIDES;
+
+                if(key == GLFW_KEY_RIGHT)
+                    m_selectedHouse = HouseType::HARKONNEN;
+            break;
+
+            case HouseType::HARKONNEN:
+                if(key == GLFW_KEY_LEFT)
+                    m_selectedHouse = HouseType::ORDOS;
+            break;
+            
+            default:
+                break;
+        }
+    }
 }

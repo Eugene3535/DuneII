@@ -6,10 +6,11 @@
 #include <memory>
 #include <typeindex>
 
+#include <cglm/struct/vec2.h>
+
 #include "resources/files/FileProvider.hpp"
 #include "resources/ogl/holder/GlResourceManager.hpp"
 #include "graphics/camera/OrthogonalCamera.hpp"
-
 #include "game/scenes/Scene.hpp"
 
 
@@ -26,11 +27,14 @@ public:
 
     void updateUniformBuffer(mat4 modelViewProjection) noexcept;
 
+    void press(int key) noexcept;
     void click(int button) noexcept;
     void setCursorPosition(float x, float y) noexcept;
     void resize(int width, int height) noexcept;
 
     void switchScene(const Scene* requester, Scene::Type nextScene) noexcept;
+
+    ivec2s getWindowsSize() const noexcept;
 
 //  Resources
     FileProvider fileProvider;
