@@ -46,11 +46,9 @@ TitleScreen::TitleScreen(DuneII* game) noexcept:
     m_exitButton(nullptr),
     m_settingsButton(nullptr),
     m_isMouseButtonPressed(false),
-    m_isPresented(false)
+    m_isPresented(true)
 {
-#ifdef DEBUG
-    m_isPresented = true;
-#endif
+
 }
 
 
