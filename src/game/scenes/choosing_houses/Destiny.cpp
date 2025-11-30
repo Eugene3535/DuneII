@@ -16,6 +16,7 @@
 #define DEFAULT_OUTLINE_HEIGHT 16.f
 #define SWITCH_HOUSE_OUTLINE_DELAY 0.3f
 
+
 Destiny::Destiny(DuneII* game) noexcept:
     Scene(game),
     m_spriteProgram(0),
@@ -71,7 +72,7 @@ bool Destiny::load(std::string_view info) noexcept
 
 //  Outline
     m_outline = std::make_unique<Outline>(vboHandles[0], vaoHandles[0]);
-    vec2s outlineSize = { DEFAULT_OUTLINE_WIDTH, DEFAULT_OUTLINE_HEIGHT };
+    const vec2s outlineSize = { DEFAULT_OUTLINE_WIDTH, DEFAULT_OUTLINE_HEIGHT };
 
     m_outline->create(4, [outlineSize](size_t index) -> vec2s
     {

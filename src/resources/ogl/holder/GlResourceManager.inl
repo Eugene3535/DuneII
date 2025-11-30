@@ -15,10 +15,6 @@ std::array<GLuint, N> GlResourceManager::create() noexcept
     {
         return createResources<N>(m_textures, glGenTextures);
     }
-    else
-    {
-        static_assert(false, "Resource must be implemented!\n");
-    }
 }
 
 
@@ -36,10 +32,6 @@ void GlResourceManager::destroy(const std::span<GLuint> objects) noexcept
     else if constexpr(std::is_same_v<T, Texture>)
     {
         destroyResources(objects, m_textures, glDeleteTextures);
-    }
-    else
-    {
-        static_assert(false, "Resource must be implemented!\n");
     }
 }
 
