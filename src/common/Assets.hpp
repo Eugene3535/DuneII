@@ -8,6 +8,7 @@
 #define CROSSHAIRS_TILESHEET_PNG "crosshairs_tilesheet.png"
 #define SPACE_JPG                "space.jpg"
 #define DUNE_PNG                 "dune.png"
+#define LANDSCAPE_PNG            "Landscape.png"
 #define BUTTON_PLAY_PNG          "button_play.png"
 #define BUTTON_EXIT_RU_PNG       "button_exit_ru.png"
 #define BUTTON_SETTINGS_RU_PNG   "button_settings_ru.png"

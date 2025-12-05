@@ -1,12 +1,11 @@
 #ifndef MISSION_HPP
 #define MISSION_HPP
 
-#include <SFML/Graphics/Drawable.hpp>
-#include <entt/entity/registry.hpp>
+#include <memory>
 
-#include "scenes/mission/tilemap/TileMap.hpp"
-#include "scenes/Scene.hpp"
-#include "ui/Cursor.hpp"
+#include "graphics/Meshes.hpp"
+#include "game/scenes/mission/tilemap/TileMap.hpp"
+#include "game/scenes/Scene.hpp"
 
 
 class Mission:
@@ -14,24 +13,24 @@ class Mission:
 {
 public:
     explicit Mission(class DuneII* game) noexcept;
-    ~Mission();
 
-    bool load(const std::string& info) noexcept override;
-    void update(const sf::Time dt)     noexcept override;
+    bool load(std::string_view info)         noexcept override;
+    void update(float dt)                    noexcept override;
+    void draw()                              noexcept override;
+    void resize(int width, int height)       noexcept override;
+    void press(int key)                      noexcept override;
+    void click(int button)                   noexcept override;
+    void setCursorPosition(float x, float y) noexcept override;
 
 private:
-    bool loadAnimations() noexcept;
     void createSystems() noexcept;
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
-    std::vector<void(*)(Mission*, sf::Time)> m_systems;
+    std::unique_ptr<TileMap> m_tilemap;
+    Plane m_landscape;
+    Transform2D m_landscapeTransform;
+    uint32_t m_shaderProgram;
 
-    sf::IntRect                m_viewport;
-    sf::Vector2i               m_viewPosition;
-    TileMap                    m_tilemap;
-    entt::registry             m_registry;
-    std::vector<sf::Drawable*> m_sprites;
-    Cursor                     m_cursor;
+    std::vector<void(*)(Mission*, float)> m_systems;
 };
 
 #endif // !MISSION_HPP

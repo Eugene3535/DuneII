@@ -3,42 +3,15 @@
 
 #include <string>
 #include <vector>
-#include <unordered_map>
+#include <span>
 #include <filesystem>
-#include <optional>
 
-#include <SFML/Graphics/VertexBuffer.hpp>
-#include <entt/entity/registry.hpp>
+#include <cglm/struct/ivec2.h>
+#include <cglm/struct/ivec4.h>
 
-#include "common/Enums.hpp"
 
-class TileMap:
-	public sf::Drawable
+class TileMap
 {
-	struct Tileset
-	{
-		const sf::Texture* texture = nullptr;
-		int32_t columns   = 0;
-		int32_t tileCount = 0;
-		int32_t firstGID  = 1;
-	};
-
-	enum WallCellType : uint32_t
-    {
-        DOT               = 1 << 1,
-        LEFT_RIGHT        = 1 << 2,
-        BOTTOM_TOP        = 1 << 3,
-        TOP_RIGHT         = 1 << 4,
-        RIGHT_BOTTOM      = 1 << 5,
-        BOTTOM_LEFT       = 1 << 6,
-        LEFT_TOP          = 1 << 7,
-        TOP_RIGHT_BOTTOM  = 1 << 8,
-        RIGHT_BOTTOM_LEFT = 1 << 9,
-        BOTTOM_LEFT_TOP   = 1 << 10,
-        LEFT_TOP_RIGHT    = 1 << 11,
-        CROSS             = 1 << 12
-    };
-
 public:
 	struct Object
 	{
@@ -52,53 +25,37 @@ public:
 		std::vector<Property> properties;
 		std::string           name;
 		std::string           type;
-		sf::IntRect           bounds;
+		ivec4s                bounds;
 	};
 
-public:
-	TileMap(entt::registry& registry, class AnimationManager& animationManager, class AssetManager& assets) noexcept;
+	TileMap() noexcept;
 
-	bool loadFromFile(const std::filesystem::path& file_path)                noexcept;
-	void unload()                                                            noexcept;
-	bool putStructureOnMap(StructureType type, int32_t cellX, int32_t cellY) noexcept;
-	void removeStructureFromMap(int32_t structureId)                         noexcept;
+	bool loadFromFile(const std::filesystem::path& filePath) noexcept;
+	bool loadFromSQLiteDb(const std::filesystem::path& filePath) noexcept;
 
-	std::optional<entt::entity> getEntityUnderCursor(const sf::Vector2i& point) noexcept;
+	std::string_view getTitle() const noexcept;
 
-	const std::vector<Object>& getObjects()         const noexcept;
-	std::string_view           getTileMask()        const noexcept;
-	const sf::Vector2i&        getMapSizeInTiles()  const noexcept;
-	const sf::Vector2i&        getMapSizeInPixels() const noexcept;
-	const sf::Vector2i&        getTileSize()        const noexcept;
+	std::span<const vec4s>    getVertices() const noexcept;
+	std::span<const uint32_t> getIndices()  const noexcept;
+	std::span<const Object>   getObjects()  const noexcept;
+
+	ivec2s getMapSize()  const noexcept;
+	ivec2s getTileSize() const noexcept;
 	
 private:
-	bool         loadLayers(const void* map_node)                                                    noexcept;
-	bool         loadObjects(const void* map_node)                                                   noexcept;
-	void         loadTilesets(const void* map_node, std::vector<Tileset>& tilesets)                  noexcept;
-	bool         loadLandscape(const Tileset& tileset, const std::vector<int>& parsed_layer)         noexcept;
-	void         loadStructures(const Tileset& tileset, const std::vector<int>& parsed_layer)        noexcept;
-	char         convertTileNumToChar(int32_t index)                                           const noexcept;
-	void         draw(sf::RenderTarget& target, sf::RenderStates states)                       const override;
-	void         updateWall(int32_t origin, int32_t level)                                           noexcept;
-    WallCellType computeWallType(bool left, bool top, bool right, bool bottom)                       noexcept;
-    sf::IntRect  getTexCoordsOf(WallCellType type)                                                   noexcept;
-    sf::IntRect  getTexCoordsOf(StructureType type)                                            const noexcept;
-	sf::IntRect  getBoundsOf(StructureType type, int32_t coordX, int32_t coordY)               const noexcept;
-	int32_t      getHitPointsOf(StructureType type)                                            const noexcept;
+    bool loadLayers(const void* rootNode) noexcept;
+    bool loadObjects(const void* rootNode) noexcept;
+	void loadLandscape(const struct Tileset& tileset, std::span<const int> tileIds) noexcept;
+    void readTilesetsInfo(const void* rootNode, std::span<struct Tileset> tilesets) noexcept;
 
+	std::string m_title;
 
-	std::unordered_map<int32_t, entt::entity> m_structuresById;
-	class AnimationManager&   m_animationManager;
-	class AssetManager&       m_assets;
-	entt::registry&           m_registry;
-	sf::VertexBuffer          m_vertices;
-	const sf::Texture*        m_texture;
-	std::vector<Object>       m_objects;
-	std::string               m_tileMask;
-	std::string               m_title;
-	sf::Vector2i              m_mapSizeInTiles;
-	sf::Vector2i              m_mapSizeInPixels;
-	sf::Vector2i              m_tileSize;
+	std::vector<vec4s>    m_vertices;
+	std::vector<uint32_t> m_indices;
+	std::vector<Object>   m_objects;
+	
+	ivec2s m_mapSize;
+	ivec2s m_tileSize;
 };
 
 #endif // !TILEMAP_HPP

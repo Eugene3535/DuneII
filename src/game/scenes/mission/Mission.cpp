@@ -1,281 +1,140 @@
-#include <SFML/Window/Keyboard.hpp>
-#include <SFML/Window/Mouse.hpp>
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
 
-#include "common/Defines.hpp"
-#include "common/FileProvider.hpp"
-#include "assets/AssetManager.hpp"
-#include "animation/AnimationData.hpp"
-#include "ecs/components/Structure.hpp"
-#include "scenes/mission/tilemap/Tile.hpp"
 #include "game/DuneII.hpp"
-#include "scenes/mission/Mission.hpp"
+#include "game/scenes/mission/Mission.hpp"
 
 
 Mission::Mission(DuneII* game) noexcept:
     Scene(game),
-    m_tilemap(m_registry, game->animationManager, game->getAssets())
+    m_shaderProgram(0)
 {
 
 }
 
 
-Mission::~Mission() = default;
-
-
-bool Mission::load(const std::string& info) noexcept
+bool Mission::load(std::string_view info) noexcept
 {
     if(m_isLoaded)
         return true;
 
-    if(!loadAnimations()) return false;
-    if(!m_cursor.load(m_game->animationManager, m_game->getAssets())) return false;
-    if(!m_tilemap.loadFromFile(FileProvider::findPathToFile(info))) return false;
-
-    createSystems();
-    
-    if(auto theme = m_game->getAssets().get<sf::Music>(COMMAND_POST_FLAC))
+    if(!m_tilemap)
     {
-        theme->setLooping(true);
-        theme->play();
-    }
+        auto& provider = m_game->fileProvider;
+        auto& glResources = m_game->glResources;
 
-    m_isLoaded = true;
+        auto vboHandles     = glResources.create<GLBuffer, 2>();
+        auto vaoHandles     = glResources.create<VertexArrayObject, 1>();
+        auto textureHandles = glResources.create<Texture, 1>();
+        
+        Texture landscapeTexture = {.handle = textureHandles[0] };
+
+        if(!landscapeTexture.loadFromFile(provider.findPathToFile(LANDSCAPE_PNG)))
+            return false;
+
+        if(m_shaderProgram = glResources.getShaderProgram("sprite"); m_shaderProgram == 0)
+            return false;
+
+        if(m_tilemap = std::make_unique<TileMap>(); m_tilemap->loadFromFile(provider.findPathToFile(std::string(info))))
+        {
+            auto vertices = m_tilemap->getVertices();
+            auto indices = m_tilemap->getIndices();
+
+            GLBuffer vbo(vboHandles[0], GL_ARRAY_BUFFER);
+            GLBuffer ebo(vboHandles[1], GL_ELEMENT_ARRAY_BUFFER);
+            vbo.create(sizeof(vec4s), vertices.size(), vertices.data(), GL_STATIC_DRAW);
+            ebo.create(sizeof(GLuint), indices.size(), indices.data(), GL_STATIC_DRAW);
+
+            VertexArrayObject vao(vaoHandles[0]);
+            const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
+            vao.addVertexBuffer(vbo, attributes);
+            vao.setElementBuffer(ebo);
+
+            m_landscape.texture = landscapeTexture.handle;
+            m_landscape.vao = vao.getHandle();
+            m_landscape.count = vao.getIndexCount();
+
+            createSystems();
+            m_isLoaded = true;
+        }
+    }
 
     return m_isLoaded;
 }
 
 
-void Mission::update(const sf::Time dt) noexcept
+void Mission::update(float dt) noexcept
 {
+    alignas(16) mat4 MVP;
+    alignas(16) mat4 modelView;
+    alignas(16) mat4 result;
+
+    auto& camera = m_game->camera;
+    camera.getModelViewProjectionMatrix(MVP);
+
+    m_landscapeTransform.calculate(modelView);
+    glmc_mat4_mul(MVP, modelView, result);
+    m_game->updateUniformBuffer(result);
+
     if(m_isLoaded)
     {
         for(auto system : m_systems)
             system(this, dt);
-
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::X))
-        {
-            m_status = { Scene::Type::MAIN_MENU, true };
-            m_game->window.setMouseCursorVisible(true);
-
-            if(auto theme = m_game->getAssets().get<sf::Music>(COMMAND_POST_FLAC))
-            {
-                theme->stop();
-            }
-        }
     }
 }
 
 
-bool Mission::loadAnimations() noexcept
+void Mission::draw() noexcept
 {
-    AnimationData flagData;
+    glUseProgram(m_shaderProgram);
+    glBindTextureUnit(0, m_landscape.texture);
+    glBindVertexArray(m_landscape.vao);
+    glDrawElements(GL_TRIANGLES, m_landscape.count, GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(0);
+    glBindTextureUnit(0, 0);
+    glUseProgram(0);
+}
 
-    flagData.name = "HarkonnenFlag";
-    flagData.layout = AnimationData::LINEAR;
-    flagData.startFrame = {{ 0, 0 }, { 14, 14 }};
-    flagData.duration = 8;
-    flagData.isLooped = true;
-    flagData.delay = sf::seconds(0.5f);
 
-    if(!m_game->animationManager.createAnimation(flagData)) 
-        return false;
+void Mission::resize(int width, int height) noexcept
+{
 
-    flagData.name = "OrdosFlag";
-    flagData.startFrame = {{ 0, 14 }, { 14, 14 }};
+}
 
-    if(!m_game->animationManager.createAnimation(flagData)) 
-        return false;
 
-    flagData.name = "AtreidesFlag";
-    flagData.startFrame = {{ 0, 28 }, { 14, 14 }};
+void Mission::press(int key) noexcept
+{
+    vec2 movement;
 
-    if(!m_game->animationManager.createAnimation(flagData)) 
-        return false;
+    if(key == GLFW_KEY_A)
+        movement[0] = -0.1f;
 
-    return true;
+    if(key == GLFW_KEY_D)
+        movement[0] = 0.1f;
+
+    if(key == GLFW_KEY_W)
+        movement[1] = 0.1f;
+
+    if(key == GLFW_KEY_S)
+        movement[1] = -0.1f;
+
+    m_landscapeTransform.move(movement);
+}
+
+
+void Mission::click(int button) noexcept
+{
+
+}
+
+
+void Mission::setCursorPosition(float x, float y) noexcept
+{
+
 }
 
 
 void Mission::createSystems() noexcept
 {
-//  Animations
-    m_systems.emplace_back([](Mission* mission, sf::Time dt)
-    {
-        auto view = mission->m_registry.view<Animation, sf::Sprite>();
 
-        for (auto [entity, animation, sprite] : view.each())
-        {
-            if( ! animation.isOver )
-            {
-                animation.timer += dt;
-
-                if(animation.timer > animation.delay)
-                {
-                    animation.currentFrame++;
-                    animation.timer = sf::Time::Zero;
-
-                    if(animation.currentFrame == animation.frames.size())
-                    {
-                        if(animation.isLooped)
-                        {
-                            animation.currentFrame = 0;
-                        }
-                        else
-                        {
-                            animation.isOver = true;
-                            continue;
-                        }
-                    }
-
-                    sprite.setTextureRect(animation.frames[animation.currentFrame]);
-                }
-            }
-        }
-    });
-
-
-//  ViewportController
-    m_systems.emplace_back([](Mission* mission, sf::Time dt)
-    {
-        constexpr int CAMERA_VELOCITY = 600;
-        constexpr int SCREEN_MARGIN = 150;
-
-        const sf::Vector2i& m_mapSize = mission->m_tilemap.getMapSizeInPixels();
-        auto& viewPosition = mission->m_viewPosition;
-
-        auto seconds = dt.asSeconds();
-        float camera_velocity = seconds * CAMERA_VELOCITY;
-
-        sf::Vector2i mouse_position  = sf::Mouse::getPosition(mission->m_game->window);
-        const sf::Vector2i view_size = static_cast<sf::Vector2i>(mission->m_view.getSize());
-
-        bool is_near_the_left_edge   = (mouse_position.x > 0 && mouse_position.x < SCREEN_MARGIN);
-        bool is_near_the_top_edge    = (mouse_position.y > 0 && mouse_position.y < SCREEN_MARGIN);
-        bool is_near_the_right_edge  = (mouse_position.x > (view_size.x - SCREEN_MARGIN) && mouse_position.x < view_size.x);
-        bool is_near_the_bottom_edge = (mouse_position.y > (view_size.y - SCREEN_MARGIN) && mouse_position.y < view_size.y);
-
-        if(is_near_the_left_edge)
-            viewPosition.x -= camera_velocity;
-        
-        if(is_near_the_top_edge)
-            viewPosition.y -= camera_velocity;
-        
-        if(is_near_the_right_edge)
-            viewPosition.x += camera_velocity;
-        
-        if(is_near_the_bottom_edge)
-            viewPosition.y += camera_velocity;            
-        
-        if(viewPosition.x < 0)                         viewPosition.x = 0;
-        if(viewPosition.y < 0)                         viewPosition.y = 0;
-        if(viewPosition.x + view_size.x > m_mapSize.x) viewPosition.x = m_mapSize.x - view_size.x;
-        if(viewPosition.y + view_size.y > m_mapSize.y) viewPosition.y = m_mapSize.y - view_size.y;
-
-        mission->m_view.setCenter(static_cast<sf::Vector2f>(viewPosition + sf::Vector2i(view_size.x >> 1, view_size.y >> 1)));
-        mission->m_viewport = sf::IntRect({viewPosition.x, viewPosition.y}, {view_size.x, view_size.y});
-    });
-
-
-//  CullingController
-    m_systems.emplace_back([](Mission* mission, sf::Time dt)
-    {
-        mission->m_sprites.clear();
-
-        auto structure_view = mission->m_registry.view<Tile, sf::IntRect>();
-
-        for (auto [entity, tile, bounds] : structure_view.each())
-        {
-            if(mission->m_viewport.findIntersection(bounds))
-                mission->m_sprites.push_back(&tile);
-        }
-
-        auto anim_view = mission->m_registry.view<sf::IntRect, Animation, sf::Sprite>();
-
-        for (auto [entity, bounds, animation, sprite] : anim_view.each())
-        {
-            if(mission->m_viewport.findIntersection(bounds))
-                mission->m_sprites.push_back(&sprite);
-        }
-
-#ifdef DEBUG
-        static sf::Time timer = sf::Time::Zero;
-
-        if(timer > sf::seconds(1.0f))
-        {
-            timer = sf::Time::Zero;
-            printf("Number of sprites on the screen: %zu\n", mission->m_sprites.size());
-        }
-        timer += dt;
-#endif
-    });
-
-
-//  CursorController
-    m_systems.emplace_back([](Mission* mission, sf::Time dt)
-    {
-        static constexpr int32_t cooldown = 4;
-        static int timer = 0;
-
-        sf::Vector2i mouse_position = sf::Mouse::getPosition(mission->m_game->window);
-        auto world_position = mission->m_game->window.mapPixelToCoords(mouse_position);
-
-        mission->m_cursor.update(world_position, dt);
-
-        if(timer > cooldown)
-        {
-            timer = 0;
-
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
-            {
-                if(auto entity = mission->m_tilemap.getEntityUnderCursor(static_cast<sf::Vector2i>(world_position)); entity.has_value())
-                {
-                    if(auto [structure, bounds] = mission->m_registry.try_get<Structure, sf::IntRect>(entity.value()); structure != nullptr)
-                    {
-                        bool can_be_highlighted = 
-                                    ((structure->type != StructureType::SLAB_1x1) &&
-                                    ( structure->type != StructureType::SLAB_2x2) && 
-                                    ( structure->type != StructureType::WALL)     && 
-                                    structure->type < StructureType::MAX);
-
-                        if(can_be_highlighted)
-                        {
-                            mission->m_cursor.setVertexFrame(*bounds);
-                            mission->m_cursor.select();
-                        }
-                        else
-                        {
-                            mission->m_cursor.release();
-                        }
-                    }
-                }
-                else
-                {
-                    mission->m_cursor.release();
-                }
-
-                //m_cursor.capture(); // for units
-            }
-
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
-            {
-                mission->m_cursor.release();
-            }
-        }
-
-        ++timer;
-    });
-}
-
-
-void Mission::draw(sf::RenderTarget& target, sf::RenderStates states) const
-{
-    if(m_isLoaded)
-    {
-        target.draw(m_tilemap, states);
-
-        for(auto sprite : m_sprites)
-            target.draw(*sprite, states);
-
-        target.draw(m_cursor, states);
-    }
 }

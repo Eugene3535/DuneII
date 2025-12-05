@@ -3,6 +3,7 @@
 
 #include "game/scenes/intro/TitleScreen.hpp"
 #include "game/scenes/choosing_houses/Destiny.hpp"
+#include "game/scenes/mission/Mission.hpp"
 #include "game/DuneII.hpp"
 
 
@@ -63,7 +64,8 @@ void DuneII::update(float dt) noexcept
 
             case Scene::Type::MISSION:
             {
-                
+                if (auto missionScene = load<Mission>("Atreides-8.tmx"))
+                    m_currentScene = missionScene;
             }
             break;
 
@@ -143,7 +145,11 @@ void DuneII::switchScene(const Scene* requester, Scene::Type nextScene) noexcept
         break;
 
         case Scene::Type::MISSION:
-            m_isSceneNeedToBeChanged = true;
+            if(dynamic_cast<const Destiny*>(requester) != nullptr)
+            {
+                m_isSceneNeedToBeChanged = true;
+                m_nextSceneType = Scene::Type::MISSION;
+            }
         break;
 
         default:

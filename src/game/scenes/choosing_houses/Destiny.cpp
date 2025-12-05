@@ -226,4 +226,7 @@ void Destiny::press(int key) noexcept
                 break;
         }
     }
+
+    if(key == GLFW_KEY_ENTER)
+        m_game->switchScene(this, Scene::MISSION);
 }
