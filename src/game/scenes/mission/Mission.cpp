@@ -6,8 +6,13 @@
 
 
 Mission::Mission(DuneII* game) noexcept:
-    Scene(game),
-    m_shaderProgram(0)
+    Scene(game)
+{
+
+}
+
+
+Mission::~Mission()
 {
 
 }
@@ -17,46 +22,43 @@ bool Mission::load(std::string_view info) noexcept
 {
     if(m_isLoaded)
         return true;
+  
+    auto& provider = m_game->fileProvider;
+    auto& glResources = m_game->glResources;
 
-    if(!m_tilemap)
+    auto vboHandles     = glResources.create<GLBuffer, 2>();
+    auto vaoHandles     = glResources.create<VertexArrayObject, 1>();
+    auto textureHandles = glResources.create<Texture, 1>();
+    
+    Texture landscapeTexture = {.handle = textureHandles[0] };
+
+    if(!landscapeTexture.loadFromFile(provider.findPathToFile(LANDSCAPE_PNG)))
+        return false;
+
+    if(m_landscape.shaderProgram = glResources.getShaderProgram("sprite"); m_landscape.shaderProgram == 0)
+        return false;
+
+    if(m_tilemap.loadFromFile(provider.findPathToFile(std::string(info))))
     {
-        auto& provider = m_game->fileProvider;
-        auto& glResources = m_game->glResources;
+        auto vertices = m_tilemap.getVertices();
+        auto indices = m_tilemap.getIndices();
 
-        auto vboHandles     = glResources.create<GLBuffer, 2>();
-        auto vaoHandles     = glResources.create<VertexArrayObject, 1>();
-        auto textureHandles = glResources.create<Texture, 1>();
-        
-        Texture landscapeTexture = {.handle = textureHandles[0] };
+        GLBuffer vbo(vboHandles[0], GL_ARRAY_BUFFER);
+        GLBuffer ebo(vboHandles[1], GL_ELEMENT_ARRAY_BUFFER);
+        vbo.create(sizeof(vec4s), vertices.size(), vertices.data(), GL_STATIC_DRAW);
+        ebo.create(sizeof(GLuint), indices.size(), indices.data(), GL_STATIC_DRAW);
 
-        if(!landscapeTexture.loadFromFile(provider.findPathToFile(LANDSCAPE_PNG)))
-            return false;
+        VertexArrayObject vao(vaoHandles[0]);
+        const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
+        vao.addVertexBuffer(vbo, attributes);
+        vao.setElementBuffer(ebo);
 
-        if(m_shaderProgram = glResources.getShaderProgram("sprite"); m_shaderProgram == 0)
-            return false;
+        m_landscape.texture = landscapeTexture.handle;
+        m_landscape.vao = vao.getHandle();
+        m_landscape.count = vao.getIndexCount();
 
-        if(m_tilemap = std::make_unique<TileMap>(); m_tilemap->loadFromFile(provider.findPathToFile(std::string(info))))
-        {
-            auto vertices = m_tilemap->getVertices();
-            auto indices = m_tilemap->getIndices();
-
-            GLBuffer vbo(vboHandles[0], GL_ARRAY_BUFFER);
-            GLBuffer ebo(vboHandles[1], GL_ELEMENT_ARRAY_BUFFER);
-            vbo.create(sizeof(vec4s), vertices.size(), vertices.data(), GL_STATIC_DRAW);
-            ebo.create(sizeof(GLuint), indices.size(), indices.data(), GL_STATIC_DRAW);
-
-            VertexArrayObject vao(vaoHandles[0]);
-            const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
-            vao.addVertexBuffer(vbo, attributes);
-            vao.setElementBuffer(ebo);
-
-            m_landscape.texture = landscapeTexture.handle;
-            m_landscape.vao = vao.getHandle();
-            m_landscape.count = vao.getIndexCount();
-
-            createSystems();
-            m_isLoaded = true;
-        }
+        createSystems();
+        m_isLoaded = true;
     }
 
     return m_isLoaded;
@@ -72,7 +74,7 @@ void Mission::update(float dt) noexcept
     auto& camera = m_game->camera;
     camera.getModelViewProjectionMatrix(MVP);
 
-    m_landscapeTransform.calculate(modelView);
+    m_landscape.transform.calculate(modelView);
     glmc_mat4_mul(MVP, modelView, result);
     m_game->updateUniformBuffer(result);
 
@@ -86,7 +88,7 @@ void Mission::update(float dt) noexcept
 
 void Mission::draw() noexcept
 {
-    glUseProgram(m_shaderProgram);
+    glUseProgram(m_landscape.shaderProgram);
     glBindTextureUnit(0, m_landscape.texture);
     glBindVertexArray(m_landscape.vao);
     glDrawElements(GL_TRIANGLES, m_landscape.count, GL_UNSIGNED_INT, nullptr);
@@ -104,21 +106,21 @@ void Mission::resize(int width, int height) noexcept
 
 void Mission::press(int key) noexcept
 {
-    vec2 movement;
+    vec2 movement = { 0, 0 };
 
     if(key == GLFW_KEY_A)
-        movement[0] = -0.1f;
+        movement[0] = 10.f;
 
     if(key == GLFW_KEY_D)
-        movement[0] = 0.1f;
+        movement[0] = -10.f;
 
     if(key == GLFW_KEY_W)
-        movement[1] = 0.1f;
+        movement[1] = 10.f;
 
     if(key == GLFW_KEY_S)
-        movement[1] = -0.1f;
+        movement[1] = -10.f;
 
-    m_landscapeTransform.move(movement);
+    m_landscape.transform.move(movement);
 }
 
 

@@ -1,9 +1,8 @@
 #ifndef MISSION_HPP
 #define MISSION_HPP
 
-#include <memory>
+#include <glad/glad.h>
 
-#include "graphics/Meshes.hpp"
 #include "game/scenes/mission/tilemap/TileMap.hpp"
 #include "game/scenes/Scene.hpp"
 
@@ -13,6 +12,7 @@ class Mission:
 {
 public:
     explicit Mission(class DuneII* game) noexcept;
+    ~Mission();
 
     bool load(std::string_view info)         noexcept override;
     void update(float dt)                    noexcept override;
@@ -25,10 +25,15 @@ public:
 private:
     void createSystems() noexcept;
 
-    std::unique_ptr<TileMap> m_tilemap;
-    Plane m_landscape;
-    Transform2D m_landscapeTransform;
-    uint32_t m_shaderProgram;
+    TileMap m_tilemap;
+    struct
+    {
+        GLuint shaderProgram;
+        GLuint texture;
+        GLuint vao;
+        GLuint count; // indices
+        Transform2D transform;
+    } m_landscape;
 
     std::vector<void(*)(Mission*, float)> m_systems;
 };

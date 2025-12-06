@@ -152,7 +152,7 @@ void Application::initCallbacks() noexcept
 
 	glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
-		if (action == GLFW_PRESS)
+		if (action == GLFW_PRESS || action == GLFW_REPEAT)
         {
 			if (auto game = static_cast<DuneII*>(glfwGetWindowUserPointer(window)))
 				game->press(key);
