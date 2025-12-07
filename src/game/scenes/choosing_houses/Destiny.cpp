@@ -23,7 +23,6 @@ Destiny::Destiny(DuneII* game) noexcept:
     m_vbo(0),
     m_vao(0),
     m_texture(0),
-    m_sprites(game->glResources),
     m_backgroundTransform(),
     m_outlineTransform(),
     m_selectedHouse(HouseType::ATREIDES),

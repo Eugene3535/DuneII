@@ -39,7 +39,6 @@ static bool is_intro_active_phase_end;
 
 TitleScreen::TitleScreen(DuneII* game) noexcept:
     Scene(game),
-    m_sprites(game->glResources),
     m_playButton(nullptr),
     m_exitButton(nullptr),
     m_settingsButton(nullptr),

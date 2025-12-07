@@ -2,22 +2,31 @@
 
 #include "RapidXML/rapidxml_utils.hpp"
 
-#include "resources/ogl/holder/GlResourceManager.hpp"
+#include "resources/ogl/texture/Texture.hpp"
+#include "resources/ogl/vao/VertexArrayObject.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
 
 
-SpriteManager::SpriteManager(GlResourceManager& holder) noexcept
+SpriteManager::SpriteManager() noexcept:
+	m_vbo(0),
+	m_vao(0)
 {
-	auto vboHandles = holder.create<GLBuffer, 1>();
-    auto vaoHandles = holder.create<VertexArrayObject, 1>();
-	m_vbo = GLBuffer(vboHandles[0], GL_ARRAY_BUFFER);
-	m_vbo.create(sizeof(float), 0, nullptr, GL_STATIC_DRAW);
+	glGenBuffers(1, &m_vbo);
+	glGenVertexArrays(1, &m_vao);
 
-    VertexArrayObject vao(vaoHandles[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
-    vao.addVertexBuffer(m_vbo, attributes);
+	VertexArrayObject::createVertexInputState(m_vao, m_vbo, attributes);
+}
 
-	m_vao = vao.getHandle();
+
+SpriteManager::~SpriteManager()
+{
+	glDeleteBuffers(1, &m_vbo);
+	glDeleteVertexArrays(1, &m_vao);
 }
 
 
@@ -41,7 +50,7 @@ void SpriteManager::createSprite(const std::string& name, const Texture& texture
 		const vec2 ratio = { 1.f / texture.width, 1.f / texture.height };
 		addSprite(texture.handle, frame, ratio);
 
-		m_vbo.update(0, sizeof(float), m_vertices.size(), static_cast<const void*>(m_vertices.data()));
+		pushVerticesOnGPU();
 	}
 }
 
@@ -64,7 +73,7 @@ void SpriteManager::createLinearAnimaton(const std::string& name, const Texture&
 			addSprite(handle, frame, ratio);
 		}
 
-		m_vbo.update(0, sizeof(float), m_vertices.size(), static_cast<const void*>(m_vertices.data()));
+		pushVerticesOnGPU();
 	}
 }
 
@@ -91,7 +100,7 @@ void SpriteManager::createGridAnimaton(const std::string& name, const Texture& t
 				addSprite(handle, frame, ratio);
 			}
 
-		m_vbo.update(0, sizeof(float), m_vertices.size(), static_cast<const void*>(m_vertices.data()));
+		pushVerticesOnGPU();
 	}
 }
 
@@ -109,7 +118,7 @@ void SpriteManager::createCustomAnimaton(const std::string& name, const class Te
 		for (const auto& frame : frames)	
 			addSprite(handle, frame, ratio);
 
-		m_vbo.update(0, sizeof(float), m_vertices.size(), static_cast<const void*>(m_vertices.data()));
+		pushVerticesOnGPU();
 	}
 }
 
@@ -165,13 +174,7 @@ void SpriteManager::loadSpriteSheet(const std::filesystem::path& filePath, const
 		}
 	}
 
-	m_vbo.update(0, sizeof(float), m_vertices.size(), static_cast<const void*>(m_vertices.data()));
-}
-
-
-const GLBuffer& SpriteManager::getVertexBuffer() const noexcept
-{
-	return m_vbo;
+	pushVerticesOnGPU();
 }
 
 
@@ -210,7 +213,7 @@ void SpriteManager::bind(bool toBind) const noexcept
 }
 
 
-void SpriteManager::addSprite(GLuint texture, const ivec4s& frame, const vec2 ratio) noexcept
+void SpriteManager::addSprite(uint32_t texture, const ivec4s& frame, const vec2 ratio) noexcept
 {
 	auto& sprite   = m_sprites.emplace_back();
 	sprite.frame   = m_vertices.size() >> 2;
@@ -243,4 +246,12 @@ void SpriteManager::addSprite(GLuint texture, const ivec4s& frame, const vec2 ra
 	quad[15] = bottom;
 
 	m_vertices.insert(m_vertices.end(), quad.begin(), quad.end());
+}
+
+
+void SpriteManager::pushVerticesOnGPU() noexcept
+{
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(float), static_cast<const void*>(m_vertices.data()), GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
