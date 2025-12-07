@@ -17,15 +17,15 @@ public:
 	{
 		struct Property
 		{
-			std::string name;
-			std::string type;
-			std::string value;
+			std::string_view name;
+			std::string_view type;
+			std::string_view value;
 		};
 
-		std::vector<Property> properties;
-		std::string           name;
-		std::string           type;
+		std::string_view      name;
+		std::string_view      type;
 		ivec4s                bounds;
+		std::vector<Property> properties;
 	};
 
 	TileMap() noexcept;
@@ -46,13 +46,14 @@ private:
     bool loadLayers(const void* rootNode) noexcept;
     bool loadObjects(const void* rootNode) noexcept;
 	void loadLandscape(const struct Tileset& tileset, std::span<const int> tileIds) noexcept;
-    void readTilesetsInfo(const void* rootNode, std::span<struct Tileset> tilesets) noexcept;
 
 	std::string m_title;
 
 	std::vector<vec4s>    m_vertices;
 	std::vector<uint32_t> m_indices;
 	std::vector<Object>   m_objects;
+
+	std::string m_objectData;
 	
 	ivec2s m_mapSize;
 	ivec2s m_tileSize;

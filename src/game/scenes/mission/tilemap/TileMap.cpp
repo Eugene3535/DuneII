@@ -8,6 +8,9 @@
 #include "game/scenes/mission/tilemap/TileMap.hpp"
 
 
+#define OBJECT_DATA_BUFFER_SIZE 2048
+
+
 struct Tileset
 {
 	int32_t columns   = 0;
@@ -32,6 +35,7 @@ bool TileMap::loadFromFile(const std::filesystem::path &filePath) noexcept
 	m_vertices.clear();
 	m_indices.clear();
 	m_objects.clear();
+	m_objectData.clear();
 	m_mapSize = glms_ivec2_zero();
 	m_tileSize = glms_ivec2_zero();
 
@@ -67,6 +71,7 @@ bool TileMap::loadFromFile(const std::filesystem::path &filePath) noexcept
 
 		m_vertices.reserve(mapWidth * mapHeight * 4);
 		m_indices.reserve(mapWidth * mapHeight * 6);
+		m_objectData.reserve(OBJECT_DATA_BUFFER_SIZE);
 
 		if(loadLayers(static_cast<const void*>(mapNode)))
 			if(loadObjects(static_cast<const void*>(mapNode)))
@@ -124,7 +129,26 @@ bool TileMap::loadLayers(const void* rootNode) noexcept
 	const auto mapNode = static_cast<const rapidxml::xml_node<char>*>(rootNode);
 
 	std::array<Tileset, 2> tilesets;
-	readTilesetsInfo(mapNode, tilesets);
+	{
+		size_t index = 0;
+
+		for (auto tilesetNode = mapNode->first_node("tileset");
+				  tilesetNode != nullptr;
+				  tilesetNode = tilesetNode->next_sibling("tileset"))
+		{
+			auto tileCount = tilesetNode->first_attribute("tilecount");
+			auto columns   = tilesetNode->first_attribute("columns");
+			auto firstGID  = tilesetNode->first_attribute("firstgid");
+
+			Tileset& tileset  = tilesets[index];
+			tileset.tileCount = (tileCount != nullptr) ? atoi(tileCount->value()) : 0;
+			tileset.columns   = (columns   != nullptr) ? atoi(columns->value())   : 0;
+			tileset.firstGID  = (firstGID  != nullptr) ? atoi(firstGID->value())  : 0;
+			tileset.rows      = (tileset.tileCount > 0) ? tileset.tileCount / tileset.columns : 0;
+
+			++index;
+		}
+	}
 
 	for (auto layerNode = mapNode->first_node("layer");
 			  layerNode != nullptr;
@@ -176,7 +200,58 @@ bool TileMap::loadLayers(const void* rootNode) noexcept
 bool TileMap::loadObjects(const void* rootNode) noexcept
 {
 	const auto mapNode = static_cast<const rapidxml::xml_node<char>*>(rootNode);
-	return true;
+
+	auto write_object_data = [this] (std::string_view& field, const char* data) -> void
+	{
+		size_t size = m_objectData.size();
+		size_t len = strlen(data);
+		m_objectData += data;
+		field = std::string_view(m_objectData.data() + size, len);
+
+		assert(m_objectData.size() < OBJECT_DATA_BUFFER_SIZE); // buffer pointers will become invalid, need to increase the limit
+	};
+
+	for (auto objectGroupNode = mapNode->first_node("objectgroup");
+		      objectGroupNode != nullptr;
+		      objectGroupNode = objectGroupNode->next_sibling("objectgroup"))
+	{
+		for (auto objectNode = objectGroupNode->first_node("object");
+			      objectNode != nullptr;
+			      objectNode = objectNode->next_sibling("object"))
+		{
+			auto& object = m_objects.emplace_back();
+
+			for (auto attribute = objectNode->first_attribute(); attribute != nullptr; attribute = attribute->next_attribute())
+			{
+				if (strcmp(attribute->name(), "x")      == 0) { object.bounds.x = atoi(attribute->value()); continue; }
+				if (strcmp(attribute->name(), "y")      == 0) { object.bounds.y = atoi(attribute->value()); continue; }
+				if (strcmp(attribute->name(), "width")  == 0) { object.bounds.z = atoi(attribute->value()); continue; }
+				if (strcmp(attribute->name(), "height") == 0) { object.bounds.w = atoi(attribute->value()); continue; }
+
+				if (strcmp(attribute->name(), "name") == 0)  write_object_data(object.name, attribute->value());
+				if (strcmp(attribute->name(), "class") == 0) write_object_data(object.type, attribute->value());
+			}
+
+			if (const auto propertiesNode = objectNode->first_node("properties"); propertiesNode != nullptr)
+			{
+				for (auto propertyNode = propertiesNode->first_node("property");
+					      propertyNode != nullptr;
+					      propertyNode = propertyNode->next_sibling("property"))
+				{
+					auto& property = object.properties.emplace_back();
+
+					for (auto attribute = propertyNode->first_attribute(); attribute != nullptr; attribute = attribute->next_attribute())
+					{
+						if (strcmp(attribute->name(), "name") == 0) { write_object_data(property.name,  attribute->value()); continue; }
+						if (strcmp(attribute->name(), "type") == 0) { write_object_data(property.type,  attribute->value()); continue; }
+						if (strcmp(attribute->name(), "value") == 0)  write_object_data(property.value, attribute->value());
+					}
+				}
+			}
+		}
+	}
+	
+	return ( ! m_objects.empty() );
 }
 
 
@@ -233,29 +308,5 @@ void TileMap::loadLandscape(const Tileset& tileset, std::span<const int> tileIds
 			m_indices.push_back(index + 2);
 			m_indices.push_back(index + 3);
 		}
-	}
-}
-
-
-void TileMap::readTilesetsInfo(const void* rootNode, std::span<Tileset> tilesets) noexcept
-{
-	const auto mapNode = static_cast<const rapidxml::xml_node<char>*>(rootNode);
-	size_t index = 0;
-
-	for (auto tilesetNode = mapNode->first_node("tileset");
-			  tilesetNode != nullptr;
-			  tilesetNode = tilesetNode->next_sibling("tileset"))
-	{
-		auto tileCount = tilesetNode->first_attribute("tilecount");
-		auto columns   = tilesetNode->first_attribute("columns");
-		auto firstGID  = tilesetNode->first_attribute("firstgid");
-
-		Tileset& tileset  = tilesets[index];
-		tileset.tileCount = (tileCount != nullptr) ? atoi(tileCount->value()) : 0;
-		tileset.columns   = (columns   != nullptr) ? atoi(columns->value())   : 0;
-		tileset.firstGID  = (firstGID  != nullptr) ? atoi(firstGID->value())  : 0;
-		tileset.rows      = (tileset.tileCount > 0) ? tileset.tileCount / tileset.columns : 0;
-
-		++index;
 	}
 }

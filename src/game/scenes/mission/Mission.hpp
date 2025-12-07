@@ -24,12 +24,9 @@ public:
 private:
     void createSystems() noexcept;
 
-    struct
-    {
-        GLuint textures[1];
-        GLuint vbo[2];
-        GLuint vao[1];
-    } m_glHandles;
+    GLuint textures[1];
+    GLuint vbo[2];
+    GLuint vao[1];
 
     TileMap m_tilemap;
     struct

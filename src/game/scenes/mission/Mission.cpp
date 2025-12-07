@@ -17,9 +17,9 @@ Mission::Mission(DuneII* game) noexcept:
 
 Mission::~Mission()
 {
-    glDeleteTextures(1, m_glHandles.textures);
-    glDeleteVertexArrays(1, m_glHandles.vao);
-    glDeleteBuffers(2, m_glHandles.vbo);
+    glDeleteTextures(1, textures);
+    glDeleteVertexArrays(1, vao);
+    glDeleteBuffers(2, vbo);
 }
 
 
@@ -30,11 +30,11 @@ bool Mission::load(std::string_view info) noexcept
   
     auto& provider = m_game->fileProvider;
 
-    glGenTextures(1, m_glHandles.textures);
-    glGenBuffers(2, m_glHandles.vbo);
-    glGenVertexArrays(1, m_glHandles.vao);
+    glGenTextures(1, textures);
+    glGenBuffers(2, vbo);
+    glGenVertexArrays(1, vao);
 
-    Texture landscapeTexture = {.handle = m_glHandles.textures[0] };
+    Texture landscapeTexture = {.handle = textures[0] };
 
     if(!landscapeTexture.loadFromFile(provider.findPathToFile(LANDSCAPE_PNG)))
         return false;
@@ -55,25 +55,25 @@ bool Mission::load(std::string_view info) noexcept
     if(m_tilemap.loadFromFile(provider.findPathToFile(std::string(info))))
     {
         auto vertices = m_tilemap.getVertices();
-        glBindBuffer(GL_ARRAY_BUFFER, m_glHandles.vbo[0]);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
         glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertices.size_bytes()), vertices.data(), GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         auto indices = m_tilemap.getIndices();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_glHandles.vbo[1]);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(indices.size_bytes()), indices.data(), GL_STATIC_DRAW);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
         const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
-        VertexArrayObject::createVertexInputState(m_glHandles.vao[0], m_glHandles.vbo[0], attributes);
+        VertexArrayObject::createVertexInputState(vao[0], vbo[0], attributes);
         
-        glBindVertexArray(m_glHandles.vao[0]);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_glHandles.vbo[1]);
+        glBindVertexArray(vao[0]);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
         glBindVertexArray(0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
         m_landscape.texture = landscapeTexture.handle;
-        m_landscape.vao = m_glHandles.vao[0];
+        m_landscape.vao = vao[0];
         m_landscape.count = indices.size();
 
         createSystems();
