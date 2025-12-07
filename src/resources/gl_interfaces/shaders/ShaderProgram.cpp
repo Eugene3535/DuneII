@@ -3,7 +3,7 @@
 #endif
 
 #include "resources/files/Shader.hpp"
-#include "resources/ogl/shaders/ShaderProgram.hpp"
+#include "resources/gl_interfaces/shaders/ShaderProgram.hpp"
 
 
 ShaderProgram::ShaderProgram() noexcept:

@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "common/Enums.hpp"
-#include "resources/ogl/shaders/ShaderProgram.hpp"
+#include "resources/gl_interfaces/shaders/ShaderProgram.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
 #include "graphics/outline/Outline.hpp"
 #include "game/scenes/Scene.hpp"

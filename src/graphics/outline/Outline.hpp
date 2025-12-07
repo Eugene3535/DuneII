@@ -6,7 +6,7 @@
 
 #include <cglm/struct/vec2.h>
 
-#include "resources/ogl/buffers/GlBuffer.hpp"
+#include "resources/gl_interfaces/buffers/GlBuffer.hpp"
 
 
 class Outline

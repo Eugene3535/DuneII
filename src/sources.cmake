@@ -4,11 +4,11 @@ set(RESOURCE_SRC_FILES
 	# src/resources/files/Font.cpp
 	src/resources/files/Shader.cpp
 	src/resources/files/StbImage.cpp
-	src/resources/ogl/buffers/GlBuffer.cpp
-	src/resources/ogl/shaders/ShaderProgram.cpp
-	src/resources/ogl/texture/Texture.cpp
-	src/resources/ogl/vao/attributes/VertexBufferLayout.cpp
-	src/resources/ogl/vao/VertexArrayObject.cpp
+	src/resources/gl_interfaces/buffers/GlBuffer.cpp
+	src/resources/gl_interfaces/shaders/ShaderProgram.cpp
+	src/resources/gl_interfaces/texture/Texture.cpp
+	src/resources/gl_interfaces/vao/attributes/VertexBufferLayout.cpp
+	src/resources/gl_interfaces/vao/VertexArrayObject.cpp
 )
 
 set(RESOURCE_HDR_FILES
@@ -16,11 +16,11 @@ set(RESOURCE_HDR_FILES
 	# src/resources/files/Font.hpp
 	src/resources/files/Shader.hpp
 	src/resources/files/StbImage.hpp
-	src/resources/ogl/buffers/GlBuffer.hpp
-	src/resources/ogl/shaders/ShaderProgram.hpp
-	src/resources/ogl/texture/Texture.hpp
-	src/resources/ogl/vao/attributes/VertexBufferLayout.hpp
-	src/resources/ogl/vao/VertexArrayObject.hpp
+	src/resources/gl_interfaces/buffers/GlBuffer.hpp
+	src/resources/gl_interfaces/shaders/ShaderProgram.hpp
+	src/resources/gl_interfaces/texture/Texture.hpp
+	src/resources/gl_interfaces/vao/attributes/VertexBufferLayout.hpp
+	src/resources/gl_interfaces/vao/VertexArrayObject.hpp
 )
 
 

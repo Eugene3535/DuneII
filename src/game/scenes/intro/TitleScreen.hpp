@@ -2,7 +2,7 @@
 #define TITLE_SCREEN_HPP
 
 #include "graphics/sprites/SpriteManager.hpp"
-#include "resources/ogl/shaders/ShaderProgram.hpp"
+#include "resources/gl_interfaces/shaders/ShaderProgram.hpp"
 #include "game/scenes/intro/interactive_elements/Button.hpp"
 #include "game/scenes/Scene.hpp"
 

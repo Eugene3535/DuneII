@@ -1,7 +1,7 @@
 #include <cstring>
 
 #include "resources/files/StbImage.hpp"
-#include "resources/ogl/texture/Texture.hpp"
+#include "resources/gl_interfaces/texture/Texture.hpp"
 
 
 bool Texture::loadFromImage(const StbImage& image) noexcept

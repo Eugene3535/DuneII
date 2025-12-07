@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 
 #include "resources/files/Shader.hpp"
-#include "resources/ogl/texture/Texture.hpp"
+#include "resources/gl_interfaces/texture/Texture.hpp"
 #include "game/DuneII.hpp"
 #include "game/scenes/choosing_houses/Destiny.hpp"
 

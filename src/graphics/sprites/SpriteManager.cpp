@@ -2,8 +2,8 @@
 
 #include "RapidXML/rapidxml_utils.hpp"
 
-#include "resources/ogl/texture/Texture.hpp"
-#include "resources/ogl/vao/VertexArrayObject.hpp"
+#include "resources/gl_interfaces/texture/Texture.hpp"
+#include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
 
 

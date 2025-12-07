@@ -1,6 +1,6 @@
 #include <cstring>
 
-#include "resources/ogl/buffers/GlBuffer.hpp"
+#include "resources/gl_interfaces/buffers/GlBuffer.hpp"
 
 
 GLBuffer::GLBuffer() noexcept:

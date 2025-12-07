@@ -1,8 +1,8 @@
 #ifndef VERTEX_ARRAY_OBJECT_HPP
 #define VERTEX_ARRAY_OBJECT_HPP
 
-#include "resources/ogl/buffers/GlBuffer.hpp"
-#include "resources/ogl/vao/attributes/VertexBufferLayout.hpp"
+#include "resources/gl_interfaces/buffers/GlBuffer.hpp"
+#include "resources/gl_interfaces/vao/attributes/VertexBufferLayout.hpp"
 
 class VertexArrayObject final
 {

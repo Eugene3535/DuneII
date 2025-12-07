@@ -5,7 +5,7 @@
 #include <cglm/call/vec2.h>
 #include <cglm/struct/vec4.h>
 
-#include "resources/ogl/vao/VertexArrayObject.hpp"
+#include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "graphics/outline/Outline.hpp"
 
 

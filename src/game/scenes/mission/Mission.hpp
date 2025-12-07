@@ -1,7 +1,7 @@
 #ifndef MISSION_HPP
 #define MISSION_HPP
 
-#include "resources/ogl/shaders/ShaderProgram.hpp"
+#include "resources/gl_interfaces/shaders/ShaderProgram.hpp"
 #include "game/scenes/mission/tilemap/TileMap.hpp"
 #include "game/scenes/Scene.hpp"
 

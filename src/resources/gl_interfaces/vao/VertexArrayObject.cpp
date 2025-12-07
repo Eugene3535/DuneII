@@ -1,4 +1,4 @@
-#include "resources/ogl/vao/VertexArrayObject.hpp"
+#include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 
 
 VertexArrayObject::VertexArrayObject() noexcept:

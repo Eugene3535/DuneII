@@ -1,8 +1,8 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include "resources/ogl/texture/Texture.hpp"
-#include "resources/ogl/vao/VertexArrayObject.hpp"
+#include "resources/gl_interfaces/texture/Texture.hpp"
+#include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "resources/files/Shader.hpp"
 #include "game/DuneII.hpp"
 #include "game/scenes/mission/Mission.hpp"
