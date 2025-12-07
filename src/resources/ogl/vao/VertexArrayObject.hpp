@@ -15,6 +15,8 @@ public:
     void addVertexBuffer(const GLBuffer& buffer, std::span<const VertexBufferLayout::Attribute> attributes) noexcept;
     void setElementBuffer(const GLBuffer& buffer) noexcept;
 
+    static void createVertexInputState(GLuint vao, GLuint vbo, std::span<const VertexBufferLayout::Attribute> attributes) noexcept;
+
     GLuint getHandle()     const noexcept;
     GLuint getIndexCount() const noexcept;
 

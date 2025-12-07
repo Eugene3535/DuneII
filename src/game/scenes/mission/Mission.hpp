@@ -1,8 +1,7 @@
 #ifndef MISSION_HPP
 #define MISSION_HPP
 
-#include <glad/glad.h>
-
+#include "resources/ogl/shaders/ShaderProgram.hpp"
 #include "game/scenes/mission/tilemap/TileMap.hpp"
 #include "game/scenes/Scene.hpp"
 
@@ -25,13 +24,20 @@ public:
 private:
     void createSystems() noexcept;
 
+    struct
+    {
+        GLuint textures[1];
+        GLuint vbo[2];
+        GLuint vao[1];
+    } m_glHandles;
+
     TileMap m_tilemap;
     struct
     {
-        GLuint shaderProgram;
         GLuint texture;
         GLuint vao;
         GLuint count; // indices
+        ShaderProgram shaderProgram;
         Transform2D transform;
     } m_landscape;
 

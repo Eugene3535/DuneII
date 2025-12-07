@@ -15,6 +15,8 @@ public:
     ShaderProgram& operator = (ShaderProgram&&) noexcept;
     ~ShaderProgram() noexcept;
 
+    void operator()(bool bind) const noexcept;
+
     GLuint link(std::span<const class Shader> shaders) noexcept;
     GLuint getHandle() const noexcept;
     GLint  getUniformLocation(const char* name) const noexcept;

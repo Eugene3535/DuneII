@@ -1,6 +1,7 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include "resources/files/Shader.hpp"
 #include "game/DuneII.hpp"
 #include "game/scenes/mission/Mission.hpp"
 
@@ -14,7 +15,9 @@ Mission::Mission(DuneII* game) noexcept:
 
 Mission::~Mission()
 {
-
+    glDeleteTextures(1, m_glHandles.textures);
+    glDeleteVertexArrays(1, m_glHandles.vao);
+    glDeleteBuffers(2, m_glHandles.vbo);
 }
 
 
@@ -26,36 +29,51 @@ bool Mission::load(std::string_view info) noexcept
     auto& provider = m_game->fileProvider;
     auto& glResources = m_game->glResources;
 
-    auto vboHandles     = glResources.create<GLBuffer, 2>();
-    auto vaoHandles     = glResources.create<VertexArrayObject, 1>();
-    auto textureHandles = glResources.create<Texture, 1>();
-    
-    Texture landscapeTexture = {.handle = textureHandles[0] };
+    glGenTextures(1, m_glHandles.textures);
+    glGenBuffers(2, m_glHandles.vbo);
+    glGenVertexArrays(1, m_glHandles.vao);
+
+    Texture landscapeTexture = {.handle = m_glHandles.textures[0] };
 
     if(!landscapeTexture.loadFromFile(provider.findPathToFile(LANDSCAPE_PNG)))
         return false;
 
-    if(m_landscape.shaderProgram = glResources.getShaderProgram("sprite"); m_landscape.shaderProgram == 0)
-        return false;
+    {
+        std::array<Shader, 2> shaders;
+
+        if(!shaders[0].loadFromFile(provider.findPathToFile("sprite.vert"), GL_VERTEX_SHADER))
+            return false;
+
+        if(!shaders[1].loadFromFile(provider.findPathToFile("sprite.frag"), GL_FRAGMENT_SHADER))
+            return false;
+
+        if( ! m_landscape.shaderProgram.link(shaders) )
+            return false;
+    }
 
     if(m_tilemap.loadFromFile(provider.findPathToFile(std::string(info))))
     {
         auto vertices = m_tilemap.getVertices();
+        glBindBuffer(GL_ARRAY_BUFFER, m_glHandles.vbo[0]);
+        glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertices.size_bytes()), vertices.data(), GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
         auto indices = m_tilemap.getIndices();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_glHandles.vbo[1]);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(indices.size_bytes()), indices.data(), GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-        GLBuffer vbo(vboHandles[0], GL_ARRAY_BUFFER);
-        GLBuffer ebo(vboHandles[1], GL_ELEMENT_ARRAY_BUFFER);
-        vbo.create(sizeof(vec4s), vertices.size(), vertices.data(), GL_STATIC_DRAW);
-        ebo.create(sizeof(GLuint), indices.size(), indices.data(), GL_STATIC_DRAW);
-
-        VertexArrayObject vao(vaoHandles[0]);
         const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
-        vao.addVertexBuffer(vbo, attributes);
-        vao.setElementBuffer(ebo);
+        VertexArrayObject::createVertexInputState(m_glHandles.vao[0], m_glHandles.vbo[0], attributes);
+        
+        glBindVertexArray(m_glHandles.vao[0]);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_glHandles.vbo[1]);
+        glBindVertexArray(0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
         m_landscape.texture = landscapeTexture.handle;
-        m_landscape.vao = vao.getHandle();
-        m_landscape.count = vao.getIndexCount();
+        m_landscape.vao = m_glHandles.vao[0];
+        m_landscape.count = indices.size();
 
         createSystems();
         m_isLoaded = true;
@@ -88,13 +106,13 @@ void Mission::update(float dt) noexcept
 
 void Mission::draw() noexcept
 {
-    glUseProgram(m_landscape.shaderProgram);
+    m_landscape.shaderProgram(true);
     glBindTextureUnit(0, m_landscape.texture);
     glBindVertexArray(m_landscape.vao);
     glDrawElements(GL_TRIANGLES, m_landscape.count, GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
     glBindTextureUnit(0, 0);
-    glUseProgram(0);
+    m_landscape.shaderProgram(false);
 }
 
 

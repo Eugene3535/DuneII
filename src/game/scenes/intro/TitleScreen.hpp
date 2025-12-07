@@ -2,6 +2,7 @@
 #define TITLE_SCREEN_HPP
 
 #include "graphics/sprites/SpriteManager.hpp"
+#include "resources/ogl/shaders/ShaderProgram.hpp"
 #include "game/scenes/intro/interactive_elements/Button.hpp"
 #include "game/scenes/Scene.hpp"
 
@@ -21,8 +22,10 @@ public:
     void setCursorPosition(float x, float y) noexcept override;
 
 private:
-    GLuint m_spriteProgram;
-    GLuint m_buttonSpriteProgram;
+    GLuint m_textures[5];
+
+    ShaderProgram m_spriteProgram;
+    ShaderProgram m_buttonSpriteProgram;
 
     Sprite      m_space;
     Transform2D m_spaceTransform;

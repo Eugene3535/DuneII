@@ -4,7 +4,6 @@
 #include <memory>
 
 #include "common/Enums.hpp"
-#include "resources/ogl/vao/VertexArrayObject.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
 #include "graphics/outline/Outline.hpp"
 #include "game/scenes/Scene.hpp"
@@ -15,6 +14,7 @@ class Destiny:
 {
 public:
     explicit Destiny(class DuneII* game) noexcept;
+    ~Destiny();
 
     bool load(std::string_view info)   noexcept override;
     void update(float dt)              noexcept override;
@@ -24,6 +24,10 @@ public:
     void press(int key) noexcept override;
 
 private:
+    GLuint m_vbo;
+    GLuint m_vao;
+    GLuint m_texture;
+
     GLuint m_spriteProgram;
     GLuint m_outlineProgram;
     SpriteManager m_sprites;

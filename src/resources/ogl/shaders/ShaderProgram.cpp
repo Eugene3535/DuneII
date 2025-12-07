@@ -35,6 +35,12 @@ ShaderProgram::~ShaderProgram() noexcept
 }
 
 
+void ShaderProgram::operator()(bool bind) const noexcept
+{
+    glUseProgram( (bind && m_handle) ? m_handle : 0 );
+}
+
+
 GLuint ShaderProgram::link(std::span<const Shader> shaders) noexcept
 {
     glDeleteProgram(m_handle);

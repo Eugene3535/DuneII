@@ -19,6 +19,9 @@
 
 Destiny::Destiny(DuneII* game) noexcept:
     Scene(game),
+    m_vbo(0),
+    m_vao(0),
+    m_texture(0),
     m_spriteProgram(0),
     m_outlineProgram(0),
     m_sprites(game->glResources),
@@ -32,6 +35,14 @@ Destiny::Destiny(DuneII* game) noexcept:
 }
 
 
+Destiny::~Destiny()
+{
+    glDeleteBuffers(1, &m_vbo);
+    glDeleteVertexArrays(1, &m_vao);
+    glDeleteTextures(1, &m_texture);
+}
+
+
 bool Destiny::load(std::string_view info) noexcept
 {
     if(m_isLoaded)
@@ -40,12 +51,12 @@ bool Destiny::load(std::string_view info) noexcept
     auto& provider = m_game->fileProvider;
     auto& glResources = m_game->glResources;
 
-    auto vboHandles     = glResources.create<GLBuffer, 1>();
-    auto vaoHandles     = glResources.create<VertexArrayObject, 1>();
-    auto textureHandles = glResources.create<Texture, 1>();
+    glGenBuffers(1, &m_vbo);
+    glGenVertexArrays(1, &m_vao);
+    glGenTextures(1, &m_texture);
 
 //  Textures
-    Texture housesTexture = {.handle = textureHandles[0] };
+    Texture housesTexture = {.handle = m_texture };
 
     if(!housesTexture.loadFromFile(provider.findPathToFile(HOUSES_PNG)))
         return false;
@@ -71,7 +82,7 @@ bool Destiny::load(std::string_view info) noexcept
     m_background = m_sprites.getSprite("background");
 
 //  Outline
-    m_outline = std::make_unique<Outline>(vboHandles[0], vaoHandles[0]);
+    m_outline = std::make_unique<Outline>(m_vbo, m_vao);
     const vec2s outlineSize = { DEFAULT_OUTLINE_WIDTH, DEFAULT_OUTLINE_HEIGHT };
 
     m_outline->create(4, [outlineSize](size_t index) -> vec2s

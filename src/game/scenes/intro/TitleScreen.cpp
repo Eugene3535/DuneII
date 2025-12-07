@@ -39,8 +39,6 @@ static bool is_intro_active_phase_end;
 
 TitleScreen::TitleScreen(DuneII* game) noexcept:
     Scene(game),
-    m_spriteProgram(0),
-    m_buttonSpriteProgram(0),
     m_sprites(game->glResources),
     m_playButton(nullptr),
     m_exitButton(nullptr),
@@ -62,6 +60,8 @@ TitleScreen::~TitleScreen()
 
     if(m_settingsButton)
         m_settingsButton->~Button();
+
+    glDeleteTextures(5, m_textures);
 }
 
 
@@ -71,16 +71,15 @@ bool TitleScreen::load(std::string_view info) noexcept
         return true;
     
     auto& provider = m_game->fileProvider;
-    auto& glResources = m_game->glResources;
     
-    auto textureHandles = glResources.create<Texture, 5>();
+    glGenTextures(5, m_textures);
 
 //  Textures
-    Texture spaceTexture    = {.handle = textureHandles[0] };
-    Texture planetTexture   = {.handle = textureHandles[1] };  
-    Texture playTexture     = {.handle = textureHandles[2] }; 
-    Texture exitTexture     = {.handle = textureHandles[3] };
-    Texture settingsTexture = {.handle = textureHandles[4] };
+    Texture spaceTexture    = {.handle = m_textures[0] };
+    Texture planetTexture   = {.handle = m_textures[1] };  
+    Texture playTexture     = {.handle = m_textures[2] }; 
+    Texture exitTexture     = {.handle = m_textures[3] };
+    Texture settingsTexture = {.handle = m_textures[4] };
 
     if(!spaceTexture.loadFromFile(provider.findPathToFile(SPACE_JPG)))
         return false;
@@ -98,11 +97,27 @@ bool TitleScreen::load(std::string_view info) noexcept
         return false;
 
 //  Shaders
-    if(m_spriteProgram = glResources.getShaderProgram("sprite"); m_spriteProgram == 0)
-        return false;
+    {
+        std::array<Shader, 2> shaders;
 
-    if(m_buttonSpriteProgram = glResources.getShaderProgram("color_sprite"); m_buttonSpriteProgram == 0)
-        return false;
+        if(!shaders[0].loadFromFile(provider.findPathToFile("sprite.vert"), GL_VERTEX_SHADER))
+            return false;
+
+        if(!shaders[1].loadFromFile(provider.findPathToFile("sprite.frag"), GL_FRAGMENT_SHADER))
+            return false;
+
+        if(!m_spriteProgram.link(shaders))
+            return false;
+
+        if(!shaders[0].loadFromFile(provider.findPathToFile("color_sprite.vert"), GL_VERTEX_SHADER))
+            return false;
+
+        if(!shaders[1].loadFromFile(provider.findPathToFile("color_sprite.frag"), GL_FRAGMENT_SHADER))
+            return false;
+
+        if(!m_buttonSpriteProgram.link(shaders) )
+            return false;
+    }
     
 //  Sprites
     m_sprites.createSprite("space", spaceTexture);
@@ -116,7 +131,7 @@ bool TitleScreen::load(std::string_view info) noexcept
     m_planetTransform.setOrigin(planetTexture.width * 0.5f, planetTexture.height * 0.5f);
 
 //  Buttons
-    int32_t uniform = glGetUniformLocation(m_buttonSpriteProgram, "spriteColor");
+    int32_t uniform = glGetUniformLocation(m_buttonSpriteProgram.getHandle(), "spriteColor");
 
     if(uniform == -1)
         return false;
@@ -175,7 +190,7 @@ void TitleScreen::draw() noexcept
     auto& camera = m_game->camera;
     camera.getModelViewProjectionMatrix(MVP);
 
-    glUseProgram(m_spriteProgram);
+    m_spriteProgram(true);
     m_sprites.bind(true);
 
     m_spaceTransform.calculate(model);
@@ -197,7 +212,7 @@ void TitleScreen::draw() noexcept
 //  Draw buttons
     if(m_isPresented)
     {
-        glUseProgram(m_buttonSpriteProgram);
+        m_buttonSpriteProgram(true);
 
         m_playButton->calculate(model);
         glmc_mat4_mul(MVP, model, modelView);
