@@ -5,7 +5,6 @@ set(RESOURCE_SRC_FILES
 	src/resources/files/Shader.cpp
 	src/resources/files/StbImage.cpp
 	src/resources/ogl/buffers/GlBuffer.cpp
-	src/resources/ogl/holder/GlResourceManager.cpp
 	src/resources/ogl/shaders/ShaderProgram.cpp
 	src/resources/ogl/texture/Texture.cpp
 	src/resources/ogl/vao/attributes/VertexBufferLayout.cpp
@@ -18,7 +17,6 @@ set(RESOURCE_HDR_FILES
 	src/resources/files/Shader.hpp
 	src/resources/files/StbImage.hpp
 	src/resources/ogl/buffers/GlBuffer.hpp
-	src/resources/ogl/holder/GlResourceManager.hpp
 	src/resources/ogl/shaders/ShaderProgram.hpp
 	src/resources/ogl/texture/Texture.hpp
 	src/resources/ogl/vao/attributes/VertexBufferLayout.hpp

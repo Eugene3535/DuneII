@@ -9,7 +9,6 @@
 #include <cglm/struct/vec2.h>
 
 #include "resources/files/FileProvider.hpp"
-#include "resources/ogl/holder/GlResourceManager.hpp"
 #include "graphics/camera/OrthogonalCamera.hpp"
 #include "game/scenes/Scene.hpp"
 
@@ -38,7 +37,6 @@ public:
 
 //  Resources
     FileProvider fileProvider;
-    GlResourceManager glResources;
 
     OrthogonalCamera camera;
     
@@ -53,7 +51,7 @@ private:
     Scene::Type m_nextSceneType;
     bool m_isSceneNeedToBeChanged;
 
-    GLBuffer m_uniformBuffer;
+    uint32_t m_uniformBuffer;
 };
 
 #include "game/DuneII.inl"

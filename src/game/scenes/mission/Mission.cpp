@@ -1,6 +1,8 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include "resources/ogl/texture/Texture.hpp"
+#include "resources/ogl/vao/VertexArrayObject.hpp"
 #include "resources/files/Shader.hpp"
 #include "game/DuneII.hpp"
 #include "game/scenes/mission/Mission.hpp"
@@ -27,7 +29,6 @@ bool Mission::load(std::string_view info) noexcept
         return true;
   
     auto& provider = m_game->fileProvider;
-    auto& glResources = m_game->glResources;
 
     glGenTextures(1, m_glHandles.textures);
     glGenBuffers(2, m_glHandles.vbo);

@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 
 #include "resources/files/Shader.hpp"
+#include "resources/ogl/texture/Texture.hpp"
 #include "game/DuneII.hpp"
 #include "game/scenes/choosing_houses/Destiny.hpp"
 
@@ -47,7 +48,6 @@ bool Destiny::load(std::string_view info) noexcept
         return true;
 
     auto& provider = m_game->fileProvider;
-    auto& glResources = m_game->glResources;
 
     glGenBuffers(1, &m_vbo);
     glGenVertexArrays(1, &m_vao);
