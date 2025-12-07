@@ -41,10 +41,10 @@ bool Mission::load(std::string_view info) noexcept
     {
         std::array<Shader, 2> shaders;
 
-        if(!shaders[0].loadFromFile(provider.findPathToFile("sprite.vert"), GL_VERTEX_SHADER))
+        if(!shaders[0].loadFromFile(provider.findPathToFile("tilemap.vert"), GL_VERTEX_SHADER))
             return false;
 
-        if(!shaders[1].loadFromFile(provider.findPathToFile("sprite.frag"), GL_FRAGMENT_SHADER))
+        if(!shaders[1].loadFromFile(provider.findPathToFile("tilemap.frag"), GL_FRAGMENT_SHADER))
             return false;
 
         if( ! m_landscape.shaderProgram.link(shaders) )

@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "common/Enums.hpp"
+#include "resources/ogl/shaders/ShaderProgram.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
 #include "graphics/outline/Outline.hpp"
 #include "game/scenes/Scene.hpp"
@@ -28,8 +29,9 @@ private:
     GLuint m_vao;
     GLuint m_texture;
 
-    GLuint m_spriteProgram;
-    GLuint m_outlineProgram;
+    ShaderProgram m_spriteProgram;
+    ShaderProgram m_outlineProgram;
+    
     SpriteManager m_sprites;
 
     Sprite m_background;

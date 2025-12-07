@@ -3,6 +3,7 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include "resources/files/Shader.hpp"
 #include "game/DuneII.hpp"
 #include "game/scenes/choosing_houses/Destiny.hpp"
 
@@ -22,8 +23,6 @@ Destiny::Destiny(DuneII* game) noexcept:
     m_vbo(0),
     m_vao(0),
     m_texture(0),
-    m_spriteProgram(0),
-    m_outlineProgram(0),
     m_sprites(game->glResources),
     m_backgroundTransform(),
     m_outlineTransform(),
@@ -62,18 +61,34 @@ bool Destiny::load(std::string_view info) noexcept
         return false;
 
 //  Shaders
-    if(m_spriteProgram = glResources.getShaderProgram("sprite"); m_spriteProgram == 0)
-        return false;
-    
-    if(m_outlineProgram = glResources.getShaderProgram("color_outline"); m_outlineProgram == 0)
-        return false;
+    {
+        std::array<Shader, 2> shaders;
 
-    if(GLint uniformColor = glGetUniformLocation(m_outlineProgram, "outlineColor"); uniformColor != -1)
+        if(!shaders[0].loadFromFile(provider.findPathToFile("sprite.vert"), GL_VERTEX_SHADER))
+            return false;
+
+        if(!shaders[1].loadFromFile(provider.findPathToFile("sprite.frag"), GL_FRAGMENT_SHADER))
+            return false;
+
+        if(!m_spriteProgram.link(shaders))
+            return false;
+
+        if(!shaders[0].loadFromFile(provider.findPathToFile("color_outline.vert"), GL_VERTEX_SHADER))
+            return false;
+
+        if(!shaders[1].loadFromFile(provider.findPathToFile("color_outline.frag"), GL_FRAGMENT_SHADER))
+            return false;
+
+        if(!m_outlineProgram.link(shaders) )
+            return false;
+    }
+
+    if(GLint uniformColor = glGetUniformLocation(m_outlineProgram.getHandle(), "outlineColor"); uniformColor != -1)
     {
         const float outlineColor[] = { 1.f, 0.f, 0.f, 1.f };
-        glUseProgram(m_outlineProgram);
+        m_outlineProgram(true);
         glUniform4fv(uniformColor, 1, outlineColor);
-        glUseProgram(0); 
+        m_outlineProgram(false); 
     }
 
 //  Sprites
@@ -152,7 +167,7 @@ void Destiny::draw() noexcept
     auto& camera = m_game->camera;
     camera.getModelViewProjectionMatrix(MVP);
 
-    glUseProgram(m_spriteProgram);
+    m_spriteProgram(true);
     m_sprites.bind(true);
 
     m_backgroundTransform.calculate(modelView);
@@ -163,7 +178,7 @@ void Destiny::draw() noexcept
     glDrawArrays(GL_TRIANGLE_FAN, m_background.frame, 4);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    glUseProgram(m_outlineProgram);
+    m_outlineProgram(true);
 
     m_outlineTransform.calculate(modelView);
     glmc_mat4_mul(MVP, modelView, result);

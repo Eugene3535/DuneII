@@ -86,6 +86,8 @@ set(SHADER_FILES
 	${PROJECT_SOURCE_DIR}/src/shaders/color_sprite.frag
 	${PROJECT_SOURCE_DIR}/src/shaders/sprite.vert
 	${PROJECT_SOURCE_DIR}/src/shaders/sprite.frag
+	${PROJECT_SOURCE_DIR}/src/shaders/tilemap.vert
+	${PROJECT_SOURCE_DIR}/src/shaders/tilemap.frag
 )
 
 source_group("shaders" FILES ${SHADER_FILES})
