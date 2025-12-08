@@ -1,7 +1,8 @@
 #ifndef ENUMS_HPP
 #define ENUMS_HPP
 
-enum class HouseType 
+
+enum class HouseType : int
 {
     ATREIDES = 0,
     ORDOS,
@@ -13,7 +14,8 @@ enum class HouseType
 	INVALID = 0xFF
 };
 
-enum class StructureType 
+
+enum class StructureType : int
 {
 	SLAB_1x1 = 0,
 	SLAB_2x2,
@@ -35,7 +37,8 @@ enum class StructureType
 	INVALID = 0xFF
 };
 
-enum class UnitType
+
+enum class UnitType : int
 {
     CARRYALL = 0,
     ORNITHOPTER,

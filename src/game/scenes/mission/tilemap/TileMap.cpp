@@ -5,10 +5,8 @@
 #include "RapidXML/rapidxml.hpp"
 #include "RapidXML/rapidxml_utils.hpp"
 
+#include "common/Enums.hpp"
 #include "game/scenes/mission/tilemap/TileMap.hpp"
-
-
-#define OBJECT_DATA_BUFFER_SIZE 2048
 
 
 struct Tileset
@@ -35,7 +33,6 @@ bool TileMap::loadFromFile(const std::filesystem::path &filePath) noexcept
 	m_vertices.clear();
 	m_indices.clear();
 	m_objects.clear();
-	m_objectData.clear();
 	m_mapSize = glms_ivec2_zero();
 	m_tileSize = glms_ivec2_zero();
 
@@ -71,7 +68,6 @@ bool TileMap::loadFromFile(const std::filesystem::path &filePath) noexcept
 
 		m_vertices.reserve(mapWidth * mapHeight * 4);
 		m_indices.reserve(mapWidth * mapHeight * 6);
-		m_objectData.reserve(OBJECT_DATA_BUFFER_SIZE);
 
 		if(loadLayers(static_cast<const void*>(mapNode)))
 			if(loadObjects(static_cast<const void*>(mapNode)))
@@ -188,8 +184,8 @@ bool TileMap::loadLayers(const void* rootNode) noexcept
 			if(strcmp(attrName->value(), "Landscape") == 0)
 				loadLandscape(*currentTileset, tileIDs);
 
-			// if(strcmp(attrName->value(), "Structures") == 0)
-			// 	loadStructures(*current_tileset, parsed_layer);
+			if(strcmp(attrName->value(), "Structures") == 0)
+				loadStructures(*currentTileset, tileIDs);
 		}
 	}
 
@@ -200,16 +196,6 @@ bool TileMap::loadLayers(const void* rootNode) noexcept
 bool TileMap::loadObjects(const void* rootNode) noexcept
 {
 	const auto mapNode = static_cast<const rapidxml::xml_node<char>*>(rootNode);
-
-	auto write_object_data = [this] (std::string_view& field, const char* data) -> void
-	{
-		size_t size = m_objectData.size();
-		size_t len = strlen(data);
-		m_objectData += data;
-		field = std::string_view(m_objectData.data() + size, len);
-
-		assert(m_objectData.size() < OBJECT_DATA_BUFFER_SIZE); // buffer pointers will become invalid, need to increase the limit
-	};
 
 	for (auto objectGroupNode = mapNode->first_node("objectgroup");
 		      objectGroupNode != nullptr;
@@ -228,8 +214,8 @@ bool TileMap::loadObjects(const void* rootNode) noexcept
 				if (strcmp(attribute->name(), "width")  == 0) { object.bounds.z = atoi(attribute->value()); continue; }
 				if (strcmp(attribute->name(), "height") == 0) { object.bounds.w = atoi(attribute->value()); continue; }
 
-				if (strcmp(attribute->name(), "name") == 0)  write_object_data(object.name, attribute->value());
-				if (strcmp(attribute->name(), "class") == 0) write_object_data(object.type, attribute->value());
+				if (strcmp(attribute->name(), "name") == 0)  object.name = attribute->value();
+				if (strcmp(attribute->name(), "class") == 0) object.type = attribute->value();
 			}
 
 			if (const auto propertiesNode = objectNode->first_node("properties"); propertiesNode != nullptr)
@@ -242,15 +228,15 @@ bool TileMap::loadObjects(const void* rootNode) noexcept
 
 					for (auto attribute = propertyNode->first_attribute(); attribute != nullptr; attribute = attribute->next_attribute())
 					{
-						if (strcmp(attribute->name(), "name") == 0) { write_object_data(property.name,  attribute->value()); continue; }
-						if (strcmp(attribute->name(), "type") == 0) { write_object_data(property.type,  attribute->value()); continue; }
-						if (strcmp(attribute->name(), "value") == 0)  write_object_data(property.value, attribute->value());
+						if (strcmp(attribute->name(), "name") == 0) { property.name  = attribute->value(); continue; }
+						if (strcmp(attribute->name(), "type") == 0) { property.type  = attribute->value(); continue; }
+						if (strcmp(attribute->name(), "value") == 0)  property.value = attribute->value();
 					}
 				}
 			}
 		}
 	}
-	
+
 	return ( ! m_objects.empty() );
 }
 
@@ -259,8 +245,8 @@ void TileMap::loadLandscape(const Tileset& tileset, std::span<const int> tileIds
 {
 	vec2s ratio;
 	{
-		int textureWidth  = tileset.columns * m_tileSize.x;
-		int textureHeight = tileset.rows * m_tileSize.y;
+		const int textureWidth  = tileset.columns * m_tileSize.x;
+		const int textureHeight = tileset.rows * m_tileSize.y;
 		ratio.x = 1.f / textureWidth;
 		ratio.y = 1.f / textureHeight;
 	}
@@ -307,6 +293,119 @@ void TileMap::loadLandscape(const Tileset& tileset, std::span<const int> tileIds
 			m_indices.push_back(index);
 			m_indices.push_back(index + 2);
 			m_indices.push_back(index + 3);
+		}
+	}
+}
+
+
+void TileMap::loadStructures(const Tileset& tileset, std::span<const int> tileIds) noexcept
+{
+//  TODO: offset to first tile (tileset.firstGID - tileNum etc ...)
+	auto get_structure_type = [](int tileNum) -> StructureType
+	{
+		switch (tileNum) // start num of tile in grid
+		{
+			case 111:
+			case 112:
+			case 113:
+			case 114:
+			case 115:
+			case 116:
+			case 117:
+			case 118:
+			case 119:
+			case 120:
+			case 121:
+			case 122: return StructureType::WALL;
+			case 124: return StructureType::REFINERY;
+			case 127: return StructureType::CONSTRUCTION_YARD;
+			case 129: return StructureType::WIND_TRAP;
+			case 131: return StructureType::OUTPOST;
+			case 133: return StructureType::SILO;
+			case 135: return StructureType::VEHICLE;
+			case 159: return StructureType::BARRACKS;
+			case 161: return StructureType::PALACE;
+			case 164: return StructureType::HIGH_TECH;
+			case 166: return StructureType::REPAIR;
+			case 191: return StructureType::SLAB_1x1;
+			case 207: return StructureType::STARPORT;
+			case 261: return StructureType::TURRET;
+			case 269: return StructureType::ROCKET_TURRET;
+		
+			default: return StructureType::INVALID;
+		}
+	};
+
+	auto get_structure_name = [](StructureType type) -> std::string_view
+	{
+		switch (type)
+		{
+			case StructureType::WALL:              return "Wall";
+			case StructureType::REFINERY:          return "Refinery";
+			case StructureType::CONSTRUCTION_YARD: return "ConstructYard";
+			case StructureType::WIND_TRAP:         return "WindTrap";
+			case StructureType::OUTPOST:           return "Outpost";
+			case StructureType::SILO:              return "Silo";
+			case StructureType::VEHICLE:           return "Vehicle";
+			case StructureType::BARRACKS:          return "Barracks";
+			case StructureType::PALACE:            return "Palace";
+			case StructureType::HIGH_TECH:         return "HighTech";
+			case StructureType::REPAIR:            return "Repair";
+			case StructureType::SLAB_1x1:          return "Slab_1x1";
+			case StructureType::STARPORT:          return "Starport";
+			case StructureType::TURRET:            return "Turret";
+			case StructureType::ROCKET_TURRET:     return "RocketTurret";
+		
+			default:
+				return {};
+		}
+	};
+
+	auto get_structure_bounds = [](StructureType type, int x, int y) -> ivec4s
+	{
+		switch (type)
+		{
+            case StructureType::SLAB_1x1:          return { x, y, 1, 1 };
+			case StructureType::PALACE:            return { x, y, 3, 3 };
+			case StructureType::VEHICLE:           return { x, y, 3, 2 };
+			case StructureType::HIGH_TECH:         return { x, y, 2, 2 };
+            case StructureType::CONSTRUCTION_YARD: return { x, y, 2, 2 };
+			case StructureType::WIND_TRAP:         return { x, y, 2, 2 };
+            case StructureType::BARRACKS:          return { x, y, 2, 2 };
+			case StructureType::STARPORT:          return { x, y, 3, 3 };
+			case StructureType::REFINERY:          return { x, y, 3, 2 };
+			case StructureType::REPAIR:            return { x, y, 3, 2 };
+            case StructureType::WALL:              return { x, y, 1, 1 };
+            case StructureType::TURRET:            return { x, y, 1, 1 };
+            case StructureType::ROCKET_TURRET:     return { x, y, 1, 1 };
+            case StructureType::SILO:              return { x, y, 2, 2 };
+            case StructureType::OUTPOST:           return { x, y, 2, 2 };
+
+            default: return { 0, 0, 0, 0 };
+		}
+	};
+
+	const int width  = m_mapSize.x;
+	const int height = m_mapSize.y;
+
+	for (int y = 0; y < height; ++y)
+	{
+		for (int x = 0; x < width; ++x)
+		{
+			const size_t index = y * width + x;
+			const int tileID = tileIds[index];
+
+			if (!tileID)
+				continue;
+			
+			if(const auto type = get_structure_type(tileID); type != StructureType::INVALID)
+			{
+				auto& object = m_objects.emplace_back();
+
+				object.name = "Structure";
+				object.type = get_structure_name(type);
+				object.bounds = get_structure_bounds(type, x, y);
+			}
 		}
 	}
 }
