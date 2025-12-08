@@ -168,7 +168,7 @@ void TitleScreen::update(float dt) noexcept
         m_isMouseButtonPressed = false;
 
         if(m_playButton->isSelected())
-            m_game->switchScene(this, Scene::CHOOSE_DESTINY);
+            m_game->switchScene(this, Scene::PICK_HOUSE);
     }
     else
     {

@@ -16,7 +16,7 @@ public:
     {
         NONE = 0,
         MAIN_MENU,
-        CHOOSE_DESTINY,
+        PICK_HOUSE,
         MISSION
     };
 

@@ -365,21 +365,21 @@ void TileMap::loadStructures(const Tileset& tileset, std::span<const int> tileId
 	{
 		switch (type)
 		{
-            case StructureType::SLAB_1x1:          return { x, y, 1, 1 };
-			case StructureType::PALACE:            return { x, y, 3, 3 };
-			case StructureType::VEHICLE:           return { x, y, 3, 2 };
-			case StructureType::HIGH_TECH:         return { x, y, 2, 2 };
-            case StructureType::CONSTRUCTION_YARD: return { x, y, 2, 2 };
-			case StructureType::WIND_TRAP:         return { x, y, 2, 2 };
-            case StructureType::BARRACKS:          return { x, y, 2, 2 };
-			case StructureType::STARPORT:          return { x, y, 3, 3 };
-			case StructureType::REFINERY:          return { x, y, 3, 2 };
-			case StructureType::REPAIR:            return { x, y, 3, 2 };
-            case StructureType::WALL:              return { x, y, 1, 1 };
-            case StructureType::TURRET:            return { x, y, 1, 1 };
-            case StructureType::ROCKET_TURRET:     return { x, y, 1, 1 };
-            case StructureType::SILO:              return { x, y, 2, 2 };
-            case StructureType::OUTPOST:           return { x, y, 2, 2 };
+            case StructureType::SLAB_1x1:          return { x, y, x + 1, y + 1 };
+			case StructureType::PALACE:            return { x, y, x + 3, y + 3 };
+			case StructureType::VEHICLE:           return { x, y, x + 3, y + 2 };
+			case StructureType::HIGH_TECH:         return { x, y, x + 2, y + 2 };
+            case StructureType::CONSTRUCTION_YARD: return { x, y, x + 2, y + 2 };
+			case StructureType::WIND_TRAP:         return { x, y, x + 2, y + 2 };
+            case StructureType::BARRACKS:          return { x, y, x + 2, y + 2 };
+			case StructureType::STARPORT:          return { x, y, x + 3, y + 3 };
+			case StructureType::REFINERY:          return { x, y, x + 3, y + 2 };
+			case StructureType::REPAIR:            return { x, y, x + 3, y + 2 };
+            case StructureType::WALL:              return { x, y, x + 1, y + 1 };
+            case StructureType::TURRET:            return { x, y, x + 1, y + 1 };
+            case StructureType::ROCKET_TURRET:     return { x, y, x + 1, y + 1 };
+            case StructureType::SILO:              return { x, y, x + 2, y + 2 };
+            case StructureType::OUTPOST:           return { x, y, x + 2, y + 2 };
 
             default: return { 0, 0, 0, 0 };
 		}
@@ -402,8 +402,8 @@ void TileMap::loadStructures(const Tileset& tileset, std::span<const int> tileId
 			{
 				auto& object = m_objects.emplace_back();
 
-				object.name = "Structure";
-				object.type = get_structure_name(type);
+				object.name = get_structure_name(type); 
+				object.type = "Structure";
 				object.bounds = get_structure_bounds(type, x, y);
 			}
 		}

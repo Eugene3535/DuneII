@@ -1,5 +1,5 @@
-#ifndef DESTINY_HPP
-#define DESTINY_HPP
+#ifndef PICK_HOUSE_HPP
+#define PICK_HOUSE_HPP
 
 #include <memory>
 
@@ -10,12 +10,12 @@
 #include "game/scenes/Scene.hpp"
 
 
-class Destiny:
+class PickHouse:
     public Scene
 {
 public:
-    explicit Destiny(class DuneII* game) noexcept;
-    ~Destiny();
+    explicit PickHouse(class DuneII* game) noexcept;
+    ~PickHouse();
 
     bool load(std::string_view info)   noexcept override;
     void update(float dt)              noexcept override;
@@ -45,4 +45,4 @@ private:
     bool m_outlineNeedUpdate;
 };
 
-#endif // !DESTINY_HPP
+#endif // !PICK_HOUSE_HPP

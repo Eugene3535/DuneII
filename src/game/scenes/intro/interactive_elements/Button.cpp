@@ -32,7 +32,7 @@ void Button::update(vec2 mousePosition, bool isClicked) noexcept
         vec2 position, scale;  
         getPosition(position);
         getScale(scale);
-        vec2 size = { static_cast<float>(m_sprite.width) * scale[0], static_cast<float>(m_sprite.height) * scale[1] };
+        const vec2 size = { static_cast<float>(m_sprite.width) * scale[0], static_cast<float>(m_sprite.height) * scale[1] };
 
         position[0] -= size[0] * 0.5f;
         position[1] -= size[1] * 0.5f;

@@ -6,7 +6,7 @@
 #include "resources/files/Shader.hpp"
 #include "resources/gl_interfaces/texture/Texture.hpp"
 #include "game/DuneII.hpp"
-#include "game/scenes/choosing_houses/Destiny.hpp"
+#include "game/scenes/pick_house/PickHouse.hpp"
 
 
 #define ATREIDES_OUTLINE_POSITION_X 32.f
@@ -19,7 +19,7 @@
 #define SWITCH_HOUSE_OUTLINE_DELAY 0.3f
 
 
-Destiny::Destiny(DuneII* game) noexcept:
+PickHouse::PickHouse(DuneII* game) noexcept:
     Scene(game),
     m_vbo(0),
     m_vao(0),
@@ -34,7 +34,7 @@ Destiny::Destiny(DuneII* game) noexcept:
 }
 
 
-Destiny::~Destiny()
+PickHouse::~PickHouse()
 {
     glDeleteBuffers(1, &m_vbo);
     glDeleteVertexArrays(1, &m_vao);
@@ -42,7 +42,7 @@ Destiny::~Destiny()
 }
 
 
-bool Destiny::load(std::string_view info) noexcept
+bool PickHouse::load(std::string_view info) noexcept
 {
     if(m_isLoaded)
         return true;
@@ -117,7 +117,7 @@ bool Destiny::load(std::string_view info) noexcept
 }
 
 
-void Destiny::update(float dt) noexcept
+void PickHouse::update(float dt) noexcept
 {
     m_timer += dt;
 
@@ -154,7 +154,7 @@ void Destiny::update(float dt) noexcept
 }
 
 
-void Destiny::draw() noexcept
+void PickHouse::draw() noexcept
 {
     if(!m_isLoaded)
         return;
@@ -188,7 +188,7 @@ void Destiny::draw() noexcept
 }
 
 
-void Destiny::resize(int width, int height) noexcept
+void PickHouse::resize(int width, int height) noexcept
 {
     vec2 size = { static_cast<float>(width), static_cast<float>(height) };
     setSpriteSizeInPixels(m_background, size, m_backgroundTransform);
@@ -220,7 +220,7 @@ void Destiny::resize(int width, int height) noexcept
 }
 
 
-void Destiny::press(int key) noexcept
+void PickHouse::press(int key) noexcept
 {
     if(m_timer > SWITCH_HOUSE_OUTLINE_DELAY)
     {

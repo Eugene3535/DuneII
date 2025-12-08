@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 
 #include "game/scenes/intro/TitleScreen.hpp"
-#include "game/scenes/choosing_houses/Destiny.hpp"
+#include "game/scenes/pick_house/PickHouse.hpp"
 #include "game/scenes/mission/Mission.hpp"
 #include "game/DuneII.hpp"
 
@@ -57,10 +57,10 @@ void DuneII::update(float dt) noexcept
             }
             break;
 
-            case Scene::Type::CHOOSE_DESTINY:
+            case Scene::Type::PICK_HOUSE:
             {
-                if (auto destinyScene = load<Destiny>({}))
-                    m_currentScene = destinyScene;
+                if (auto pickHouseScene = load<PickHouse>({}))
+                    m_currentScene = pickHouseScene;
             }
             break;
 
@@ -140,16 +140,16 @@ void DuneII::switchScene(const Scene* requester, Scene::Type nextScene) noexcept
             m_isSceneNeedToBeChanged = true;
         break;
 
-        case Scene::Type::CHOOSE_DESTINY:
+        case Scene::Type::PICK_HOUSE:
             if(dynamic_cast<const TitleScreen*>(requester) != nullptr)
             {
                 m_isSceneNeedToBeChanged = true;
-                m_nextSceneType = Scene::Type::CHOOSE_DESTINY;
+                m_nextSceneType = Scene::Type::PICK_HOUSE;
             }
         break;
 
         case Scene::Type::MISSION:
-            if(dynamic_cast<const Destiny*>(requester) != nullptr)
+            if(dynamic_cast<const PickHouse*>(requester) != nullptr)
             {
                 m_isSceneNeedToBeChanged = true;
                 m_nextSceneType = Scene::Type::MISSION;
