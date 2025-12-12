@@ -32,6 +32,7 @@ add_executable(${PROJECT_NAME} ${DUNEII_ALL_FILES})
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/glfw glfw)
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/glad/core glad)
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/cglm cglm)
+add_subdirectory(${EXTERNAL_SOURCE_DIR}/entt entt)
 
 target_sources(${PROJECT_NAME} PRIVATE ${SHADER_FILES})
 
@@ -45,6 +46,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	glfw
 	glad
 	cglm
+	EnTT::EnTT
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG> CGLM_USE_ANONYMOUS_STRUCT)

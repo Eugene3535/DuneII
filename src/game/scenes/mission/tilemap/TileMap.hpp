@@ -47,8 +47,8 @@ public:
 private:
     bool loadLayers(const void* rootNode) noexcept;
     bool loadObjects(const void* rootNode) noexcept;
-	void loadLandscape(const struct Tileset& tileset, std::span<const int> tileIds) noexcept;
-	void loadStructures(const struct Tileset& tileset, std::span<const int> tileIds) noexcept;
+	void loadLandscape(const struct Tileset& tileset, std::span<const int32_t> tileIds) noexcept;
+	void loadStructures(const struct Tileset& tileset, std::span<const int32_t> tileIds) noexcept;
 
 	std::string m_title;
 

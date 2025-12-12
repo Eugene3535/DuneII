@@ -48,7 +48,7 @@ bool Mission::load(std::string_view info) noexcept
         if(!shaders[1].loadFromFile(provider.findPathToFile("tilemap.frag"), GL_FRAGMENT_SHADER))
             return false;
 
-        if( ! m_landscape.shaderProgram.link(shaders) )
+        if( ! m_landscape.program.link(shaders) )
             return false;
     }
 
@@ -93,7 +93,7 @@ void Mission::update(float dt) noexcept
     auto& camera = m_game->camera;
     camera.getModelViewProjectionMatrix(MVP);
 
-    m_landscape.transform.calculate(modelView);
+    transform.calculate(modelView);
     glmc_mat4_mul(MVP, modelView, result);
     m_game->updateUniformBuffer(result);
 
@@ -107,13 +107,13 @@ void Mission::update(float dt) noexcept
 
 void Mission::draw() noexcept
 {
-    m_landscape.shaderProgram(true);
+    m_landscape.program(true);
     glBindTextureUnit(0, m_landscape.texture);
     glBindVertexArray(m_landscape.vao);
     glDrawElements(GL_TRIANGLES, m_landscape.count, GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
     glBindTextureUnit(0, 0);
-    m_landscape.shaderProgram(false);
+    m_landscape.program(false);
 }
 
 
@@ -139,7 +139,7 @@ void Mission::press(int key) noexcept
     if(key == GLFW_KEY_S)
         movement[1] = -10.f;
 
-    m_landscape.transform.move(movement);
+    transform.move(movement);
 }
 
 

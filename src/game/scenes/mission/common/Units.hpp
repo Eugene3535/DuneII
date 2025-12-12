@@ -1,0 +1,37 @@
+#ifndef UNITS_HPP
+#define UNITS_HPP
+
+
+enum class UnitType : int
+{
+    CARRYALL = 0,
+    ORNITHOPTER,
+    INFANTRY,
+    TROOPERS,
+    SOLDIER,
+    TROOPER,
+    SABOTEUR,
+    LAUNCHER,
+    DEVIATOR,
+    TANK,
+    SIEGE_TANK,
+    DEVASTATOR,
+    SONIC_TANK,
+    TRIKE,
+    RAIDER_TRIKE,
+    QUAD,
+    HARVESTER,
+    MCV,
+    MISSILE_HOUSE,
+    MISSILE_ROCKET,
+    MISSILE_TURRET,
+    MISSILE_DEVIATOR,
+    MISSILE_TROOPER,
+    BULLET,
+    SONIC_BLAST,
+    SANDWORM,
+    MAX,
+    INVALID = 0xFF
+};
+
+#endif // !UNITS_HPP

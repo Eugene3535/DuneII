@@ -5,7 +5,7 @@
 #include "RapidXML/rapidxml.hpp"
 #include "RapidXML/rapidxml_utils.hpp"
 
-#include "common/Enums.hpp"
+#include "game/scenes/mission/common/Structures.hpp"
 #include "game/scenes/mission/tilemap/TileMap.hpp"
 
 
@@ -18,7 +18,7 @@ struct Tileset
 };
 
 
-static char convert_tile_num_to_char(int index) noexcept;
+static char convert_tile_num_to_char(int32_t index) noexcept;
 
 TileMap::TileMap() noexcept:
 	m_mapSize(glms_ivec2_zero()),
@@ -257,38 +257,38 @@ bool TileMap::loadObjects(const void* rootNode) noexcept
 }
 
 
-void TileMap::loadLandscape(const Tileset& tileset, std::span<const int> tileIds) noexcept
+void TileMap::loadLandscape(const Tileset& tileset, std::span<const int32_t> tileIds) noexcept
 {
 	vec2s ratio;
 	{
-		const int textureWidth  = tileset.columns * m_tileSize.x;
-		const int textureHeight = tileset.rows * m_tileSize.y;
+		const int32_t textureWidth  = tileset.columns * m_tileSize.x;
+		const int32_t textureHeight = tileset.rows * m_tileSize.y;
 		ratio.x = 1.f / textureWidth;
 		ratio.y = 1.f / textureHeight;
 	}
 
-	const int mapWidth   = m_mapSize.x;
-	const int mapHeight  = m_mapSize.y;
-	const int tileWidth  = m_tileSize.x;
-	const int tileHeight = m_tileSize.x;
+	const int32_t mapWidth   = m_mapSize.x;
+	const int32_t mapHeight  = m_mapSize.y;
+	const int32_t tileWidth  = m_tileSize.x;
+	const int32_t tileHeight = m_tileSize.x;
 
 	size_t tileIndex = 0;
 
-	for (int y = 0; y < mapHeight; ++y)
+	for (int32_t y = 0; y < mapHeight; ++y)
 	{
-		for (int x = 0; x < mapWidth; ++x)
+		for (int32_t x = 0; x < mapWidth; ++x)
 		{
-			const int tileID = tileIds[y * mapWidth + x];
-			const int tileNum = tileID - tileset.firstGID;
+			const int32_t tileID = tileIds[y * mapWidth + x];
+			const int32_t tileNum = tileID - tileset.firstGID;
 
 			m_tileMask[tileIndex] = convert_tile_num_to_char(tileID);
 			++tileIndex;
 
-			const int tileY = (tileNum >= tileset.columns) ? tileNum / tileset.columns : 0;
-			const int tileX = tileNum % tileset.columns;
+			const int32_t tileY = (tileNum >= tileset.columns) ? tileNum / tileset.columns : 0;
+			const int32_t tileX = tileNum % tileset.columns;
 
-			const int positionX = tileX * tileWidth;
-			const int positionY = tileY * tileHeight;
+			const int32_t positionX = tileX * tileWidth;
+			const int32_t positionY = tileY * tileHeight;
 //  Texture coords
 			const float left   = positionX * ratio.x;
 			const float top    = positionY * ratio.y;
@@ -322,7 +322,7 @@ void TileMap::loadLandscape(const Tileset& tileset, std::span<const int> tileIds
 void TileMap::loadStructures(const Tileset& tileset, std::span<const int> tileIds) noexcept
 {
 //  TODO: offset to first tile (tileset.firstGID - tileNum etc ...)
-	auto get_structure_type = [](int tileNum) -> StructureType
+	auto get_structure_type = [](int tileNum) -> Structure::Type
 	{
 		switch (tileNum) // start num of tile in grid
 		{
@@ -337,89 +337,89 @@ void TileMap::loadStructures(const Tileset& tileset, std::span<const int> tileId
 			case 119:
 			case 120:
 			case 121:
-			case 122: return StructureType::WALL;
-			case 124: return StructureType::REFINERY;
-			case 127: return StructureType::CONSTRUCTION_YARD;
-			case 129: return StructureType::WIND_TRAP;
-			case 131: return StructureType::OUTPOST;
-			case 133: return StructureType::SILO;
-			case 135: return StructureType::VEHICLE;
-			case 159: return StructureType::BARRACKS;
-			case 161: return StructureType::PALACE;
-			case 164: return StructureType::HIGH_TECH;
-			case 166: return StructureType::REPAIR;
-			case 191: return StructureType::SLAB_1x1;
-			case 207: return StructureType::STARPORT;
-			case 261: return StructureType::TURRET;
-			case 269: return StructureType::ROCKET_TURRET;
+			case 122: return Structure::Type::WALL;
+			case 124: return Structure::Type::REFINERY;
+			case 127: return Structure::Type::CONSTRUCTION_YARD;
+			case 129: return Structure::Type::WIND_TRAP;
+			case 131: return Structure::Type::OUTPOST;
+			case 133: return Structure::Type::SILO;
+			case 135: return Structure::Type::VEHICLE;
+			case 159: return Structure::Type::BARRACKS;
+			case 161: return Structure::Type::PALACE;
+			case 164: return Structure::Type::HIGH_TECH;
+			case 166: return Structure::Type::REPAIR;
+			case 191: return Structure::Type::SLAB_1x1;
+			case 207: return Structure::Type::STARPORT;
+			case 261: return Structure::Type::TURRET;
+			case 269: return Structure::Type::ROCKET_TURRET;
 		
-			default: return StructureType::INVALID;
+			default: return Structure::Type::INVALID;
 		}
 	};
 
-	auto get_structure_name = [](StructureType type) -> std::string_view
+	auto get_structure_name = [](Structure::Type type) -> std::string_view
 	{
 		switch (type)
 		{
-			case StructureType::WALL:              return "Wall";
-			case StructureType::REFINERY:          return "Refinery";
-			case StructureType::CONSTRUCTION_YARD: return "ConstructYard";
-			case StructureType::WIND_TRAP:         return "WindTrap";
-			case StructureType::OUTPOST:           return "Outpost";
-			case StructureType::SILO:              return "Silo";
-			case StructureType::VEHICLE:           return "Vehicle";
-			case StructureType::BARRACKS:          return "Barracks";
-			case StructureType::PALACE:            return "Palace";
-			case StructureType::HIGH_TECH:         return "HighTech";
-			case StructureType::REPAIR:            return "Repair";
-			case StructureType::SLAB_1x1:          return "Slab_1x1";
-			case StructureType::STARPORT:          return "Starport";
-			case StructureType::TURRET:            return "Turret";
-			case StructureType::ROCKET_TURRET:     return "RocketTurret";
+			case Structure::Type::WALL:              return "Wall";
+			case Structure::Type::REFINERY:          return "Refinery";
+			case Structure::Type::CONSTRUCTION_YARD: return "ConstructYard";
+			case Structure::Type::WIND_TRAP:         return "WindTrap";
+			case Structure::Type::OUTPOST:           return "Outpost";
+			case Structure::Type::SILO:              return "Silo";
+			case Structure::Type::VEHICLE:           return "Vehicle";
+			case Structure::Type::BARRACKS:          return "Barracks";
+			case Structure::Type::PALACE:            return "Palace";
+			case Structure::Type::HIGH_TECH:         return "HighTech";
+			case Structure::Type::REPAIR:            return "Repair";
+			case Structure::Type::SLAB_1x1:          return "Slab_1x1";
+			case Structure::Type::STARPORT:          return "Starport";
+			case Structure::Type::TURRET:            return "Turret";
+			case Structure::Type::ROCKET_TURRET:     return "RocketTurret";
 		
 			default:
 				return {};
 		}
 	};
 
-	auto get_structure_bounds = [](StructureType type, int x, int y) -> ivec4s
+	auto get_structure_bounds = [](Structure::Type type, int32_t x, int32_t y) -> ivec4s
 	{
 		switch (type)
 		{
-            case StructureType::SLAB_1x1:          return { x, y, x + 1, y + 1 };
-			case StructureType::PALACE:            return { x, y, x + 3, y + 3 };
-			case StructureType::VEHICLE:           return { x, y, x + 3, y + 2 };
-			case StructureType::HIGH_TECH:         return { x, y, x + 2, y + 2 };
-            case StructureType::CONSTRUCTION_YARD: return { x, y, x + 2, y + 2 };
-			case StructureType::WIND_TRAP:         return { x, y, x + 2, y + 2 };
-            case StructureType::BARRACKS:          return { x, y, x + 2, y + 2 };
-			case StructureType::STARPORT:          return { x, y, x + 3, y + 3 };
-			case StructureType::REFINERY:          return { x, y, x + 3, y + 2 };
-			case StructureType::REPAIR:            return { x, y, x + 3, y + 2 };
-            case StructureType::WALL:              return { x, y, x + 1, y + 1 };
-            case StructureType::TURRET:            return { x, y, x + 1, y + 1 };
-            case StructureType::ROCKET_TURRET:     return { x, y, x + 1, y + 1 };
-            case StructureType::SILO:              return { x, y, x + 2, y + 2 };
-            case StructureType::OUTPOST:           return { x, y, x + 2, y + 2 };
+            case Structure::Type::SLAB_1x1:          return { x, y, x + 1, y + 1 };
+			case Structure::Type::PALACE:            return { x, y, x + 3, y + 3 };
+			case Structure::Type::VEHICLE:           return { x, y, x + 3, y + 2 };
+			case Structure::Type::HIGH_TECH:         return { x, y, x + 2, y + 2 };
+            case Structure::Type::CONSTRUCTION_YARD: return { x, y, x + 2, y + 2 };
+			case Structure::Type::WIND_TRAP:         return { x, y, x + 2, y + 2 };
+            case Structure::Type::BARRACKS:          return { x, y, x + 2, y + 2 };
+			case Structure::Type::STARPORT:          return { x, y, x + 3, y + 3 };
+			case Structure::Type::REFINERY:          return { x, y, x + 3, y + 2 };
+			case Structure::Type::REPAIR:            return { x, y, x + 3, y + 2 };
+            case Structure::Type::WALL:              return { x, y, x + 1, y + 1 };
+            case Structure::Type::TURRET:            return { x, y, x + 1, y + 1 };
+            case Structure::Type::ROCKET_TURRET:     return { x, y, x + 1, y + 1 };
+            case Structure::Type::SILO:              return { x, y, x + 2, y + 2 };
+            case Structure::Type::OUTPOST:           return { x, y, x + 2, y + 2 };
 
             default: return { 0, 0, 0, 0 };
 		}
 	};
 
-	const int width  = m_mapSize.x;
-	const int height = m_mapSize.y;
+	const int32_t width  = m_mapSize.x;
+	const int32_t height = m_mapSize.y;
 
-	for (int y = 0; y < height; ++y)
+	for (int32_t y = 0; y < height; ++y)
 	{
-		for (int x = 0; x < width; ++x)
+		for (int32_t x = 0; x < width; ++x)
 		{
 			const size_t index = y * width + x;
-			const int tileID = tileIds[index];
+			const int32_t tileID = tileIds[index];
 
 			if (!tileID)
 				continue;
 			
-			if(const auto type = get_structure_type(tileID); type != StructureType::INVALID)
+			if(const auto type = get_structure_type(tileID); type != Structure::Type::INVALID)
 			{
 				auto& object = m_objects.emplace_back();
 
@@ -432,7 +432,7 @@ void TileMap::loadStructures(const Tileset& tileset, std::span<const int> tileId
 }
 
 
-char convert_tile_num_to_char(int index) noexcept
+char convert_tile_num_to_char(int32_t index) noexcept
 {
 #if defined(__GNUC__) || defined(__MINGW32__)
 

@@ -192,18 +192,17 @@ Sprite SpriteManager::getSprite(const std::string& name) const noexcept
 }
 
 
-std::span<const Sprite> SpriteManager::getSprites(const std::string& name) const noexcept
+std::vector<Sprite> SpriteManager::getAnimation(const std::string& name) const noexcept
 {
 	if(auto it = m_animations.find(name); it != m_animations.end())
 	{
-		const auto sprites = m_sprites.data();
-		size_t startFrame = static_cast<size_t>(it->second.first);
-		size_t duration = static_cast<size_t>(it->second.second);
+		const size_t startFrame = static_cast<size_t>(it->second.first);
+		const size_t duration = static_cast<size_t>(it->second.second);
 
-		return std::span<const Sprite>(sprites + startFrame, duration);
+		return { m_sprites.begin() + startFrame, m_sprites.begin() + duration };
 	}
 
-	return std::span<const Sprite>();
+	return {};
 }
 
 

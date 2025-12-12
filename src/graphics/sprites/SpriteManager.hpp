@@ -30,7 +30,7 @@ public:
 	void loadSpriteSheet(const std::filesystem::path& filePath, const class Texture& texture) noexcept;
 
 	Sprite getSprite(const std::string& name) const noexcept;
-	std::span<const Sprite> getSprites(const std::string& name) const noexcept;
+	std::vector<Sprite> getAnimation(const std::string& name) const noexcept;
 
 	void bind(bool toBind) const noexcept;
 

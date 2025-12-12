@@ -30,8 +30,9 @@ set(SCENE_SRC_FILES
 	src/game/scenes/intro/interactive_elements/Button.cpp
 	src/game/scenes/intro/TitleScreen.cpp
 	src/game/scenes/pick_house/PickHouse.cpp
-	src/game/scenes/mission/Mission.cpp
+	src/game/scenes/mission/builder/Builder.cpp
 	src/game/scenes/mission/tilemap/TileMap.cpp
+	src/game/scenes/mission/Mission.cpp
 )
 
 set(SCENE_HDR_FILES
@@ -39,8 +40,11 @@ set(SCENE_HDR_FILES
 	src/game/scenes/intro/interactive_elements/Button.hpp
 	src/game/scenes/intro/TitleScreen.hpp
 	src/game/scenes/pick_house/PickHouse.hpp
-	src/game/scenes/mission/Mission.hpp
+	src/game/scenes/mission/common/Structures.hpp
+	src/game/scenes/mission/common/Units.hpp
+	src/game/scenes/mission/builder/Builder.hpp
 	src/game/scenes/mission/tilemap/TileMap.hpp
+	src/game/scenes/mission/Mission.hpp
 )
 
 
