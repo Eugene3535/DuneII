@@ -11,13 +11,10 @@ SpriteManager::SpriteManager() noexcept:
 	m_vbo(0),
 	m_vao(0)
 {
-	glGenBuffers(1, &m_vbo);
+	glCreateBuffers(1, &m_vbo);
+	glNamedBufferData(m_vbo, 0, nullptr, GL_STATIC_DRAW);
+
 	glGenVertexArrays(1, &m_vao);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
 	VertexArrayObject::createVertexInputState(m_vao, m_vbo, attributes);
 }
@@ -178,17 +175,17 @@ void SpriteManager::loadSpriteSheet(const std::filesystem::path& filePath, const
 }
 
 
-Sprite SpriteManager::getSprite(const std::string& name) const noexcept
+std::optional<Sprite> SpriteManager::getSprite(const std::string& name) const noexcept
 {
 	if(auto it = m_animations.find(name); it != m_animations.end())
 	{
 		const auto sprites = m_sprites.data();
 		const auto sprite = sprites + static_cast<ptrdiff_t>(it->second.first);
 
-		return *sprite;
+		return std::make_optional<Sprite>(*sprite);
 	}
 
-	return {};
+	return std::nullopt;
 }
 
 

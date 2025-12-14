@@ -93,7 +93,9 @@ bool PickHouse::load(std::string_view info) noexcept
 //  Sprites
     memset(&m_background, 0, sizeof(Sprite));
     m_sprites.createSprite("background", housesTexture);
-    m_background = m_sprites.getSprite("background");
+
+    if(auto bg = m_sprites.getSprite("background"); bg.has_value())
+        m_background = bg.value();
 
 //  Outline
     m_outline = std::make_unique<Outline>(m_vbo, m_vao);

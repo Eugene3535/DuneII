@@ -125,8 +125,12 @@ bool TitleScreen::load(std::string_view info) noexcept
     m_sprites.createSprite("exit", exitTexture);
     m_sprites.createSprite("settings", settingsTexture);
 
-    m_space = m_sprites.getSprite("space");
-    m_planet = m_sprites.getSprite("planet");
+    if(auto spaceSprite = m_sprites.getSprite("space"); spaceSprite.has_value())
+        m_space = spaceSprite.value();
+
+    if(auto planetSprite = m_sprites.getSprite("planet"); planetSprite.has_value())
+        m_planet = planetSprite.value();
+
     m_planetTransform.setOrigin(planetTexture.width * 0.5f, planetTexture.height * 0.5f);
 
 //  Buttons
@@ -139,13 +143,15 @@ bool TitleScreen::load(std::string_view info) noexcept
 
     for(const auto btn : { "play", "exit", "settings" })
     {
-        Sprite sprite = m_sprites.getSprite(btn);
-        Button* button = new(offset) Button(sprite, uniform);
-        offset += sizeof(Button);
+        if(auto sprite = m_sprites.getSprite(btn); sprite.has_value())
+        {
+            Button* button = new(offset) Button(sprite.value(), uniform);
+            offset += sizeof(Button);
 
-        if(strcmp(btn, "play") == 0)     m_playButton = button;
-        if(strcmp(btn, "exit") == 0)     m_exitButton = button;
-        if(strcmp(btn, "settings") == 0) m_settingsButton = button;
+            if(strcmp(btn, "play") == 0)     m_playButton = button;
+            if(strcmp(btn, "exit") == 0)     m_exitButton = button;
+            if(strcmp(btn, "settings") == 0) m_settingsButton = button;
+        }
     }
     
     m_isLoaded = true;

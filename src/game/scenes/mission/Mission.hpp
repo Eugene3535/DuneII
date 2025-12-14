@@ -1,10 +1,9 @@
 #ifndef MISSION_HPP
 #define MISSION_HPP
 
-#include <entt/entity/registry.hpp>
-
 #include "resources/gl_interfaces/shaders/ShaderProgram.hpp"
 #include "game/scenes/mission/tilemap/TileMap.hpp"
+#include "game/scenes/mission/builder/Builder.hpp"
 #include "game/scenes/Scene.hpp"
 
 
@@ -32,6 +31,7 @@ private:
 
     Transform2D transform;
     TileMap m_tilemap;
+    SpriteManager m_sprites;
     entt::registry m_registry;
     struct
     {

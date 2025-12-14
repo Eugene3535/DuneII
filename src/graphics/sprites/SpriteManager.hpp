@@ -6,6 +6,7 @@
 #include <span>
 #include <unordered_map>
 #include <filesystem>
+#include <optional>
 
 #include <cglm/struct/ivec4.h>
 
@@ -29,7 +30,7 @@ public:
 	
 	void loadSpriteSheet(const std::filesystem::path& filePath, const class Texture& texture) noexcept;
 
-	Sprite getSprite(const std::string& name) const noexcept;
+	std::optional<Sprite> getSprite(const std::string& name) const noexcept;
 	std::vector<Sprite> getAnimation(const std::string& name) const noexcept;
 
 	void bind(bool toBind) const noexcept;

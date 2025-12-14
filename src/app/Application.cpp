@@ -121,19 +121,57 @@ void Application::initCallbacks() noexcept
 	printf("Vendor: %s\n", glGetString(GL_VENDOR));
 	printf("Renderer: %s\n", glGetString(GL_RENDERER));
 
+	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
-	glDebugMessageCallback([](
-		GLenum source,
-		GLenum type,
-		GLuint id,
-		GLenum severity,
-		GLsizei length,
-		const GLchar* message,
-		const void* userParam)
+
+	glDebugMessageCallback([](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, GLchar const* message, void const* user_param)
+	{
+		auto source_str = [source]() -> const char*
 		{
-			fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n", (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
-		}, nullptr);
+			switch (source)
+			{
+				case GL_DEBUG_SOURCE_API:             return "API";
+				case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   return "WINDOW SYSTEM";
+				case GL_DEBUG_SOURCE_SHADER_COMPILER: return "SHADER COMPILER";
+				case GL_DEBUG_SOURCE_THIRD_PARTY:     return "THIRD PARTY";
+				case GL_DEBUG_SOURCE_APPLICATION:     return "APPLICATION";
+				case GL_DEBUG_SOURCE_OTHER:           return "OTHER";
+				
+				default: return "UNKNOWN";
+			}
+		}();
+
+		auto type_str = [type]() -> const char*
+		{
+			switch (type)
+			{
+				case GL_DEBUG_TYPE_ERROR:               return "ERROR";
+				case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: return "DEPRECATED_BEHAVIOR";
+				case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  return "UNDEFINED_BEHAVIOR";
+				case GL_DEBUG_TYPE_PORTABILITY:         return "PORTABILITY";
+				case GL_DEBUG_TYPE_PERFORMANCE:         return "PERFORMANCE";
+				case GL_DEBUG_TYPE_MARKER:              return "MARKER";
+				case GL_DEBUG_TYPE_OTHER:               return "OTHER";
+
+				default: return "UNKNOWN";
+			}
+		}();
+
+		auto severity_str = [severity]() -> const char*
+		{
+			switch (severity) 
+			{
+				case GL_DEBUG_SEVERITY_NOTIFICATION: return "NOTIFICATION";
+				case GL_DEBUG_SEVERITY_LOW:          return "LOW";
+				case GL_DEBUG_SEVERITY_MEDIUM:       return "MEDIUM";
+				case GL_DEBUG_SEVERITY_HIGH:         return "HIGH";
+
+				default: return "UNKNOWN";
+			}
+		}();
+
+		printf("%s, %s, %s, %u: %s\n", source_str, type_str, severity_str, id, message);
+	}, nullptr);
 #endif
 
 	glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int width, int height)
