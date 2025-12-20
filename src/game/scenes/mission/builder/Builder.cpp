@@ -236,8 +236,8 @@ bool Builder::putStructureOnMap(const Structure::Type type, const ivec2s cell) n
 		default: break;
 	}
 
-	//if(type == Structure::Type::WALL)
-	//	updateWall(origin, 2);
+	if(type == Structure::Type::WALL)
+		updateWall(origin, 2);
 
 	return true;
 }
@@ -300,27 +300,27 @@ void Builder::updateWall(int32_t origin, int32_t level) noexcept
 		if(m_mappedStorage)
 		{
 			const auto& building = m_registry.get<Structure>(entity);
-			char* ptr = static_cast<char*>(m_mappedStorage);
-			ptr += building.frame * 64; // TODO: fix magic num
-			float* vertices = reinterpret_cast<float*>(ptr);
 
-			vertices[2] = texCoords.x;
-			vertices[3] = texCoords.y;
+			float* bytes = static_cast<float*>(m_mappedStorage);
+			bytes += building.id * 16; // TODO: fix magic num
 
-			vertices[6] = texCoords.z; 
-			vertices[7] = texCoords.x;
+			bytes[2] = texCoords.x;
+			bytes[3] = texCoords.y;
 
-			vertices[10] = texCoords.z; 
-			vertices[11] = texCoords.w;
+			bytes[6] = texCoords.z;
+			bytes[7] = texCoords.y;
 
-			vertices[14] = texCoords.x; 
-			vertices[15] = texCoords.w;
+			bytes[10] = texCoords.z;
+			bytes[11] = texCoords.w;
+
+			bytes[14] = texCoords.x;
+			bytes[15] = texCoords.w;
+
+			if (a) updateWall(left, level - 1);
+			if (b) updateWall(top, level - 1);
+			if (c) updateWall(right, level - 1);
+			if (d) updateWall(bottom, level - 1);
 		}
-
-		if(a) updateWall(left, level - 1);
-		if(b) updateWall(top, level - 1);
-		if(c) updateWall(right, level - 1);
-		if(d) updateWall(bottom, level - 1);
 	}
 }
 
