@@ -44,7 +44,7 @@ void SpriteManager::createSprite(const std::string& name, const Texture& texture
 		const GLuint id = m_sprites.size();
 		m_animations.emplace(name, sprite_range(id, 1));
 
-		const vec2 ratio = { 1.f / texture.width, 1.f / texture.height };
+		const vec2s ratio = { 1.f / texture.width, 1.f / texture.height };
 		addSprite(texture.handle, frame, ratio);
 
 		pushVerticesOnGPU();
@@ -59,14 +59,14 @@ void SpriteManager::createLinearAnimaton(const std::string& name, const Texture&
 		const GLuint id = m_sprites.size();
 		m_animations.emplace(name, sprite_range(id, duration));
 
-		const ivec2 size  = { texture.width, texture.height };
-		const vec2 ratio = { 1.f / size[0], 1.f / size[1] };
+		const ivec2s size  = { texture.width, texture.height };
+		const vec2s ratio = { 1.f / size.x, 1.f / size.y };
 		const int frameWidth = texture.width / duration;
 		const GLuint handle = texture.handle;
 	
 		for (int i = 0; i < duration; ++i)
 		{
-			ivec4s frame = { i * frameWidth, 0, frameWidth, size[1] };
+			ivec4s frame = { i * frameWidth, 0, frameWidth, size.y };
 			addSprite(handle, frame, ratio);
 		}
 
@@ -83,11 +83,11 @@ void SpriteManager::createGridAnimaton(const std::string& name, const Texture& t
 		const GLuint duration = columns * rows;
 		m_animations.emplace(name, sprite_range(id, duration));
 
-		const ivec2 size  = { texture.width, texture.height };
-		const vec2 ratio = { 1.f / size[0], 1.f / size[1] };
+		const ivec2s size  = { texture.width, texture.height };
+		const vec2s ratio = { 1.f / size.x, 1.f / size.y };
 
-		const int32_t width  = size[0] / columns;
-		const int32_t height = size[1] / rows;
+		const int32_t width  = size.x / columns;
+		const int32_t height = size.y / rows;
 		const GLuint handle = texture.handle;
 	
 		for (int y = 0; y < rows; ++y)
@@ -109,7 +109,7 @@ void SpriteManager::createCustomAnimaton(const std::string& name, const class Te
 		const GLuint id = m_sprites.size();
 		m_animations.emplace(name, sprite_range(id, static_cast<GLuint>(frames.size())));
 
-		const vec2 ratio = { 1.f / texture.width, 1.f / texture.height };
+		const vec2s ratio = { 1.f / texture.width, 1.f / texture.height };
 		const GLuint handle = texture.handle;
 	
 		for (const auto& frame : frames)	
@@ -127,8 +127,8 @@ void SpriteManager::loadSpriteSheet(const std::filesystem::path& filePath, const
 	document->parse<0>(xmlFile.data());
 	const auto spriteNode = document->first_node("sprites");
 
-	const ivec2 size = { texture.width, texture.height };
-	const vec2 ratio = { 1.f / size[0], 1.f / size[1] };
+	const ivec2s size = { texture.width, texture.height };
+	const vec2s ratio = { 1.f / size.x, 1.f / size.y };
 	const GLuint handle = texture.handle;
 
 	for(auto animNode = spriteNode->first_node("animation");
@@ -209,7 +209,7 @@ void SpriteManager::bind(bool toBind) const noexcept
 }
 
 
-void SpriteManager::addSprite(const uint32_t texture, const ivec4s frame, const vec2 ratio) noexcept
+void SpriteManager::addSprite(const uint32_t texture, const ivec4s frame, const vec2s ratio) noexcept
 {
 	auto& sprite   = m_sprites.emplace_back();
 	sprite.frame   = m_vertices.size() >> 2;
@@ -224,10 +224,10 @@ void SpriteManager::addSprite(const uint32_t texture, const ivec4s frame, const 
 	quad[9]  = static_cast<float>(frame.w);
 	quad[13] = static_cast<float>(frame.w);
 
-	float left   = frame.x * ratio[0];
-	float top    = frame.y * ratio[1];
-	float right  = (frame.x + frame.z) * ratio[0];
-	float bottom = (frame.y + frame.w) * ratio[1];
+	float left   = frame.x * ratio.x;
+	float top    = frame.y * ratio.y;
+	float right  = (frame.x + frame.z) * ratio.x;
+	float bottom = (frame.y + frame.w) * ratio.y;
 
 	quad[2] = left;
 	quad[3] = top;

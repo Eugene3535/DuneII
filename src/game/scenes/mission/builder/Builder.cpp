@@ -118,7 +118,7 @@ bool Builder::loadFromTileMap(const TileMap& tilemap) noexcept
 
 	for(const auto& object : objects)
 	{
-		if(object.type == "Structure")
+		if (object.type == "Structure")
 		{
 			const auto type = get_structure_enum(object.name);
 			const ivec2s cell = { object.bounds.x, object.bounds.y };
@@ -138,8 +138,6 @@ bool Builder::putStructureOnMap(const Structure::Type type, const ivec2s cell) n
 	if(type >= Structure::Type::MAX)
         return false;
 
-	int32_t coordX = cell.x * m_tileSize.x;
-	int32_t coordY = cell.y * m_tileSize.y;
     auto bounds = get_bounds_of(type, cell, m_tileSize);
 
     {// out of bounds (in pixels) ?
@@ -198,9 +196,9 @@ bool Builder::putStructureOnMap(const Structure::Type type, const ivec2s cell) n
 	
 	auto& structure = m_registry.emplace<Structure>(entity);
 	structure.type = type;
-	createGraphicsForEntity(entity);
 	structure.armor = structure.maxArmor = get_armor_of(type);
-
+	createGraphicsForEntity(entity);
+	
 	auto setup_tiles_on_mask = [this, origin, entity](int32_t width, int32_t height, char symbol = 'B') -> void
 	{
 		int32_t offset = origin;
@@ -255,29 +253,25 @@ void Builder::createGraphicsForEntity(const entt::entity entity) noexcept
 {
 	if(m_mappedStorage)
 	{
+		const uint32_t id = m_registry.storage<Structure>().size() - 1;
+
 		auto& building = m_registry.get<Structure>(entity);
-		building.frame = m_registry.storage<Structure>().size() - 1;
+		building.id = id;
+		building.frame = (id << 2);
 
-		const auto& bounds = m_registry.get<ivec4s>(entity);
-		vec4s texCoords = get_texcoords_of_structure(building.type, m_textureSize.x, m_textureSize.y);
+		const auto bounds = m_registry.get<ivec4s>(entity);
+		const vec4s texCoords = get_texcoords_of_structure(building.type, m_textureSize.x, m_textureSize.y);
 
-		float vertices[] = 
+		const float vertices[] = 
 		{
-			(float)bounds.x, (float)bounds.y,
-			texCoords.x, texCoords.y,
-
-			(float)bounds.z, (float)bounds.y,
-			texCoords.z, texCoords.y,
-
-			(float)bounds.z, (float)bounds.w, 
-			texCoords.z, texCoords.w,
-
-			(float)bounds.x, (float)bounds.w,
-			texCoords.x, texCoords.w
+			static_cast<float>(bounds.x), static_cast<float>(bounds.y), texCoords.x, texCoords.y,
+			static_cast<float>(bounds.z), static_cast<float>(bounds.y), texCoords.z, texCoords.y,
+			static_cast<float>(bounds.z), static_cast<float>(bounds.w), texCoords.z, texCoords.w,
+			static_cast<float>(bounds.x), static_cast<float>(bounds.w), texCoords.x, texCoords.w
 		};
 
-		char* bytes = static_cast<char*>(m_mappedStorage);
-		bytes += building.frame * sizeof(vertices);
+		float* bytes = static_cast<float*>(m_mappedStorage);
+		bytes += id * std::size(vertices);
 		memcpy(bytes, vertices, sizeof(vertices));
 	}
 }
@@ -407,7 +401,7 @@ vec4s get_texcoords_of_structure(const Structure::Type type, float width, float 
 
 ivec4s get_bounds_of(const Structure::Type type, const ivec2s cell, const ivec2s tileSize) noexcept
 {
-	ivec2s offset = { cell.x * tileSize.x, cell.y * tileSize.y }; 
+	const ivec2s offset = { cell.x * tileSize.x, cell.y * tileSize.y }; 
 
 	switch (type)
 	{

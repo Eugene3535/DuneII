@@ -28,6 +28,7 @@ struct Structure
         INVALID = 0xFF
     };
 
+    uint32_t id;
     uint32_t frame;
     ivec2s texOffset;
 
