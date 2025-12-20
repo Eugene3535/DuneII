@@ -25,22 +25,28 @@ public:
 private:
     void createSystems() noexcept;
 
-    GLuint textures[1];
-    GLuint vbo[2];
-    GLuint vao[1];
-
-    Transform2D transform;
-    TileMap m_tilemap;
-    SpriteManager m_sprites;
+    Transform2D    m_transform;
+    TileMap        m_tilemap;
+    SpriteManager  m_sprites;
     entt::registry m_registry;
+    Builder        m_builder;
+    std::string    m_tileMask;
+    
     struct
     {
         GLuint texture;
         GLuint vao;
+        GLuint vbo[2];
         GLuint count; // indices
         ShaderProgram program;
     } m_landscape;
 
+    struct
+    {
+        GLuint texture;
+        GLuint vao;
+    } m_buildings;
+    
     std::vector<void(*)(Mission*, float)> m_systems;
 };
 

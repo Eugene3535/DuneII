@@ -86,8 +86,8 @@ void SpriteManager::createGridAnimaton(const std::string& name, const Texture& t
 		const ivec2 size  = { texture.width, texture.height };
 		const vec2 ratio = { 1.f / size[0], 1.f / size[1] };
 
-		const int32_t width  = size[0] / static_cast<float>(columns);
-		const int32_t height = size[1] / static_cast<float>(rows);
+		const int32_t width  = size[0] / columns;
+		const int32_t height = size[1] / rows;
 		const GLuint handle = texture.handle;
 	
 		for (int y = 0; y < rows; ++y)
@@ -209,7 +209,7 @@ void SpriteManager::bind(bool toBind) const noexcept
 }
 
 
-void SpriteManager::addSprite(uint32_t texture, const ivec4s& frame, const vec2 ratio) noexcept
+void SpriteManager::addSprite(const uint32_t texture, const ivec4s frame, const vec2 ratio) noexcept
 {
 	auto& sprite   = m_sprites.emplace_back();
 	sprite.frame   = m_vertices.size() >> 2;

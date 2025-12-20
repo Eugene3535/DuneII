@@ -4,7 +4,6 @@
 #include <unordered_map>
 
 #include <entt/entity/registry.hpp>
-#include <cglm/struct/ivec2.h>
 
 #include "graphics/sprites/SpriteManager.hpp"
 #include "game/scenes/mission/common/Structures.hpp"
@@ -24,26 +23,19 @@ public:
     uint32_t getVertexBuffer() const noexcept;
 
 private:
+    void createGraphicsForEntity(const entt::entity entity) noexcept;
+    void updateWall(int32_t origin, int32_t level) noexcept;
+
     entt::registry& m_registry;
     std::unordered_map<int32_t, entt::entity> m_structureMap;
-    uint32_t m_vertexBuffer;
 
-    struct
-    {
-        Animation refinery;
-        Animation starport;
-        Animation turret;
-        Animation rocketTurret;
-        Animation wall;
-        bool isLoaded;
-    } m_animations;
-    
+    uint32_t m_vertexBuffer;
+    void* m_mappedStorage;
 
     char* m_tileMask;
-    int32_t m_mapWidth;
-    int32_t m_mapHeight;
-    int32_t m_tileWidth;
-    int32_t m_tileHeight;
+    ivec2s m_textureSize;
+    ivec2s m_mapSize;
+    ivec2s m_tileSize;
 };
 
 #endif // !BUILDER_HPP

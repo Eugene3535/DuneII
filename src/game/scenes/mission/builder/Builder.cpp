@@ -1,12 +1,13 @@
 #include <glad/glad.h>
 #include <cglm/struct/ivec2.h>
-#include <cglm/struct/ivec4.h>
 
 #include "game/scenes/mission/tilemap/TileMap.hpp"
 #include "game/scenes/mission/builder/Builder.hpp"
 
 
-#define STRUCTURE_LIMIT_ON_MAP 256
+#define STRUCTURE_LIMIT_ON_MAP 512
+#define BUILDING_LIMIT_ON_MAP 128
+
 
 enum class WallCellType : uint32_t
 {
@@ -25,50 +26,107 @@ enum class WallCellType : uint32_t
 };
 
 
-static WallCellType compute_wall_type(bool left, bool top, bool right, bool bottom) noexcept;
-static ivec4s       get_texcoords_of_custom_wall(const WallCellType type)           noexcept;
-static ivec4s       get_texcoords_of_structure(const Structure::Type type)          noexcept;
-static ivec4s       get_bounds_of(const Structure::Type type, const ivec2s cell)    noexcept; // cell value must be presented in tiles, not pixels
-static int32_t      get_armor_of(const Structure::Type type)                        noexcept;
+static WallCellType compute_wall_type(bool left, bool top, bool right, bool bottom)                     noexcept;
+static vec4s        get_texcoords_of_custom_wall(const WallCellType type, ivec2s textureSize)           noexcept;
+static vec4s        get_texcoords_of_structure(const Structure::Type type, float width, float height)   noexcept;
+static ivec4s       get_bounds_of(const Structure::Type type, const ivec2s cell, const ivec2s tileSize) noexcept; // cell value must be presented in tiles, not pixels
+static int32_t      get_armor_of(const Structure::Type type)                                            noexcept;
 
 
 
 Builder::Builder(entt::registry& registry) noexcept:
     m_registry(registry),
 	m_vertexBuffer(0),
+	m_mappedStorage(nullptr),
     m_tileMask(nullptr),
-    m_mapWidth(0),
-    m_mapHeight(0),
-	m_tileWidth(0),
-    m_tileHeight(0)
+	m_textureSize(glms_ivec2_zero()),
+	m_mapSize(glms_ivec2_zero()),
+	m_tileSize(glms_ivec2_zero())
 {
-	m_animations.isLoaded = false;
-
 	glCreateBuffers(1, &m_vertexBuffer);
-	glNamedBufferData(m_vertexBuffer, STRUCTURE_LIMIT_ON_MAP * sizeof(float) * 16, nullptr, GL_DYNAMIC_DRAW);
+
+	glNamedBufferStorage(
+		m_vertexBuffer,
+		STRUCTURE_LIMIT_ON_MAP * sizeof(vec4s) * 4,
+		nullptr,
+		GL_DYNAMIC_STORAGE_BIT |
+		GL_MAP_WRITE_BIT | 
+		GL_MAP_PERSISTENT_BIT | 
+		GL_MAP_COHERENT_BIT
+	);
+
+	m_mappedStorage = glMapNamedBufferRange(
+		m_vertexBuffer,
+		0, 
+		STRUCTURE_LIMIT_ON_MAP * sizeof(vec4s) * 4,
+		GL_MAP_WRITE_BIT |
+		GL_MAP_PERSISTENT_BIT |
+		GL_MAP_COHERENT_BIT |
+		GL_MAP_UNSYNCHRONIZED_BIT
+	);
 }
 
 
 Builder::~Builder()
 {
-	glDeleteBuffers(1, &m_vertexBuffer);
+	if(m_mappedStorage)
+		glUnmapNamedBuffer(m_vertexBuffer);
+		
+    glDeleteBuffers(1, &m_vertexBuffer);
 }
 
 
-void Builder::reset(const IConstructionSite& site) noexcept
+void Builder::reset(const IConstructionSite& site) noexcept // TODO: move to constructor
 {
 	m_structureMap.clear();
+
+	m_textureSize = site.textureSize;
     m_tileMask  = site.tileMask;
-    m_mapWidth  = site.mapWidth;
-    m_mapHeight = site.mapHeight;
-	m_tileWidth  = site.tileWidth;
-    m_tileHeight = site.tileHeight;
 }
 
 
 bool Builder::loadFromTileMap(const TileMap& tilemap) noexcept
 {
-    return false;
+	m_mapSize = tilemap.getMapSize();
+	m_tileSize = tilemap.getTileSize();
+
+	auto get_structure_enum = [](const std::string& name) -> Structure::Type
+	{
+		if(name =="Wall")          return Structure::Type::WALL;
+		if(name =="Refinery")      return Structure::Type::REFINERY;
+		if(name =="ConstructYard") return Structure::Type::CONSTRUCTION_YARD ;
+		if(name =="WindTrap")      return Structure::Type::WIND_TRAP;
+		if(name =="Outpost")       return Structure::Type::OUTPOST;
+		if(name =="Silo")          return Structure::Type::SILO;
+		if(name =="Vehicle")       return Structure::Type::VEHICLE;
+		if(name =="Barracks")      return Structure::Type::BARRACKS;
+		if(name =="Palace")        return Structure::Type::PALACE;
+		if(name =="HighTech")      return Structure::Type::HIGH_TECH;
+		if(name =="Repair")        return Structure::Type::REPAIR;
+		if(name =="Slab_1x1")      return Structure::Type::SLAB_1x1;
+		if(name =="Starport")      return Structure::Type::STARPORT;
+		if(name =="Turret")        return Structure::Type::TURRET;
+		if(name =="RocketTurret")  return Structure::Type::ROCKET_TURRET;
+
+		return Structure::Type::INVALID;
+	};
+
+	auto objects = tilemap.getObjects();
+
+	if(objects.empty())
+		return false;
+
+	for(const auto& object : objects)
+	{
+		if(object.type == "Structure")
+		{
+			const auto type = get_structure_enum(object.name);
+			const ivec2s cell = { object.bounds.x, object.bounds.y };
+			putStructureOnMap(type, cell);
+		}
+	}
+
+    return true;
 }
 
 
@@ -80,13 +138,13 @@ bool Builder::putStructureOnMap(const Structure::Type type, const ivec2s cell) n
 	if(type >= Structure::Type::MAX)
         return false;
 
-	int32_t coordX = cell.x * m_tileWidth;
-	int32_t coordY = cell.y * m_tileHeight;
-    auto bounds = get_bounds_of(type, cell);
+	int32_t coordX = cell.x * m_tileSize.x;
+	int32_t coordY = cell.y * m_tileSize.y;
+    auto bounds = get_bounds_of(type, cell, m_tileSize);
 
     {// out of bounds (in pixels) ?
-        const int32_t mapWidth  = m_mapWidth * m_tileWidth;
-        const int32_t mapHeight = m_mapHeight * m_tileHeight;
+        const int32_t mapWidth  = m_mapSize.x * m_tileSize.x;
+        const int32_t mapHeight = m_mapSize.y * m_tileSize.y;
 
         if(bounds.x < 0)         return false;
         if(bounds.y < 0)         return false;
@@ -94,13 +152,13 @@ bool Builder::putStructureOnMap(const Structure::Type type, const ivec2s cell) n
         if(bounds.w > mapHeight) return false;
     }
 
-    const int32_t origin = cell.y * m_mapWidth + cell.x;
+    const int32_t origin = cell.y * m_mapSize.x + cell.x;
 
 	if(auto found = m_structureMap.find(origin); found != m_structureMap.end())
 		return false;
 
     {
-        ivec2s size;
+		ivec2s size = { 0, 0 };
 
         switch (type)
         {
@@ -131,60 +189,57 @@ bool Builder::putStructureOnMap(const Structure::Type type, const ivec2s cell) n
                 if(m_tileMask[offset + j] != 'R')
                     return false;
             
-            offset += m_mapWidth;
+            offset += m_mapSize.x;
         }
     }
 
 	const auto entity = m_registry.create();
 	m_registry.emplace<ivec4s>(entity, bounds);
+	
 	auto& structure = m_registry.emplace<Structure>(entity);
+	structure.type = type;
+	createGraphicsForEntity(entity);
+	structure.armor = structure.maxArmor = get_armor_of(type);
 
-	
-	// auto& tile = m_registry.emplace<Tile>(entity, texture, getTexCoordsOf(type));
-	
-	// structure.type = type;
-	// tile.setPosition(sf::Vector2f(coordX, coordY));
-	// structure.hitPoints = structure.maxHitPoints = getHitPointsOf(type);
+	auto setup_tiles_on_mask = [this, origin, entity](int32_t width, int32_t height, char symbol = 'B') -> void
+	{
+		int32_t offset = origin;
 
-	// auto setup_tiles_on_mask = [this, origin, entity](int32_t width, int32_t height, char symbol = 'B') -> void
-	// {
-	// 	int32_t offset = origin;
+		for (int32_t i = 0; i < height; ++i)
+		{
+			for (int32_t j = 0; j < width; ++j)
+			{
+				m_tileMask[offset + j] = symbol;
+				m_structureMap[offset + j] = entity;
+			}
 
-	// 	for (int32_t i = 0; i < height; ++i)
-	// 	{
-	// 		for (int32_t j = 0; j < width; ++j)
-	// 		{
-	// 			m_tileMask[offset + j] = symbol;
-	// 			m_structureMap[offset + j] = entity;
-	// 		}
+			offset += m_mapSize.x;
+		}
+	};
 
-	// 		offset += m_mapWidth;
-	// 	}
-	// };
+	switch(type)
+	{
+		case Structure::Type::SLAB_1x1:          setup_tiles_on_mask(1, 1, 'C'); break;
+		case Structure::Type::PALACE:            setup_tiles_on_mask(3, 3);      break;
+		case Structure::Type::VEHICLE:           setup_tiles_on_mask(3, 2);      break;
+		case Structure::Type::HIGH_TECH:         setup_tiles_on_mask(2, 2);      break;
+		case Structure::Type::CONSTRUCTION_YARD: setup_tiles_on_mask(2, 2);      break;
+		case Structure::Type::WIND_TRAP:         setup_tiles_on_mask(2, 2);      break;
+		case Structure::Type::BARRACKS:          setup_tiles_on_mask(2, 2);      break;
+		case Structure::Type::STARPORT:          setup_tiles_on_mask(3, 3);      break;
+		case Structure::Type::REFINERY:          setup_tiles_on_mask(3, 2);      break;
+		case Structure::Type::REPAIR:            setup_tiles_on_mask(3, 2);      break;
+		case Structure::Type::WALL:              setup_tiles_on_mask(1, 1, 'W'); break;
+		case Structure::Type::TURRET:            setup_tiles_on_mask(1, 1);      break;
+		case Structure::Type::ROCKET_TURRET:     setup_tiles_on_mask(1, 1);      break;
+		case Structure::Type::SILO:              setup_tiles_on_mask(2, 2);      break;
+		case Structure::Type::OUTPOST:           setup_tiles_on_mask(2, 2);      break;
 
-	// switch(type)
-	// {
-	// 	case Structure::Type::SLAB_1x1:          setup_tiles_on_mask(1, 1, 'C'); break;
-	// 	case Structure::Type::PALACE:            setup_tiles_on_mask(3, 3);      break;
-	// 	case Structure::Type::VEHICLE:           setup_tiles_on_mask(3, 2);      break;
-	// 	case Structure::Type::HIGH_TECH:         setup_tiles_on_mask(2, 2);      break;
-	// 	case Structure::Type::CONSTRUCTION_YARD: setup_tiles_on_mask(2, 2);      break;
-	// 	case Structure::Type::WIND_TRAP:         setup_tiles_on_mask(2, 2);      break;
-	// 	case Structure::Type::BARRACKS:          setup_tiles_on_mask(2, 2);      break;
-	// 	case Structure::Type::STARPORT:          setup_tiles_on_mask(3, 3);      break;
-	// 	case Structure::Type::REFINERY:          setup_tiles_on_mask(3, 2);      break;
-	// 	case Structure::Type::REPAIR:            setup_tiles_on_mask(3, 2);      break;
-	// 	case Structure::Type::WALL:              setup_tiles_on_mask(1, 1, 'W'); break;
-	// 	case Structure::Type::TURRET:            setup_tiles_on_mask(1, 1);      break;
-	// 	case Structure::Type::ROCKET_TURRET:     setup_tiles_on_mask(1, 1);      break;
-	// 	case Structure::Type::SILO:              setup_tiles_on_mask(2, 2);      break;
-	// 	case Structure::Type::OUTPOST:           setup_tiles_on_mask(2, 2);      break;
+		default: break;
+	}
 
-	// 	default: break;
-	// }
-
-	// if(type == StructureType::WALL)
-	// 	updateWall(origin, 2);
+	//if(type == Structure::Type::WALL)
+	//	updateWall(origin, 2);
 
 	return true;
 }
@@ -193,6 +248,86 @@ bool Builder::putStructureOnMap(const Structure::Type type, const ivec2s cell) n
 uint32_t Builder::getVertexBuffer() const noexcept
 {
 	return m_vertexBuffer;
+}
+
+
+void Builder::createGraphicsForEntity(const entt::entity entity) noexcept
+{
+	if(m_mappedStorage)
+	{
+		auto& building = m_registry.get<Structure>(entity);
+		building.frame = m_registry.storage<Structure>().size() - 1;
+
+		const auto& bounds = m_registry.get<ivec4s>(entity);
+		vec4s texCoords = get_texcoords_of_structure(building.type, m_textureSize.x, m_textureSize.y);
+
+		float vertices[] = 
+		{
+			(float)bounds.x, (float)bounds.y,
+			texCoords.x, texCoords.y,
+
+			(float)bounds.z, (float)bounds.y,
+			texCoords.z, texCoords.y,
+
+			(float)bounds.z, (float)bounds.w, 
+			texCoords.z, texCoords.w,
+
+			(float)bounds.x, (float)bounds.w,
+			texCoords.x, texCoords.w
+		};
+
+		char* bytes = static_cast<char*>(m_mappedStorage);
+		bytes += building.frame * sizeof(vertices);
+		memcpy(bytes, vertices, sizeof(vertices));
+	}
+}
+
+
+void Builder::updateWall(int32_t origin, int32_t level) noexcept
+{
+    if(level > 0)
+	{
+		int32_t left   = origin - 1;
+		int32_t top    = origin - m_mapSize.x;
+		int32_t right  = origin + 1;
+		int32_t bottom = origin + m_mapSize.y;
+
+		const char* field = m_tileMask;
+		const int32_t tileCount = m_mapSize.x * m_mapSize.y;
+
+		bool a = (left >= 0)          ? (field[left]   == 'W') : false;
+		bool b = (top >= 0)           ? (field[top]    == 'W') : false;
+		bool c = (right < tileCount)  ? (field[right]  == 'W') : false;
+		bool d = (bottom < tileCount) ? (field[bottom] == 'W') : false;
+
+		const auto texCoords = get_texcoords_of_custom_wall(compute_wall_type(a, b, c, d), m_textureSize);
+		const auto entity = m_structureMap[origin];
+
+		if(m_mappedStorage)
+		{
+			const auto& building = m_registry.get<Structure>(entity);
+			char* ptr = static_cast<char*>(m_mappedStorage);
+			ptr += building.frame * 64; // TODO: fix magic num
+			float* vertices = reinterpret_cast<float*>(ptr);
+
+			vertices[2] = texCoords.x;
+			vertices[3] = texCoords.y;
+
+			vertices[6] = texCoords.z; 
+			vertices[7] = texCoords.x;
+
+			vertices[10] = texCoords.z; 
+			vertices[11] = texCoords.w;
+
+			vertices[14] = texCoords.x; 
+			vertices[15] = texCoords.w;
+		}
+
+		if(a) updateWall(left, level - 1);
+		if(b) updateWall(top, level - 1);
+		if(c) updateWall(right, level - 1);
+		if(d) updateWall(bottom, level - 1);
+	}
 }
 
 
@@ -214,71 +349,83 @@ WallCellType compute_wall_type(bool left, bool top, bool right, bool bottom) noe
 }
 
 
-ivec4s get_texcoords_of_custom_wall(const WallCellType type) noexcept
+vec4s get_texcoords_of_custom_wall(const WallCellType type, ivec2s textureSize) noexcept
 {
+	const vec4s ratio = { 1.f / textureSize.x, 1.f / textureSize.y };
+	vec4s tc; // texture coords
+
     switch (type)
     {
 		default:
-        case WallCellType::DOT:               return { 0,   0, 32, 32 }; 
-        case WallCellType::LEFT_RIGHT:        return { 32,  0, 32, 32 }; 
-        case WallCellType::BOTTOM_TOP:        return { 64,  0, 32, 32 }; 
-        case WallCellType::TOP_RIGHT:         return { 96,  0, 32, 32 }; 
-        case WallCellType::RIGHT_BOTTOM:      return { 128, 0, 32, 32 };
-        case WallCellType::BOTTOM_LEFT:       return { 160, 0, 32, 32 };
-        case WallCellType::LEFT_TOP:          return { 192, 0, 32, 32 };
-        case WallCellType::TOP_RIGHT_BOTTOM:  return { 224, 0, 32, 32 }; 
-        case WallCellType::RIGHT_BOTTOM_LEFT: return { 256, 0, 32, 32 }; 
-        case WallCellType::BOTTOM_LEFT_TOP:   return { 288, 0, 32, 32 };
-        case WallCellType::LEFT_TOP_RIGHT:    return { 320, 0, 32, 32 };
-        case WallCellType::CROSS:             return { 352, 0, 32, 32 };
+        case WallCellType::DOT:               { tc =  { 0.f,   0.f, 32.f, 32.f }; break; } 
+        case WallCellType::LEFT_RIGHT:        { tc =  { 32.f,  0.f, 32.f, 32.f }; break; } 
+        case WallCellType::BOTTOM_TOP:        { tc =  { 64.f,  0.f, 32.f, 32.f }; break; } 
+        case WallCellType::TOP_RIGHT:         { tc =  { 96.f,  0.f, 32.f, 32.f }; break; } 
+        case WallCellType::RIGHT_BOTTOM:      { tc =  { 128.f, 0.f, 32.f, 32.f }; break; }
+        case WallCellType::BOTTOM_LEFT:       { tc =  { 160.f, 0.f, 32.f, 32.f }; break; }
+        case WallCellType::LEFT_TOP:          { tc =  { 192.f, 0.f, 32.f, 32.f }; break; }
+        case WallCellType::TOP_RIGHT_BOTTOM:  { tc =  { 224.f, 0.f, 32.f, 32.f }; break; } 
+        case WallCellType::RIGHT_BOTTOM_LEFT: { tc =  { 256.f, 0.f, 32.f, 32.f }; break; } 
+        case WallCellType::BOTTOM_LEFT_TOP:   { tc =  { 288.f, 0.f, 32.f, 32.f }; break; }
+        case WallCellType::LEFT_TOP_RIGHT:    { tc =  { 320.f, 0.f, 32.f, 32.f }; break; }
+        case WallCellType::CROSS:             { tc =  { 352.f, 0.f, 32.f, 32.f }; break; }
     }
+
+	return { tc.x * ratio.x, tc.y * ratio.y, (tc.x + tc.z) * ratio.x, (tc.y + tc.w) * ratio.y };
 }
 
 
-ivec4s get_texcoords_of_structure(const Structure::Type type) noexcept
+vec4s get_texcoords_of_structure(const Structure::Type type, float width, float height) noexcept
 {
+	const vec4s ratio = { 1.f / width, 1.f / height };
+	vec4s tc; // texture coords
+
 	switch (type)
 	{
-		case Structure::Type::SLAB_1x1:          return { 0,   160, 32, 32 };
-		case Structure::Type::PALACE:            return { 64,  96 , 96, 96 };
-		case Structure::Type::VEHICLE:           return { 256, 32 , 96, 64 };
-		case Structure::Type::HIGH_TECH:         return { 160, 96 , 64, 64 };
-		case Structure::Type::CONSTRUCTION_YARD: return { 0,   32 , 64, 64 };
-		case Structure::Type::WIND_TRAP:         return { 64,  32 , 64, 64 };
-		case Structure::Type::BARRACKS:          return { 0,   96 , 64, 64 };
-		case Structure::Type::STARPORT:          return { 0,   192, 96, 96 };
-		case Structure::Type::REFINERY:          return { 416, 0  , 96, 64 };
-		case Structure::Type::REPAIR:            return { 224, 96 , 96, 64 };
-		case Structure::Type::WALL:              return { 0,   0  , 32, 32 };
-		case Structure::Type::TURRET:            return { 192, 288, 32, 32 };
-		case Structure::Type::ROCKET_TURRET:     return { 448, 288, 32, 32 };
-		case Structure::Type::SILO:              return { 192, 32 , 64, 64 };
-		case Structure::Type::OUTPOST:           return { 128, 32 , 64, 64 };
+		case Structure::Type::SLAB_1x1:          { tc = { 0.f,   160.f, 32.f, 32.f }; break; }
+		case Structure::Type::PALACE:            { tc = { 64.f,  96.f , 96.f, 96.f }; break; }
+		case Structure::Type::VEHICLE:           { tc = { 256.f, 32.f , 96.f, 64.f }; break; }
+		case Structure::Type::HIGH_TECH:         { tc = { 160.f, 96.f , 64.f, 64.f }; break; }
+		case Structure::Type::CONSTRUCTION_YARD: { tc = { 0.f,   32.f , 64.f, 64.f }; break; }
+		case Structure::Type::WIND_TRAP:         { tc = { 64.f,  32.f , 64.f, 64.f }; break; }
+		case Structure::Type::BARRACKS:          { tc = { 0.f,   96.f , 64.f, 64.f }; break; }
+		case Structure::Type::STARPORT:          { tc = { 0.f,   192.f, 96.f, 96.f }; break; }
+		case Structure::Type::REFINERY:          { tc = { 416.f, 0.f  , 96.f, 64.f }; break; }
+		case Structure::Type::REPAIR:            { tc = { 224.f, 96.f , 96.f, 64.f }; break; }
+		case Structure::Type::WALL:              { tc = { 0.f,   0.f  , 32.f, 32.f }; break; }
+		case Structure::Type::TURRET:            { tc = { 192.f, 288.f, 32.f, 32.f }; break; }
+		case Structure::Type::ROCKET_TURRET:     { tc = { 448.f, 288.f, 32.f, 32.f }; break; }
+		case Structure::Type::SILO:              { tc = { 192.f, 32.f , 64.f, 64.f }; break; }
+		case Structure::Type::OUTPOST:           { tc = { 128.f, 32.f , 64.f, 64.f }; break; }
 
-		default: return { 0, 0, 0, 0 };
+		default: return { 0.f, 0.f, 0.f, 0.f };
 	}
+
+	return { tc.x * ratio.x, tc.y * ratio.y, (tc.x + tc.z) * ratio.x, (tc.y + tc.w) * ratio.y };
 }
 
 
-ivec4s get_bounds_of(const Structure::Type type, const ivec2s cell) noexcept
+ivec4s get_bounds_of(const Structure::Type type, const ivec2s cell, const ivec2s tileSize) noexcept
 {
+	ivec2s offset = { cell.x * tileSize.x, cell.y * tileSize.y }; 
+
 	switch (type)
 	{
-		case Structure::Type::SLAB_1x1:          return { cell.x, cell.y, cell.x + 32, cell.y + 32 };
-		case Structure::Type::PALACE:            return { cell.x, cell.y, cell.x + 96, cell.y + 96 };
-		case Structure::Type::VEHICLE:           return { cell.x, cell.y, cell.x + 96, cell.y + 64 };
-		case Structure::Type::HIGH_TECH:         return { cell.x, cell.y, cell.x + 64, cell.y + 64 };
-		case Structure::Type::CONSTRUCTION_YARD: return { cell.x, cell.y, cell.x + 64, cell.y + 64 };
-		case Structure::Type::WIND_TRAP:         return { cell.x, cell.y, cell.x + 64, cell.y + 64 };
-		case Structure::Type::BARRACKS:          return { cell.x, cell.y, cell.x + 64, cell.y + 64 };
-		case Structure::Type::STARPORT:          return { cell.x, cell.y, cell.x + 96, cell.y + 96 };
-		case Structure::Type::REFINERY:          return { cell.x, cell.y, cell.x + 96, cell.y + 64 };
-		case Structure::Type::REPAIR:            return { cell.x, cell.y, cell.x + 96, cell.y + 64 };
-		case Structure::Type::WALL:              return { cell.x, cell.y, cell.x + 32, cell.y + 32 };
-		case Structure::Type::TURRET:            return { cell.x, cell.y, cell.x + 32, cell.y + 32 };
-		case Structure::Type::ROCKET_TURRET:     return { cell.x, cell.y, cell.x + 32, cell.y + 32 };
-		case Structure::Type::SILO:              return { cell.x, cell.y, cell.x + 64, cell.y + 64 };
-		case Structure::Type::OUTPOST:           return { cell.x, cell.y, cell.x + 64, cell.y + 64 }; 
+		case Structure::Type::SLAB_1x1:          return { offset.x, offset.y, offset.x + 32, offset.y + 32 };
+		case Structure::Type::PALACE:            return { offset.x, offset.y, offset.x + 96, offset.y + 96 };
+		case Structure::Type::VEHICLE:           return { offset.x, offset.y, offset.x + 96, offset.y + 64 };
+		case Structure::Type::HIGH_TECH:         return { offset.x, offset.y, offset.x + 64, offset.y + 64 };
+		case Structure::Type::CONSTRUCTION_YARD: return { offset.x, offset.y, offset.x + 64, offset.y + 64 };
+		case Structure::Type::WIND_TRAP:         return { offset.x, offset.y, offset.x + 64, offset.y + 64 };
+		case Structure::Type::BARRACKS:          return { offset.x, offset.y, offset.x + 64, offset.y + 64 };
+		case Structure::Type::STARPORT:          return { offset.x, offset.y, offset.x + 96, offset.y + 96 };
+		case Structure::Type::REFINERY:          return { offset.x, offset.y, offset.x + 96, offset.y + 64 };
+		case Structure::Type::REPAIR:            return { offset.x, offset.y, offset.x + 96, offset.y + 64 };
+		case Structure::Type::WALL:              return { offset.x, offset.y, offset.x + 32, offset.y + 32 };
+		case Structure::Type::TURRET:            return { offset.x, offset.y, offset.x + 32, offset.y + 32 };
+		case Structure::Type::ROCKET_TURRET:     return { offset.x, offset.y, offset.x + 32, offset.y + 32 };
+		case Structure::Type::SILO:              return { offset.x, offset.y, offset.x + 64, offset.y + 64 };
+		case Structure::Type::OUTPOST:           return { offset.x, offset.y, offset.x + 64, offset.y + 64 }; 
 
 		default: return { 0, 0, 0, 0 };
 	}

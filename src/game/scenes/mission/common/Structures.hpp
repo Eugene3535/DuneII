@@ -1,7 +1,7 @@
 #ifndef STRUCTURE_HPP
 #define STRUCTURE_HPP
 
-#include <cstdint>
+#include <cglm/struct/ivec2.h>
 
 
 struct Structure
@@ -28,8 +28,8 @@ struct Structure
         INVALID = 0xFF
     };
 
-    uint32_t currentFrame;
-    uint32_t frames;
+    uint32_t frame;
+    ivec2s texOffset;
 
     Type type;
     int32_t cost;
@@ -38,11 +38,14 @@ struct Structure
 
     bool hasLandingPad;
     bool hasFlag;
+    bool isEnabled;
 };
 
 
 struct IConstructionSite
 {
+    ivec2s textureSize;
+
     char* tileMask;
     int32_t mapWidth;
     int32_t mapHeight;

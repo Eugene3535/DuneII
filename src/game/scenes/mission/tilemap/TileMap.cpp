@@ -382,7 +382,7 @@ void TileMap::loadStructures(const Tileset& tileset, std::span<const int> tileId
 		}
 	};
 
-	auto get_structure_bounds = [](Structure::Type type, int32_t x, int32_t y) -> ivec4s
+	auto get_structure_tile_bounds = [](Structure::Type type, int32_t x, int32_t y) -> ivec4s
 	{
 		switch (type)
 		{
@@ -425,7 +425,7 @@ void TileMap::loadStructures(const Tileset& tileset, std::span<const int> tileId
 
 				object.name = get_structure_name(type); 
 				object.type = "Structure";
-				object.bounds = get_structure_bounds(type, x, y);
+				object.bounds = get_structure_tile_bounds(type, x, y);
 			}
 		}
 	}

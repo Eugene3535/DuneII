@@ -9,17 +9,26 @@
 
 
 Mission::Mission(DuneII* game) noexcept:
-    Scene(game)
+    Scene(game),
+    m_builder(m_registry)
 {
-
+    memset(&m_landscape, 0, sizeof(m_landscape)); 
+    memset(&m_buildings, 0, sizeof(m_buildings));
 }
 
 
 Mission::~Mission()
 {
-    glDeleteTextures(1, textures);
-    glDeleteVertexArrays(1, vao);
-    glDeleteBuffers(2, vbo);
+    if (m_isLoaded)
+    {
+        GLuint textures[] = { m_landscape.texture, m_buildings.texture };
+        GLuint vertexArrayObjects[] = { m_landscape.vao, m_buildings.vao };
+        GLuint vertexBufferObjects[] = { m_landscape.vbo[0], m_landscape.vbo[1] };
+
+        glDeleteTextures(std::size(textures), textures);
+        glDeleteVertexArrays(std::size(vertexArrayObjects), vertexArrayObjects);
+        glDeleteBuffers(std::size(vertexBufferObjects), vertexBufferObjects);
+    }
 }
 
 
@@ -30,11 +39,11 @@ bool Mission::load(std::string_view info) noexcept
   
     auto& provider = m_game->fileProvider;
 
-    glGenTextures(1, textures);
-    glGenBuffers(2, vbo);
-    glGenVertexArrays(1, vao);
+    glGenTextures(1, &m_landscape.texture);
+    glGenBuffers(2, m_landscape.vbo);
+    glGenVertexArrays(1, &m_landscape.vao);
 
-    Texture landscapeTexture = {.handle = textures[0] };
+    Texture landscapeTexture = {.handle = m_landscape.texture };
 
     if(!landscapeTexture.loadFromFile(provider.findPathToFile(LANDSCAPE_PNG)))
         return false;
@@ -55,28 +64,69 @@ bool Mission::load(std::string_view info) noexcept
     if(m_tilemap.loadFromFile(provider.findPathToFile(std::string(info))))
     {
         auto vertices = m_tilemap.getVertices();
-        glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+        glBindBuffer(GL_ARRAY_BUFFER, m_landscape.vbo[0]);
         glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertices.size_bytes()), vertices.data(), GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         auto indices = m_tilemap.getIndices();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_landscape.vbo[1]);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(indices.size_bytes()), indices.data(), GL_STATIC_DRAW);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
         const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
-        VertexArrayObject::createVertexInputState(vao[0], vbo[0], attributes);
+        VertexArrayObject::createVertexInputState(m_landscape.vao, m_landscape.vbo[0], attributes);
         
-        glBindVertexArray(vao[0]);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
+        glBindVertexArray(m_landscape.vao);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_landscape.vbo[1]);
         glBindVertexArray(0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
         m_landscape.texture = landscapeTexture.handle;
-        m_landscape.vao = vao[0];
+        m_landscape.vao = m_landscape.vao;
         m_landscape.count = indices.size();
 
+        glGenTextures(1, &m_buildings.texture);
+        glGenVertexArrays(1, &m_buildings.vao);
+
+        VertexArrayObject::createVertexInputState(m_buildings.vao, m_builder.getVertexBuffer(), attributes);
+
+        //glBindVertexArray(m_buildings.vao);
+        //glVertexArrayVertexBuffer(m_buildings.vao, 0, m_builder.getVertexBuffer(), 0, sizeof(vec4s));
+        //glEnableVertexArrayAttrib(m_buildings.vao, 0);
+        //glVertexArrayAttribFormat(m_buildings.vao, 0, 4, GL_FLOAT, GL_FALSE, 0);
+        //glVertexArrayAttribBinding(m_buildings.vao, 0, 0);
+        //glBindVertexArray(0);
+
+        Texture buildingTexture = {.handle = m_buildings.texture };
+
+        if(!buildingTexture.loadFromFile(provider.findPathToFile(STRUCTURES_PNG)))
+            return false;
+
+        m_tileMask    = m_tilemap.getTileMask();
+        auto mapSize  = m_tilemap.getMapSize();
+        auto tileSize = m_tilemap.getTileSize();
+
+        IConstructionSite iSite = 
+        {
+            .textureSize = 
+            {
+                buildingTexture.width,
+                buildingTexture.height
+            },
+            .tileMask   = m_tileMask.data(),
+            .mapWidth   = mapSize.x,
+            .mapHeight  = mapSize.y,
+            .tileWidth  = tileSize.x,
+            .tileHeight = tileSize.y
+        };
+
+        m_builder.reset(iSite);
+
+        if(!m_builder.loadFromTileMap(m_tilemap))
+            return false;
+
         createSystems();
+
         m_isLoaded = true;
     }
 
@@ -93,7 +143,7 @@ void Mission::update(float dt) noexcept
     auto& camera = m_game->camera;
     camera.getModelViewProjectionMatrix(MVP);
 
-    transform.calculate(modelView);
+    m_transform.calculate(modelView);
     glmc_mat4_mul(MVP, modelView, result);
     m_game->updateUniformBuffer(result);
 
@@ -108,11 +158,26 @@ void Mission::update(float dt) noexcept
 void Mission::draw() noexcept
 {
     m_landscape.program(true);
+
     glBindTextureUnit(0, m_landscape.texture);
     glBindVertexArray(m_landscape.vao);
     glDrawElements(GL_TRIANGLES, m_landscape.count, GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
     glBindTextureUnit(0, 0);
+
+    glBindTextureUnit(0, m_buildings.texture);
+    glBindVertexArray(m_buildings.vao);
+
+    auto view = m_registry.view<const Structure>();
+
+    view.each([](const Structure& building) 
+    {
+        glDrawArrays(GL_TRIANGLE_FAN, building.frame, 4);
+    });
+
+    glBindVertexArray(0);
+    glBindTextureUnit(0, 0);
+
     m_landscape.program(false);
 }
 
@@ -139,7 +204,7 @@ void Mission::press(int key) noexcept
     if(key == GLFW_KEY_S)
         movement[1] = -10.f;
 
-    transform.move(movement);
+    m_transform.move(movement);
 }
 
 
