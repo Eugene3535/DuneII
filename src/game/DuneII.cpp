@@ -11,94 +11,9 @@ DuneII::DuneII() noexcept:
     m_window(nullptr),
     m_currentScene(nullptr),
     m_nextSceneType(Scene::NONE),
-    m_isSceneNeedToBeChanged(false),
-    m_uniformBuffer(0)
+    m_isSceneNeedToBeChanged(false)
 {
 
-}
-
-
-bool DuneII::init(GLFWwindow* window) noexcept
-{
-    if (!m_currentScene)
-    {
-        m_window = window;
-
-        glClearColor(0.f, 0.f, 0.f, 1.f);
-
-        glGenBuffers(1, &m_uniformBuffer);
-        glBindBuffer(GL_UNIFORM_BUFFER, m_uniformBuffer);
-        glBufferData(GL_UNIFORM_BUFFER, sizeof(mat4), nullptr, GL_DYNAMIC_DRAW);
-        glBindBufferRange(GL_UNIFORM_BUFFER, 0, m_uniformBuffer, 0, sizeof(mat4));
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-        m_currentScene = load<TitleScreen>({});
-    }
-	    
-    return m_currentScene ? true : false;
-}
-
-
-void DuneII::update(float dt) noexcept
-{
-    if(!m_currentScene)
-        return;
-
-    m_currentScene->update(dt);
-
-    if (m_isSceneNeedToBeChanged)
-    {
-        switch (m_nextSceneType)
-        {
-            case Scene::Type::MAIN_MENU:
-            {
-                if (auto titleScene = load<TitleScreen>({}))
-                    m_currentScene = titleScene;
-            }
-            break;
-
-            case Scene::Type::PICK_HOUSE:
-            {
-                if (auto pickHouseScene = load<PickHouse>({}))
-                    m_currentScene = pickHouseScene;
-            }
-            break;
-
-            case Scene::Type::MISSION:
-            {
-                if (auto missionScene = load<Mission>("Atreides-8.tmx"))
-                    m_currentScene = missionScene;
-            }
-            break;
-
-            default:
-                break;
-        }
-
-        int width, height;
-        glfwGetWindowSize(m_window, &width, &height);
-        m_currentScene->resize(width, height);
-
-        m_isSceneNeedToBeChanged = false;
-        m_nextSceneType = Scene::NONE;
-    }
-}
-
-
-void DuneII::draw() noexcept
-{
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    if(m_currentScene)
-        m_currentScene->draw();
-}
-
-
-void DuneII::updateUniformBuffer(mat4 modelViewProjection) noexcept
-{
-    glBindBuffer(GL_UNIFORM_BUFFER, m_uniformBuffer);
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mat4), static_cast<const void*>(modelViewProjection));
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 
@@ -172,4 +87,75 @@ ivec2s DuneII::getWindowsSize() const noexcept
         glfwGetWindowSize(m_window, &width, &height);
 
     return { width, height };
+}
+
+
+bool DuneII::init(GLFWwindow* window) noexcept
+{
+    if (!m_currentScene)
+    {
+        m_window = window;
+        camera.init();
+
+        glClearColor(0.f, 0.f, 0.f, 1.f);
+
+        m_currentScene = load<TitleScreen>({});
+    }
+
+    return m_currentScene ? true : false;
+}
+
+
+void DuneII::update(float dt) noexcept
+{
+    if (!m_currentScene)
+        return;
+
+    m_currentScene->update(dt);
+
+    if (m_isSceneNeedToBeChanged)
+    {
+        switch (m_nextSceneType)
+        {
+        case Scene::Type::MAIN_MENU:
+        {
+            if (auto titleScene = load<TitleScreen>({}))
+                m_currentScene = titleScene;
+        }
+        break;
+
+        case Scene::Type::PICK_HOUSE:
+        {
+            if (auto pickHouseScene = load<PickHouse>({}))
+                m_currentScene = pickHouseScene;
+        }
+        break;
+
+        case Scene::Type::MISSION:
+        {
+            if (auto missionScene = load<Mission>("Atreides-8.tmx"))
+                m_currentScene = missionScene;
+        }
+        break;
+
+        default:
+            break;
+        }
+
+        int width, height;
+        glfwGetWindowSize(m_window, &width, &height);
+        m_currentScene->resize(width, height);
+
+        m_isSceneNeedToBeChanged = false;
+        m_nextSceneType = Scene::NONE;
+    }
+}
+
+
+void DuneII::draw() noexcept
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    if (m_currentScene)
+        m_currentScene->draw();
 }

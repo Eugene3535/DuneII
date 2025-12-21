@@ -173,7 +173,7 @@ void PickHouse::draw() noexcept
 
     m_backgroundTransform.calculate(modelView);
     glmc_mat4_mul(MVP, modelView, result);
-    m_game->updateUniformBuffer(result);
+    camera.updateUniformBuffer(result);
 
     glBindTexture(GL_TEXTURE_2D, m_background.texture);
     glDrawArrays(GL_TRIANGLE_FAN, m_background.frame, 4);
@@ -183,7 +183,7 @@ void PickHouse::draw() noexcept
 
     m_outlineTransform.calculate(modelView);
     glmc_mat4_mul(MVP, modelView, result);
-    m_game->updateUniformBuffer(result);
+    camera.updateUniformBuffer(result);
     m_outline->draw();
 
     glUseProgram(0);

@@ -44,13 +44,12 @@ int Application::run(DuneII& game) noexcept
 
 	glfwSetWindowUserPointer(m_window, static_cast<void*>(&game));
 	
-	int width, height;
-	glfwGetWindowSize(m_window, &width, &height);
-	game.camera.setupProjectionMatrix(width, height);
-
 	if(!game.init(m_window))
 		return 1;
 
+	int width, height;
+	glfwGetWindowSize(m_window, &width, &height);
+	game.camera.setupProjectionMatrix(width, height);
 	game.resize(width, height);
 
 	float deltaTime = 0.f;

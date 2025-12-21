@@ -20,12 +20,6 @@ class DuneII final
 public:
     DuneII() noexcept;
 
-    bool init(struct GLFWwindow* window) noexcept;
-    void update(float dt) noexcept;
-    void draw() noexcept;
-
-    void updateUniformBuffer(mat4 modelViewProjection) noexcept;
-
     void press(int key) noexcept;
     void click(int button) noexcept;
     void setCursorPosition(float x, float y) noexcept;
@@ -41,6 +35,10 @@ public:
     OrthogonalCamera camera;
     
 private:
+    bool init(struct GLFWwindow* window) noexcept;
+    void update(float dt) noexcept;
+    void draw() noexcept;
+
     template<class T>
     std::shared_ptr<T> load(std::string_view info) noexcept;
 
@@ -50,8 +48,6 @@ private:
     std::shared_ptr<Scene> m_currentScene;
     Scene::Type m_nextSceneType;
     bool m_isSceneNeedToBeChanged;
-
-    uint32_t m_uniformBuffer;
 };
 
 #include "game/DuneII.inl"

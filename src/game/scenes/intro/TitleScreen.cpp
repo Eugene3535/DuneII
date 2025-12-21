@@ -201,7 +201,7 @@ void TitleScreen::draw() noexcept
 
     m_spaceTransform.calculate(model);
     glmc_mat4_mul(MVP, model, modelView);
-    m_game->updateUniformBuffer(modelView);
+    camera.updateUniformBuffer(modelView);
 
     glBindTexture(GL_TEXTURE_2D, m_space.texture);
     glDrawArrays(GL_TRIANGLE_FAN, m_space.frame, 4);
@@ -209,7 +209,7 @@ void TitleScreen::draw() noexcept
 
     m_planetTransform.calculate(model);
     glmc_mat4_mul(MVP, model, modelView);
-    m_game->updateUniformBuffer(modelView);
+    camera.updateUniformBuffer(modelView);
 
     glBindTexture(GL_TEXTURE_2D, m_planet.texture);
     glDrawArrays(GL_TRIANGLE_FAN, m_planet.frame, 4);
@@ -222,17 +222,17 @@ void TitleScreen::draw() noexcept
 
         m_playButton->calculate(model);
         glmc_mat4_mul(MVP, model, modelView);
-        m_game->updateUniformBuffer(modelView);
+        camera.updateUniformBuffer(modelView);
         m_playButton->draw();
 
         m_exitButton->calculate(model);
         glmc_mat4_mul(MVP, model, modelView);
-        m_game->updateUniformBuffer(modelView);
+        camera.updateUniformBuffer(modelView);
         m_exitButton->draw();
 
         m_settingsButton->calculate(model);
         glmc_mat4_mul(MVP, model, modelView);
-        m_game->updateUniformBuffer(modelView); 
+        camera.updateUniformBuffer(modelView);
         m_settingsButton->draw();
     }
 

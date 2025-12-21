@@ -122,7 +122,7 @@ void Mission::update(float dt) noexcept
 
     m_transform.calculate(modelView);
     glmc_mat4_mul(MVP, modelView, result);
-    m_game->updateUniformBuffer(result);
+    camera.updateUniformBuffer(result);
 
     if(m_isLoaded)
     {
