@@ -20,8 +20,9 @@ public:
 private:
     void update(std::span<vec2s> points, float thickness) noexcept;
 
-    GLBuffer m_vbo;
+    uint32_t m_vbo;
     uint32_t m_vao;
+    uint32_t m_count;
 };
 
 #endif // !OUTLINE_HPP

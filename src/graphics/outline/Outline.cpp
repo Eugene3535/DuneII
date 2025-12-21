@@ -10,14 +10,15 @@
 
 
 Outline::Outline(uint32_t vboHandle, uint32_t vaoHandle) noexcept:
-    m_vbo(vboHandle, GL_ARRAY_BUFFER),
-    m_vao(vaoHandle)
+    m_vbo(vboHandle),
+    m_vao(vaoHandle),
+    m_count(0)
 {
-	m_vbo.create(sizeof(float), 0, nullptr, GL_STATIC_DRAW);
+	glNamedBufferData(m_vbo, 0, nullptr, GL_STATIC_DRAW);
 
     VertexArrayObject vao(vaoHandle);
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float2 };
-    vao.addVertexBuffer(m_vbo, attributes);
+    VertexArrayObject::createVertexInputState(m_vao, m_vbo, attributes);
 }
 
 
@@ -70,7 +71,7 @@ void Outline::create(size_t pointCount, const std::function<vec2s(size_t)>& getP
 void Outline::draw() noexcept
 {
     glBindVertexArray(m_vao);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, m_vbo.getCount());
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, m_count);
     glBindVertexArray(0);
 }
 
@@ -152,5 +153,8 @@ void Outline::update(std::span<vec2s> points, float thickness) noexcept
     vertices[count * 2 + 1] = vertices[1];
 
 //  Push to GPU
-    m_vbo.update(0, sizeof(vertices[0]), vertices.size(), static_cast<const void*>(vertices.data()));
+    m_count = static_cast<uint32_t>(vertices.size());
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vec2s), static_cast<const void*>(vertices.data()), GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

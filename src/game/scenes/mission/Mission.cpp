@@ -99,7 +99,7 @@ bool Mission::load(std::string_view info) noexcept
         auto mapSize  = m_tilemap.getMapSize();
         auto tileSize = m_tilemap.getTileSize();
 
-        if(!m_builder.loadFromTileMap(m_tilemap, buildingTexture))
+        if(!m_builder.loadFromTileMap(m_tilemap, buildingTexture.handle))
             return false;
 
         createSystems();

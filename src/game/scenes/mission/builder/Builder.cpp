@@ -1,7 +1,6 @@
 #include <glad/glad.h>
 #include <cglm/struct/ivec2.h>
 
-#include "resources/gl_interfaces/texture/Texture.hpp"
 #include "game/scenes/mission/tilemap/TileMap.hpp"
 #include "game/scenes/mission/builder/Builder.hpp"
 
@@ -77,12 +76,14 @@ Builder::~Builder()
 }
 
 
-bool Builder::loadFromTileMap(const TileMap& tilemap, const Texture& texture) noexcept
+bool Builder::loadFromTileMap(const TileMap& tilemap, const uint32_t texture) noexcept
 {
 	m_structureMap.clear();
+	
 	m_mapSize = tilemap.getMapSize();
 	m_tileSize = tilemap.getTileSize();
-	m_textureSize = { texture.width, texture.height };
+	glGetTextureLevelParameteriv(texture, 0, GL_TEXTURE_WIDTH, &m_textureSize.x);
+	glGetTextureLevelParameteriv(texture, 0, GL_TEXTURE_HEIGHT, &m_textureSize.y);
 
 	auto get_structure_enum = [](const std::string& name) -> Structure::Type
 	{

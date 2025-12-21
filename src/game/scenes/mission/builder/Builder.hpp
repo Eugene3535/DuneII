@@ -15,7 +15,7 @@ public:
     Builder(entt::registry& registry, std::string& tileMask) noexcept;
     ~Builder();
 
-    bool loadFromTileMap(const class TileMap& tilemap, const struct Texture& texture) noexcept;
+    bool loadFromTileMap(const class TileMap& tilemap, const uint32_t texture) noexcept;
     bool putStructureOnMap(const Structure::Type type, const ivec2s cell) noexcept; // cell must be in tiles
 
     uint32_t getVertexBuffer() const noexcept;
