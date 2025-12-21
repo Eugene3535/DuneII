@@ -42,6 +42,7 @@ TitleScreen::TitleScreen(DuneII* game) noexcept:
     m_playButton(nullptr),
     m_exitButton(nullptr),
     m_settingsButton(nullptr),
+    m_mousePosition(glms_vec2_zero()),
     m_isMouseButtonPressed(false),
     m_isPresented(true)
 {
@@ -287,6 +288,5 @@ void TitleScreen::click(int button) noexcept
 
 void TitleScreen::setCursorPosition(float x, float y) noexcept
 {
-    m_mousePosition[0] = x;
-    m_mousePosition[1] = y;
+    m_mousePosition = { x, y };
 }

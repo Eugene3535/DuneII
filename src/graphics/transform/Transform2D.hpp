@@ -1,7 +1,7 @@
 #ifndef TRANSFORM_2D_HPP
 #define TRANSFORM_2D_HPP
 
-#include <cglm/types.h>
+#include <cglm/struct/vec2.h>
 #include <cglm/call/mat4.h>
 
 
@@ -17,26 +17,26 @@ public:
     void setPosition(float x, float y) noexcept;
     void setScale(float x, float y)    noexcept;
     void setOrigin(float x, float y)   noexcept;
+    void setRotation(float angle)      noexcept;
 
-    void setPosition(const vec2 position) noexcept;
-    void setRotation(float angle)         noexcept;
-    void setScale(const vec2 factors)     noexcept;
-    void setOrigin(const vec2 origin)     noexcept;
+    void setPosition(const vec2s position) noexcept;
+    void setScale(const vec2s factors)     noexcept;
+    void setOrigin(const vec2s origin)     noexcept;
 
-    void  getPosition(vec2 position) const noexcept;
-    float getRotation()              const noexcept;
-    void  getScale(vec2 scale)       const noexcept;
-    void  getOrigin(vec2 origin)     const noexcept;
+    vec2s getPosition() const noexcept;
+    vec2s getScale()    const noexcept;
+    vec2s getOrigin()   const noexcept;
+    float getRotation() const noexcept;
 
-    void move(const vec2 offset) noexcept;
+    void move(const vec2s offset) noexcept;
     void rotate(float angle)     noexcept;
 
     void calculate(mat4 result) const noexcept;
 
 private:
-    vec2  m_origin;
-    vec2  m_position;       
-    vec2  m_scale;
+    vec2s m_origin;
+    vec2s m_position;       
+    vec2s m_scale;
     float m_rotation;   
 };
 

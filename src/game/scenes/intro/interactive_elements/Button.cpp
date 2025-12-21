@@ -25,22 +25,21 @@ Button::Button(const Sprite& sprite, const int32_t uniformLocation) noexcept:
 }
 
 
-void Button::update(vec2 mousePosition, bool isClicked) noexcept
+void Button::update(vec2s mousePosition, bool isClicked) noexcept
 {
     if(m_boundsNeedUpdate)
     {
-        vec2 position, scale;  
-        getPosition(position);
-        getScale(scale);
-        const vec2 size = { static_cast<float>(m_sprite.width) * scale[0], static_cast<float>(m_sprite.height) * scale[1] };
+        vec2s position = getPosition();
+        vec2s scale = getScale();
+        const vec2s size = { static_cast<float>(m_sprite.width) * scale.x, static_cast<float>(m_sprite.height) * scale.y };
 
-        position[0] -= size[0] * 0.5f;
-        position[1] -= size[1] * 0.5f;
-        glmc_vec2_copy(position, m_bounds[0]);
+        position.x -= size.x * 0.5f;
+        position.y -= size.y * 0.5f;
+        glmc_vec2_copy(position.raw, m_bounds[0]);
 
-        position[0] += size[0];
-        position[1] += size[1];
-        glmc_vec2_copy(position, m_bounds[1]);
+        position.x += size.x;
+        position.y += size.y;
+        glmc_vec2_copy(position.raw, m_bounds[1]);
 
         m_boundsNeedUpdate = false;
     }
@@ -48,7 +47,7 @@ void Button::update(vec2 mousePosition, bool isClicked) noexcept
     m_isSelected = false;
 
     m_currentColor = normal_color;
-    const bool isUnderCursor = glmc_aabb2d_point(m_bounds, mousePosition);
+    const bool isUnderCursor = glmc_aabb2d_point(m_bounds, mousePosition.raw);
 
     if(isUnderCursor)
         m_currentColor = isClicked ? is_clicked_color : under_cursor_color;

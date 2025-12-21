@@ -38,7 +38,7 @@ private:
     Button*       m_settingsButton;
     char m_memoryPool[sizeof(Button) * 3];
 
-    vec2 m_mousePosition;
+    vec2s m_mousePosition;
     bool m_isMouseButtonPressed;
 
     bool m_isPresented;

@@ -167,19 +167,19 @@ void Mission::resize(int width, int height) noexcept
 
 void Mission::press(int key) noexcept
 {
-    vec2 movement = { 0, 0 };
+    vec2s movement = { 0, 0 };
 
     if(key == GLFW_KEY_A)
-        movement[0] = 10.f;
+        movement.x = 10.f;
 
     if(key == GLFW_KEY_D)
-        movement[0] = -10.f;
+        movement.x = -10.f;
 
     if(key == GLFW_KEY_W)
-        movement[1] = 10.f;
+        movement.y = 10.f;
 
     if(key == GLFW_KEY_S)
-        movement[1] = -10.f;
+        movement.y = -10.f;
 
     m_transform.move(movement);
 }

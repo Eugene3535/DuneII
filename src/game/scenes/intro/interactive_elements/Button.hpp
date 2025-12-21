@@ -10,7 +10,7 @@ class Button:
 public:
     Button(const Sprite& sprite, const int32_t uniformLocation) noexcept;
 
-    void update(vec2 mousePosition, bool isClicked) noexcept;
+    void update(vec2s mousePosition, bool isClicked) noexcept;
     void draw() noexcept;
     void resize(int width, int height) noexcept;
     bool isSelected() const noexcept;
