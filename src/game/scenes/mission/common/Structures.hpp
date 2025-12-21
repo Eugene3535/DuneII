@@ -42,16 +42,4 @@ struct Structure
     bool isEnabled;
 };
 
-
-struct IConstructionSite
-{
-    ivec2s textureSize;
-
-    char* tileMask;
-    int32_t mapWidth;
-    int32_t mapHeight;
-    int32_t tileWidth;
-    int32_t tileHeight;
-};
-
 #endif // !STRUCTURE_HPP

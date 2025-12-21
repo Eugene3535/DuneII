@@ -10,7 +10,7 @@
 
 Mission::Mission(DuneII* game) noexcept:
     Scene(game),
-    m_builder(m_registry)
+    m_builder(m_registry, m_tileMask)
 {
     memset(&m_landscape, 0, sizeof(m_landscape)); 
     memset(&m_buildings, 0, sizeof(m_buildings));
@@ -90,13 +90,6 @@ bool Mission::load(std::string_view info) noexcept
 
         VertexArrayObject::createVertexInputState(m_buildings.vao, m_builder.getVertexBuffer(), attributes);
 
-        //glBindVertexArray(m_buildings.vao);
-        //glVertexArrayVertexBuffer(m_buildings.vao, 0, m_builder.getVertexBuffer(), 0, sizeof(vec4s));
-        //glEnableVertexArrayAttrib(m_buildings.vao, 0);
-        //glVertexArrayAttribFormat(m_buildings.vao, 0, 4, GL_FLOAT, GL_FALSE, 0);
-        //glVertexArrayAttribBinding(m_buildings.vao, 0, 0);
-        //glBindVertexArray(0);
-
         Texture buildingTexture = {.handle = m_buildings.texture };
 
         if(!buildingTexture.loadFromFile(provider.findPathToFile(STRUCTURES_PNG)))
@@ -106,23 +99,7 @@ bool Mission::load(std::string_view info) noexcept
         auto mapSize  = m_tilemap.getMapSize();
         auto tileSize = m_tilemap.getTileSize();
 
-        IConstructionSite iSite = 
-        {
-            .textureSize = 
-            {
-                buildingTexture.width,
-                buildingTexture.height
-            },
-            .tileMask   = m_tileMask.data(),
-            .mapWidth   = mapSize.x,
-            .mapHeight  = mapSize.y,
-            .tileWidth  = tileSize.x,
-            .tileHeight = tileSize.y
-        };
-
-        m_builder.reset(iSite);
-
-        if(!m_builder.loadFromTileMap(m_tilemap))
+        if(!m_builder.loadFromTileMap(m_tilemap, buildingTexture))
             return false;
 
         createSystems();

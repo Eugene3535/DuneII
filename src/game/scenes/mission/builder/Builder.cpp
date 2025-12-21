@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <cglm/struct/ivec2.h>
 
+#include "resources/gl_interfaces/texture/Texture.hpp"
 #include "game/scenes/mission/tilemap/TileMap.hpp"
 #include "game/scenes/mission/builder/Builder.hpp"
 
@@ -34,11 +35,11 @@ static int32_t      get_armor_of(const Structure::Type type)                    
 
 
 
-Builder::Builder(entt::registry& registry) noexcept:
+Builder::Builder(entt::registry& registry, std::string& tileMask) noexcept:
     m_registry(registry),
+	m_tileMask(tileMask),
 	m_vertexBuffer(0),
 	m_mappedStorage(nullptr),
-    m_tileMask(nullptr),
 	m_textureSize(glms_ivec2_zero()),
 	m_mapSize(glms_ivec2_zero()),
 	m_tileSize(glms_ivec2_zero())
@@ -76,37 +77,30 @@ Builder::~Builder()
 }
 
 
-void Builder::reset(const IConstructionSite& site) noexcept // TODO: move to constructor
+bool Builder::loadFromTileMap(const TileMap& tilemap, const Texture& texture) noexcept
 {
 	m_structureMap.clear();
-
-	m_textureSize = site.textureSize;
-    m_tileMask  = site.tileMask;
-}
-
-
-bool Builder::loadFromTileMap(const TileMap& tilemap) noexcept
-{
 	m_mapSize = tilemap.getMapSize();
 	m_tileSize = tilemap.getTileSize();
+	m_textureSize = { texture.width, texture.height };
 
 	auto get_structure_enum = [](const std::string& name) -> Structure::Type
 	{
-		if(name =="Wall")          return Structure::Type::WALL;
-		if(name =="Refinery")      return Structure::Type::REFINERY;
-		if(name =="ConstructYard") return Structure::Type::CONSTRUCTION_YARD ;
-		if(name =="WindTrap")      return Structure::Type::WIND_TRAP;
-		if(name =="Outpost")       return Structure::Type::OUTPOST;
-		if(name =="Silo")          return Structure::Type::SILO;
-		if(name =="Vehicle")       return Structure::Type::VEHICLE;
-		if(name =="Barracks")      return Structure::Type::BARRACKS;
-		if(name =="Palace")        return Structure::Type::PALACE;
-		if(name =="HighTech")      return Structure::Type::HIGH_TECH;
-		if(name =="Repair")        return Structure::Type::REPAIR;
-		if(name =="Slab_1x1")      return Structure::Type::SLAB_1x1;
-		if(name =="Starport")      return Structure::Type::STARPORT;
-		if(name =="Turret")        return Structure::Type::TURRET;
-		if(name =="RocketTurret")  return Structure::Type::ROCKET_TURRET;
+		if(name == "Wall")          return Structure::Type::WALL;
+		if(name == "Refinery")      return Structure::Type::REFINERY;
+		if(name == "ConstructYard") return Structure::Type::CONSTRUCTION_YARD ;
+		if(name == "WindTrap")      return Structure::Type::WIND_TRAP;
+		if(name == "Outpost")       return Structure::Type::OUTPOST;
+		if(name == "Silo")          return Structure::Type::SILO;
+		if(name == "Vehicle")       return Structure::Type::VEHICLE;
+		if(name == "Barracks")      return Structure::Type::BARRACKS;
+		if(name == "Palace")        return Structure::Type::PALACE;
+		if(name == "HighTech")      return Structure::Type::HIGH_TECH;
+		if(name == "Repair")        return Structure::Type::REPAIR;
+		if(name == "Slab_1x1")      return Structure::Type::SLAB_1x1;
+		if(name == "Starport")      return Structure::Type::STARPORT;
+		if(name == "Turret")        return Structure::Type::TURRET;
+		if(name == "RocketTurret")  return Structure::Type::ROCKET_TURRET;
 
 		return Structure::Type::INVALID;
 	};
@@ -132,7 +126,7 @@ bool Builder::loadFromTileMap(const TileMap& tilemap) noexcept
 
 bool Builder::putStructureOnMap(const Structure::Type type, const ivec2s cell) noexcept
 {
-	if(!m_tileMask)
+	if(auto size = m_registry.storage<Structure>().size(); size >= STRUCTURE_LIMIT_ON_MAP)
 		return false;
 
 	if(type >= Structure::Type::MAX)
@@ -286,7 +280,7 @@ void Builder::updateWall(int32_t origin, int32_t level) noexcept
 		int32_t right  = origin + 1;
 		int32_t bottom = origin + m_mapSize.y;
 
-		const char* field = m_tileMask;
+		const char* field = m_tileMask.data();
 		const int32_t tileCount = m_mapSize.x * m_mapSize.y;
 
 		bool a = (left >= 0)          ? (field[left]   == 'W') : false;

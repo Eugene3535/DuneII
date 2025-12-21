@@ -12,12 +12,10 @@
 class Builder
 {
 public:
-    Builder(entt::registry& registry) noexcept;
+    Builder(entt::registry& registry, std::string& tileMask) noexcept;
     ~Builder();
 
-    void reset(const IConstructionSite& site) noexcept;
-
-    bool loadFromTileMap(const class TileMap& tilemap) noexcept;
+    bool loadFromTileMap(const class TileMap& tilemap, const struct Texture& texture) noexcept;
     bool putStructureOnMap(const Structure::Type type, const ivec2s cell) noexcept; // cell must be in tiles
 
     uint32_t getVertexBuffer() const noexcept;
@@ -27,12 +25,12 @@ private:
     void updateWall(int32_t origin, int32_t level) noexcept;
 
     entt::registry& m_registry;
+    std::string& m_tileMask;
     std::unordered_map<int32_t, entt::entity> m_structureMap;
 
     uint32_t m_vertexBuffer;
     void* m_mappedStorage;
 
-    char* m_tileMask;
     ivec2s m_textureSize;
     ivec2s m_mapSize;
     ivec2s m_tileSize;
