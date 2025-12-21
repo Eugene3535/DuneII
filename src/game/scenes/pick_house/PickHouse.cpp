@@ -121,7 +121,41 @@ bool PickHouse::load(std::string_view info) noexcept
 
 void PickHouse::update(float dt) noexcept
 {
-    m_timer += dt;
+    if (!m_isLoaded)
+        return;
+
+    if (m_timer > SWITCH_HOUSE_OUTLINE_DELAY)
+    {
+        m_timer = 0;
+        m_outlineNeedUpdate = true;
+
+        switch (m_selectedHouse)
+        {
+        case HouseType::ATREIDES:
+            if (m_game->isKeyPressed(GLFW_KEY_RIGHT))
+                m_selectedHouse = HouseType::ORDOS;
+            break;
+
+        case HouseType::ORDOS:
+            if (m_game->isKeyPressed(GLFW_KEY_LEFT))
+                m_selectedHouse = HouseType::ATREIDES;
+
+            if (m_game->isKeyPressed(GLFW_KEY_RIGHT))
+                m_selectedHouse = HouseType::HARKONNEN;
+            break;
+
+        case HouseType::HARKONNEN:
+            if (m_game->isKeyPressed(GLFW_KEY_LEFT))
+                m_selectedHouse = HouseType::ORDOS;
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    if (m_game->isKeyPressed(GLFW_KEY_ENTER))
+        m_game->switchScene(this, Scene::MISSION);
 
     if(m_outlineNeedUpdate)
     {
@@ -219,41 +253,4 @@ void PickHouse::resize(int width, int height) noexcept
 
     m_outlineTransform.setPosition(outlinePositionX, OUTLINE_POSITION_Y * dy);
     m_outlineTransform.setScale(dx, dy);
-}
-
-
-void PickHouse::press(int key) noexcept
-{
-    if(m_timer > SWITCH_HOUSE_OUTLINE_DELAY)
-    {
-        m_timer = 0;
-        m_outlineNeedUpdate = true;
-
-        switch (m_selectedHouse)
-        {
-            case HouseType::ATREIDES:
-                if(key == GLFW_KEY_RIGHT)
-                    m_selectedHouse = HouseType::ORDOS;      
-            break;
-
-            case HouseType::ORDOS:
-                if(key == GLFW_KEY_LEFT)
-                    m_selectedHouse = HouseType::ATREIDES;
-
-                if(key == GLFW_KEY_RIGHT)
-                    m_selectedHouse = HouseType::HARKONNEN;
-            break;
-
-            case HouseType::HARKONNEN:
-                if(key == GLFW_KEY_LEFT)
-                    m_selectedHouse = HouseType::ORDOS;
-            break;
-            
-            default:
-                break;
-        }
-    }
-
-    if(key == GLFW_KEY_ENTER)
-        m_game->switchScene(this, Scene::MISSION);
 }

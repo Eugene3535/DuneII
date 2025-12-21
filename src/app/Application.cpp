@@ -180,28 +180,4 @@ void Application::initCallbacks() noexcept
 		if (auto game = static_cast<DuneII*>(glfwGetWindowUserPointer(window)))
 			game->resize(width, height);
 	});
-
-	glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double xpos, double ypos)
-	{
-		if (auto game = static_cast<DuneII*>(glfwGetWindowUserPointer(window)))
-			game->setCursorPosition(static_cast<float>(xpos), static_cast<float>(ypos));	
-	});
-
-	glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
-	{
-		if (action == GLFW_PRESS || action == GLFW_REPEAT)
-        {
-			if (auto game = static_cast<DuneII*>(glfwGetWindowUserPointer(window)))
-				game->press(key);
-		}
-	});
-
-	glfwSetMouseButtonCallback(m_window, [](GLFWwindow* window, int button, int action, int mods)
-	{
-		if(action == GLFW_PRESS)
-		{
-			if (auto game = static_cast<DuneII*>(glfwGetWindowUserPointer(window)))
-				game->click(button);
-		}
-	});
 }

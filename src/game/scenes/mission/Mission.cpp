@@ -113,6 +113,28 @@ bool Mission::load(std::string_view info) noexcept
 
 void Mission::update(float dt) noexcept
 {
+    if (!m_isLoaded)
+        return;
+
+    {
+        vec2s movement = { 0, 0 };
+
+        if (m_game->isKeyPressed(GLFW_KEY_A))
+            movement.x = 10.f;
+
+        if (m_game->isKeyPressed(GLFW_KEY_D))
+            movement.x = -10.f;
+
+        if (m_game->isKeyPressed(GLFW_KEY_W))
+            movement.y = 10.f;
+
+        if (m_game->isKeyPressed(GLFW_KEY_S))
+            movement.y = -10.f;
+
+
+        m_transform.move(movement);
+    }
+
     alignas(16) mat4 MVP;
     alignas(16) mat4 modelView;
     alignas(16) mat4 result;
@@ -123,12 +145,6 @@ void Mission::update(float dt) noexcept
     m_transform.calculate(modelView);
     glmc_mat4_mul(MVP, modelView, result);
     camera.updateUniformBuffer(result);
-
-    if(m_isLoaded)
-    {
-        for(auto system : m_systems)
-            system(this, dt);
-    }
 }
 
 
@@ -160,38 +176,6 @@ void Mission::draw() noexcept
 
 
 void Mission::resize(int width, int height) noexcept
-{
-
-}
-
-
-void Mission::press(int key) noexcept
-{
-    vec2s movement = { 0, 0 };
-
-    if(key == GLFW_KEY_A)
-        movement.x = 10.f;
-
-    if(key == GLFW_KEY_D)
-        movement.x = -10.f;
-
-    if(key == GLFW_KEY_W)
-        movement.y = 10.f;
-
-    if(key == GLFW_KEY_S)
-        movement.y = -10.f;
-
-    m_transform.move(movement);
-}
-
-
-void Mission::click(int button) noexcept
-{
-
-}
-
-
-void Mission::setCursorPosition(float x, float y) noexcept
 {
 
 }

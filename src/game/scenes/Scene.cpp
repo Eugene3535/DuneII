@@ -41,24 +41,6 @@ void Scene::resize(int width, int height) noexcept
 }
 
 
-void Scene::press(int key) noexcept
-{
-
-}
-
-
-void Scene::click(int button) noexcept
-{
-
-}
-
-
-void Scene::setCursorPosition(float x, float y) noexcept
-{
-
-}
-
-
 bool Scene::isLoaded() const noexcept
 {
     return m_isLoaded;

@@ -42,8 +42,6 @@ TitleScreen::TitleScreen(DuneII* game) noexcept:
     m_playButton(nullptr),
     m_exitButton(nullptr),
     m_settingsButton(nullptr),
-    m_mousePosition(glms_vec2_zero()),
-    m_isMouseButtonPressed(false),
     m_isPresented(true)
 {
 
@@ -168,11 +166,12 @@ void TitleScreen::update(float dt) noexcept
 
     if(m_isPresented)
     {
-        m_settingsButton->update(m_mousePosition, m_isMouseButtonPressed);
-        m_playButton->update(m_mousePosition, m_isMouseButtonPressed);
-        m_exitButton->update(m_mousePosition, m_isMouseButtonPressed);
+        const bool isMouseButtonPressed = m_game->isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
+        const vec2s mousePosition = m_game->getCursorPosition();
 
-        m_isMouseButtonPressed = false;
+        m_settingsButton->update(mousePosition, isMouseButtonPressed);
+        m_playButton->update(mousePosition, isMouseButtonPressed);
+        m_exitButton->update(mousePosition, isMouseButtonPressed);
 
         if(m_playButton->isSelected())
             m_game->switchScene(this, Scene::PICK_HOUSE);
@@ -276,17 +275,4 @@ void TitleScreen::resize(int width, int height) noexcept
             m_exitButton->setPosition(centerX + offset, centerY);
         }
     }
-}
-
-
-void TitleScreen::click(int button) noexcept
-{
-    if(button == GLFW_MOUSE_BUTTON_LEFT)
-        m_isMouseButtonPressed = true;
-}
-
-
-void TitleScreen::setCursorPosition(float x, float y) noexcept
-{
-    m_mousePosition = { x, y };
 }

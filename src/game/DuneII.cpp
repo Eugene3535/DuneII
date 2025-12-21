@@ -17,27 +17,6 @@ DuneII::DuneII() noexcept:
 }
 
 
-//void DuneII::press(int key) noexcept
-//{
-//    if(m_currentScene)
-//        m_currentScene->press(key);
-//}
-//
-//
-//void DuneII::click(int button) noexcept
-//{
-//    if(m_currentScene)
-//        m_currentScene->click(button);
-//}
-//
-//
-//void DuneII::setCursorPosition(float x, float y) noexcept
-//{
-//    if(m_currentScene)
-//        m_currentScene->setCursorPosition(x, y);
-//}
-
-
 void DuneII::resize(int width, int height) noexcept
 {
     camera.setupProjectionMatrix(width, height);

@@ -20,11 +20,7 @@ class DuneII final
 public:
     DuneII() noexcept;
 
-    void press(int key) noexcept;
-    void click(int button) noexcept;
-    void setCursorPosition(float x, float y) noexcept;
     void resize(int width, int height) noexcept;
-
     void switchScene(const Scene* requester, Scene::Type nextScene) noexcept;
 
     bool isKeyPressed(int key) const noexcept;

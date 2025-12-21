@@ -27,9 +27,6 @@ public:
     virtual void update(float dt)                    noexcept;
     virtual void draw()                              noexcept;
     virtual void resize(int width, int height)       noexcept;
-    virtual void press(int key)                      noexcept;
-    virtual void click(int button)                   noexcept;
-    virtual void setCursorPosition(float x, float y) noexcept;
 
     bool isLoaded() const noexcept;
 

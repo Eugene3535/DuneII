@@ -22,8 +22,6 @@ public:
     void draw()                        noexcept override;
     void resize(int width, int height) noexcept override;
 
-    void press(int key) noexcept override;
-
 private:
     GLuint m_vbo;
     GLuint m_vao;

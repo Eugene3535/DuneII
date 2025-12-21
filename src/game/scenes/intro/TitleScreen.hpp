@@ -18,8 +18,6 @@ public:
     void update(float dt)                    noexcept override;
     void draw()                              noexcept override;
     void resize(int width, int height)       noexcept override;
-    void click(int button)                   noexcept override;
-    void setCursorPosition(float x, float y) noexcept override;
 
 private:
     GLuint m_textures[5];
@@ -37,9 +35,6 @@ private:
     Button*       m_exitButton;
     Button*       m_settingsButton;
     char m_memoryPool[sizeof(Button) * 3];
-
-    vec2s m_mousePosition;
-    bool m_isMouseButtonPressed;
 
     bool m_isPresented;
 };
