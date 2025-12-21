@@ -6,9 +6,10 @@
 #include "game/scenes/Scene.hpp"
 
 
-Scene::Scene(DuneII* game) noexcept:
+Scene::Scene(DuneII* game, const Scene::Type type) noexcept:
     m_game(game),
-    m_isLoaded(false)
+    m_isLoaded(false),
+    m_type(type)
 {
 
 }
@@ -44,6 +45,12 @@ void Scene::resize(int width, int height) noexcept
 bool Scene::isLoaded() const noexcept
 {
     return m_isLoaded;
+}
+
+
+Scene::Type Scene::getType() const noexcept
+{
+    return m_type;
 }
 
 

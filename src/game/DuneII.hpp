@@ -4,7 +4,6 @@
 #include <string_view>
 #include <unordered_map>
 #include <memory>
-#include <typeindex>
 
 #include <cglm/struct/vec2.h>
 
@@ -20,7 +19,6 @@ class DuneII final
 public:
     DuneII() noexcept;
 
-    void resize(int width, int height) noexcept;
     void switchScene(const Scene* requester, Scene::Type nextScene) noexcept;
 
     bool isKeyPressed(int key) const noexcept;
@@ -34,15 +32,16 @@ public:
     
 private:
     bool init(struct GLFWwindow* window) noexcept;
-    void update(float dt) noexcept;
-    void draw() noexcept;
+    void update(float dt)                noexcept;
+    void draw()                          noexcept;
+    void resize(int width, int height)   noexcept;
 
     template<class T>
     std::shared_ptr<T> load(std::string_view info) noexcept;
 
     struct GLFWwindow* m_window;
 
-    std::unordered_map<std::type_index, std::shared_ptr<void>> m_scenes;
+    std::unordered_map<Scene::Type, std::shared_ptr<Scene>> m_scenes;
     std::shared_ptr<Scene> m_currentScene;
     Scene::Type m_nextSceneType;
     bool m_isSceneNeedToBeChanged;

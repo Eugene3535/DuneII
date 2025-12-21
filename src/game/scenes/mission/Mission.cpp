@@ -1,3 +1,5 @@
+#include <cstring>
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
@@ -9,7 +11,7 @@
 
 
 Mission::Mission(DuneII* game) noexcept:
-    Scene(game),
+    Scene(game, Scene::MISSION),
     m_builder(m_registry, m_tileMask)
 {
     memset(&m_landscape, 0, sizeof(m_landscape)); 

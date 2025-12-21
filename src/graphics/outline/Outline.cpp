@@ -14,7 +14,9 @@ Outline::Outline(uint32_t vboHandle, uint32_t vaoHandle) noexcept:
     m_vao(vaoHandle),
     m_count(0)
 {
-	glNamedBufferData(m_vbo, 0, nullptr, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     VertexArrayObject vao(vaoHandle);
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float2 };

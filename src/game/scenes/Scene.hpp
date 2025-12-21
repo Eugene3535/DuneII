@@ -20,7 +20,7 @@ public:
         MISSION
     };
 
-	Scene(class DuneII* game) noexcept;
+	Scene(class DuneII* game, const Type type) noexcept;
 	virtual ~Scene();
     
     virtual bool load(std::string_view info)         noexcept;
@@ -29,13 +29,16 @@ public:
     virtual void resize(int width, int height)       noexcept;
 
     bool isLoaded() const noexcept;
+    Type getType() const noexcept;
 
 protected:
     void setSpriteSizeInPixels(const Sprite& sprite, vec2 newSize, Transform2D& transform) noexcept;
 
     class DuneII* m_game;
+    bool          m_isLoaded;
 
-    bool m_isLoaded;
+private:
+    const Type m_type;
 };
 
 #endif // !SCENE_HPP

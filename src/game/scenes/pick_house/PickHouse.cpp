@@ -20,7 +20,7 @@
 
 
 PickHouse::PickHouse(DuneII* game) noexcept:
-    Scene(game),
+    Scene(game, Scene::PICK_HOUSE),
     m_vbo(0),
     m_vao(0),
     m_texture(0),
@@ -124,6 +124,8 @@ void PickHouse::update(float dt) noexcept
     if (!m_isLoaded)
         return;
 
+    m_timer += dt;
+
     if (m_timer > SWITCH_HOUSE_OUTLINE_DELAY)
     {
         m_timer = 0;
@@ -131,26 +133,26 @@ void PickHouse::update(float dt) noexcept
 
         switch (m_selectedHouse)
         {
-        case HouseType::ATREIDES:
-            if (m_game->isKeyPressed(GLFW_KEY_RIGHT))
-                m_selectedHouse = HouseType::ORDOS;
-            break;
+            case HouseType::ATREIDES:
+                if (m_game->isKeyPressed(GLFW_KEY_RIGHT))
+                    m_selectedHouse = HouseType::ORDOS;
+                break;
 
-        case HouseType::ORDOS:
-            if (m_game->isKeyPressed(GLFW_KEY_LEFT))
-                m_selectedHouse = HouseType::ATREIDES;
+            case HouseType::ORDOS:
+                if (m_game->isKeyPressed(GLFW_KEY_LEFT))
+                    m_selectedHouse = HouseType::ATREIDES;
 
-            if (m_game->isKeyPressed(GLFW_KEY_RIGHT))
-                m_selectedHouse = HouseType::HARKONNEN;
-            break;
+                if (m_game->isKeyPressed(GLFW_KEY_RIGHT))
+                    m_selectedHouse = HouseType::HARKONNEN;
+                break;
 
-        case HouseType::HARKONNEN:
-            if (m_game->isKeyPressed(GLFW_KEY_LEFT))
-                m_selectedHouse = HouseType::ORDOS;
-            break;
+            case HouseType::HARKONNEN:
+                if (m_game->isKeyPressed(GLFW_KEY_LEFT))
+                    m_selectedHouse = HouseType::ORDOS;
+                break;
 
-        default:
-            break;
+            default:
+                break;
         }
     }
 

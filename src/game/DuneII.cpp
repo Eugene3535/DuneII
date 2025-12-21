@@ -17,40 +17,39 @@ DuneII::DuneII() noexcept:
 }
 
 
-void DuneII::resize(int width, int height) noexcept
-{
-    camera.setupProjectionMatrix(width, height);
-    
-    if(m_currentScene)
-        m_currentScene->resize(width, height);
-}
-
-
 void DuneII::switchScene(const Scene* requester, Scene::Type nextScene) noexcept
 {
+    if (!requester)
+        return;
+
     switch (nextScene)
     {
-        case Scene::Type::MAIN_MENU:
-            m_isSceneNeedToBeChanged = true;
-        break;
-
-        case Scene::Type::PICK_HOUSE:
-            if(dynamic_cast<const TitleScreen*>(requester) != nullptr)
+        case Scene::MAIN_MENU:
+            if (requester->getType() == Scene::MISSION)
             {
+                m_nextSceneType = nextScene;
                 m_isSceneNeedToBeChanged = true;
-                m_nextSceneType = Scene::Type::PICK_HOUSE;
             }
         break;
 
-        case Scene::Type::MISSION:
-            if(dynamic_cast<const PickHouse*>(requester) != nullptr)
+        case Scene::PICK_HOUSE:
+            if(requester->getType() == Scene::MAIN_MENU)
             {
+                m_nextSceneType = nextScene;
                 m_isSceneNeedToBeChanged = true;
-                m_nextSceneType = Scene::Type::MISSION;
+            }
+        break;
+
+        case Scene::MISSION:
+            if(requester->getType() == Scene::PICK_HOUSE)
+            {
+                m_nextSceneType = nextScene;
+                m_isSceneNeedToBeChanged = true;
             }
         break;
 
         default:
+            m_nextSceneType = Scene::NONE;
             m_isSceneNeedToBeChanged = false;
         break;
     }
@@ -166,4 +165,13 @@ void DuneII::draw() noexcept
 
     if (m_currentScene)
         m_currentScene->draw();
+}
+
+
+void DuneII::resize(int width, int height) noexcept
+{
+    camera.setupProjectionMatrix(width, height);
+
+    if (m_currentScene)
+        m_currentScene->resize(width, height);
 }
