@@ -27,11 +27,13 @@ public:
 
     void switchScene(const Scene* requester, Scene::Type nextScene) noexcept;
 
+    bool isKeyPressed(int key) const noexcept;
+    bool isMouseButtonPressed(int button) const noexcept;
+
+    vec2s  getCursorPosition() const noexcept;
     ivec2s getWindowsSize() const noexcept;
 
-//  Resources
     FileProvider fileProvider;
-
     OrthogonalCamera camera;
     
 private:

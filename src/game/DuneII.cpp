@@ -17,25 +17,25 @@ DuneII::DuneII() noexcept:
 }
 
 
-void DuneII::press(int key) noexcept
-{
-    if(m_currentScene)
-        m_currentScene->press(key);
-}
-
-
-void DuneII::click(int button) noexcept
-{
-    if(m_currentScene)
-        m_currentScene->click(button);
-}
-
-
-void DuneII::setCursorPosition(float x, float y) noexcept
-{
-    if(m_currentScene)
-        m_currentScene->setCursorPosition(x, y);
-}
+//void DuneII::press(int key) noexcept
+//{
+//    if(m_currentScene)
+//        m_currentScene->press(key);
+//}
+//
+//
+//void DuneII::click(int button) noexcept
+//{
+//    if(m_currentScene)
+//        m_currentScene->click(button);
+//}
+//
+//
+//void DuneII::setCursorPosition(float x, float y) noexcept
+//{
+//    if(m_currentScene)
+//        m_currentScene->setCursorPosition(x, y);
+//}
 
 
 void DuneII::resize(int width, int height) noexcept
@@ -75,6 +75,35 @@ void DuneII::switchScene(const Scene* requester, Scene::Type nextScene) noexcept
             m_isSceneNeedToBeChanged = false;
         break;
     }
+}
+
+
+bool DuneII::isKeyPressed(int key) const noexcept
+{
+    if(m_window)
+        return (glfwGetKey(m_window, key) == GLFW_PRESS);
+
+    return false;
+}
+
+
+bool DuneII::isMouseButtonPressed(int button) const noexcept
+{
+    if (m_window)
+        return (glfwGetMouseButton(m_window, button) == GLFW_PRESS);
+
+    return false;
+}
+
+
+vec2s DuneII::getCursorPosition() const noexcept
+{
+    double xpos = 0, ypos = 0;
+
+    if(m_window)
+        glfwGetCursorPos(m_window, &xpos, &ypos);
+
+    return { static_cast<float>(xpos), static_cast<float>(ypos) };
 }
 
 
