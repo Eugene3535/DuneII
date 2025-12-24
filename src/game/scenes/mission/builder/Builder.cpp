@@ -33,7 +33,6 @@ static ivec4s       get_bounds_of(const Structure::Type type, const ivec2s cell,
 static int32_t      get_armor_of(const Structure::Type type)                                            noexcept;
 
 
-
 Builder::Builder(entt::registry& registry, std::string& tileMask) noexcept:
     m_registry(registry),
 	m_tileMask(tileMask),
@@ -44,26 +43,6 @@ Builder::Builder(entt::registry& registry, std::string& tileMask) noexcept:
 	m_tileSize(glms_ivec2_zero())
 {
 	glCreateBuffers(1, &m_vertexBuffer);
-
-	glNamedBufferStorage(
-		m_vertexBuffer,
-		STRUCTURE_LIMIT_ON_MAP * sizeof(vec4s) * 4,
-		nullptr,
-		GL_DYNAMIC_STORAGE_BIT |
-		GL_MAP_WRITE_BIT | 
-		GL_MAP_PERSISTENT_BIT | 
-		GL_MAP_COHERENT_BIT
-	);
-
-	m_mappedStorage = glMapNamedBufferRange(
-		m_vertexBuffer,
-		0, 
-		STRUCTURE_LIMIT_ON_MAP * sizeof(vec4s) * 4,
-		GL_MAP_WRITE_BIT |
-		GL_MAP_PERSISTENT_BIT |
-		GL_MAP_COHERENT_BIT |
-		GL_MAP_UNSYNCHRONIZED_BIT
-	);
 }
 
 
@@ -78,6 +57,7 @@ Builder::~Builder()
 
 bool Builder::loadFromTileMap(const TileMap& tilemap, const uint32_t texture) noexcept
 {
+	initStorage();
 	m_structureMap.clear();
 	
 	m_mapSize = tilemap.getMapSize();
@@ -241,6 +221,33 @@ bool Builder::putStructureOnMap(const Structure::Type type, const ivec2s cell) n
 uint32_t Builder::getVertexBuffer() const noexcept
 {
 	return m_vertexBuffer;
+}
+
+
+void Builder::initStorage() noexcept
+{
+	if(m_mappedStorage)
+		return;
+
+	glNamedBufferStorage(
+		m_vertexBuffer,
+		STRUCTURE_LIMIT_ON_MAP * sizeof(vec4s) * 4,
+		nullptr,
+		GL_DYNAMIC_STORAGE_BIT |
+		GL_MAP_WRITE_BIT | 
+		GL_MAP_PERSISTENT_BIT | 
+		GL_MAP_COHERENT_BIT
+	);
+
+	m_mappedStorage = glMapNamedBufferRange(
+		m_vertexBuffer,
+		0, 
+		STRUCTURE_LIMIT_ON_MAP * sizeof(vec4s) * 4,
+		GL_MAP_WRITE_BIT |
+		GL_MAP_PERSISTENT_BIT |
+		GL_MAP_COHERENT_BIT |
+		GL_MAP_UNSYNCHRONIZED_BIT
+	);
 }
 
 

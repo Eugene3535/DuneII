@@ -2,6 +2,7 @@
 #define MISSION_HPP
 
 #include "resources/gl_interfaces/shaders/ShaderProgram.hpp"
+#include "graphics/sprites/SpriteManager.hpp"
 #include "game/scenes/mission/tilemap/TileMap.hpp"
 #include "game/scenes/mission/builder/Builder.hpp"
 #include "game/scenes/Scene.hpp"
@@ -22,6 +23,7 @@ public:
 private:
     void createSystems() noexcept;
 
+    vec2s          m_position;
     Transform2D    m_transform;
     TileMap        m_tilemap;
     SpriteManager  m_sprites;

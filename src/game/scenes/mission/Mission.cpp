@@ -10,8 +10,13 @@
 #include "game/scenes/mission/Mission.hpp"
 
 
+#define CAMERA_VELOCITY 600
+#define SCREEN_MARGIN 150
+
+
 Mission::Mission(DuneII* game) noexcept:
     Scene(game, Scene::MISSION),
+    m_position(glms_vec2_zero()),
     m_builder(m_registry, m_tileMask)
 {
     memset(&m_landscape, 0, sizeof(m_landscape)); 
@@ -104,10 +109,10 @@ bool Mission::load(std::string_view info) noexcept
         if(!m_builder.loadFromTileMap(m_tilemap, buildingTexture.handle))
             return false;
 
-        createSystems();
-
         m_isLoaded = true;
     }
+
+    createSystems();
 
     return m_isLoaded;
 }
@@ -118,24 +123,8 @@ void Mission::update(float dt) noexcept
     if (!m_isLoaded)
         return;
 
-    {
-        vec2s movement = { 0, 0 };
-
-        if (m_game->isKeyPressed(GLFW_KEY_A))
-            movement.x = 10.f;
-
-        if (m_game->isKeyPressed(GLFW_KEY_D))
-            movement.x = -10.f;
-
-        if (m_game->isKeyPressed(GLFW_KEY_W))
-            movement.y = 10.f;
-
-        if (m_game->isKeyPressed(GLFW_KEY_S))
-            movement.y = -10.f;
-
-
-        m_transform.move(movement);
-    }
+    for(auto system : m_systems)
+        system(this, dt);
 
     alignas(16) mat4 MVP;
     alignas(16) mat4 modelView;
@@ -185,5 +174,40 @@ void Mission::resize(int width, int height) noexcept
 
 void Mission::createSystems() noexcept
 {
+//  Viewport Controller
+    m_systems.emplace_back([](Mission* mission, float dt)
+    {
+        const auto game     = mission->m_game;
+        const auto cursor   = game->getCursorPosition();
+        const auto viewSize = game->getWindowsSize();
+        const auto mapSize  = glms_ivec2_mul(mission->m_tilemap.getMapSize(), mission->m_tilemap.getTileSize());
 
+        const bool is_near_the_left_edge   = (cursor.x > 0 && cursor.x < SCREEN_MARGIN);
+        const bool is_near_the_top_edge    = (cursor.y > 0 && cursor.y < SCREEN_MARGIN);
+        const bool is_near_the_right_edge  = (cursor.x > (viewSize.x - SCREEN_MARGIN) && cursor.x < viewSize.x);
+        const bool is_near_the_bottom_edge = (cursor.y > (viewSize.y - SCREEN_MARGIN) && cursor.y < viewSize.y);
+
+        const float velocity = dt * CAMERA_VELOCITY;
+        vec2s scenePosition = mission->m_position;
+
+        if(is_near_the_left_edge)
+            scenePosition.x += velocity;
+        
+        if(is_near_the_top_edge)
+            scenePosition.y += velocity;
+        
+        if(is_near_the_right_edge)
+            scenePosition.x -= velocity;
+        
+        if(is_near_the_bottom_edge)
+            scenePosition.y -= velocity;
+
+        if(scenePosition.x > 0) scenePosition.x = 0;
+        if(scenePosition.y > 0) scenePosition.y = 0;
+        if(scenePosition.x < (viewSize.x - mapSize.x)) scenePosition.x = viewSize.x - mapSize.x;
+        if(scenePosition.y < (viewSize.y - mapSize.y)) scenePosition.y = viewSize.y - mapSize.y;
+
+        mission->m_transform.setPosition(scenePosition);
+        mission->m_position = scenePosition;
+    });
 }

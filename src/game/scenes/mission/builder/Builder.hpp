@@ -5,7 +5,6 @@
 
 #include <entt/entity/registry.hpp>
 
-#include "graphics/sprites/SpriteManager.hpp"
 #include "game/scenes/mission/common/Structures.hpp"
 
 
@@ -21,6 +20,7 @@ public:
     uint32_t getVertexBuffer() const noexcept;
 
 private:
+    void initStorage() noexcept;
     void createGraphicsForEntity(const entt::entity entity) noexcept;
     void updateWall(int32_t origin, int32_t level) noexcept;
 
