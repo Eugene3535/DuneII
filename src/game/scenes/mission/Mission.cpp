@@ -3,6 +3,7 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include "resources/files/FileProvider.hpp"
 #include "resources/gl_interfaces/texture/Texture.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "resources/files/Shader.hpp"
@@ -16,8 +17,8 @@
 
 Mission::Mission(DuneII* game) noexcept:
     Scene(game, Scene::MISSION),
-    m_position(glms_vec2_zero()),
-    m_builder(m_registry, m_tileMask)
+    m_builder(m_registry, m_tileMask),
+    m_hud(m_builder)
 {
     memset(&m_landscape, 0, sizeof(m_landscape)); 
     memset(&m_buildings, 0, sizeof(m_buildings));
@@ -28,9 +29,9 @@ Mission::~Mission()
 {
     if (m_isLoaded)
     {
-        GLuint textures[] = { m_landscape.texture, m_buildings.texture };
-        GLuint vertexArrayObjects[] = { m_landscape.vao, m_buildings.vao };
-        GLuint vertexBufferObjects[] = { m_landscape.vbo[0], m_landscape.vbo[1] };
+        GLuint textures[]            = { m_landscape.texture, m_buildings.texture, m_ui.texture };
+        GLuint vertexArrayObjects[]  = { m_landscape.vao, m_buildings.vao         };
+        GLuint vertexBufferObjects[] = { m_landscape.vbo[0], m_landscape.vbo[1]   };
 
         glDeleteTextures(std::size(textures), textures);
         glDeleteVertexArrays(std::size(vertexArrayObjects), vertexArrayObjects);
@@ -43,8 +44,6 @@ bool Mission::load(std::string_view info) noexcept
 {
     if(m_isLoaded)
         return true;
-  
-    auto& provider = m_game->fileProvider;
 
     glGenTextures(1, &m_landscape.texture);
     glGenBuffers(2, m_landscape.vbo);
@@ -52,23 +51,23 @@ bool Mission::load(std::string_view info) noexcept
 
     Texture landscapeTexture = {.handle = m_landscape.texture };
 
-    if(!landscapeTexture.loadFromFile(provider.findPathToFile(LANDSCAPE_PNG)))
+    if(!landscapeTexture.loadFromFile(FileProvider::findPathToFile(LANDSCAPE_PNG)))
         return false;
 
     {
         std::array<Shader, 2> shaders;
 
-        if(!shaders[0].loadFromFile(provider.findPathToFile("tilemap.vert"), GL_VERTEX_SHADER))
+        if(!shaders[0].loadFromFile(FileProvider::findPathToFile("tilemap.vert"), GL_VERTEX_SHADER))
             return false;
 
-        if(!shaders[1].loadFromFile(provider.findPathToFile("tilemap.frag"), GL_FRAGMENT_SHADER))
+        if(!shaders[1].loadFromFile(FileProvider::findPathToFile("tilemap.frag"), GL_FRAGMENT_SHADER))
             return false;
 
-        if( ! m_landscape.program.link(shaders) )
+        if( ! m_tilemapProgram.link(shaders) )
             return false;
     }
 
-    if(m_tilemap.loadFromFile(provider.findPathToFile(std::string(info))))
+    if(m_tilemap.loadFromFile(FileProvider::findPathToFile(std::string(info))))
     {
         auto vertices = m_tilemap.getVertices();
         glBindBuffer(GL_ARRAY_BUFFER, m_landscape.vbo[0]);
@@ -99,7 +98,7 @@ bool Mission::load(std::string_view info) noexcept
 
         Texture buildingTexture = {.handle = m_buildings.texture };
 
-        if(!buildingTexture.loadFromFile(provider.findPathToFile(STRUCTURES_PNG)))
+        if(!buildingTexture.loadFromFile(FileProvider::findPathToFile(STRUCTURES_PNG)))
             return false;
 
         m_tileMask    = m_tilemap.getTileMask();
@@ -108,8 +107,29 @@ bool Mission::load(std::string_view info) noexcept
 
         if(!m_builder.loadFromTileMap(m_tilemap, buildingTexture.handle))
             return false;
+    }
 
-        m_isLoaded = true;
+    {// HUD
+        glGenTextures(1, &m_ui.texture);
+        Texture crosshairTexture = {.handle = m_ui.texture };
+
+        if(!crosshairTexture.loadFromFile(FileProvider::findPathToFile(CROSSHAIRS_TILESHEET_PNG)))
+            return false;
+
+        m_sprites.loadSpriteSheet(FileProvider::findPathToFile(CURSOR_FRAME_XML), crosshairTexture);
+        auto crosshairReleased = m_sprites.getSprite("Released");
+        auto crosshairCaptured = m_sprites.getSprite("Captured");
+
+        if(! (crosshairReleased && crosshairCaptured) )
+            return false;
+
+        std::array<Sprite, 2> crosshairs = 
+        {
+            crosshairReleased.value(),
+            crosshairCaptured.value()
+        };
+
+        m_hud.initCrosshairs(crosshairs);
     }
 
     createSystems();
@@ -141,7 +161,7 @@ void Mission::update(float dt) noexcept
 
 void Mission::draw() noexcept
 {
-    m_landscape.program(true);
+    m_tilemapProgram(true);
 
     glBindTextureUnit(0, m_landscape.texture);
     glBindVertexArray(m_landscape.vao);
@@ -162,7 +182,7 @@ void Mission::draw() noexcept
     glBindVertexArray(0);
     glBindTextureUnit(0, 0);
 
-    m_landscape.program(false);
+    m_tilemapProgram(false);
 }
 
 
@@ -188,7 +208,7 @@ void Mission::createSystems() noexcept
         const bool is_near_the_bottom_edge = (cursor.y > (viewSize.y - SCREEN_MARGIN) && cursor.y < viewSize.y);
 
         const float velocity = dt * CAMERA_VELOCITY;
-        vec2s scenePosition = mission->m_position;
+        vec2s scenePosition = mission->m_transform.getPosition();
 
         if(is_near_the_left_edge)
             scenePosition.x += velocity;
@@ -202,12 +222,13 @@ void Mission::createSystems() noexcept
         if(is_near_the_bottom_edge)
             scenePosition.y -= velocity;
 
-        if(scenePosition.x > 0) scenePosition.x = 0;
-        if(scenePosition.y > 0) scenePosition.y = 0;
+        if(scenePosition.x > 0)                        scenePosition.x = 0;
+        if(scenePosition.y > 0)                        scenePosition.y = 0;
         if(scenePosition.x < (viewSize.x - mapSize.x)) scenePosition.x = viewSize.x - mapSize.x;
         if(scenePosition.y < (viewSize.y - mapSize.y)) scenePosition.y = viewSize.y - mapSize.y;
 
         mission->m_transform.setPosition(scenePosition);
-        mission->m_position = scenePosition;
     });
+
+    m_isLoaded = true;
 }

@@ -7,7 +7,6 @@
 
 #include <cglm/struct/vec2.h>
 
-#include "resources/files/FileProvider.hpp"
 #include "graphics/camera/OrthogonalCamera.hpp"
 #include "game/scenes/Scene.hpp"
 
@@ -27,7 +26,6 @@ public:
     vec2s  getCursorPosition() const noexcept;
     ivec2s getWindowsSize() const noexcept;
 
-    FileProvider fileProvider;
     OrthogonalCamera camera;
     
 private:

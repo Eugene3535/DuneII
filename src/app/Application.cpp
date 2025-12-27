@@ -180,4 +180,10 @@ void Application::initCallbacks() noexcept
 		if (auto game = static_cast<DuneII*>(glfwGetWindowUserPointer(window)))
 			game->resize(width, height);
 	});
+
+	glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+	{
+		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        	glfwSetWindowShouldClose(window, GLFW_TRUE);
+	});
 }

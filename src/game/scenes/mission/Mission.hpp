@@ -5,6 +5,7 @@
 #include "graphics/sprites/SpriteManager.hpp"
 #include "game/scenes/mission/tilemap/TileMap.hpp"
 #include "game/scenes/mission/builder/Builder.hpp"
+#include "game/scenes/mission/HUD/HeadUpDisplay.hpp"
 #include "game/scenes/Scene.hpp"
 
 
@@ -15,29 +16,30 @@ public:
     explicit Mission(class DuneII* game) noexcept;
     ~Mission();
 
-    bool load(std::string_view info)         noexcept override;
-    void update(float dt)                    noexcept override;
-    void draw()                              noexcept override;
-    void resize(int width, int height)       noexcept override;
+    bool load(std::string_view info)   noexcept override;
+    void update(float dt)              noexcept override;
+    void draw()                        noexcept override;
+    void resize(int width, int height) noexcept override;
 
 private:
     void createSystems() noexcept;
 
-    vec2s          m_position;
     Transform2D    m_transform;
     TileMap        m_tilemap;
     SpriteManager  m_sprites;
     entt::registry m_registry;
     Builder        m_builder;
     std::string    m_tileMask;
+    ShaderProgram  m_tilemapProgram;
+    HeadUpDisplay  m_hud;
     
+//  Resource section
     struct
     {
         GLuint texture;
         GLuint vao;
         GLuint vbo[2];
         GLuint count; // indices
-        ShaderProgram program;
     } m_landscape;
 
     struct
@@ -45,7 +47,12 @@ private:
         GLuint texture;
         GLuint vao;
     } m_buildings;
-    
+
+    struct
+    {
+        GLuint texture;
+    } m_ui;
+
     std::vector<void(*)(Mission*, float)> m_systems;
 };
 

@@ -68,8 +68,6 @@ bool TitleScreen::load(std::string_view info) noexcept
     if(m_isLoaded)
         return true;
     
-    auto& provider = m_game->fileProvider;
-    
     glGenTextures(5, m_textures);
 
 //  Textures
@@ -79,38 +77,38 @@ bool TitleScreen::load(std::string_view info) noexcept
     Texture exitTexture     = {.handle = m_textures[3] };
     Texture settingsTexture = {.handle = m_textures[4] };
 
-    if(!spaceTexture.loadFromFile(provider.findPathToFile(SPACE_JPG)))
+    if(!spaceTexture.loadFromFile(FileProvider::findPathToFile(SPACE_JPG)))
         return false;
 
-    if(!planetTexture.loadFromFile(provider.findPathToFile(DUNE_PNG)))
+    if(!planetTexture.loadFromFile(FileProvider::findPathToFile(DUNE_PNG)))
         return false;
 
-    if(!playTexture.loadFromFile(provider.findPathToFile(BUTTON_PLAY_PNG)))
+    if(!playTexture.loadFromFile(FileProvider::findPathToFile(BUTTON_PLAY_PNG)))
         return false;
 
-    if(!exitTexture.loadFromFile(provider.findPathToFile(BUTTON_EXIT_RU_PNG)))
+    if(!exitTexture.loadFromFile(FileProvider::findPathToFile(BUTTON_EXIT_RU_PNG)))
         return false;
 
-    if(!settingsTexture.loadFromFile(provider.findPathToFile(BUTTON_SETTINGS_RU_PNG)))
+    if(!settingsTexture.loadFromFile(FileProvider::findPathToFile(BUTTON_SETTINGS_RU_PNG)))
         return false;
 
 //  Shaders
     {
         std::array<Shader, 2> shaders;
 
-        if(!shaders[0].loadFromFile(provider.findPathToFile("sprite.vert"), GL_VERTEX_SHADER))
+        if(!shaders[0].loadFromFile(FileProvider::findPathToFile("sprite.vert"), GL_VERTEX_SHADER))
             return false;
 
-        if(!shaders[1].loadFromFile(provider.findPathToFile("sprite.frag"), GL_FRAGMENT_SHADER))
+        if(!shaders[1].loadFromFile(FileProvider::findPathToFile("sprite.frag"), GL_FRAGMENT_SHADER))
             return false;
 
         if(!m_spriteProgram.link(shaders))
             return false;
 
-        if(!shaders[0].loadFromFile(provider.findPathToFile("color_sprite.vert"), GL_VERTEX_SHADER))
+        if(!shaders[0].loadFromFile(FileProvider::findPathToFile("color_sprite.vert"), GL_VERTEX_SHADER))
             return false;
 
-        if(!shaders[1].loadFromFile(provider.findPathToFile("color_sprite.frag"), GL_FRAGMENT_SHADER))
+        if(!shaders[1].loadFromFile(FileProvider::findPathToFile("color_sprite.frag"), GL_FRAGMENT_SHADER))
             return false;
 
         if(!m_buttonSpriteProgram.link(shaders) )

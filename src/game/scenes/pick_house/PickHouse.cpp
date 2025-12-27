@@ -3,6 +3,7 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include "resources/files/FileProvider.hpp"
 #include "resources/files/Shader.hpp"
 #include "resources/gl_interfaces/texture/Texture.hpp"
 #include "game/DuneII.hpp"
@@ -47,8 +48,6 @@ bool PickHouse::load(std::string_view info) noexcept
     if(m_isLoaded)
         return true;
 
-    auto& provider = m_game->fileProvider;
-
     glGenBuffers(1, &m_vbo);
     glGenVertexArrays(1, &m_vao);
     glGenTextures(1, &m_texture);
@@ -56,26 +55,26 @@ bool PickHouse::load(std::string_view info) noexcept
 //  Textures
     Texture housesTexture = {.handle = m_texture };
 
-    if(!housesTexture.loadFromFile(provider.findPathToFile(HOUSES_PNG)))
+    if(!housesTexture.loadFromFile(FileProvider::findPathToFile(HOUSES_PNG)))
         return false;
 
 //  Shaders
     {
         std::array<Shader, 2> shaders;
 
-        if(!shaders[0].loadFromFile(provider.findPathToFile("sprite.vert"), GL_VERTEX_SHADER))
+        if(!shaders[0].loadFromFile(FileProvider::findPathToFile("sprite.vert"), GL_VERTEX_SHADER))
             return false;
 
-        if(!shaders[1].loadFromFile(provider.findPathToFile("sprite.frag"), GL_FRAGMENT_SHADER))
+        if(!shaders[1].loadFromFile(FileProvider::findPathToFile("sprite.frag"), GL_FRAGMENT_SHADER))
             return false;
 
         if(!m_spriteProgram.link(shaders))
             return false;
 
-        if(!shaders[0].loadFromFile(provider.findPathToFile("color_outline.vert"), GL_VERTEX_SHADER))
+        if(!shaders[0].loadFromFile(FileProvider::findPathToFile("color_outline.vert"), GL_VERTEX_SHADER))
             return false;
 
-        if(!shaders[1].loadFromFile(provider.findPathToFile("color_outline.frag"), GL_FRAGMENT_SHADER))
+        if(!shaders[1].loadFromFile(FileProvider::findPathToFile("color_outline.frag"), GL_FRAGMENT_SHADER))
             return false;
 
         if(!m_outlineProgram.link(shaders) )

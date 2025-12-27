@@ -224,6 +224,17 @@ uint32_t Builder::getVertexBuffer() const noexcept
 }
 
 
+std::optional<entt::entity> Builder::getEntityOnTile(const ivec2s tile) const noexcept
+{
+	const int32_t origin = tile.y * m_mapSize.x + tile.x;
+
+	if(auto found = m_structureMap.find(origin); found != m_structureMap.end())
+		return std::make_optional<entt::entity>(found->second);
+
+	return std::nullopt;
+}
+
+
 void Builder::initStorage() noexcept
 {
 	if(m_mappedStorage)
