@@ -44,16 +44,10 @@ bool Mission::load(std::string_view info) noexcept
     if(m_isLoaded)
         return true;
 
-    glGenTextures(1, &m_landscape.texture);
-    glGenBuffers(2, m_landscape.vbo);
-    glGenVertexArrays(1, &m_landscape.vao);
-
-    Texture landscapeTexture = {.handle = m_landscape.texture };
-
-    if(!landscapeTexture.loadFromFile(FileProvider::findPathToFile(LANDSCAPE_PNG)))
+    if(!initLandscape())
         return false;
 
-    if(m_landscape.m_program = m_game->getShaderProgram("tilemap"); m_landscape.m_program == 0)
+    if(!initHUD())
         return false;
 
     if(m_tilemap.loadFromFile(FileProvider::findPathToFile(std::string(info))))
@@ -76,7 +70,6 @@ bool Mission::load(std::string_view info) noexcept
         glBindVertexArray(0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-        m_landscape.texture = landscapeTexture.handle;
         m_landscape.vao = m_landscape.vao;
         m_landscape.count = indices.size();
 
@@ -98,29 +91,6 @@ bool Mission::load(std::string_view info) noexcept
             return false;
     }
 
-    {// HUD
-        glGenTextures(1, &m_ui.texture);
-        Texture crosshairTexture = {.handle = m_ui.texture };
-
-        if(!crosshairTexture.loadFromFile(FileProvider::findPathToFile(CROSSHAIRS_TILESHEET_PNG)))
-            return false;
-
-        m_sprites.loadSpriteSheet(FileProvider::findPathToFile(CURSOR_FRAME_XML), crosshairTexture);
-        auto crosshairReleased = m_sprites.getSprite("Released");
-        auto crosshairCaptured = m_sprites.getSprite("Captured");
-
-        if(! (crosshairReleased && crosshairCaptured) )
-            return false;
-
-        std::array<Sprite, 2> crosshairs = 
-        {
-            crosshairReleased.value(),
-            crosshairCaptured.value()
-        };
-
-        m_hud.initCrosshairs(crosshairs);
-    }
-
     createSystems();
 
     return m_isLoaded;
@@ -129,12 +99,14 @@ bool Mission::load(std::string_view info) noexcept
 
 void Mission::update(float dt) noexcept
 {
-    if (!m_isLoaded)
-        return;
+    if (m_isLoaded)
+        for(auto system : m_systems)
+            system(this, dt);
+}
 
-    for(auto system : m_systems)
-        system(this, dt);
 
+void Mission::draw() noexcept
+{
     alignas(16) mat4 MVP;
     alignas(16) mat4 modelView;
     alignas(16) mat4 result;
@@ -145,12 +117,8 @@ void Mission::update(float dt) noexcept
     m_transform.calculate(modelView);
     glmc_mat4_mul(MVP, modelView, result);
     camera.updateUniformBuffer(result);
-}
 
-
-void Mission::draw() noexcept
-{
-    glUseProgram(m_landscape.m_program);
+    glUseProgram(m_landscape.program);
 
     glBindTextureUnit(0, m_landscape.texture);
     glBindVertexArray(m_landscape.vao);
@@ -171,6 +139,14 @@ void Mission::draw() noexcept
     glBindVertexArray(0);
     glBindTextureUnit(0, 0);
 
+    m_hud.getTransform().calculate(modelView);
+    glmc_mat4_mul(MVP, modelView, result);
+    camera.updateUniformBuffer(result);
+
+    m_sprites.bind(true);
+    m_hud.draw();
+    m_sprites.bind(false);
+
     glUseProgram(0);
 }
 
@@ -178,6 +154,53 @@ void Mission::draw() noexcept
 void Mission::resize(int width, int height) noexcept
 {
 
+}
+
+
+bool Mission::initLandscape() noexcept
+{
+    glGenTextures(1, &m_landscape.texture);
+    glGenBuffers(2, m_landscape.vbo);
+    glGenVertexArrays(1, &m_landscape.vao);
+
+    Texture landscapeTexture = {.handle = m_landscape.texture };
+
+    if(!landscapeTexture.loadFromFile(FileProvider::findPathToFile(LANDSCAPE_PNG)))
+        return false;
+
+    m_landscape.texture = landscapeTexture.handle;
+
+    if(m_landscape.program = m_game->getShaderProgram("tilemap"); m_landscape.program == 0)
+        return false;
+
+    return true;
+}
+
+
+bool Mission::initHUD() noexcept
+{
+    glGenTextures(1, &m_ui.texture);
+    Texture crosshairTexture = {.handle = m_ui.texture };
+
+    if(!crosshairTexture.loadFromFile(FileProvider::findPathToFile(CROSSHAIRS_TILESHEET_PNG)))
+        return false;
+
+    m_sprites.loadSpriteSheet(FileProvider::findPathToFile(CURSOR_FRAME_XML), crosshairTexture);
+    auto crosshairReleased = m_sprites.getSprite("Released");
+    auto crosshairCaptured = m_sprites.getSprite("Captured");
+
+    if(! (crosshairReleased && crosshairCaptured) )
+        return false;
+
+    std::array<Sprite, 2> crosshairs = 
+    {
+        crosshairReleased.value(),
+        crosshairCaptured.value()
+    };
+
+    m_hud.initCrosshairs(crosshairs);
+
+    return true;
 }
 
 
@@ -217,6 +240,15 @@ void Mission::createSystems() noexcept
         if(scenePosition.y < (viewSize.y - mapSize.y)) scenePosition.y = viewSize.y - mapSize.y;
 
         mission->m_transform.setPosition(scenePosition);
+    });
+
+//  HUD Controller
+    m_systems.emplace_back([](Mission* mission, float dt)
+    {
+        const auto game   = mission->m_game;
+        const auto cursor = game->getCursorPosition();
+        
+        mission->m_hud.update(cursor, dt);
     });
 
     m_isLoaded = true;

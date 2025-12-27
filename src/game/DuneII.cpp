@@ -195,6 +195,8 @@ void DuneII::update(float dt) noexcept
         {
             if (auto missionScene = load<Mission>("Atreides-8.tmx"))
                 m_currentScene = missionScene;
+
+            glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
         }
         break;
 

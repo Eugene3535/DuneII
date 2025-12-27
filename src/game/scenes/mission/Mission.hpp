@@ -21,6 +21,8 @@ public:
     void resize(int width, int height) noexcept override;
 
 private:
+    bool initLandscape() noexcept;
+    bool initHUD() noexcept;
     void createSystems() noexcept;
 
     Transform2D    m_transform;
@@ -34,22 +36,22 @@ private:
 //  Resource section
     struct
     {
-        GLuint texture;
-        GLuint vao;
-        GLuint vbo[2];
-        GLuint count; // indices
-        GLuint m_program;
+        uint32_t texture;
+        uint32_t vao;
+        uint32_t vbo[2];
+        uint32_t count; // indices
+        uint32_t program;
     } m_landscape;
 
     struct
     {
-        GLuint texture;
-        GLuint vao;
+        uint32_t texture;
+        uint32_t vao;
     } m_buildings;
 
     struct
     {
-        GLuint texture;
+        uint32_t texture;
     } m_ui;
 
     std::vector<void(*)(Mission*, float)> m_systems;
