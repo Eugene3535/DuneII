@@ -6,7 +6,6 @@
 #include "resources/files/FileProvider.hpp"
 #include "resources/gl_interfaces/texture/Texture.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
-#include "resources/files/Shader.hpp"
 #include "game/DuneII.hpp"
 #include "game/scenes/mission/Mission.hpp"
 
@@ -54,18 +53,8 @@ bool Mission::load(std::string_view info) noexcept
     if(!landscapeTexture.loadFromFile(FileProvider::findPathToFile(LANDSCAPE_PNG)))
         return false;
 
-    {
-        std::array<Shader, 2> shaders;
-
-        if(!shaders[0].loadFromFile(FileProvider::findPathToFile("tilemap.vert"), GL_VERTEX_SHADER))
-            return false;
-
-        if(!shaders[1].loadFromFile(FileProvider::findPathToFile("tilemap.frag"), GL_FRAGMENT_SHADER))
-            return false;
-
-        if( ! m_tilemapProgram.link(shaders) )
-            return false;
-    }
+    if(m_landscape.m_program = m_game->getShaderProgram("tilemap"); m_landscape.m_program == 0)
+        return false;
 
     if(m_tilemap.loadFromFile(FileProvider::findPathToFile(std::string(info))))
     {
@@ -161,7 +150,7 @@ void Mission::update(float dt) noexcept
 
 void Mission::draw() noexcept
 {
-    m_tilemapProgram(true);
+    glUseProgram(m_landscape.m_program);
 
     glBindTextureUnit(0, m_landscape.texture);
     glBindVertexArray(m_landscape.vao);
@@ -182,7 +171,7 @@ void Mission::draw() noexcept
     glBindVertexArray(0);
     glBindTextureUnit(0, 0);
 
-    m_tilemapProgram(false);
+    glUseProgram(0);
 }
 
 

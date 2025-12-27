@@ -1,6 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "resources/files/FileProvider.hpp"
+#include "resources/files/Shader.hpp"
 #include "game/scenes/intro/TitleScreen.hpp"
 #include "game/scenes/pick_house/PickHouse.hpp"
 #include "game/scenes/mission/Mission.hpp"
@@ -71,6 +73,57 @@ bool DuneII::isMouseButtonPressed(int button) const noexcept
         return (glfwGetMouseButton(m_window, button) == GLFW_PRESS);
 
     return false;
+}
+
+
+uint32_t DuneII::getShaderProgram(const std::string& name) noexcept
+{
+    if(auto it = m_shaderPrograms.find(name); it != m_shaderPrograms.end())
+        return it->second.getHandle();
+
+    size_t index = 0;
+
+    if(const auto shaderPaths = FileProvider::findShaders(name); !shaderPaths.empty())
+    {
+        if(shaderPaths.size() < 2)
+            return 0;
+
+        std::vector<Shader> shaders(shaderPaths.size());
+
+        for(const auto& filePath : shaderPaths)
+        {
+            if(filePath.extension().string() == ".vert")
+            {
+                if(shaders[index].loadFromFile(filePath, GL_VERTEX_SHADER))
+                    ++index;
+            }
+
+            if(filePath.extension().string() == ".frag")
+            {
+                if(shaders[index].loadFromFile(filePath, GL_FRAGMENT_SHADER))
+                    ++index;
+            }
+
+            if(filePath.extension().string() == ".geom")
+            {
+                if(shaders[index].loadFromFile(filePath, GL_GEOMETRY_SHADER))
+                    ++index;
+            }
+        }
+
+        if(index > 1)
+        {
+            if(ShaderProgram program; program.link(shaders))
+            {
+                auto it = m_shaderPrograms.emplace(name, std::move(program));
+
+                if(it.second)
+                    return it.first->second.getHandle();
+            }
+        }
+    }
+
+    return 0;
 }
 
 

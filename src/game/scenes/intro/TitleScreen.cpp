@@ -4,7 +4,6 @@
 #include <GLFW/glfw3.h>
 
 #include "resources/files/FileProvider.hpp"
-#include "resources/files/Shader.hpp"
 #include "resources/gl_interfaces/texture/Texture.hpp"
 #include "game/DuneII.hpp"
 #include "game/scenes/intro/TitleScreen.hpp"
@@ -39,6 +38,8 @@ static bool is_intro_active_phase_end;
 
 TitleScreen::TitleScreen(DuneII* game) noexcept:
     Scene(game, Scene::MAIN_MENU),
+    m_spriteProgram(0),
+    m_buttonSpriteProgram(0),
     m_playButton(nullptr),
     m_exitButton(nullptr),
     m_settingsButton(nullptr),
@@ -94,24 +95,10 @@ bool TitleScreen::load(std::string_view info) noexcept
 
 //  Shaders
     {
-        std::array<Shader, 2> shaders;
-
-        if(!shaders[0].loadFromFile(FileProvider::findPathToFile("sprite.vert"), GL_VERTEX_SHADER))
+        if(m_spriteProgram = m_game->getShaderProgram("sprite"); m_spriteProgram == 0)
             return false;
 
-        if(!shaders[1].loadFromFile(FileProvider::findPathToFile("sprite.frag"), GL_FRAGMENT_SHADER))
-            return false;
-
-        if(!m_spriteProgram.link(shaders))
-            return false;
-
-        if(!shaders[0].loadFromFile(FileProvider::findPathToFile("color_sprite.vert"), GL_VERTEX_SHADER))
-            return false;
-
-        if(!shaders[1].loadFromFile(FileProvider::findPathToFile("color_sprite.frag"), GL_FRAGMENT_SHADER))
-            return false;
-
-        if(!m_buttonSpriteProgram.link(shaders) )
+        if(m_buttonSpriteProgram = m_game->getShaderProgram("color_sprite"); m_buttonSpriteProgram == 0)
             return false;
     }
     
@@ -131,7 +118,7 @@ bool TitleScreen::load(std::string_view info) noexcept
     m_planetTransform.setOrigin(planetTexture.width * 0.5f, planetTexture.height * 0.5f);
 
 //  Buttons
-    int32_t uniform = glGetUniformLocation(m_buttonSpriteProgram.getHandle(), "spriteColor");
+    int32_t uniform = glGetUniformLocation(m_buttonSpriteProgram, "spriteColor");
 
     if(uniform == -1)
         return false;
@@ -193,7 +180,7 @@ void TitleScreen::draw() noexcept
     auto& camera = m_game->camera;
     camera.getModelViewProjectionMatrix(MVP);
 
-    m_spriteProgram(true);
+    glUseProgram(m_spriteProgram);
     m_sprites.bind(true);
 
     m_spaceTransform.calculate(model);
@@ -215,7 +202,7 @@ void TitleScreen::draw() noexcept
 //  Draw buttons
     if(m_isPresented)
     {
-        m_buttonSpriteProgram(true);
+        glUseProgram(m_buttonSpriteProgram);
 
         m_playButton->calculate(model);
         glmc_mat4_mul(MVP, model, modelView);

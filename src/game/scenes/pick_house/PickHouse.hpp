@@ -27,8 +27,8 @@ private:
     GLuint m_vao;
     GLuint m_texture;
 
-    ShaderProgram m_spriteProgram;
-    ShaderProgram m_outlineProgram;
+    GLuint m_spriteProgram;
+    GLuint m_outlineProgram;
     
     SpriteManager m_sprites;
 

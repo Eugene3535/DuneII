@@ -1,7 +1,6 @@
 #ifndef MISSION_HPP
 #define MISSION_HPP
 
-#include "resources/gl_interfaces/shaders/ShaderProgram.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
 #include "game/scenes/mission/tilemap/TileMap.hpp"
 #include "game/scenes/mission/builder/Builder.hpp"
@@ -30,7 +29,6 @@ private:
     entt::registry m_registry;
     Builder        m_builder;
     std::string    m_tileMask;
-    ShaderProgram  m_tilemapProgram;
     HeadUpDisplay  m_hud;
     
 //  Resource section
@@ -40,6 +38,7 @@ private:
         GLuint vao;
         GLuint vbo[2];
         GLuint count; // indices
+        GLuint m_program;
     } m_landscape;
 
     struct

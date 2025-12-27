@@ -7,6 +7,7 @@
 
 #include <cglm/struct/vec2.h>
 
+#include "resources/gl_interfaces/shaders/ShaderProgram.hpp"
 #include "graphics/camera/OrthogonalCamera.hpp"
 #include "game/scenes/Scene.hpp"
 
@@ -23,8 +24,9 @@ public:
     bool isKeyPressed(int key) const noexcept;
     bool isMouseButtonPressed(int button) const noexcept;
 
-    vec2s  getCursorPosition() const noexcept;
-    ivec2s getWindowsSize() const noexcept;
+    uint32_t getShaderProgram(const std::string& name) noexcept;
+    vec2s    getCursorPosition() const noexcept;
+    ivec2s   getWindowsSize() const noexcept;
 
     OrthogonalCamera camera;
     
@@ -43,6 +45,8 @@ private:
     std::shared_ptr<Scene> m_currentScene;
     Scene::Type m_nextSceneType;
     bool m_isSceneNeedToBeChanged;
+
+    std::unordered_map<std::string, ShaderProgram> m_shaderPrograms;
 };
 
 #include "game/DuneII.inl"
