@@ -2,6 +2,7 @@
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include "cglm/struct/affine-mat.h"
 
 #include "resources/files/FileProvider.hpp"
 #include "resources/files/Shader.hpp"
@@ -184,19 +185,19 @@ void PickHouse::draw() noexcept
     if(!m_isLoaded)
         return;
         
-    alignas(16) mat4 MVP;
-    alignas(16) mat4 modelView;
-    alignas(16) mat4 result;
+    alignas(16) mat4s MVP;
+    alignas(16) mat4s modelView;
+    alignas(16) mat4s result;
 
     auto& camera = m_game->camera;
-    camera.getModelViewProjectionMatrix(MVP);
+    camera.getModelViewProjectionMatrix(MVP.raw);
 
     glUseProgram(m_spriteProgram);
     m_sprites.bind(true);
 
-    m_backgroundTransform.calculate(modelView);
-    glmc_mat4_mul(MVP, modelView, result);
-    camera.updateUniformBuffer(result);
+    modelView = m_backgroundTransform.getMatrix();
+    result = glms_mul(MVP, modelView);
+    camera.updateUniformBuffer(result.raw);
 
     glBindTexture(GL_TEXTURE_2D, m_background.texture);
     glDrawArrays(GL_TRIANGLE_FAN, m_background.frame, 4);
@@ -204,9 +205,9 @@ void PickHouse::draw() noexcept
 
     glUseProgram(m_outlineProgram);
 
-    m_outlineTransform.calculate(modelView);
-    glmc_mat4_mul(MVP, modelView, result);
-    camera.updateUniformBuffer(result);
+    modelView = m_outlineTransform.getMatrix();
+    result = glms_mul(MVP, modelView);
+    camera.updateUniformBuffer(result.raw);
     m_outline->draw();
 
     glUseProgram(0);

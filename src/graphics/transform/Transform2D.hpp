@@ -31,7 +31,7 @@ public:
     void move(const vec2s offset) noexcept;
     void rotate(float angle)     noexcept;
 
-    void calculate(mat4 result) const noexcept;
+    mat4s getMatrix() const noexcept;
 
 private:
     vec2s m_origin;

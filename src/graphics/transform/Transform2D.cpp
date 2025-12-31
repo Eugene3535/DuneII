@@ -102,22 +102,25 @@ void Transform2D::rotate(float angle) noexcept
 }
 
 
-void Transform2D::calculate(mat4 result) const noexcept
-{  
-    float angle  = glm_rad(-m_rotation);
-    float cosine = cos(angle);
-    float sine   = sin(angle);
-    float sxc    = m_scale.x * cosine;
-    float syc    = m_scale.y * cosine;
-    float sxs    = m_scale.x * sine;
-    float sys    = m_scale.y * sine;
-    float tx     = -m_origin.x * sxc - m_origin.y * sys + m_position.x;
-    float ty     =  m_origin.x * sxs - m_origin.y * syc + m_position.y;
+mat4s Transform2D::getMatrix() const noexcept
+{
+    const float angle  = glm_rad(-m_rotation);
+    const float cosine = cos(angle);
+    const float sine   = sin(angle);
+    const float sxc    = m_scale.x * cosine;
+    const float syc    = m_scale.y * cosine;
+    const float sxs    = m_scale.x * sine;
+    const float sys    = m_scale.y * sine;
+    const float tx     = -m_origin.x * sxc - m_origin.y * sys + m_position.x;
+    const float ty     =  m_origin.x * sxs - m_origin.y * syc + m_position.y;
 
-    auto m = static_cast<float*>(&result[0][0]);
-
+    mat4s result;
+    auto m = static_cast<float*>(&result.raw[0][0]);
+    
     m[0] = sxc;  m[4] = sys; m[8] = 0.f;  m[12] = tx;
     m[1] = -sxs; m[5] = syc; m[9] = 0.f;  m[13] = ty;
     m[2] = 0.f;  m[6] = 0.f; m[10] = 1.f; m[14] = 0.f;
     m[3] = 0.f;  m[7] = 0.f; m[11] = 0.f; m[15] = 1.f;
+
+    return result;
 }

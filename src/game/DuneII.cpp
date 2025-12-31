@@ -177,31 +177,31 @@ void DuneII::update(float dt) noexcept
     {
         switch (m_nextSceneType)
         {
-        case Scene::Type::MAIN_MENU:
-        {
-            if (auto titleScene = load<TitleScreen>({}))
-                m_currentScene = titleScene;
-        }
-        break;
-
-        case Scene::Type::PICK_HOUSE:
-        {
-            if (auto pickHouseScene = load<PickHouse>({}))
-                m_currentScene = pickHouseScene;
-        }
-        break;
-
-        case Scene::Type::MISSION:
-        {
-            if (auto missionScene = load<Mission>("Atreides-8.tmx"))
-                m_currentScene = missionScene;
-
-            glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-        }
-        break;
-
-        default:
+            case Scene::Type::MAIN_MENU:
+            {
+                if (auto titleScene = load<TitleScreen>({}))
+                    m_currentScene = titleScene;
+            }
             break;
+
+            case Scene::Type::PICK_HOUSE:
+            {
+                if (auto pickHouseScene = load<PickHouse>({}))
+                    m_currentScene = pickHouseScene;
+            }
+            break;
+
+            case Scene::Type::MISSION:
+            {
+                if (auto missionScene = load<Mission>("Atreides-8.tmx"))
+                    m_currentScene = missionScene;
+
+                glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+            }
+            break;
+
+            default:
+                break;
         }
 
         int width, height;

@@ -2,6 +2,7 @@
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include "cglm/struct/affine-mat.h"
 
 #include "resources/files/FileProvider.hpp"
 #include "resources/gl_interfaces/texture/Texture.hpp"
@@ -107,16 +108,16 @@ void Mission::update(float dt) noexcept
 
 void Mission::draw() noexcept
 {
-    alignas(16) mat4 MVP;
-    alignas(16) mat4 modelView;
-    alignas(16) mat4 result;
+    alignas(16) mat4s MVP;
+    alignas(16) mat4s modelView;
+    alignas(16) mat4s result;
 
     auto& camera = m_game->camera;
-    camera.getModelViewProjectionMatrix(MVP);
+    camera.getModelViewProjectionMatrix(MVP.raw);
 
-    m_transform.calculate(modelView);
-    glmc_mat4_mul(MVP, modelView, result);
-    camera.updateUniformBuffer(result);
+    modelView = m_transform.getMatrix();
+    result = glms_mul(MVP, modelView);
+    camera.updateUniformBuffer(result.raw);
 
     glUseProgram(m_landscape.program);
 
@@ -139,9 +140,9 @@ void Mission::draw() noexcept
     glBindVertexArray(0);
     glBindTextureUnit(0, 0);
 
-    m_hud.getTransform().calculate(modelView);
-    glmc_mat4_mul(MVP, modelView, result);
-    camera.updateUniformBuffer(result);
+    modelView = m_hud.getTransform().getMatrix();
+    result = glms_mul(MVP, modelView);
+    camera.updateUniformBuffer(result.raw);
 
     m_sprites.bind(true);
     m_hud.draw();

@@ -1,5 +1,6 @@
 #include <glad/glad.h>
 #include <cglm/call/cam.h>
+#include "cglm/struct/affine-mat.h"
 
 #include "graphics/camera/OrthogonalCamera.hpp"
 
@@ -59,9 +60,8 @@ void OrthogonalCamera::flipVertically(bool flip) noexcept
 
 void OrthogonalCamera::getModelViewProjectionMatrix(mat4 mvp) noexcept
 {
-    mat4 model_view;
-    calculate(model_view);
-    glmc_mat4_mul(m_projection, model_view, mvp);
+    mat4s modelView = getMatrix();
+    glmc_mat4_mul(m_projection, modelView.raw, mvp);
 }
 
 

@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "cglm/struct/affine-mat.h"
 
 #include "resources/files/FileProvider.hpp"
 #include "resources/gl_interfaces/texture/Texture.hpp"
@@ -173,27 +174,27 @@ void TitleScreen::draw() noexcept
     if(!m_isLoaded)
         return;
         
-    alignas(16) mat4 MVP;
-    alignas(16) mat4 modelView;
-    alignas(16) mat4 model;
+    alignas(16) mat4s MVP;
+    alignas(16) mat4s modelView;
+    alignas(16) mat4s model;
     
     auto& camera = m_game->camera;
-    camera.getModelViewProjectionMatrix(MVP);
+    camera.getModelViewProjectionMatrix(MVP.raw);
 
     glUseProgram(m_spriteProgram);
     m_sprites.bind(true);
 
-    m_spaceTransform.calculate(model);
-    glmc_mat4_mul(MVP, model, modelView);
-    camera.updateUniformBuffer(modelView);
+    model = m_spaceTransform.getMatrix();
+    modelView = glms_mul(MVP, model);
+    camera.updateUniformBuffer(modelView.raw);
 
     glBindTexture(GL_TEXTURE_2D, m_space.texture);
     glDrawArrays(GL_TRIANGLE_FAN, m_space.frame, 4);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    m_planetTransform.calculate(model);
-    glmc_mat4_mul(MVP, model, modelView);
-    camera.updateUniformBuffer(modelView);
+    model = m_planetTransform.getMatrix();
+    modelView = glms_mul(MVP, model);
+    camera.updateUniformBuffer(modelView.raw);
 
     glBindTexture(GL_TEXTURE_2D, m_planet.texture);
     glDrawArrays(GL_TRIANGLE_FAN, m_planet.frame, 4);
@@ -204,19 +205,19 @@ void TitleScreen::draw() noexcept
     {
         glUseProgram(m_buttonSpriteProgram);
 
-        m_playButton->calculate(model);
-        glmc_mat4_mul(MVP, model, modelView);
-        camera.updateUniformBuffer(modelView);
+        model = m_playButton->getMatrix();
+        modelView = glms_mul(MVP, model);
+        camera.updateUniformBuffer(modelView.raw);
         m_playButton->draw();
 
-        m_exitButton->calculate(model);
-        glmc_mat4_mul(MVP, model, modelView);
-        camera.updateUniformBuffer(modelView);
+        model = m_exitButton->getMatrix();
+        modelView = glms_mul(MVP, model);
+        camera.updateUniformBuffer(modelView.raw);
         m_exitButton->draw();
 
-        m_settingsButton->calculate(model);
-        glmc_mat4_mul(MVP, model, modelView);
-        camera.updateUniformBuffer(modelView);
+        model = m_settingsButton->getMatrix();
+        modelView = glms_mul(MVP, model);
+        camera.updateUniformBuffer(modelView.raw);
         m_settingsButton->draw();
     }
 
