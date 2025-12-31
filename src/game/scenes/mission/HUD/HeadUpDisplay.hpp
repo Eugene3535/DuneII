@@ -10,21 +10,33 @@
 class HeadUpDisplay
 {
 public:
-    HeadUpDisplay(const class Builder& builder) noexcept;
+    HeadUpDisplay(class Builder& builder) noexcept;
     ~HeadUpDisplay();
 
-    void initCrosshairs(std::span<const Sprite> crosshairs) noexcept;
+    void init(std::span<const Sprite> crosshairs) noexcept;
 
-    void update(const vec2s position, float dt) noexcept;
-    void draw() const noexcept;
+    void update(const vec2s position, float dt, bool isClicked) noexcept;
+    void drawSelection() const noexcept;
+    void drawCursor() const noexcept;
 
-    const Transform2D& getTransform() const noexcept;
+    const Transform2D& getCursorTransform() const noexcept;
 
 private:
-    const class Builder& m_builder;
+    class Builder& m_builder;
 
-    Sprite m_cursor;
-    Transform2D m_transform;
+    Sprite m_releasedCursor;
+    Sprite m_capturedCursor;
+    Sprite* m_currentCursor;
+    Transform2D m_cursorTransform;
+
+    struct
+    {
+        uint32_t vbo;
+        uint32_t vao;
+        float timer;
+        bool enabled;
+    } m_selectionFrame;
+    
 };
 
 #endif // !HEAD_UP_DISPLAY_HPP

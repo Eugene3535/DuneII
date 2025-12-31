@@ -224,14 +224,21 @@ uint32_t Builder::getVertexBuffer() const noexcept
 }
 
 
-std::optional<entt::entity> Builder::getEntityOnTile(const ivec2s tile) const noexcept
+std::optional<entt::entity> Builder::getEntityUnderCursor(const vec2s point) const noexcept
 {
+	const ivec2s tile = { point.x / m_tileSize.x, point.y / m_tileSize.y };
 	const int32_t origin = tile.y * m_mapSize.x + tile.x;
 
 	if(auto found = m_structureMap.find(origin); found != m_structureMap.end())
 		return std::make_optional<entt::entity>(found->second);
 
 	return std::nullopt;
+}
+
+
+entt::registry& Builder::getRegistry() const noexcept
+{
+	return m_registry;
 }
 
 

@@ -19,6 +19,7 @@ public:
     void update(float dt)              noexcept override;
     void draw()                        noexcept override;
     void resize(int width, int height) noexcept override;
+    void click(bool value)             noexcept;
 
 private:
     bool initLandscape() noexcept;
@@ -52,6 +53,8 @@ private:
     struct
     {
         uint32_t texture;
+        uint32_t selectionShader;
+        bool isMouseButtonPressed;
     } m_ui;
 
     std::vector<void(*)(Mission*, float)> m_systems;

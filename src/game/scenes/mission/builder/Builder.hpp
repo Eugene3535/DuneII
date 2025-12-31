@@ -18,8 +18,9 @@ public:
     bool loadFromTileMap(const class TileMap& tilemap, const uint32_t texture) noexcept;
     bool putStructureOnMap(const Structure::Type type, const ivec2s cell)      noexcept; // cell must be in tiles
 
-    uint32_t                    getVertexBuffer()                  const noexcept;
-    std::optional<entt::entity> getEntityOnTile(const ivec2s tile) const noexcept;
+    uint32_t                    getVertexBuffer()                       const noexcept;
+    std::optional<entt::entity> getEntityUnderCursor(const vec2s point) const noexcept;
+    entt::registry& getRegistry()                                       const noexcept;
 
 private:
     void initStorage()                                      noexcept;

@@ -22,6 +22,10 @@ Mission::Mission(DuneII* game) noexcept:
 {
     memset(&m_landscape, 0, sizeof(m_landscape)); 
     memset(&m_buildings, 0, sizeof(m_buildings));
+
+    m_ui.texture = 0;
+    m_ui.selectionShader = 0;
+    m_ui.isMouseButtonPressed = false;
 }
 
 
@@ -103,20 +107,22 @@ void Mission::update(float dt) noexcept
     if (m_isLoaded)
         for(auto system : m_systems)
             system(this, dt);
+
+    m_ui.isMouseButtonPressed = false;
 }
 
 
 void Mission::draw() noexcept
 {
-    alignas(16) mat4s MVP;
+    alignas(16) mat4s uniformMatrix;
     alignas(16) mat4s modelView;
     alignas(16) mat4s result;
 
     auto& camera = m_game->camera;
-    camera.getModelViewProjectionMatrix(MVP.raw);
+    camera.getModelViewProjectionMatrix(uniformMatrix.raw);
 
     modelView = m_transform.getMatrix();
-    result = glms_mul(MVP, modelView);
+    result = glms_mul(uniformMatrix, modelView);
     camera.updateUniformBuffer(result.raw);
 
     glUseProgram(m_landscape.program);
@@ -140,12 +146,16 @@ void Mission::draw() noexcept
     glBindVertexArray(0);
     glBindTextureUnit(0, 0);
 
-    modelView = m_hud.getTransform().getMatrix();
-    result = glms_mul(MVP, modelView);
+    glUseProgram(m_ui.selectionShader);
+    m_hud.drawSelection();
+
+    glUseProgram(m_landscape.program);
+    modelView = m_hud.getCursorTransform().getMatrix();
+    result = glms_mul(uniformMatrix, modelView);
     camera.updateUniformBuffer(result.raw);
 
     m_sprites.bind(true);
-    m_hud.draw();
+    m_hud.drawCursor();
     m_sprites.bind(false);
 
     glUseProgram(0);
@@ -155,6 +165,12 @@ void Mission::draw() noexcept
 void Mission::resize(int width, int height) noexcept
 {
 
+}
+
+
+void Mission::click(bool value) noexcept
+{
+    m_ui.isMouseButtonPressed = value;
 }
 
 
@@ -199,7 +215,10 @@ bool Mission::initHUD() noexcept
         crosshairCaptured.value()
     };
 
-    m_hud.initCrosshairs(crosshairs);
+    if(m_ui.selectionShader = m_game->getShaderProgram("selection"); m_ui.selectionShader == 0)
+        return false;
+
+    m_hud.init(crosshairs);
 
     return true;
 }
@@ -249,7 +268,7 @@ void Mission::createSystems() noexcept
         const auto game   = mission->m_game;
         const auto cursor = game->getCursorPosition();
         
-        mission->m_hud.update(cursor, dt);
+        mission->m_hud.update(cursor, dt, mission->m_ui.isMouseButtonPressed);
     });
 
     m_isLoaded = true;
