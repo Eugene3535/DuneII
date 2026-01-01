@@ -4,14 +4,16 @@
 #include "game/scenes/mission/HUD/HeadUpDisplay.hpp"
 
 
-HeadUpDisplay::HeadUpDisplay(Builder& builder) noexcept:
+HeadUpDisplay::HeadUpDisplay(Builder& builder, const Transform2D& sceneTransform) noexcept:
     m_builder(builder),
+    m_sceneTransform(sceneTransform),
     m_currentCursor(nullptr)
 {
     m_selectionFrame.vbo = 0;
     m_selectionFrame.vao = 0;
     m_selectionFrame.timer = 0.f;
     m_selectionFrame.enabled = false;
+    m_isClicked = false;
 }
 
 
@@ -42,18 +44,21 @@ void HeadUpDisplay::init(std::span<const Sprite> crosshairs) noexcept
 }
 
 
-void HeadUpDisplay::update(const vec2s position, float dt, bool isClicked) noexcept
+void HeadUpDisplay::update(const vec2s cursorPosition, float dt) noexcept
 {
     m_selectionFrame.timer += dt;
 
     if(m_selectionFrame.timer > 0.25f)
         m_selectionFrame.timer = 0.f;
 
-    m_cursorTransform.setPosition(position);
+    m_cursorTransform.setPosition(cursorPosition);
 
-    if(isClicked)
+    if(m_isClicked)
     {
-        if(auto entity = m_builder.getEntityUnderCursor(position); entity.has_value())
+        vec2s scenePosition = m_sceneTransform.getPosition();
+        vec2s woorldCoords = glms_vec2_add(glms_vec2_negate(scenePosition), cursorPosition);
+
+        if(auto entity = m_builder.getEntityUnderCursor(woorldCoords); entity.has_value())
         {
             auto& registry = m_builder.getRegistry();
 
@@ -107,7 +112,23 @@ void HeadUpDisplay::update(const vec2s position, float dt, bool isClicked) noexc
                 }
             }
         }
+        else m_selectionFrame.enabled = false;
     }
+
+    m_isClicked = false;
+}
+
+
+void HeadUpDisplay::select() noexcept
+{
+    m_isClicked = true;
+}
+
+
+void HeadUpDisplay::release() noexcept
+{
+    m_selectionFrame.enabled = false;
+    m_isClicked = false;
 }
 
 

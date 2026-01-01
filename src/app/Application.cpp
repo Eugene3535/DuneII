@@ -187,31 +187,4 @@ void Application::initCallbacks() noexcept
 		if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         	glfwSetWindowShouldClose(window, GLFW_TRUE);
 	});
-
-	glfwSetMouseButtonCallback(m_window, [](GLFWwindow* window, int button, int action, int mods)
-	{
-		if(action == GLFW_PRESS)
-		{
-			auto game = static_cast<DuneII*>(glfwGetWindowUserPointer(window));
-
-			if(!game)
-				return;
-
-			switch (button)
-			{
-				case GLFW_MOUSE_BUTTON_LEFT:
-					if(game->m_currentScene && (game->m_currentScene->getType() == Scene::MISSION))
-						std::static_pointer_cast<Mission>(game->m_currentScene)->click(true);
-				break;
-
-				case GLFW_MOUSE_BUTTON_RIGHT:
-					if(game->m_currentScene && (game->m_currentScene->getType() == Scene::MISSION))
-						std::static_pointer_cast<Mission>(game->m_currentScene)->click(false);
-				break;
-				
-				default:
-					break;
-			}
-		}
-	});
 }

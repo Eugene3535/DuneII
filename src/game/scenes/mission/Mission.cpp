@@ -18,14 +18,14 @@
 Mission::Mission(DuneII* game) noexcept:
     Scene(game, Scene::MISSION),
     m_builder(m_registry, m_tileMask),
-    m_hud(m_builder)
+    m_hud(m_builder, m_transform)
 {
     memset(&m_landscape, 0, sizeof(m_landscape)); 
     memset(&m_buildings, 0, sizeof(m_buildings));
 
     m_ui.texture = 0;
     m_ui.selectionShader = 0;
-    m_ui.isMouseButtonPressed = false;
+    m_ui.clickTimer = 0.f;
 }
 
 
@@ -107,8 +107,6 @@ void Mission::update(float dt) noexcept
     if (m_isLoaded)
         for(auto system : m_systems)
             system(this, dt);
-
-    m_ui.isMouseButtonPressed = false;
 }
 
 
@@ -159,18 +157,6 @@ void Mission::draw() noexcept
     m_sprites.bind(false);
 
     glUseProgram(0);
-}
-
-
-void Mission::resize(int width, int height) noexcept
-{
-
-}
-
-
-void Mission::click(bool value) noexcept
-{
-    m_ui.isMouseButtonPressed = value;
 }
 
 
@@ -267,8 +253,24 @@ void Mission::createSystems() noexcept
     {
         const auto game   = mission->m_game;
         const auto cursor = game->getCursorPosition();
-        
-        mission->m_hud.update(cursor, dt, mission->m_ui.isMouseButtonPressed);
+
+        mission->m_ui.clickTimer += dt;
+
+        if(mission->m_ui.clickTimer > 0.1f)
+        {
+            mission->m_ui.clickTimer = 0.f;
+
+            const bool isMouseButtoLeftPressed = game->isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
+            const bool isMouseButtoRightPressed = game->isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
+
+            if(isMouseButtoLeftPressed)
+                mission->m_hud.select();
+
+            if(isMouseButtoRightPressed)
+                mission->m_hud.release();
+        }
+ 
+        mission->m_hud.update(cursor, dt);
     });
 
     m_isLoaded = true;

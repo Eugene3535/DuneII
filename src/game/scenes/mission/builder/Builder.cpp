@@ -130,7 +130,7 @@ bool Builder::putStructureOnMap(const Structure::Type type, const ivec2s cell) n
 	if(auto found = m_structureMap.find(origin); found != m_structureMap.end())
 		return false;
 
-    {
+    {// We check that the building will fit completely on the rocky soil.
 		ivec2s size = { 0, 0 };
 
         switch (type)
@@ -226,12 +226,12 @@ uint32_t Builder::getVertexBuffer() const noexcept
 
 std::optional<entt::entity> Builder::getEntityUnderCursor(const vec2s point) const noexcept
 {
-	const ivec2s tile = { point.x / m_tileSize.x, point.y / m_tileSize.y };
+	const ivec2s tile = { static_cast<int>(point.x) / m_tileSize.x, static_cast<int>(point.y) / m_tileSize.y };
 	const int32_t origin = tile.y * m_mapSize.x + tile.x;
 
 	if(auto found = m_structureMap.find(origin); found != m_structureMap.end())
 		return std::make_optional<entt::entity>(found->second);
-
+	
 	return std::nullopt;
 }
 

@@ -386,21 +386,21 @@ void TileMap::loadStructures(const Tileset& tileset, std::span<const int> tileId
 	{
 		switch (type)
 		{
-            case Structure::Type::SLAB_1x1:          return { x, y, x + 1, y + 1 };
-			case Structure::Type::PALACE:            return { x, y, x + 3, y + 3 };
-			case Structure::Type::VEHICLE:           return { x, y, x + 3, y + 2 };
-			case Structure::Type::HIGH_TECH:         return { x, y, x + 2, y + 2 };
-            case Structure::Type::CONSTRUCTION_YARD: return { x, y, x + 2, y + 2 };
-			case Structure::Type::WIND_TRAP:         return { x, y, x + 2, y + 2 };
-            case Structure::Type::BARRACKS:          return { x, y, x + 2, y + 2 };
-			case Structure::Type::STARPORT:          return { x, y, x + 3, y + 3 };
-			case Structure::Type::REFINERY:          return { x, y, x + 3, y + 2 };
-			case Structure::Type::REPAIR:            return { x, y, x + 3, y + 2 };
-            case Structure::Type::WALL:              return { x, y, x + 1, y + 1 };
-            case Structure::Type::TURRET:            return { x, y, x + 1, y + 1 };
-            case Structure::Type::ROCKET_TURRET:     return { x, y, x + 1, y + 1 };
-            case Structure::Type::SILO:              return { x, y, x + 2, y + 2 };
-            case Structure::Type::OUTPOST:           return { x, y, x + 2, y + 2 };
+            case Structure::Type::SLAB_1x1:          return { x, y, 1, 1 };
+			case Structure::Type::PALACE:            return { x, y, 3, 3 };
+			case Structure::Type::VEHICLE:           return { x, y, 3, 2 };
+			case Structure::Type::HIGH_TECH:         return { x, y, 2, 2 };
+            case Structure::Type::CONSTRUCTION_YARD: return { x, y, 2, 2 };
+			case Structure::Type::WIND_TRAP:         return { x, y, 2, 2 };
+            case Structure::Type::BARRACKS:          return { x, y, 2, 2 };
+			case Structure::Type::STARPORT:          return { x, y, 3, 3 };
+			case Structure::Type::REFINERY:          return { x, y, 3, 2 };
+			case Structure::Type::REPAIR:            return { x, y, 3, 2 };
+            case Structure::Type::WALL:              return { x, y, 1, 1 };
+            case Structure::Type::TURRET:            return { x, y, 1, 1 };
+            case Structure::Type::ROCKET_TURRET:     return { x, y, 1, 1 };
+            case Structure::Type::SILO:              return { x, y, 2, 2 };
+            case Structure::Type::OUTPOST:           return { x, y, 2, 2 };
 
             default: return { 0, 0, 0, 0 };
 		}
