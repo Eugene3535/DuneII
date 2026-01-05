@@ -4,10 +4,9 @@
 #include "game/scenes/mission/HUD/HeadUpDisplay.hpp"
 
 
-HeadUpDisplay::HeadUpDisplay(Builder& builder, const Transform2D& sceneTransform) noexcept:
+HeadUpDisplay::HeadUpDisplay(const Builder& builder, const Transform2D& sceneTransform) noexcept:
     m_builder(builder),
-    m_sceneTransform(sceneTransform),
-    m_currentCursor(nullptr)
+    m_sceneTransform(sceneTransform)
 {
     m_selectionFrame.vbo = 0;
     m_selectionFrame.vao = 0;
@@ -31,7 +30,7 @@ void HeadUpDisplay::init(std::span<const Sprite> crosshairs) noexcept
     m_capturedCursor = crosshairs[1];
     m_cursorTransform.setOrigin(m_releasedCursor.width * 0.5f, m_releasedCursor.height * 0.5f);
     m_cursorTransform.setScale(0.5f, 0.5f);
-    m_currentCursor = &m_releasedCursor;
+    m_currentCursor = m_releasedCursor;
 
 //  Selection frame
     const float vertexData[32] = {}; // 16 vertices
@@ -145,12 +144,9 @@ void HeadUpDisplay::drawSelection() const noexcept
 
 void HeadUpDisplay::drawCursor() const noexcept
 {
-    if(m_currentCursor)
-    {
-        glBindTextureUnit(0, m_currentCursor->texture);
-        glDrawArrays(GL_TRIANGLE_FAN, m_currentCursor->frame, 4);
-        glBindTextureUnit(0, 0);
-    }
+    glBindTextureUnit(0, m_currentCursor.texture);
+    glDrawArrays(GL_TRIANGLE_FAN, m_currentCursor.frame, 4);
+    glBindTextureUnit(0, 0);
 }
 
 

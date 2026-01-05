@@ -19,6 +19,10 @@ class SpriteManager final
 
 public:
 	SpriteManager() noexcept;
+	SpriteManager(const SpriteManager&)              noexcept = delete;
+	SpriteManager(SpriteManager&&)                   noexcept = delete;
+	SpriteManager& operator = (const SpriteManager&) noexcept = delete;
+	SpriteManager& operator = (SpriteManager&&)      noexcept = delete;
 	~SpriteManager();
 
 	void createSprite(const std::string& name, const struct Texture& texture) noexcept;
