@@ -162,10 +162,6 @@ void TitleScreen::update(float dt) noexcept
         if(m_playButton->isSelected())
             m_game->switchScene(this, Scene::PICK_HOUSE);
     }
-    else
-    {
-
-    }
 }
 
 
@@ -173,13 +169,12 @@ void TitleScreen::draw() noexcept
 {
     if(!m_isLoaded)
         return;
+
+    auto& camera = m_game->camera;
         
-    alignas(16) mat4s MVP;
+    alignas(16) mat4s MVP = camera.getModelViewProjectionMatrix();
     alignas(16) mat4s modelView;
     alignas(16) mat4s model;
-    
-    auto& camera = m_game->camera;
-    camera.getModelViewProjectionMatrix(MVP.raw);
 
     glUseProgram(m_spriteProgram);
     m_sprites.bind(true);

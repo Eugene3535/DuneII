@@ -112,12 +112,11 @@ void Mission::update(float dt) noexcept
 
 void Mission::draw() noexcept
 {
-    alignas(16) mat4s uniformMatrix;
+    auto& camera = m_game->camera;
+
+    alignas(16) mat4s uniformMatrix = camera.getModelViewProjectionMatrix();
     alignas(16) mat4s modelView;
     alignas(16) mat4s result;
-
-    auto& camera = m_game->camera;
-    camera.getModelViewProjectionMatrix(uniformMatrix.raw);
 
     modelView = m_transform.getMatrix();
     result = glms_mul(uniformMatrix, modelView);

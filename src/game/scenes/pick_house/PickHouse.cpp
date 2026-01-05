@@ -184,13 +184,12 @@ void PickHouse::draw() noexcept
 {
     if(!m_isLoaded)
         return;
-        
-    alignas(16) mat4s MVP;
-    alignas(16) mat4s modelView;
-    alignas(16) mat4s result;
 
     auto& camera = m_game->camera;
-    camera.getModelViewProjectionMatrix(MVP.raw);
+        
+    alignas(16) mat4s MVP = camera.getModelViewProjectionMatrix();
+    alignas(16) mat4s modelView;
+    alignas(16) mat4s result;
 
     glUseProgram(m_spriteProgram);
     m_sprites.bind(true);
