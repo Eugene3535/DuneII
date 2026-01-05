@@ -144,8 +144,11 @@ void Mission::draw() noexcept
     glBindVertexArray(0);
     glBindTextureUnit(0, 0);
 
-    glUseProgram(m_ui.selectionShader);
-    m_hud.drawSelection();
+    if(m_hud.isSelectionEnabled())
+    {
+        glUseProgram(m_ui.selectionShader);
+        m_hud.drawSelection();
+    }
 
     glUseProgram(m_landscape.program);
     modelView = m_hud.getCursorTransform().getMatrix();

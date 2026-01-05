@@ -26,6 +26,8 @@ public:
     void drawSelection() const noexcept;
     void drawCursor() const noexcept;
 
+    bool isSelectionEnabled() const noexcept;
+
     const Transform2D& getCursorTransform() const noexcept;
 
 private:

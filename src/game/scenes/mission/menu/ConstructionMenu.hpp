@@ -15,12 +15,11 @@ public:
     ~ConstructionMenu();
 
     void createMenu() noexcept;
+    void draw() noexcept;
 
 private:
-    uint32_t m_texture;
     uint32_t m_vao;
     uint32_t m_vbo;
-    uint32_t m_program;
 };
 
 #endif // !CONSTRUCTION_MENU_HPP

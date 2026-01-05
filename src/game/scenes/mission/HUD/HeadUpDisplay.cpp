@@ -150,6 +150,12 @@ void HeadUpDisplay::drawCursor() const noexcept
 }
 
 
+bool HeadUpDisplay::isSelectionEnabled() const noexcept
+{
+    return m_selectionFrame.enabled;
+}
+
+
 const Transform2D& HeadUpDisplay::getCursorTransform() const noexcept
 {
     return m_cursorTransform;

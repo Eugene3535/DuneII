@@ -13,10 +13,8 @@ static std::vector<float> create_rect_with_rounded_edges(float x, float y, float
 
 
 ConstructionMenu::ConstructionMenu() noexcept:
-    m_texture(0),
     m_vao(0),
-    m_vbo(0),
-    m_program(0)
+    m_vbo(0)
 {
 	glCreateBuffers(1, &m_vbo);
 	glNamedBufferData(m_vbo, 0, nullptr, GL_STATIC_DRAW);
@@ -38,12 +36,17 @@ void ConstructionMenu::createMenu() noexcept
 {
     auto vertices = create_rect_with_rounded_edges(100.f, 100.f, 800.f, 600.f, 10.f);
 
-
-    
-
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), static_cast<const void*>(vertices.data()), GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+
+void ConstructionMenu::draw() noexcept
+{
+    glBindVertexArray(m_vao);
+    glDrawArrays(GL_TRIANGLES, 0, 8 + 4 * CORNER_SEGMENTS);
+    glBindVertexArray(0);
 }
 
 
