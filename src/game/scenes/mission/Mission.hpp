@@ -5,6 +5,7 @@
 #include "game/scenes/mission/tilemap/TileMap.hpp"
 #include "game/scenes/mission/builder/Builder.hpp"
 #include "game/scenes/mission/HUD/HeadUpDisplay.hpp"
+#include "game/scenes/mission/menu/ConstructionMenu.hpp"
 #include "game/scenes/Scene.hpp"
 
 
@@ -54,6 +55,8 @@ private:
         uint32_t selectionShader;
         float clickTimer;
     } m_ui;
+
+    ConstructionMenu m_constructionMenu;
 
     std::vector<void(*)(Mission*, float)> m_systems;
 };

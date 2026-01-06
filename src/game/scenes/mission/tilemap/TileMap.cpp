@@ -322,7 +322,7 @@ void TileMap::loadLandscape(const Tileset& tileset, std::span<const int32_t> til
 void TileMap::loadStructures(const Tileset& tileset, std::span<const int> tileIds) noexcept
 {
 //  TODO: offset to first tile (tileset.firstGID - tileNum etc ...)
-	auto get_structure_type = [](int tileNum) -> Structure::Type
+	auto get_structure_type = [](int tileNum) -> StructureInfo::Type
 	{
 		switch (tileNum) // start num of tile in grid
 		{
@@ -337,70 +337,70 @@ void TileMap::loadStructures(const Tileset& tileset, std::span<const int> tileId
 			case 119:
 			case 120:
 			case 121:
-			case 122: return Structure::Type::WALL;
-			case 124: return Structure::Type::REFINERY;
-			case 127: return Structure::Type::CONSTRUCTION_YARD;
-			case 129: return Structure::Type::WIND_TRAP;
-			case 131: return Structure::Type::OUTPOST;
-			case 133: return Structure::Type::SILO;
-			case 135: return Structure::Type::VEHICLE;
-			case 159: return Structure::Type::BARRACKS;
-			case 161: return Structure::Type::PALACE;
-			case 164: return Structure::Type::HIGH_TECH;
-			case 166: return Structure::Type::REPAIR;
-			case 191: return Structure::Type::SLAB_1x1;
-			case 207: return Structure::Type::STARPORT;
-			case 261: return Structure::Type::TURRET;
-			case 269: return Structure::Type::ROCKET_TURRET;
+			case 122: return StructureInfo::Type::WALL;
+			case 124: return StructureInfo::Type::REFINERY;
+			case 127: return StructureInfo::Type::CONSTRUCTION_YARD;
+			case 129: return StructureInfo::Type::WIND_TRAP;
+			case 131: return StructureInfo::Type::OUTPOST;
+			case 133: return StructureInfo::Type::SILO;
+			case 135: return StructureInfo::Type::VEHICLE;
+			case 159: return StructureInfo::Type::BARRACKS;
+			case 161: return StructureInfo::Type::PALACE;
+			case 164: return StructureInfo::Type::HIGH_TECH;
+			case 166: return StructureInfo::Type::REPAIR;
+			case 191: return StructureInfo::Type::SLAB_1x1;
+			case 207: return StructureInfo::Type::STARPORT;
+			case 261: return StructureInfo::Type::TURRET;
+			case 269: return StructureInfo::Type::ROCKET_TURRET;
 		
-			default: return Structure::Type::INVALID;
+			default: return StructureInfo::Type::INVALID;
 		}
 	};
 
-	auto get_structure_name = [](Structure::Type type) -> std::string_view
+	auto get_structure_name = [](StructureInfo::Type type) -> std::string_view
 	{
 		switch (type)
 		{
-			case Structure::Type::WALL:              return "Wall";
-			case Structure::Type::REFINERY:          return "Refinery";
-			case Structure::Type::CONSTRUCTION_YARD: return "ConstructYard";
-			case Structure::Type::WIND_TRAP:         return "WindTrap";
-			case Structure::Type::OUTPOST:           return "Outpost";
-			case Structure::Type::SILO:              return "Silo";
-			case Structure::Type::VEHICLE:           return "Vehicle";
-			case Structure::Type::BARRACKS:          return "Barracks";
-			case Structure::Type::PALACE:            return "Palace";
-			case Structure::Type::HIGH_TECH:         return "HighTech";
-			case Structure::Type::REPAIR:            return "Repair";
-			case Structure::Type::SLAB_1x1:          return "Slab_1x1";
-			case Structure::Type::STARPORT:          return "Starport";
-			case Structure::Type::TURRET:            return "Turret";
-			case Structure::Type::ROCKET_TURRET:     return "RocketTurret";
+			case StructureInfo::Type::WALL:              return "Wall";
+			case StructureInfo::Type::REFINERY:          return "Refinery";
+			case StructureInfo::Type::CONSTRUCTION_YARD: return "ConstructYard";
+			case StructureInfo::Type::WIND_TRAP:         return "WindTrap";
+			case StructureInfo::Type::OUTPOST:           return "Outpost";
+			case StructureInfo::Type::SILO:              return "Silo";
+			case StructureInfo::Type::VEHICLE:           return "Vehicle";
+			case StructureInfo::Type::BARRACKS:          return "Barracks";
+			case StructureInfo::Type::PALACE:            return "Palace";
+			case StructureInfo::Type::HIGH_TECH:         return "HighTech";
+			case StructureInfo::Type::REPAIR:            return "Repair";
+			case StructureInfo::Type::SLAB_1x1:          return "Slab_1x1";
+			case StructureInfo::Type::STARPORT:          return "Starport";
+			case StructureInfo::Type::TURRET:            return "Turret";
+			case StructureInfo::Type::ROCKET_TURRET:     return "RocketTurret";
 		
 			default:
 				return {};
 		}
 	};
 
-	auto get_structure_tile_bounds = [](Structure::Type type, int32_t x, int32_t y) -> ivec4s
+	auto get_structure_tile_bounds = [](StructureInfo::Type type, int32_t x, int32_t y) -> ivec4s
 	{
 		switch (type)
 		{
-            case Structure::Type::SLAB_1x1:          return { x, y, 1, 1 };
-			case Structure::Type::PALACE:            return { x, y, 3, 3 };
-			case Structure::Type::VEHICLE:           return { x, y, 3, 2 };
-			case Structure::Type::HIGH_TECH:         return { x, y, 2, 2 };
-            case Structure::Type::CONSTRUCTION_YARD: return { x, y, 2, 2 };
-			case Structure::Type::WIND_TRAP:         return { x, y, 2, 2 };
-            case Structure::Type::BARRACKS:          return { x, y, 2, 2 };
-			case Structure::Type::STARPORT:          return { x, y, 3, 3 };
-			case Structure::Type::REFINERY:          return { x, y, 3, 2 };
-			case Structure::Type::REPAIR:            return { x, y, 3, 2 };
-            case Structure::Type::WALL:              return { x, y, 1, 1 };
-            case Structure::Type::TURRET:            return { x, y, 1, 1 };
-            case Structure::Type::ROCKET_TURRET:     return { x, y, 1, 1 };
-            case Structure::Type::SILO:              return { x, y, 2, 2 };
-            case Structure::Type::OUTPOST:           return { x, y, 2, 2 };
+            case StructureInfo::Type::SLAB_1x1:          return { x, y, 1, 1 };
+			case StructureInfo::Type::PALACE:            return { x, y, 3, 3 };
+			case StructureInfo::Type::VEHICLE:           return { x, y, 3, 2 };
+			case StructureInfo::Type::HIGH_TECH:         return { x, y, 2, 2 };
+            case StructureInfo::Type::CONSTRUCTION_YARD: return { x, y, 2, 2 };
+			case StructureInfo::Type::WIND_TRAP:         return { x, y, 2, 2 };
+            case StructureInfo::Type::BARRACKS:          return { x, y, 2, 2 };
+			case StructureInfo::Type::STARPORT:          return { x, y, 3, 3 };
+			case StructureInfo::Type::REFINERY:          return { x, y, 3, 2 };
+			case StructureInfo::Type::REPAIR:            return { x, y, 3, 2 };
+            case StructureInfo::Type::WALL:              return { x, y, 1, 1 };
+            case StructureInfo::Type::TURRET:            return { x, y, 1, 1 };
+            case StructureInfo::Type::ROCKET_TURRET:     return { x, y, 1, 1 };
+            case StructureInfo::Type::SILO:              return { x, y, 2, 2 };
+            case StructureInfo::Type::OUTPOST:           return { x, y, 2, 2 };
 
             default: return { 0, 0, 0, 0 };
 		}
@@ -419,7 +419,7 @@ void TileMap::loadStructures(const Tileset& tileset, std::span<const int> tileId
 			if (!tileID)
 				continue;
 			
-			if(const auto type = get_structure_type(tileID); type != Structure::Type::INVALID)
+			if(const auto type = get_structure_type(tileID); type != StructureInfo::Type::INVALID)
 			{
 				auto& object = m_objects.emplace_back();
 

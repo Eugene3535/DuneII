@@ -4,7 +4,7 @@
 #include <cglm/struct/ivec2.h>
 
 
-struct Structure
+struct StructureInfo
 {
     enum Type : int32_t
     {

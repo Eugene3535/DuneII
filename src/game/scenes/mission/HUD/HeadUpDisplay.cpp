@@ -12,6 +12,7 @@ HeadUpDisplay::HeadUpDisplay(const Builder& builder, const Transform2D& sceneTra
     m_selectionFrame.vao = 0;
     m_selectionFrame.timer = 0.f;
     m_selectionFrame.enabled = false;
+    m_selectionFrame.lastSelectedEntity = entt::null;
     m_isClicked = false;
 }
 
@@ -23,7 +24,7 @@ HeadUpDisplay::~HeadUpDisplay()
 }
 
 
-void HeadUpDisplay::init(std::span<const Sprite> crosshairs) noexcept
+void HeadUpDisplay::init(std::span<const Sprite> crosshairs, const std::function<void(const entt::entity)>& callback) noexcept
 {
 //  Cursors
     m_releasedCursor = crosshairs[0];
@@ -40,6 +41,8 @@ void HeadUpDisplay::init(std::span<const Sprite> crosshairs) noexcept
 	glGenVertexArrays(1, &m_selectionFrame.vao);
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float2 };
 	VertexArrayObject::createVertexInputState(m_selectionFrame.vao, m_selectionFrame.vbo, attributes);
+
+    m_showMenuForEntity = callback;
 }
 
 
@@ -57,20 +60,31 @@ void HeadUpDisplay::update(const vec2s cursorPosition, float dt) noexcept
         vec2s scenePosition = m_sceneTransform.getPosition();
         vec2s woorldCoords = glms_vec2_add(glms_vec2_negate(scenePosition), cursorPosition);
 
-        if(auto entity = m_builder.getEntityUnderCursor(woorldCoords); entity.has_value())
+        if(auto entity = m_builder.getEntityUnderCursor(woorldCoords); entity != entt::null)
         {
+            if(m_selectionFrame.lastSelectedEntity != entity)
+            {
+                m_selectionFrame.lastSelectedEntity = entity;
+            }           
+            else
+            {
+                m_showMenuForEntity(entity);
+
+                return;
+            }
+
             auto& registry = m_builder.getRegistry();
 
-            if(auto* building = registry.try_get<Structure>(entity.value()))
+            if(StructureInfo* info = registry.try_get<StructureInfo>(entity))
             {
-                bool isSelectable = ((building->type != Structure::Type::SLAB_1x1) &&
-                                     (building->type != Structure::Type::SLAB_2x2) && 
-                                     (building->type != Structure::Type::WALL)     && 
-                                      building->type <  Structure::Type::MAX);
+                bool isSelectable = ((info->type != StructureInfo::Type::SLAB_1x1) &&
+                                     (info->type != StructureInfo::Type::SLAB_2x2) && 
+                                     (info->type != StructureInfo::Type::WALL)     && 
+                                      info->type <  StructureInfo::Type::MAX);
 
                 if(isSelectable)
                 {
-                    const auto bounds = registry.get<ivec4s>(entity.value());
+                    const auto bounds = registry.get<ivec4s>(entity);
                     glBindBuffer(GL_ARRAY_BUFFER, m_selectionFrame.vbo);
 
                     if(void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
@@ -111,7 +125,11 @@ void HeadUpDisplay::update(const vec2s cursorPosition, float dt) noexcept
                 }
             }
         }
-        else m_selectionFrame.enabled = false;
+        else 
+        {
+            m_selectionFrame.enabled = false;
+            m_selectionFrame.lastSelectedEntity = entt::null;
+        }
     }
 
     m_isClicked = false;
@@ -127,6 +145,7 @@ void HeadUpDisplay::select() noexcept
 void HeadUpDisplay::release() noexcept
 {
     m_selectionFrame.enabled = false;
+    m_selectionFrame.lastSelectedEntity = entt::null;
     m_isClicked = false;
 }
 

@@ -115,50 +115,51 @@ void Mission::draw() noexcept
     auto& camera = m_game->camera;
 
     alignas(16) mat4s uniformMatrix = camera.getModelViewProjectionMatrix();
-    alignas(16) mat4s modelView;
-    alignas(16) mat4s result;
+    alignas(16) mat4s modelView     = m_transform.getMatrix();
+    alignas(16) mat4s result        = glms_mul(uniformMatrix, modelView);
 
-    modelView = m_transform.getMatrix();
-    result = glms_mul(uniformMatrix, modelView);
     camera.updateUniformBuffer(result.raw);
 
-    glUseProgram(m_landscape.program);
-
-    glBindTextureUnit(0, m_landscape.texture);
-    glBindVertexArray(m_landscape.vao);
-    glDrawElements(GL_TRIANGLES, m_landscape.count, GL_UNSIGNED_INT, nullptr);
-    glBindVertexArray(0);
-    glBindTextureUnit(0, 0);
-
-    glBindTextureUnit(0, m_buildings.texture);
-    glBindVertexArray(m_buildings.vao);
-
-    auto view = m_registry.view<const Structure>();
-
-    view.each([](const Structure& building) 
-    {
-        glDrawArrays(GL_TRIANGLE_FAN, building.frame, 4);
-    });
-
-    glBindVertexArray(0);
-    glBindTextureUnit(0, 0);
-
-    if(m_hud.isSelectionEnabled())
-    {
-        glUseProgram(m_ui.selectionShader);
-        m_hud.drawSelection();
+    {// Landscape
+        glUseProgram(m_landscape.program);
+        glBindTextureUnit(0, m_landscape.texture);
+        glBindVertexArray(m_landscape.vao);
+        glDrawElements(GL_TRIANGLES, m_landscape.count, GL_UNSIGNED_INT, nullptr);
+        glBindVertexArray(0);
+        glBindTextureUnit(0, 0);
     }
 
-    glUseProgram(m_landscape.program);
-    modelView = m_hud.getCursorTransform().getMatrix();
-    result = glms_mul(uniformMatrix, modelView);
-    camera.updateUniformBuffer(result.raw);
+    {// Structures
+        glBindTextureUnit(0, m_buildings.texture);
+        glBindVertexArray(m_buildings.vao);
 
-    m_sprites.bind(true);
-    m_hud.drawCursor();
-    m_sprites.bind(false);
+        auto view = m_registry.view<const StructureInfo>();
 
-    glUseProgram(0);
+        view.each([](const StructureInfo& building) 
+        {
+            glDrawArrays(GL_TRIANGLE_FAN, building.frame, 4);
+        });
+
+        glBindVertexArray(0);
+        glBindTextureUnit(0, 0);
+    }
+
+    {// HUD
+        if(m_hud.isSelectionEnabled())
+        {
+            glUseProgram(m_ui.selectionShader);
+            m_hud.drawSelection();
+            glUseProgram(m_landscape.program);
+        }
+ 
+        modelView = m_hud.getCursorTransform().getMatrix();
+        result = glms_mul(uniformMatrix, modelView);
+        camera.updateUniformBuffer(result.raw);
+
+        m_sprites.bind(true);
+        m_hud.drawCursor();
+        m_sprites.bind(false);
+    }
 }
 
 
@@ -206,7 +207,12 @@ bool Mission::initHUD() noexcept
     if(m_ui.selectionShader = m_game->getShaderProgram("selection"); m_ui.selectionShader == 0)
         return false;
 
-    m_hud.init(crosshairs);
+    auto showMenuForEntityCallback = [this](const entt::entity e) -> void
+    {
+        
+    };
+
+    m_hud.init(crosshairs, showMenuForEntityCallback);
 
     return true;
 }

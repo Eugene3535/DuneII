@@ -2,6 +2,7 @@
 #define HEAD_UP_DISPLAY_HPP
 
 #include <span>
+#include <functional>
 
 #include "graphics/Meshes.hpp"
 #include "graphics/transform/Transform2D.hpp"
@@ -17,7 +18,7 @@ public:
 	HeadUpDisplay& operator = (HeadUpDisplay&&)                                    noexcept = delete;
     ~HeadUpDisplay();
 
-    void init(std::span<const Sprite> crosshairs) noexcept;
+    void init(std::span<const Sprite> crosshairs, const std::function<void(const entt::entity)>& callback) noexcept;
     void update(const vec2s cursorPosition, float dt) noexcept;
 
     void select() noexcept;
@@ -45,7 +46,10 @@ private:
         uint32_t vao;
         float timer;
         bool enabled;
+        entt::entity lastSelectedEntity;
     } m_selectionFrame;
+
+    std::function<void(const entt::entity)> m_showMenuForEntity;
 
     bool m_isClicked;
 };
