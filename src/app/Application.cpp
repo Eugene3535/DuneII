@@ -50,7 +50,6 @@ int Application::run(DuneII& game) noexcept
 
 	int width, height;
 	glfwGetWindowSize(m_window, &width, &height);
-	game.camera.setupProjectionMatrix(width, height);
 	game.resize(width, height);
 
 	float deltaTime = 0.f;

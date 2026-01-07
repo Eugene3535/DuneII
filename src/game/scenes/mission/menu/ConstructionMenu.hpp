@@ -8,7 +8,7 @@
 class ConstructionMenu
 {
 public:
-    ConstructionMenu() noexcept;
+    ConstructionMenu(const ivec2s& windowSize) noexcept;
     ConstructionMenu(const ConstructionMenu&)              noexcept = delete;
 	ConstructionMenu(ConstructionMenu&&)                   noexcept = delete;
 	ConstructionMenu& operator = (const ConstructionMenu&) noexcept = delete;
@@ -16,13 +16,18 @@ public:
     ~ConstructionMenu();
 
     void init()    noexcept;
+    void update()  noexcept;
     void enable()  noexcept;
     void disable() noexcept;
     void draw()    noexcept;
 
     bool isEnabled() const noexcept;
+    const Transform2D& getTransform() const noexcept;
 
 private:
+    const ivec2s& m_windowSize;
+    Transform2D m_transform;
+
     uint32_t m_vao;
     uint32_t m_vbo;
 

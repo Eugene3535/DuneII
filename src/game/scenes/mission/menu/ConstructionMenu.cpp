@@ -13,7 +13,9 @@ static constexpr size_t total_vertices = 8 + 4 * CORNER_SEGMENTS;
 static std::vector<float> create_rect_with_rounded_edges(float x, float y, float w, float h, float r) noexcept;
 
 
-ConstructionMenu::ConstructionMenu() noexcept:
+ConstructionMenu::ConstructionMenu(const ivec2s& windowSize) noexcept:
+    m_windowSize(windowSize),
+    m_transform(),
     m_vao(0),
     m_vbo(0),
     m_isEnabled(false)
@@ -50,6 +52,19 @@ void ConstructionMenu::init() noexcept
 }
 
 
+void ConstructionMenu::update() noexcept
+{
+    if(m_isEnabled)
+    {
+        vec2s center = { m_windowSize.x * 0.5f, m_windowSize.y * 0.5f };
+
+        m_transform.setOrigin(400, 300);
+        m_transform.setPosition(center);
+    }
+
+}
+
+
 void ConstructionMenu::enable() noexcept
 {
     m_isEnabled = true;
@@ -73,6 +88,12 @@ void ConstructionMenu::draw() noexcept
 bool ConstructionMenu::isEnabled() const noexcept
 {
     return m_isEnabled;
+}
+
+
+const Transform2D& ConstructionMenu::getTransform() const noexcept
+{
+    return m_transform;
 }
 
 

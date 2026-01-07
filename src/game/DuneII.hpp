@@ -26,7 +26,7 @@ public:
 
     uint32_t getShaderProgram(const std::string& name) noexcept;
     vec2s    getCursorPosition() const noexcept;
-    ivec2s   getWindowsSize() const noexcept;
+    const ivec2s& getWindowsSize() const noexcept;
 
     OrthogonalCamera camera;
     
@@ -40,6 +40,7 @@ private:
     std::shared_ptr<T> load(std::string_view info) noexcept;
 
     struct GLFWwindow* m_window;
+    ivec2s m_windowSize;
 
     std::unordered_map<Scene::Type, std::shared_ptr<Scene>> m_scenes;
     std::shared_ptr<Scene> m_currentScene;

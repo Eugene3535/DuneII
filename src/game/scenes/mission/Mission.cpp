@@ -18,7 +18,8 @@
 Mission::Mission(DuneII* game) noexcept:
     Scene(game, Scene::MISSION),
     m_builder(m_registry, m_tileMask),
-    m_hud(m_builder, m_transform)
+    m_hud(m_builder, m_transform),
+    m_menu(game->getWindowsSize())
 {
     memset(&m_landscape, 0, sizeof(m_landscape)); 
     memset(&m_buildings, 0, sizeof(m_buildings));
@@ -57,7 +58,7 @@ bool Mission::load(std::string_view info) noexcept
     if(!initHUD())
         return false;
 
-    m_construction.menu.init();
+    m_menu.init();
 
     if(m_construction.program = m_game->getShaderProgram("color_outline"); m_construction.program == 0)
         return false;
@@ -177,21 +178,14 @@ void Mission::draw() noexcept
     }
 
     {// Test construction menu
-        if(m_construction.menu.isEnabled())
+        if(m_menu.isEnabled())
         {
-            auto size = m_game->getWindowsSize();
-            vec2s woorldCoords = { size.x / 2, size.y / 2 };
-
-            Transform2D tmp;
-            tmp.setOrigin(400, 300);
-            tmp.setPosition(woorldCoords);
-
-            modelView = tmp.getMatrix();
+            modelView = m_menu.getTransform().getMatrix();
             result = glms_mul(uniformMatrix, modelView);
             camera.updateUniformBuffer(result.raw);
 
             glUseProgram(m_construction.program);
-            m_construction.menu.draw();
+            m_menu.draw();
         }
     }
 }
@@ -243,7 +237,7 @@ bool Mission::initHUD() noexcept
 
     auto showMenuForEntityCallback = [this](const entt::entity e) -> void
     {
-        m_construction.menu.enable();
+        m_menu.enable();
     };
 
     m_hud.init(crosshairs, showMenuForEntityCallback);
@@ -313,6 +307,14 @@ void Mission::createSystems() noexcept
         }
  
         mission->m_hud.update(cursor, dt);
+
+        if(mission->m_menu.isEnabled())
+        {
+            mission->m_menu.update();
+
+            if(game->isKeyPressed(GLFW_KEY_SPACE))
+                mission->m_menu.disable();
+        }
     });
 
     m_isLoaded = true;

@@ -15,7 +15,7 @@ DuneII::DuneII() noexcept:
     m_nextSceneType(Scene::NONE),
     m_isSceneNeedToBeChanged(false)
 {
-
+    m_windowSize = { 0, 0 };
 }
 
 
@@ -138,15 +138,9 @@ vec2s DuneII::getCursorPosition() const noexcept
 }
 
 
-ivec2s DuneII::getWindowsSize() const noexcept
+const ivec2s& DuneII::getWindowsSize() const noexcept
 {
-    int width = 0;
-    int height = 0;
-
-    if(m_window)
-        glfwGetWindowSize(m_window, &width, &height);
-
-    return { width, height };
+    return m_windowSize;
 }
 
 
@@ -225,6 +219,7 @@ void DuneII::draw() noexcept
 
 void DuneII::resize(int width, int height) noexcept
 {
+    m_windowSize = { width, height };
     camera.setupProjectionMatrix(width, height);
 
     if (m_currentScene)

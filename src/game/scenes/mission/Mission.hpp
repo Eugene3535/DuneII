@@ -25,13 +25,14 @@ private:
     bool initHUD() noexcept;
     void createSystems() noexcept;
 
-    Transform2D    m_transform;
-    TileMap        m_tilemap;
-    SpriteManager  m_sprites;
-    entt::registry m_registry;
-    Builder        m_builder;
-    std::string    m_tileMask;
-    HeadUpDisplay  m_hud;
+    Transform2D      m_transform;
+    TileMap          m_tilemap;
+    SpriteManager    m_sprites;
+    entt::registry   m_registry;
+    Builder          m_builder;
+    std::string      m_tileMask;
+    HeadUpDisplay    m_hud;
+    ConstructionMenu m_menu;
     
 //  Resource section
     struct
@@ -58,7 +59,6 @@ private:
 
     struct
     {
-        ConstructionMenu menu;
         uint32_t program;
     } m_construction;
 
