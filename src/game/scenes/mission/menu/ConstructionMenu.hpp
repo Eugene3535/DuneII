@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "graphics/transform/Transform2D.hpp"
 
 class ConstructionMenu
 {
@@ -14,9 +15,12 @@ public:
 	ConstructionMenu& operator = (ConstructionMenu&&)      noexcept = delete;
     ~ConstructionMenu();
 
-    void createMenu() noexcept;
-    void showMenuForEntity() noexcept;
-    void draw() noexcept;
+    void init()    noexcept;
+    void enable()  noexcept;
+    void disable() noexcept;
+    void draw()    noexcept;
+
+    bool isEnabled() const noexcept;
 
 private:
     uint32_t m_vao;

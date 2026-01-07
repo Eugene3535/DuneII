@@ -9,6 +9,7 @@
 
 
 #define CORNER_SEGMENTS 12
+static constexpr size_t total_vertices = 8 + 4 * CORNER_SEGMENTS;
 static std::vector<float> create_rect_with_rounded_edges(float x, float y, float w, float h, float r) noexcept;
 
 
@@ -17,12 +18,7 @@ ConstructionMenu::ConstructionMenu() noexcept:
     m_vbo(0),
     m_isEnabled(false)
 {
-	glCreateBuffers(1, &m_vbo);
-	glNamedBufferData(m_vbo, 0, nullptr, GL_STATIC_DRAW);
 
-	glGenVertexArrays(1, &m_vao);
-    const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float2 };
-	VertexArrayObject::createVertexInputState(m_vao, m_vbo, attributes);
 }
 
 
@@ -33,9 +29,20 @@ ConstructionMenu::~ConstructionMenu()
 }
 
 
-void ConstructionMenu::createMenu() noexcept
+void ConstructionMenu::init() noexcept
 {
-    auto vertices = create_rect_with_rounded_edges(100.f, 100.f, 800.f, 600.f, 10.f);
+    if(m_vbo && m_vao)
+        return;
+
+//  Test rectangle
+    glCreateBuffers(1, &m_vbo);
+    glNamedBufferData(m_vbo, 0, nullptr, GL_STATIC_DRAW);
+
+    glGenVertexArrays(1, &m_vao);
+    const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float2 };
+    VertexArrayObject::createVertexInputState(m_vao, m_vbo, attributes);
+    
+    auto vertices = create_rect_with_rounded_edges(0.f, 0.f, 800.f, 600.f, 10.f);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), static_cast<const void*>(vertices.data()), GL_STATIC_DRAW);
@@ -43,17 +50,29 @@ void ConstructionMenu::createMenu() noexcept
 }
 
 
-void ConstructionMenu::showMenuForEntity() noexcept
+void ConstructionMenu::enable() noexcept
 {
+    m_isEnabled = true;
+}
 
+
+void ConstructionMenu::disable() noexcept
+{
+    m_isEnabled = false;
 }
 
 
 void ConstructionMenu::draw() noexcept
 {
     glBindVertexArray(m_vao);
-    glDrawArrays(GL_TRIANGLES, 0, 8 + 4 * CORNER_SEGMENTS);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, total_vertices);
     glBindVertexArray(0);
+}
+
+
+bool ConstructionMenu::isEnabled() const noexcept
+{
+    return m_isEnabled;
 }
 
 
@@ -64,9 +83,7 @@ std::vector<float> create_rect_with_rounded_edges(float x, float y, float w, flo
     if (r > minDimension * 0.5f)
         r = minDimension * 0.5f;
 
-    constexpr size_t totalVertices = 8 + 4 * CORNER_SEGMENTS;
-
-    std::vector<float> vertices(totalVertices);
+    std::vector<float> vertices(total_vertices * 2);
     size_t vertex = 0;
 
     vertices[vertex++] = x + r;     vertices[vertex++] = y;

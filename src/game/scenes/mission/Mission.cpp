@@ -24,8 +24,10 @@ Mission::Mission(DuneII* game) noexcept:
     memset(&m_buildings, 0, sizeof(m_buildings));
 
     m_ui.texture = 0;
-    m_ui.selectionShader = 0;
+    m_ui.program = 0;
     m_ui.clickTimer = 0.f;
+
+    m_construction.program = 0;
 }
 
 
@@ -54,6 +56,19 @@ bool Mission::load(std::string_view info) noexcept
 
     if(!initHUD())
         return false;
+
+    m_construction.menu.init();
+
+    if(m_construction.program = m_game->getShaderProgram("color_outline"); m_construction.program == 0)
+        return false;
+
+    if(GLint uniformColor = glGetUniformLocation(m_construction.program, "outlineColor"); uniformColor != -1)
+    {
+        const float outlineColor[] = { 155.f / 255.f, 160.f / 255.f, 163.f / 255.f };
+        glUseProgram(m_construction.program);
+        glUniform4fv(uniformColor, 1, outlineColor);
+        glUseProgram(0); 
+    }
 
     if(m_tilemap.loadFromFile(FileProvider::findPathToFile(std::string(info))))
     {
@@ -147,7 +162,7 @@ void Mission::draw() noexcept
     {// HUD
         if(m_hud.isSelectionEnabled())
         {
-            glUseProgram(m_ui.selectionShader);
+            glUseProgram(m_ui.program);
             m_hud.drawSelection();
             glUseProgram(m_landscape.program);
         }
@@ -159,6 +174,25 @@ void Mission::draw() noexcept
         m_sprites.bind(true);
         m_hud.drawCursor();
         m_sprites.bind(false);
+    }
+
+    {// Test construction menu
+        if(m_construction.menu.isEnabled())
+        {
+            auto size = m_game->getWindowsSize();
+            vec2s woorldCoords = { size.x / 2, size.y / 2 };
+
+            Transform2D tmp;
+            tmp.setOrigin(400, 300);
+            tmp.setPosition(woorldCoords);
+
+            modelView = tmp.getMatrix();
+            result = glms_mul(uniformMatrix, modelView);
+            camera.updateUniformBuffer(result.raw);
+
+            glUseProgram(m_construction.program);
+            m_construction.menu.draw();
+        }
     }
 }
 
@@ -204,12 +238,12 @@ bool Mission::initHUD() noexcept
         crosshairCaptured.value()
     };
 
-    if(m_ui.selectionShader = m_game->getShaderProgram("selection"); m_ui.selectionShader == 0)
+    if(m_ui.program = m_game->getShaderProgram("selection"); m_ui.program == 0)
         return false;
 
     auto showMenuForEntityCallback = [this](const entt::entity e) -> void
     {
-        
+        m_construction.menu.enable();
     };
 
     m_hud.init(crosshairs, showMenuForEntityCallback);

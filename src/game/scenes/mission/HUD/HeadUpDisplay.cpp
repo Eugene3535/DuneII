@@ -57,8 +57,8 @@ void HeadUpDisplay::update(const vec2s cursorPosition, float dt) noexcept
 
     if(m_isClicked)
     {
-        vec2s scenePosition = m_sceneTransform.getPosition();
-        vec2s woorldCoords = glms_vec2_add(glms_vec2_negate(scenePosition), cursorPosition);
+        vec2s scenePosition = glms_vec2_negate(m_sceneTransform.getPosition());
+        vec2s woorldCoords = glms_vec2_add(scenePosition, cursorPosition);
 
         if(auto entity = m_builder.getEntityUnderCursor(woorldCoords); entity != entt::null)
         {

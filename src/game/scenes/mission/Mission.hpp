@@ -52,11 +52,15 @@ private:
     struct
     {
         uint32_t texture;
-        uint32_t selectionShader;
+        uint32_t program;
         float clickTimer;
     } m_ui;
 
-    ConstructionMenu m_constructionMenu;
+    struct
+    {
+        ConstructionMenu menu;
+        uint32_t program;
+    } m_construction;
 
     std::vector<void(*)(Mission*, float)> m_systems;
 };

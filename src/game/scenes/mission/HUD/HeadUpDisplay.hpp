@@ -4,6 +4,8 @@
 #include <span>
 #include <functional>
 
+#include <entt/entity/fwd.hpp>
+
 #include "graphics/Meshes.hpp"
 #include "graphics/transform/Transform2D.hpp"
 
