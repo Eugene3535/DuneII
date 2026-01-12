@@ -1,5 +1,3 @@
-#include <cstring>
-
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include "cglm/struct/affine-mat.h"
@@ -23,8 +21,6 @@
 
 PickHouse::PickHouse(DuneII* game) noexcept:
     Scene(game, Scene::PICK_HOUSE),
-    m_vbo(0),
-    m_vao(0),
     m_texture(0),
     m_spriteProgram(0),
     m_outlineProgram(0),
@@ -40,8 +36,6 @@ PickHouse::PickHouse(DuneII* game) noexcept:
 
 PickHouse::~PickHouse()
 {
-    glDeleteBuffers(1, &m_vbo);
-    glDeleteVertexArrays(1, &m_vao);
     glDeleteTextures(1, &m_texture);
 }
 
@@ -51,8 +45,6 @@ bool PickHouse::load(std::string_view info) noexcept
     if(m_isLoaded)
         return true;
 
-    glGenBuffers(1, &m_vbo);
-    glGenVertexArrays(1, &m_vao);
     glGenTextures(1, &m_texture);
 
 //  Textures
@@ -79,17 +71,15 @@ bool PickHouse::load(std::string_view info) noexcept
     }
 
 //  Sprites
-    memset(&m_background, 0, sizeof(Sprite));
     m_sprites.createSprite("background", housesTexture);
 
     if(auto bg = m_sprites.getSprite("background"); bg.has_value())
         m_background = bg.value();
 
 //  Outline
-    m_outline = std::make_unique<Outline>(m_vbo, m_vao);
     const vec2s outlineSize = { DEFAULT_OUTLINE_WIDTH, DEFAULT_OUTLINE_HEIGHT };
 
-    m_outline->create(4, [outlineSize](size_t index) -> vec2s
+    m_outline.create(4, [outlineSize](size_t index) -> vec2s
     {
         switch (index)
         {
@@ -207,7 +197,7 @@ void PickHouse::draw() noexcept
     modelView = m_outlineTransform.getMatrix();
     result = glms_mul(MVP, modelView);
     camera.updateUniformBuffer(result.raw);
-    m_outline->draw();
+    m_outline.draw();
 
     glUseProgram(0);
 }

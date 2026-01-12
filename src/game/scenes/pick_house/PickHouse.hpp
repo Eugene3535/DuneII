@@ -1,8 +1,6 @@
 #ifndef PICK_HOUSE_HPP
 #define PICK_HOUSE_HPP
 
-#include <memory>
-
 #include "common/Enums.hpp"
 #include "resources/gl_interfaces/shaders/ShaderProgram.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
@@ -23,8 +21,6 @@ public:
     void resize(int width, int height) noexcept override;
 
 private:
-    GLuint m_vbo;
-    GLuint m_vao;
     GLuint m_texture;
 
     GLuint m_spriteProgram;
@@ -35,7 +31,7 @@ private:
     Sprite m_background;
     Transform2D m_backgroundTransform;
 
-    std::unique_ptr<Outline> m_outline;
+    Outline m_outline;
     Transform2D m_outlineTransform;
 
     HouseType m_selectedHouse;

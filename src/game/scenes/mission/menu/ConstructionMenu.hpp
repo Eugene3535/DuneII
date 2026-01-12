@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "graphics/transform/Transform2D.hpp"
+#include "graphics/outline/Outline.hpp"
 
 class ConstructionMenu
 {
@@ -20,6 +21,7 @@ public:
     void enable()  noexcept;
     void disable() noexcept;
     void draw()    noexcept;
+    void drawOutline() noexcept;
 
     bool isEnabled() const noexcept;
     const Transform2D& getTransform() const noexcept;
@@ -30,6 +32,7 @@ private:
 
     uint32_t m_vao;
     uint32_t m_vbo;
+    Outline m_outline;
 
     bool m_isEnabled;
 };

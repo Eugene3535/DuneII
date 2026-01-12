@@ -9,18 +9,19 @@
 #include "graphics/outline/Outline.hpp"
 
 
-Outline::Outline(uint32_t vboHandle, uint32_t vaoHandle) noexcept:
-    m_vbo(vboHandle),
-    m_vao(vaoHandle),
+Outline::Outline() noexcept:
+    m_vbo(0),
+    m_vao(0),
     m_count(0)
 {
-    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    VertexArrayObject vao(vaoHandle);
-    const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float2 };
-    VertexArrayObject::createVertexInputState(m_vao, m_vbo, attributes);
+}
+
+
+Outline::~Outline()
+{
+    glDeleteVertexArrays(1, &m_vao);
+    glDeleteBuffers(1, &m_vbo);
 }
 
 
@@ -31,6 +32,16 @@ void Outline::create(size_t pointCount, const std::function<vec2s(size_t)>& getP
     
     if(thickness < 1.f)
         return;
+
+    if( !(m_vbo && m_vao) )
+    {
+        glCreateBuffers(1, &m_vbo);
+        glNamedBufferData(m_vbo, 0, nullptr, GL_STATIC_DRAW);
+
+        glGenVertexArrays(1, &m_vao);
+        const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float2 };
+        VertexArrayObject::createVertexInputState(m_vao, m_vbo, attributes);
+    }
     
     std::vector<vec2s> vertices(pointCount + 2); // + 2 for center and repeated first point
 

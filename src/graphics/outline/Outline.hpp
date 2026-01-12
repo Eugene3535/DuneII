@@ -10,7 +10,12 @@
 class Outline
 {
 public:
-    Outline(uint32_t vboHandle, uint32_t vaoHandle) noexcept;
+    Outline()                            noexcept;
+    Outline(const Outline&)              noexcept = delete;
+    Outline(Outline&&)                   noexcept = delete;
+    Outline& operator = (const Outline&) noexcept = delete;
+    Outline& operator = (Outline&&)      noexcept = delete;
+    ~Outline();
 
     void create(size_t pointCount, const std::function<vec2s(size_t)>& getPoint, float thickness = 1.f) noexcept;
     void draw() noexcept;

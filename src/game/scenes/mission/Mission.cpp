@@ -185,7 +185,20 @@ void Mission::draw() noexcept
             camera.updateUniformBuffer(result.raw);
 
             glUseProgram(m_construction.program);
-            m_menu.draw();
+
+            if(GLint uniformColor = glGetUniformLocation(m_construction.program, "outlineColor"); uniformColor != -1)
+            {
+                const float outlineColor[] = { 155.f / 255.f, 160.f / 255.f, 163.f / 255.f, 1.f };
+                glUniform4fv(uniformColor, 1, outlineColor);
+                m_menu.draw();
+            }
+
+            if(GLint uniformColor = glGetUniformLocation(m_construction.program, "outlineColor"); uniformColor != -1)
+            {
+                const float outlineColor[] = { 170.f / 255.f, 199.f / 255.f, 207.f / 255.f, 1.f };
+                glUniform4fv(uniformColor, 1, outlineColor);
+                m_menu.drawOutline();
+            }
         }
     }
 }
