@@ -20,8 +20,7 @@ public:
     void update()  noexcept;
     void enable()  noexcept;
     void disable() noexcept;
-    void draw()    noexcept;
-    void drawOutline() noexcept;
+    void draw(uint32_t program)    noexcept;
 
     bool isEnabled() const noexcept;
     const Transform2D& getTransform() const noexcept;
@@ -32,6 +31,7 @@ private:
 
     uint32_t m_vao;
     uint32_t m_vbo;
+    uint32_t m_count;
     Outline m_outline;
 
     bool m_isEnabled;

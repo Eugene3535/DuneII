@@ -4,12 +4,8 @@
 
 #include "resources/gl_interfaces/texture/Texture.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
+#include "graphics/geometry/GeometryGenerator.hpp"
 #include "game/scenes/mission/menu/ConstructionMenu.hpp"
-
-
-#define CORNER_SEGMENTS 8
-static constexpr size_t total_vertices = 8 + 4 * CORNER_SEGMENTS;
-static std::vector<float> create_rect_with_rounded_edges(float x, float y, float w, float h, float r) noexcept;
 
 
 ConstructionMenu::ConstructionMenu(const ivec2s& windowSize) noexcept:
@@ -17,6 +13,7 @@ ConstructionMenu::ConstructionMenu(const ivec2s& windowSize) noexcept:
     m_transform(),
     m_vao(0),
     m_vbo(0),
+    m_count(0),
     m_isEnabled(false)
 {
 
@@ -35,8 +32,11 @@ void ConstructionMenu::init() noexcept
     if(m_vbo && m_vao)
         return;
 
+    GeometryGenerator generator;
+
 //  Test rectangle
-    auto vertices = create_rect_with_rounded_edges(0.f, 0.f, 800.f, 600.f, 10.f);
+    auto vertices = generator.createRectWithRoundedEdges(0.f, 0.f, 800.f, 600.f, 10.f);
+    m_count = (vertices.size() >> 1);
 
     glCreateBuffers(1, &m_vbo);
     glNamedBufferData(m_vbo, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
@@ -47,7 +47,7 @@ void ConstructionMenu::init() noexcept
 
     const float thickness = 5.f;
 
-    m_outline.create(total_vertices, [&vertices](size_t index) -> vec2s
+    m_outline.create(m_count, [&vertices](size_t index) -> vec2s
     {
         const float* data = vertices.data() + (index << 1);
 
@@ -80,17 +80,25 @@ void ConstructionMenu::disable() noexcept
 }
 
 
-void ConstructionMenu::draw() noexcept
+void ConstructionMenu::draw(uint32_t program) noexcept
 {
-    glBindVertexArray(m_vao);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, total_vertices);
-    glBindVertexArray(0);
-}
+    glUseProgram(program);
 
-
-void ConstructionMenu::drawOutline() noexcept
-{
-    m_outline.draw();
+    if(GLint uniformColor = glGetUniformLocation(program, "outlineColor"); uniformColor != -1)
+    {
+        {
+            const float outlineColor[] = { 155.f / 255.f, 160.f / 255.f, 163.f / 255.f, 1.f };
+            glUniform4fv(uniformColor, 1, outlineColor);
+            glBindVertexArray(m_vao);
+            glDrawArrays(GL_TRIANGLE_FAN, 0, m_count);
+            glBindVertexArray(0);
+        }
+        {
+            const float outlineColor[] = { 170.f / 255.f, 199.f / 255.f, 207.f / 255.f, 1.f };
+            glUniform4fv(uniformColor, 1, outlineColor);
+            m_outline.draw();
+        }  
+    }
 }
 
 
@@ -103,63 +111,4 @@ bool ConstructionMenu::isEnabled() const noexcept
 const Transform2D& ConstructionMenu::getTransform() const noexcept
 {
     return m_transform;
-}
-
-
-std::vector<float> create_rect_with_rounded_edges(float x, float y, float w, float h, float r) noexcept
-{
-    std::vector<float> vertices(total_vertices << 1);
-    size_t vertex = 0;
-
-    constexpr float angleStep = M_PI_2 / (float)(CORNER_SEGMENTS - 1);
-
-    vertices[vertex++] = x + r;     vertices[vertex++] = y;
-    vertices[vertex++] = x + w - r; vertices[vertex++] = y;
-
-    float cx = x + w - r;
-    float cy = y + r;
-    for(int32_t i = 0; i < CORNER_SEGMENTS; ++i)
-    {
-        const float angle = M_PI * 3.f / 2.f + angleStep * i;
-        vertices[vertex++] = cx + cos(angle) * r;
-        vertices[vertex++] = cy + sin(angle) * r;
-    }
-
-    vertices[vertex++] = x + w; vertices[vertex++] = y + r;
-    vertices[vertex++] = x + w; vertices[vertex++] = y + h - r;
-
-    cx = x + w - r;
-    cy = y + h - r;
-    for(int32_t i = 0; i < CORNER_SEGMENTS; ++i)
-    {
-        const float angle = angleStep * i;
-        vertices[vertex++] = cx + cos(angle) * r;
-        vertices[vertex++] = cy + sin(angle) * r;
-    }
-
-    vertices[vertex++] = x + w - r; vertices[vertex++] = y + h;
-    vertices[vertex++] = x + r;     vertices[vertex++] = y + h;
-
-    cx = x + r;
-    cy = y + h - r;
-    for(int32_t i = 0; i < CORNER_SEGMENTS; ++i)
-    {
-        const float angle = M_PI_2 + angleStep * i;
-        vertices[vertex++] = cx + cos(angle) * r;
-        vertices[vertex++] = cy + sin(angle) * r;
-    }
-
-    vertices[vertex++] = x; vertices[vertex++] = y + h - r;
-    vertices[vertex++] = x; vertices[vertex++] = y + r;
-
-    cx = x + r;
-    cy = y + r;
-    for(int32_t i = 0; i < CORNER_SEGMENTS; ++i)
-    {
-        const float angle = M_PI + angleStep * i;
-        vertices[vertex++] = cx + cos(angle) * r;
-        vertices[vertex++] = cy + sin(angle) * r;
-    }
-
-    return vertices;
 }
