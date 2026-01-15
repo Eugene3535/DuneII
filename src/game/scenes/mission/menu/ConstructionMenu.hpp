@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "graphics/transform/Transform2D.hpp"
-#include "graphics/outline/Outline.hpp"
 
 class ConstructionMenu
 {
@@ -32,7 +31,7 @@ private:
     uint32_t m_vao;
     uint32_t m_vbo;
     uint32_t m_count;
-    Outline m_outline;
+    uint32_t m_outlineCount;
 
     bool m_isEnabled;
 };

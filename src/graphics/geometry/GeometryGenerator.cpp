@@ -198,5 +198,6 @@ void calculate_outline(std::span<vec2s> points, std::vector<float>& result, floa
     vertices[count * 2 + 1] = vertices[1];
 
     result.resize(vertices.size() << 1);
-    memcpy(result.data(), vertices.data(), sizeof(vertices.size() * sizeof(vec2s)));
+
+    memcpy(result.data(), vertices.data(), vertices.size() * sizeof(vec2s));
 }

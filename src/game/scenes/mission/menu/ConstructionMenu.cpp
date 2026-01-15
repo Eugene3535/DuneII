@@ -14,6 +14,7 @@ ConstructionMenu::ConstructionMenu(const ivec2s& windowSize) noexcept:
     m_vao(0),
     m_vbo(0),
     m_count(0),
+    m_outlineCount(0),
     m_isEnabled(false)
 {
 
@@ -35,24 +36,28 @@ void ConstructionMenu::init() noexcept
     GeometryGenerator generator;
 
 //  Test rectangle
-    auto vertices = generator.createRectWithRoundedEdges(0.f, 0.f, 800.f, 600.f, 10.f);
-    m_count = (vertices.size() >> 1);
+    auto rectVertices = generator.createRectWithRoundedEdges(0.f, 0.f, 800.f, 600.f, 10.f);
+    m_count = (rectVertices.size() >> 1);
+
+    const float thickness = 5.f;
+
+    auto outlineVertices = generator.createOutline(m_count, [&rectVertices](size_t index) -> vec2s
+    {
+        const float* data = rectVertices.data() + (index << 1);
+
+        return { data[0], data[1] };
+    }, thickness);
+    
+    m_outlineCount = (outlineVertices.size() >> 1);
+
+    rectVertices.insert(rectVertices.end(), outlineVertices.begin(), outlineVertices.end());
 
     glCreateBuffers(1, &m_vbo);
-    glNamedBufferData(m_vbo, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+    glNamedBufferData(m_vbo, rectVertices.size() * sizeof(float), rectVertices.data(), GL_STATIC_DRAW);
 
     glGenVertexArrays(1, &m_vao);
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float2 };
     VertexArrayObject::createVertexInputState(m_vao, m_vbo, attributes);
-
-    const float thickness = 5.f;
-
-    m_outline.create(m_count, [&vertices](size_t index) -> vec2s
-    {
-        const float* data = vertices.data() + (index << 1);
-
-        return { data[0], data[1] };
-    }, thickness);
 }
 
 
@@ -86,18 +91,18 @@ void ConstructionMenu::draw(uint32_t program) noexcept
 
     if(GLint uniformColor = glGetUniformLocation(program, "outlineColor"); uniformColor != -1)
     {
+        glBindVertexArray(m_vao);
         {
             const float outlineColor[] = { 155.f / 255.f, 160.f / 255.f, 163.f / 255.f, 1.f };
             glUniform4fv(uniformColor, 1, outlineColor);
-            glBindVertexArray(m_vao);
             glDrawArrays(GL_TRIANGLE_FAN, 0, m_count);
-            glBindVertexArray(0);
         }
         {
             const float outlineColor[] = { 170.f / 255.f, 199.f / 255.f, 207.f / 255.f, 1.f };
             glUniform4fv(uniformColor, 1, outlineColor);
-            m_outline.draw();
-        }  
+            glDrawArrays(GL_TRIANGLE_STRIP, m_count, m_outlineCount);
+        }
+        glBindVertexArray(0);
     }
 }
 
