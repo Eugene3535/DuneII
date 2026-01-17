@@ -30,8 +30,18 @@ private:
 
     uint32_t m_vao;
     uint32_t m_vbo;
-    uint32_t m_count;
-    uint32_t m_outlineCount;
+
+    struct
+    {
+        uint32_t background;
+        uint32_t outline;
+    } m_root;
+
+    struct
+    {
+        uint32_t background;
+        uint32_t outline;
+    } m_building;
 
     bool m_isEnabled;
 };
