@@ -58,18 +58,10 @@ bool Mission::load(std::string_view info) noexcept
     if(!initHUD())
         return false;
 
-    m_menu.init();
-
     if(m_construction.program = m_game->getShaderProgram("color_outline"); m_construction.program == 0)
         return false;
 
-    if(GLint uniformColor = glGetUniformLocation(m_construction.program, "outlineColor"); uniformColor != -1)
-    {
-        const float outlineColor[] = { 155.f / 255.f, 160.f / 255.f, 163.f / 255.f };
-        glUseProgram(m_construction.program);
-        glUniform4fv(uniformColor, 1, outlineColor);
-        glUseProgram(0); 
-    }
+    m_menu.init(m_construction.program);
 
     if(m_tilemap.loadFromFile(FileProvider::findPathToFile(std::string(info))))
     {
@@ -183,7 +175,7 @@ void Mission::draw() noexcept
             modelView = m_menu.getTransform().getMatrix();
             result = glms_mul(uniformMatrix, modelView);
             camera.updateUniformBuffer(result.raw);
-            m_menu.draw(m_construction.program);
+            m_menu.draw();
         }
     }
 }

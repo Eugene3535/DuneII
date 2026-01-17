@@ -15,11 +15,11 @@ public:
 	ConstructionMenu& operator = (ConstructionMenu&&)      noexcept = delete;
     ~ConstructionMenu();
 
-    void init()    noexcept;
+    void init(uint32_t program) noexcept;
     void update()  noexcept;
     void enable()  noexcept;
     void disable() noexcept;
-    void draw(uint32_t program)    noexcept;
+    void draw()    noexcept;
 
     bool isEnabled() const noexcept;
     const Transform2D& getTransform() const noexcept;
@@ -30,18 +30,32 @@ private:
 
     uint32_t m_vao;
     uint32_t m_vbo;
+    uint32_t m_program;
+    int32_t m_uniform;
 
     struct
     {
         uint32_t background;
         uint32_t outline;
-    } m_root;
+    } m_rootWindow;
 
     struct
     {
         uint32_t background;
         uint32_t outline;
-    } m_building;
+    } m_entityWindow;
+
+    struct
+    {
+        uint32_t background;
+        uint32_t outline;
+    } m_entityWindowLabel;
+
+    struct
+    {
+        uint32_t background;
+        uint32_t outline;
+    } m_entityWindowParams[3];
 
     bool m_isEnabled;
 };
