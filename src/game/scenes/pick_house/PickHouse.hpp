@@ -2,9 +2,7 @@
 #define PICK_HOUSE_HPP
 
 #include "common/Enums.hpp"
-#include "resources/gl_interfaces/shaders/ShaderProgram.hpp"
-#include "graphics/sprites/SpriteManager.hpp"
-#include "graphics/outline/Outline.hpp"
+#include "graphics/Meshes.hpp"
 #include "game/scenes/Scene.hpp"
 
 
@@ -21,18 +19,24 @@ public:
     void resize(int width, int height) noexcept override;
 
 private:
-    GLuint m_texture;
+    uint32_t m_vertexBufferObject;
+    uint32_t m_vertexArrayObjects[2];
 
-    GLuint m_spriteProgram;
-    GLuint m_outlineProgram;
+    struct
+    {
+        uint32_t vao;
+        Sprite   sprite;
+        uint32_t program;
+        Transform2D transform;
+    } m_background;
     
-    SpriteManager m_sprites;
-
-    Sprite m_background;
-    Transform2D m_backgroundTransform;
-
-    Outline m_outline;
-    Transform2D m_outlineTransform;
+    struct
+    {
+        uint32_t vao;
+        uint32_t program;
+        uint32_t count;
+        Transform2D transform;
+    } m_outline;
 
     HouseType m_selectedHouse;
     float m_timer;

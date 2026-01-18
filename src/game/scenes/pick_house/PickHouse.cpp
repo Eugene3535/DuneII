@@ -4,7 +4,9 @@
 
 #include "resources/files/FileProvider.hpp"
 #include "resources/files/Shader.hpp"
+#include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "resources/gl_interfaces/texture/Texture.hpp"
+#include "graphics/geometry/GeometryGenerator.hpp"
 #include "game/DuneII.hpp"
 #include "game/scenes/pick_house/PickHouse.hpp"
 
@@ -21,22 +23,27 @@
 
 PickHouse::PickHouse(DuneII* game) noexcept:
     Scene(game, Scene::PICK_HOUSE),
-    m_texture(0),
-    m_spriteProgram(0),
-    m_outlineProgram(0),
-    m_backgroundTransform(),
-    m_outlineTransform(),
+    m_vertexBufferObject(0),
+    m_vertexArrayObjects{0, 0},
     m_selectedHouse(HouseType::ATREIDES),
     m_timer(0.f),
     m_outlineNeedUpdate(true)
 {
-    
+    m_background.vao     = 0;
+    m_background.program = 0;
+    m_background.sprite.frame = 0;
+
+    m_outline.vao     = 0;
+    m_outline.program = 0;
+    m_outline.count   = 0;
 }
 
 
 PickHouse::~PickHouse()
 {
-    glDeleteTextures(1, &m_texture);
+    glDeleteTextures(1, &m_background.sprite.texture);
+    glDeleteVertexArrays(2, m_vertexArrayObjects);
+    glDeleteBuffers(1, &m_vertexBufferObject);
 }
 
 
@@ -45,53 +52,103 @@ bool PickHouse::load(std::string_view info) noexcept
     if(m_isLoaded)
         return true;
 
-    glGenTextures(1, &m_texture);
+    glGenTextures(1, &m_background.sprite.texture);
+    glGenVertexArrays(2, m_vertexArrayObjects);
+    glCreateBuffers(1, &m_vertexBufferObject);
+
+    m_background.vao = m_vertexArrayObjects[0];
+    m_outline.vao = m_vertexArrayObjects[1];
 
 //  Textures
-    Texture housesTexture = {.handle = m_texture };
+    Texture housesTexture = {.handle = m_background.sprite.texture };
 
     if(!housesTexture.loadFromFile(FileProvider::findPathToFile(HOUSES_PNG)))
         return false;
 
+    m_background.sprite.width  = housesTexture.width;
+    m_background.sprite.height = housesTexture.height;
+
 //  Shaders
     {
-        if(m_spriteProgram = m_game->getShaderProgram("sprite"); m_spriteProgram == 0)
+        if(m_background.program = m_game->getShaderProgram("sprite"); m_background.program == 0)
             return false;
 
-        if(m_outlineProgram = m_game->getShaderProgram("color_outline"); m_outlineProgram == 0)
+        if(m_outline.program = m_game->getShaderProgram("color_outline"); m_outline.program == 0)
             return false;
     }
 
-    if(GLint uniformColor = glGetUniformLocation(m_outlineProgram, "outlineColor"); uniformColor != -1)
+    if(GLint uniformColor = glGetUniformLocation(m_outline.program, "outlineColor"); uniformColor != -1)
     {
         const float outlineColor[] = { 1.f, 0.f, 0.f, 1.f };
-        glUseProgram(m_outlineProgram);
+        glUseProgram(m_outline.program);
         glUniform4fv(uniformColor, 1, outlineColor);
         glUseProgram(0); 
     }
 
-//  Sprites
-    m_sprites.createSprite("background", housesTexture);
+    std::vector<float> vertices;
 
-    if(auto bg = m_sprites.getSprite("background"); bg.has_value())
-        m_background = bg.value();
+//  Background sprite
+    {
+        const vec2s ratio = { 1.f / housesTexture.width, 1.f / housesTexture.height };
+        const ivec4s textureRect = { 0, 0, housesTexture.width, housesTexture.height };
+
+        std::array<float, 16> quad = {};
+
+        quad[4]  = static_cast<float>(textureRect.z);
+        quad[8]  = static_cast<float>(textureRect.z);
+        quad[9]  = static_cast<float>(textureRect.w);
+        quad[13] = static_cast<float>(textureRect.w);
+
+        float left   = textureRect.x * ratio.x;
+        float top    = textureRect.y * ratio.y;
+        float right  = (textureRect.x + textureRect.z) * ratio.x;
+        float bottom = (textureRect.y + textureRect.w) * ratio.y;
+
+        quad[2] = left;
+        quad[3] = top;
+
+        quad[6] = right;
+        quad[7] = top;
+
+        quad[10] = right;
+        quad[11] = bottom;
+
+        quad[14] = left;
+        quad[15] = bottom;
+
+        vertices.insert(vertices.end(), quad.begin(), quad.end());
+    }
 
 //  Outline
-    const vec2s outlineSize = { DEFAULT_OUTLINE_WIDTH, DEFAULT_OUTLINE_HEIGHT };
-
-    m_outline.create(4, [outlineSize](size_t index) -> vec2s
     {
-        switch (index)
-        {
-            default:
-            case 0: return { 0, 0 };
-            case 1: return { outlineSize.x, 0 };
-            case 2: return { outlineSize.x, outlineSize.y };
-            case 3: return { 0, outlineSize.y };
-        }
-    });
+        GeometryGenerator generator;
+        const vec2s outlineSize = { DEFAULT_OUTLINE_WIDTH, DEFAULT_OUTLINE_HEIGHT };
 
-    m_isLoaded = (m_background.texture != 0);
+        auto outlineVertices = generator.createOutline(4, [outlineSize](size_t index) -> vec2s
+        {
+            switch (index)
+            {
+                default:
+                case 0: return { 0, 0 };
+                case 1: return { outlineSize.x, 0 };
+                case 2: return { outlineSize.x, outlineSize.y };
+                case 3: return { 0, outlineSize.y };
+            }
+        });
+
+        vertices.insert(vertices.end(), outlineVertices.begin(), outlineVertices.end());
+        m_outline.count = (outlineVertices.size() >> 1);
+    }
+
+    glNamedBufferData(m_vertexBufferObject, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+
+    const std::array<VertexBufferLayout::Attribute, 1> spriteAttributes{ VertexBufferLayout::Attribute::Float4 };
+    VertexArrayObject::createVertexInputState(m_background.vao, m_vertexBufferObject, spriteAttributes);
+
+    const std::array<VertexBufferLayout::Attribute, 1> outlineAttributes{ VertexBufferLayout::Attribute::Float2 };
+    VertexArrayObject::createVertexInputState(m_outline.vao, m_vertexBufferObject, outlineAttributes);
+
+    m_isLoaded = true;
 
     return m_isLoaded;
 }
@@ -142,8 +199,8 @@ void PickHouse::update(float dt) noexcept
         auto windowSize = m_game->getWindowsSize();
         vec2 size = { static_cast<float>(windowSize.x), static_cast<float>(windowSize.y) };
 
-        float dx = size[0] / m_background.width;
-        float dy = size[1] / m_background.height;
+        float dx = size[0] / m_background.sprite.width;
+        float dy = size[1] / m_background.sprite.height;
         float outlinePositionX = 0;
 
         switch (m_selectedHouse)
@@ -164,7 +221,7 @@ void PickHouse::update(float dt) noexcept
                 break;
         }
 
-        m_outlineTransform.setPosition(outlinePositionX, OUTLINE_POSITION_Y * dy);
+        m_outline.transform.setPosition(outlinePositionX, OUTLINE_POSITION_Y * dy);
         m_outlineNeedUpdate = false;
     }
 }
@@ -181,35 +238,36 @@ void PickHouse::draw() noexcept
     alignas(16) mat4s modelView;
     alignas(16) mat4s result;
 
-    glUseProgram(m_spriteProgram);
-    m_sprites.bind(true);
-
-    modelView = m_backgroundTransform.getMatrix();
+//  Draw background
+    modelView = m_background.transform.getMatrix();
     result = glms_mul(MVP, modelView);
     camera.updateUniformBuffer(result.raw);
 
-    glBindTexture(GL_TEXTURE_2D, m_background.texture);
-    glDrawArrays(GL_TRIANGLE_FAN, m_background.frame, 4);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glUseProgram(m_background.program);
+    glBindVertexArray(m_background.vao);
+    glBindTextureUnit(0, m_background.sprite.texture);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4); // 4 float per vertex in sprite VAO !!!
+    glBindTextureUnit(0, 0);
 
-    glUseProgram(m_outlineProgram);
-
-    modelView = m_outlineTransform.getMatrix();
+//  Draw outline
+    modelView = m_outline.transform.getMatrix();
     result = glms_mul(MVP, modelView);
     camera.updateUniformBuffer(result.raw);
-    m_outline.draw();
 
-    glUseProgram(0);
+    glUseProgram(m_outline.program);
+    glBindVertexArray(m_outline.vao);
+    glDrawArrays(GL_TRIANGLE_STRIP, 8, m_outline.count); // 2 float per vertex in outline VAO !!!
+    glBindVertexArray(0);
 }
 
 
 void PickHouse::resize(int width, int height) noexcept
 {
     vec2 size = { static_cast<float>(width), static_cast<float>(height) };
-    setSpriteSizeInPixels(m_background, size, m_backgroundTransform);
+    setSpriteSizeInPixels(m_background.sprite, size, m_background.transform);
 
-    float dx = size[0] / m_background.width;
-    float dy = size[1] / m_background.height;
+    float dx = size[0] / m_background.sprite.width;
+    float dy = size[1] / m_background.sprite.height;
     float outlinePositionX = 0;
 
     switch (m_selectedHouse)
@@ -230,6 +288,6 @@ void PickHouse::resize(int width, int height) noexcept
             break;
     }
 
-    m_outlineTransform.setPosition(outlinePositionX, OUTLINE_POSITION_Y * dy);
-    m_outlineTransform.setScale(dx, dy);
+    m_outline.transform.setPosition(outlinePositionX, OUTLINE_POSITION_Y * dy);
+    m_outline.transform.setScale(dx, dy);
 }
