@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include <cglm/call/vec2.h>
 
 #include "graphics/geometry/GeometryGenerator.hpp"
