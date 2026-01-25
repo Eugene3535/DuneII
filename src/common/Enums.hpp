@@ -14,7 +14,4 @@ enum class HouseType : int
 	INVALID = 0xFF
 };
 
-
-
-
 #endif // !ENUMS_HPP

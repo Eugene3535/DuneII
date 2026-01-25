@@ -224,10 +224,10 @@ void SpriteManager::addSprite(const uint32_t texture, const ivec4s frame, const 
 	quad[9]  = static_cast<float>(frame.w);
 	quad[13] = static_cast<float>(frame.w);
 
-	float left   = frame.x * ratio.x;
-	float top    = frame.y * ratio.y;
-	float right  = (frame.x + frame.z) * ratio.x;
-	float bottom = (frame.y + frame.w) * ratio.y;
+	const float left   = frame.x * ratio.x;
+	const float top    = frame.y * ratio.y;
+	const float right  = (frame.x + frame.z) * ratio.x;
+	const float bottom = (frame.y + frame.w) * ratio.y;
 
 	quad[2] = left;
 	quad[3] = top;

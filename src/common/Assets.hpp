@@ -14,6 +14,7 @@
 #define BUTTON_SETTINGS_RU_PNG   "button_settings_ru.png"
 #define HOUSES_PNG               "Houses.png"
 #define OUTLINE_PNG              "Outline.png"
+#define PREVIEWS_PNG             "Previews.png"
 
 
 // Fonts

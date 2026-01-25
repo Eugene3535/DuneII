@@ -5,8 +5,56 @@
 
 #include "graphics/transform/Transform2D.hpp"
 
+
 class ConstructionMenu
 {
+//  https://gamicus.fandom.com/wiki/List_of_structures_in_Dune_II
+    enum Preview : uint32_t
+    {
+        WOR = 0,
+        Wind_Trap,
+        Wall,
+        Death_Hand,
+        Quad,
+        Harvester,
+        Light_Vehicle_Factory,
+        Starport,
+        Turret,
+        Slab_2x2,
+        Raider_Trike,
+        MCV,
+        House_of_IX,
+        Spice_Silo,
+        Rocket_Turret,
+        Construction_Yard,
+        Launcher,
+        Carryall,
+        High_Tech,
+        Repair,
+        Refinery,
+        Barracks,
+        Siege_Tank,
+        Starport_Intro,
+        Heavy_Vehicle_Factory,
+        Palace,
+        Outpost,
+        Fremen,
+        Sonic_Tank,
+        Devastator,
+        Saboteur,
+        Sandworm,
+        Trooper,
+        Troopers,
+        Trike,
+        Deviator,
+        Ornithopter,
+        Infantry,
+        Tank,
+        Empty_Cell,
+        MAX,
+        INVALID = 0xFF
+    };
+
 public:
     ConstructionMenu(const ivec2s& windowSize) noexcept;
     ConstructionMenu(const ConstructionMenu&)              noexcept = delete;
@@ -15,7 +63,7 @@ public:
 	ConstructionMenu& operator = (ConstructionMenu&&)      noexcept = delete;
     ~ConstructionMenu();
 
-    void init(uint32_t program) noexcept;
+    void init(uint32_t frameProgram, uint32_t previewProgram) noexcept;
     void update()  noexcept;
     void enable()  noexcept;
     void disable() noexcept;
@@ -25,37 +73,43 @@ public:
     const Transform2D& getTransform() const noexcept;
 
 private:
+    void createFrame(uint32_t program) noexcept;
+    void createPreviews(uint32_t program) noexcept;
+    void drawFrame() noexcept;
+    void drawPreviews() noexcept;
+
     const ivec2s& m_windowSize;
     Transform2D m_transform;
 
-    uint32_t m_vao;
-    uint32_t m_vbo;
-    uint32_t m_program;
-    int32_t m_uniform;
-
-    struct
+    struct Widget
     {
         uint32_t background;
         uint32_t outline;
-    } m_rootWindow;
+    };
 
     struct
     {
-        uint32_t background;
-        uint32_t outline;
-    } m_entityWindow;
+        uint32_t program;
+        uint32_t texture;
+        uint32_t vao;
+        uint32_t vbo;
+        uint32_t cellCount;
+    } m_previews;
+
+    std::vector<vec2s> m_textureGrid;
 
     struct
     {
-        uint32_t background;
-        uint32_t outline;
-    } m_entityWindowLabel;
+        uint32_t vao;
+        uint32_t vbo;
+        uint32_t program;
+        int32_t  uniform;
 
-    struct
-    {
-        uint32_t background;
-        uint32_t outline;
-    } m_entityWindowParams[3];
+        Widget rootWindow;
+        Widget entityWindow;
+        Widget entityWindowLabel;
+        Widget entityWindowParams[3];
+    } m_frame;
 
     bool m_isEnabled;
 };
