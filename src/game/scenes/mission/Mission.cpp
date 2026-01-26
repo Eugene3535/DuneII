@@ -27,9 +27,6 @@ Mission::Mission(DuneII* game) noexcept:
     m_ui.texture = 0;
     m_ui.program = 0;
     m_ui.clickTimer = 0.f;
-
-    m_construction.frameProgram = 0;
-    m_construction.previewProgram = 0;
 }
 
 
@@ -59,13 +56,13 @@ bool Mission::load(std::string_view info) noexcept
     if(!initHUD())
         return false;
 
-    if(m_construction.frameProgram = m_game->getShaderProgram("color_outline"); m_construction.frameProgram == 0)
+    uint32_t frameProgram = m_game->getShaderProgram("color_outline");
+    uint32_t previewProgram = m_game->getShaderProgram("sprite");
+
+    if( ! (frameProgram && previewProgram) )
         return false;
 
-    if(m_construction.previewProgram = m_game->getShaderProgram("sprite"); m_construction.previewProgram == 0)
-        return false;
-
-    m_menu.init(m_construction.frameProgram, m_construction.previewProgram);
+    m_menu.init(frameProgram, previewProgram);
 
     if(m_tilemap.loadFromFile(FileProvider::findPathToFile(std::string(info))))
     {

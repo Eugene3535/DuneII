@@ -181,6 +181,12 @@ void Application::initCallbacks() noexcept
 			game->resize(width, height);
 	});
 
+	glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double xpos, double ypos)
+	{
+		if(auto game = static_cast<DuneII*>(glfwGetWindowUserPointer(window)))
+			game->m_cursorPosition = { static_cast<float>(xpos), static_cast<float>(ypos) };
+	});
+
 	glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
 		if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)

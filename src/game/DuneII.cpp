@@ -16,6 +16,7 @@ DuneII::DuneII() noexcept:
     m_isSceneNeedToBeChanged(false)
 {
     m_windowSize = { 0, 0 };
+    m_cursorPosition = { 0.f, 0.f };
 }
 
 
@@ -127,14 +128,9 @@ uint32_t DuneII::getShaderProgram(const std::string& name) noexcept
 }
 
 
-vec2s DuneII::getCursorPosition() const noexcept
+const vec2s& DuneII::getCursorPosition() const noexcept
 {
-    double xpos = 0, ypos = 0;
-
-    if(m_window)
-        glfwGetCursorPos(m_window, &xpos, &ypos);
-
-    return { static_cast<float>(xpos), static_cast<float>(ypos) };
+    return m_cursorPosition;
 }
 
 

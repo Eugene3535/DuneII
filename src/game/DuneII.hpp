@@ -24,9 +24,9 @@ public:
     bool isKeyPressed(int key) const noexcept;
     bool isMouseButtonPressed(int button) const noexcept;
 
-    uint32_t getShaderProgram(const std::string& name) noexcept;
-    vec2s    getCursorPosition() const noexcept;
-    const ivec2s& getWindowsSize() const noexcept;
+    uint32_t      getShaderProgram(const std::string& name) noexcept;
+    const ivec2s& getWindowsSize()                    const noexcept;
+    const vec2s&  getCursorPosition()                 const noexcept;
 
     OrthogonalCamera camera;
     
@@ -41,6 +41,7 @@ private:
 
     struct GLFWwindow* m_window;
     ivec2s m_windowSize;
+    vec2s m_cursorPosition;
 
     std::unordered_map<Scene::Type, std::shared_ptr<Scene>> m_scenes;
     std::shared_ptr<Scene> m_currentScene;

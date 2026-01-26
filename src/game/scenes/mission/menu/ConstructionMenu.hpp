@@ -57,7 +57,7 @@ public:
         INVALID = 0xFF
     };
 
-    ConstructionMenu(const ivec2s& windowSize) noexcept;
+    ConstructionMenu(const ivec2s& windowSize)             noexcept;
     ConstructionMenu(const ConstructionMenu&)              noexcept = delete;
 	ConstructionMenu(ConstructionMenu&&)                   noexcept = delete;
 	ConstructionMenu& operator = (const ConstructionMenu&) noexcept = delete;
@@ -95,10 +95,10 @@ private:
         uint32_t program;
         int32_t  uniform;
 
-        Widget rootWindow;
-        Widget entityWindow;
-        Widget entityWindowLabel;
-        Widget entityWindowParams[3];
+        Widget rootWidget;
+        Widget entityWidget;
+        Widget entityWidgetLabel;
+        Widget entityWidgetParams[3];
     } m_frame;
 
     struct

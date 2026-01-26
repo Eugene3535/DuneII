@@ -130,18 +130,18 @@ void ConstructionMenu::createFrame(uint32_t program) noexcept
     };
 
 //  Background
-    createRectangle({0.f, 0.f, DEFAULT_MENU_WIDTH, DEFAULT_MENU_HEIGHT}, m_frame.rootWindow.background, m_frame.rootWindow.outline);
+    createRectangle({0.f, 0.f, DEFAULT_MENU_WIDTH, DEFAULT_MENU_HEIGHT}, m_frame.rootWidget.background, m_frame.rootWidget.outline);
 
-//  Entity presentation window
-    createRectangle({580.f, 50.f, 300.f, 200.f}, m_frame.entityWindow.background, m_frame.entityWindow.outline);
+//  Entity presentation цidget
+    createRectangle({580.f, 50.f, 300.f, 200.f}, m_frame.entityWidget.background, m_frame.entityWidget.outline);
 
-//  Entity window label
-    createRectangle({580.f, 265.f, 300.f, 50.f}, m_frame.entityWindowLabel.background, m_frame.entityWindowLabel.outline);
+//  Entity цidget label
+    createRectangle({580.f, 265.f, 300.f, 50.f}, m_frame.entityWidgetLabel.background, m_frame.entityWidgetLabel.outline);
 
 //  Entity property labels
-    createRectangle({580.f, 400.f, 300.f, 50.f}, m_frame.entityWindowParams[0].background, m_frame.entityWindowParams[0].outline);
-    createRectangle({580.f, 500.f, 300.f, 50.f}, m_frame.entityWindowParams[1].background, m_frame.entityWindowParams[1].outline);
-    createRectangle({580.f, 600.f, 300.f, 50.f}, m_frame.entityWindowParams[2].background, m_frame.entityWindowParams[2].outline);
+    createRectangle({580.f, 400.f, 300.f, 50.f}, m_frame.entityWidgetParams[0].background, m_frame.entityWidgetParams[0].outline);
+    createRectangle({580.f, 500.f, 300.f, 50.f}, m_frame.entityWidgetParams[1].background, m_frame.entityWidgetParams[1].outline);
+    createRectangle({580.f, 600.f, 300.f, 50.f}, m_frame.entityWidgetParams[2].background, m_frame.entityWidgetParams[2].outline);
 
 //  Unload to GPU
     glCreateBuffers(1, &m_frame.vbo);
@@ -238,30 +238,30 @@ void ConstructionMenu::drawFrame() noexcept
     glBindVertexArray(m_frame.vao);
 
     glUniform4fv(m_frame.uniform, 1, background_color);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, m_frame.rootWindow.background);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, m_frame.rootWidget.background);
     glUniform4fv(m_frame.uniform, 1, outline_color);
-    glDrawArrays(GL_TRIANGLE_STRIP, m_frame.rootWindow.background, m_frame.rootWindow.outline);
-    startFrame = m_frame.rootWindow.background + m_frame.rootWindow.outline;
+    glDrawArrays(GL_TRIANGLE_STRIP, m_frame.rootWidget.background, m_frame.rootWidget.outline);
+    startFrame = m_frame.rootWidget.background + m_frame.rootWidget.outline;
 
     glUniform4fv(m_frame.uniform, 1, cell_background_color);
-    glDrawArrays(GL_TRIANGLE_FAN, startFrame, m_frame.entityWindow.background);
+    glDrawArrays(GL_TRIANGLE_FAN, startFrame, m_frame.entityWidget.background);
     glUniform4fv(m_frame.uniform, 1, outline_color);
-    glDrawArrays(GL_TRIANGLE_STRIP, startFrame + m_frame.entityWindow.background, m_frame.entityWindow.outline);
-    startFrame += m_frame.entityWindow.background + m_frame.entityWindow.outline;
+    glDrawArrays(GL_TRIANGLE_STRIP, startFrame + m_frame.entityWidget.background, m_frame.entityWidget.outline);
+    startFrame += m_frame.entityWidget.background + m_frame.entityWidget.outline;
 
     glUniform4fv(m_frame.uniform, 1, cell_background_color);
-    glDrawArrays(GL_TRIANGLE_FAN, startFrame, m_frame.entityWindowLabel.background);
+    glDrawArrays(GL_TRIANGLE_FAN, startFrame, m_frame.entityWidgetLabel.background);
     glUniform4fv(m_frame.uniform, 1, outline_color);
-    glDrawArrays(GL_TRIANGLE_STRIP, startFrame + m_frame.entityWindowLabel.background, m_frame.entityWindowLabel.outline);
-    startFrame += m_frame.entityWindowLabel.background + m_frame.entityWindowLabel.outline;
+    glDrawArrays(GL_TRIANGLE_STRIP, startFrame + m_frame.entityWidgetLabel.background, m_frame.entityWidgetLabel.outline);
+    startFrame += m_frame.entityWidgetLabel.background + m_frame.entityWidgetLabel.outline;
 
     for (uint32_t i = 0; i < 3; ++i)
     {
         glUniform4fv(m_frame.uniform, 1, cell_background_color);
-        glDrawArrays(GL_TRIANGLE_FAN, startFrame, m_frame.entityWindowParams[i].background);
+        glDrawArrays(GL_TRIANGLE_FAN, startFrame, m_frame.entityWidgetParams[i].background);
         glUniform4fv(m_frame.uniform, 1, outline_color);
-        glDrawArrays(GL_TRIANGLE_STRIP, startFrame + m_frame.entityWindowParams[i].background, m_frame.entityWindowParams[i].outline);
-        startFrame += m_frame.entityWindowParams[i].background + m_frame.entityWindowParams[i].outline;
+        glDrawArrays(GL_TRIANGLE_STRIP, startFrame + m_frame.entityWidgetParams[i].background, m_frame.entityWidgetParams[i].outline);
+        startFrame += m_frame.entityWidgetParams[i].background + m_frame.entityWidgetParams[i].outline;
     }
 }
 

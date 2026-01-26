@@ -57,12 +57,6 @@ private:
         float clickTimer;
     } m_ui;
 
-    struct
-    {
-        uint32_t frameProgram;
-        uint32_t previewProgram;
-    } m_construction;
-
     std::vector<void(*)(Mission*, float)> m_systems;
 };
 
