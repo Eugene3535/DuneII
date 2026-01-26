@@ -12,10 +12,16 @@
 #define PREVIEW_CELL_COLUMNS 3
 #define PREVIEW_CELL_ROWS 5
 
-static constexpr float background_color[]           = { 155.f / 255.f, 160.f / 255.f, 163.f / 255.f, 1.f };
-static constexpr float outline_color[]              = { 170.f / 255.f, 199.f / 255.f, 207.f / 255.f, 1.f };
-static constexpr float cell_background_color[]      = { 116.f / 255.f, 120.f / 255.f, 121.f / 255.f, 1.f };
-static constexpr float empty_cell_rectangle_color[] = { 125.f / 255.f, 135.f / 255.f, 137.f / 255.f, 1.f };
+#define DEFAULT_MENU_WIDTH  920.f
+#define DEFAULT_MENU_HEIGHT 800.f
+#define MENU_SCALE_FACTOR 0.9f
+
+namespace
+{
+    constexpr float background_color[]      = { 155.f / 255.f, 160.f / 255.f, 163.f / 255.f, 1.f };
+    constexpr float outline_color[]         = { 170.f / 255.f, 199.f / 255.f, 207.f / 255.f, 1.f };
+    constexpr float cell_background_color[] = { 116.f / 255.f, 120.f / 255.f, 121.f / 255.f, 1.f };
+}
 
 
 ConstructionMenu::ConstructionMenu(const ivec2s& windowSize) noexcept:
@@ -25,6 +31,8 @@ ConstructionMenu::ConstructionMenu(const ivec2s& windowSize) noexcept:
 {
     memset(&m_previews, 0, sizeof(m_previews));
     memset(&m_frame, 0, sizeof(m_frame));
+
+    m_transform.setOrigin(DEFAULT_MENU_WIDTH * 0.5f, DEFAULT_MENU_HEIGHT * 0.5f);
 }
 
 
@@ -50,9 +58,11 @@ void ConstructionMenu::update() noexcept
 {
     if(m_isEnabled)
     {
-        const vec2s center = { m_windowSize.x * 0.5f, m_windowSize.y * 0.5f };
+        float dx = m_windowSize.x * MENU_SCALE_FACTOR / DEFAULT_MENU_WIDTH;
+        float dy = m_windowSize.y * MENU_SCALE_FACTOR / DEFAULT_MENU_HEIGHT;
+        m_transform.setScale(dx, dy);
 
-        m_transform.setOrigin(460, 400);
+        const vec2s center = { m_windowSize.x * 0.5f, m_windowSize.y * 0.5f };
         m_transform.setPosition(center);
     }
 }
@@ -120,7 +130,7 @@ void ConstructionMenu::createFrame(uint32_t program) noexcept
     };
 
 //  Background
-    createRectangle({0.f, 0.f, 920.f, 800.f}, m_frame.rootWindow.background, m_frame.rootWindow.outline);
+    createRectangle({0.f, 0.f, DEFAULT_MENU_WIDTH, DEFAULT_MENU_HEIGHT}, m_frame.rootWindow.background, m_frame.rootWindow.outline);
 
 //  Entity presentation window
     createRectangle({580.f, 50.f, 300.f, 200.f}, m_frame.entityWindow.background, m_frame.entityWindow.outline);

@@ -23,7 +23,7 @@ public:
     void init(std::span<const Sprite> crosshairs, const std::function<void(const entt::entity)>& callback) noexcept;
     void update(const vec2s cursorPosition, float dt) noexcept;
 
-    void select() noexcept;
+    void select()  noexcept;
     void release() noexcept;
 
     void drawSelection() const noexcept;

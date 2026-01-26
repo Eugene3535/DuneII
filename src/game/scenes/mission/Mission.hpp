@@ -29,8 +29,8 @@ private:
     TileMap          m_tilemap;
     SpriteManager    m_sprites;
     entt::registry   m_registry;
-    Builder          m_builder;
     std::string      m_tileMask;
+    Builder          m_builder;
     HeadUpDisplay    m_hud;
     ConstructionMenu m_menu;
     

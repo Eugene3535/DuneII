@@ -5,10 +5,12 @@
 
 #include "graphics/transform/Transform2D.hpp"
 
+// More info is available here
+// https://gamicus.fandom.com/wiki/List_of_structures_in_Dune_II
 
 class ConstructionMenu
 {
-//  https://gamicus.fandom.com/wiki/List_of_structures_in_Dune_II
+public:
     enum Preview : uint32_t
     {
         WOR = 0,
@@ -55,7 +57,6 @@ class ConstructionMenu
         INVALID = 0xFF
     };
 
-public:
     ConstructionMenu(const ivec2s& windowSize) noexcept;
     ConstructionMenu(const ConstructionMenu&)              noexcept = delete;
 	ConstructionMenu(ConstructionMenu&&)                   noexcept = delete;
@@ -89,17 +90,6 @@ private:
 
     struct
     {
-        uint32_t program;
-        uint32_t texture;
-        uint32_t vao;
-        uint32_t vbo;
-        uint32_t cellCount;
-    } m_previews;
-
-    std::vector<vec2s> m_textureGrid;
-
-    struct
-    {
         uint32_t vao;
         uint32_t vbo;
         uint32_t program;
@@ -110,6 +100,17 @@ private:
         Widget entityWindowLabel;
         Widget entityWindowParams[3];
     } m_frame;
+
+    struct
+    {
+        uint32_t program;
+        uint32_t texture;
+        uint32_t vao;
+        uint32_t vbo;
+        uint32_t cellCount;
+    } m_previews;
+
+    std::vector<vec2s> m_textureGrid;
 
     bool m_isEnabled;
 };
