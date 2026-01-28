@@ -1,12 +1,19 @@
+#include <cassert>
+
 #include "resources/files/FileProvider.hpp"
+#include "resources/gl_interfaces/texture/Texture.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "game/scenes/mission/builder/Builder.hpp"
+#include "game/DuneII.hpp"
 #include "game/scenes/mission/HUD/HeadUpDisplay.hpp"
 
 
-HeadUpDisplay::HeadUpDisplay(const Builder& builder, const Transform2D& sceneTransform) noexcept:
+HeadUpDisplay::HeadUpDisplay(const DuneII* game, const Builder& builder, const Transform2D& sceneTransform) noexcept:
+    m_cursorPosition(game->getCursorPosition()),
     m_builder(builder),
-    m_sceneTransform(sceneTransform)
+    m_sceneTransform(sceneTransform),
+    m_cursorTexture(0),
+    m_program(0)
 {
     m_selectionFrame.vbo = 0;
     m_selectionFrame.vao = 0;
@@ -14,21 +21,39 @@ HeadUpDisplay::HeadUpDisplay(const Builder& builder, const Transform2D& sceneTra
     m_selectionFrame.enabled = false;
     m_selectionFrame.lastSelectedEntity = entt::null;
     m_isClicked = false;
+
+    m_program = game->getShaderProgram("selection");
 }
 
 
 HeadUpDisplay::~HeadUpDisplay()
 {
+    glDeleteTextures(1, &m_cursorTexture);
     glDeleteVertexArrays(1, &m_selectionFrame.vao);
     glDeleteBuffers(1, &m_selectionFrame.vbo);
 }
 
 
-void HeadUpDisplay::init(std::span<const Sprite> crosshairs, const std::function<void(const entt::entity)>& callback) noexcept
+bool HeadUpDisplay::init(const std::function<void(const entt::entity)>& callback) noexcept
 {
+    assert(m_program != 0);
+
+    glGenTextures(1, &m_cursorTexture);
+    Texture crosshairTexture = {.handle = m_cursorTexture };
+
+    if(!crosshairTexture.loadFromFile(FileProvider::findPathToFile(CROSSHAIRS_TILESHEET_PNG)))
+        return false;
+
+    m_sprites.loadSpriteSheet(FileProvider::findPathToFile(CURSOR_FRAME_XML), crosshairTexture);
+    auto crosshairReleased = m_sprites.getSprite("Released");
+    auto crosshairCaptured = m_sprites.getSprite("Captured");
+
+    if(! (crosshairReleased && crosshairCaptured) )
+        return false;
+
 //  Cursors
-    m_releasedCursor = crosshairs[0];
-    m_capturedCursor = crosshairs[1];
+    m_releasedCursor = crosshairReleased.value();
+    m_capturedCursor = crosshairCaptured.value();
     m_cursorTransform.setOrigin(m_releasedCursor.width * 0.5f, m_releasedCursor.height * 0.5f);
     m_cursorTransform.setScale(0.5f, 0.5f);
     m_currentCursor = m_releasedCursor;
@@ -43,24 +68,26 @@ void HeadUpDisplay::init(std::span<const Sprite> crosshairs, const std::function
 	VertexArrayObject::createVertexInputState(m_selectionFrame.vao, m_selectionFrame.vbo, attributes);
 
     m_showMenuForEntity = callback;
+
+    return true;
 }
 
 
-void HeadUpDisplay::update(const vec2s cursorPosition, float dt) noexcept
+void HeadUpDisplay::update(float dt) noexcept
 {
     m_selectionFrame.timer += dt;
 
     if(m_selectionFrame.timer > 0.25f)
         m_selectionFrame.timer = 0.f;
 
-    m_cursorTransform.setPosition(cursorPosition);
+    m_cursorTransform.setPosition(m_cursorPosition);
 
     if(m_isClicked)
     {
         vec2s scenePosition = glms_vec2_negate(m_sceneTransform.getPosition());
-        vec2s woorldCoords = glms_vec2_add(scenePosition, cursorPosition);
+        vec2s worldCoords = glms_vec2_add(scenePosition, m_cursorPosition);
 
-        if(auto entity = m_builder.getEntityUnderCursor(woorldCoords); entity != entt::null)
+        if(auto entity = m_builder.getEntityUnderCursor(worldCoords); entity != entt::null)
         {
             if(m_selectionFrame.lastSelectedEntity != entity)
             {
@@ -154,16 +181,17 @@ void HeadUpDisplay::drawSelection() const noexcept
 {
     if(m_selectionFrame.enabled && m_selectionFrame.timer < 0.125f)
     {
+        glUseProgram(m_program);
         glBindVertexArray(m_selectionFrame.vao);
         glDrawArrays(GL_LINES, 0, 16);
-        glBindVertexArray(0);
     }
 }
 
 
 void HeadUpDisplay::drawCursor() const noexcept
 {
-    glBindTextureUnit(0, m_currentCursor.texture);
+    m_sprites.bind(true);
+    glBindTextureUnit(0, m_cursorTexture);
     glDrawArrays(GL_TRIANGLE_FAN, m_currentCursor.frame, 4);
     glBindTextureUnit(0, 0);
 }

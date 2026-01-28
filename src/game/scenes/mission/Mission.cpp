@@ -18,14 +18,12 @@
 Mission::Mission(DuneII* game) noexcept:
     Scene(game, Scene::MISSION),
     m_builder(m_registry, m_tileMask),
-    m_hud(m_builder, m_transform),
+    m_hud(game, m_builder, m_transform),
     m_menu(game)
 {
     memset(&m_landscape, 0, sizeof(m_landscape)); 
     memset(&m_buildings, 0, sizeof(m_buildings));
 
-    m_ui.texture = 0;
-    m_ui.program = 0;
     m_ui.clickTimer = 0.f;
 }
 
@@ -34,7 +32,7 @@ Mission::~Mission()
 {
     if (m_isLoaded)
     {
-        GLuint textures[]            = { m_landscape.texture, m_buildings.texture, m_ui.texture };
+        GLuint textures[]            = { m_landscape.texture, m_buildings.texture };
         GLuint vertexArrayObjects[]  = { m_landscape.vao, m_buildings.vao         };
         GLuint vertexBufferObjects[] = { m_landscape.vbo[0], m_landscape.vbo[1]   };
 
@@ -156,7 +154,6 @@ void Mission::draw() noexcept
     {// HUD
         if(m_hud.isSelectionEnabled())
         {
-            glUseProgram(m_ui.program);
             m_hud.drawSelection();
             glUseProgram(m_landscape.program);
         }
@@ -164,10 +161,7 @@ void Mission::draw() noexcept
         modelView = m_hud.getCursorTransform().getMatrix();
         result = glms_mul(uniformMatrix, modelView);
         camera.updateUniformBuffer(result.raw);
-
-        m_sprites.bind(true);
         m_hud.drawCursor();
-        m_sprites.bind(false);
     }
 
     {// Test construction menu
@@ -210,34 +204,12 @@ bool Mission::initLandscape() noexcept
 
 bool Mission::initHUD() noexcept
 {
-    glGenTextures(1, &m_ui.texture);
-    Texture crosshairTexture = {.handle = m_ui.texture };
-
-    if(!crosshairTexture.loadFromFile(FileProvider::findPathToFile(CROSSHAIRS_TILESHEET_PNG)))
-        return false;
-
-    m_sprites.loadSpriteSheet(FileProvider::findPathToFile(CURSOR_FRAME_XML), crosshairTexture);
-    auto crosshairReleased = m_sprites.getSprite("Released");
-    auto crosshairCaptured = m_sprites.getSprite("Captured");
-
-    if(! (crosshairReleased && crosshairCaptured) )
-        return false;
-
-    std::array<Sprite, 2> crosshairs = 
-    {
-        crosshairReleased.value(),
-        crosshairCaptured.value()
-    };
-
-    if(m_ui.program = m_game->getShaderProgram("selection"); m_ui.program == 0)
-        return false;
-
     auto showMenuForEntityCallback = [this](const entt::entity e) -> void
     {
         m_menu.show();
     };
 
-    m_hud.init(crosshairs, showMenuForEntityCallback);
+    m_hud.init(showMenuForEntityCallback);
 
     return true;
 }
@@ -306,7 +278,7 @@ void Mission::createSystems() noexcept
                 mission->m_hud.release();
         }
  
-        mission->m_hud.update(cursor, dt);
+        mission->m_hud.update(dt);
 
         if(mission->m_menu.isShown())
         {

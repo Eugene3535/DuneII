@@ -1,7 +1,6 @@
 #ifndef MISSION_HPP
 #define MISSION_HPP
 
-#include "graphics/sprites/SpriteManager.hpp"
 #include "game/scenes/mission/tilemap/TileMap.hpp"
 #include "game/scenes/mission/builder/Builder.hpp"
 #include "game/scenes/mission/HUD/HeadUpDisplay.hpp"
@@ -28,7 +27,6 @@ private:
 
     Transform2D      m_transform;
     TileMap          m_tilemap;
-    SpriteManager    m_sprites;
     entt::registry   m_registry;
     std::string      m_tileMask;
     Builder          m_builder;
@@ -53,8 +51,6 @@ private:
 
     struct
     {
-        uint32_t texture;
-        uint32_t program;
         float clickTimer;
     } m_ui;
 

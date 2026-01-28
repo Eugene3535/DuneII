@@ -8,20 +8,21 @@
 
 #include "graphics/Meshes.hpp"
 #include "graphics/transform/Transform2D.hpp"
+#include "graphics/sprites/SpriteManager.hpp"
 
 
 class HeadUpDisplay
 {
 public:
-    HeadUpDisplay(const class Builder& builder, const Transform2D& sceneTransform) noexcept;
-    HeadUpDisplay(const HeadUpDisplay&)                                            noexcept = delete;
-	HeadUpDisplay(HeadUpDisplay&&)                                                 noexcept = delete;
-	HeadUpDisplay& operator = (const HeadUpDisplay&)                               noexcept = delete;
-	HeadUpDisplay& operator = (HeadUpDisplay&&)                                    noexcept = delete;
+    HeadUpDisplay(const class DuneII* game, const class Builder& builder, const Transform2D& sceneTransform) noexcept;
+    HeadUpDisplay(const HeadUpDisplay&)              noexcept = delete;
+	HeadUpDisplay(HeadUpDisplay&&)                   noexcept = delete;
+	HeadUpDisplay& operator = (const HeadUpDisplay&) noexcept = delete;
+	HeadUpDisplay& operator = (HeadUpDisplay&&)      noexcept = delete;
     ~HeadUpDisplay();
 
-    void init(std::span<const Sprite> crosshairs, const std::function<void(const entt::entity)>& callback) noexcept;
-    void update(const vec2s cursorPosition, float dt) noexcept;
+    bool init(const std::function<void(const entt::entity)>& callback) noexcept;
+    void update(float dt) noexcept;
 
     void select()  noexcept;
     void release() noexcept;
@@ -34,13 +35,18 @@ public:
     const Transform2D& getCursorTransform() const noexcept;
 
 private:
+    const vec2s& m_cursorPosition;
     const class Builder& m_builder;
-    const Transform2D& m_sceneTransform; 
+    const Transform2D& m_sceneTransform;
+
+    SpriteManager m_sprites;
 
     Sprite m_releasedCursor;
     Sprite m_capturedCursor;
     Sprite m_currentCursor;
     Transform2D m_cursorTransform;
+    uint32_t m_cursorTexture;
+    uint32_t m_program;
 
     struct
     {
