@@ -8,10 +8,9 @@
 #include "game/scenes/mission/HUD/HeadUpDisplay.hpp"
 
 
-HeadUpDisplay::HeadUpDisplay(const DuneII* game, const Builder& builder, const Transform2D& sceneTransform) noexcept:
-    m_cursorPosition(game->getCursorPosition()),
+HeadUpDisplay::HeadUpDisplay(const DuneII* game, const Builder& builder) noexcept:
+    m_game(game),
     m_builder(builder),
-    m_sceneTransform(sceneTransform),
     m_cursorTexture(0),
     m_program(0)
 {
@@ -73,19 +72,20 @@ bool HeadUpDisplay::init(const std::function<void(const entt::entity)>& callback
 }
 
 
-void HeadUpDisplay::update(float dt) noexcept
+void HeadUpDisplay::update(const Transform2D& sceneTransform, float dt) noexcept
 {
     m_selectionFrame.timer += dt;
 
     if(m_selectionFrame.timer > 0.25f)
         m_selectionFrame.timer = 0.f;
 
-    m_cursorTransform.setPosition(m_cursorPosition);
+    auto cursorPosition = m_game->getCursorPosition();
+    m_cursorTransform.setPosition(cursorPosition);
 
     if(m_isClicked)
     {
-        vec2s scenePosition = glms_vec2_negate(m_sceneTransform.getPosition());
-        vec2s worldCoords = glms_vec2_add(scenePosition, m_cursorPosition);
+        vec2s scenePosition = glms_vec2_negate(sceneTransform.getPosition());
+        vec2s worldCoords = glms_vec2_add(scenePosition, cursorPosition);
 
         if(auto entity = m_builder.getEntityUnderCursor(worldCoords); entity != entt::null)
         {

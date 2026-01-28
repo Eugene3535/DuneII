@@ -18,7 +18,7 @@
 Mission::Mission(DuneII* game) noexcept:
     Scene(game, Scene::MISSION),
     m_builder(m_registry, m_tileMask),
-    m_hud(game, m_builder, m_transform),
+    m_hud(game, m_builder),
     m_menu(game)
 {
     memset(&m_landscape, 0, sizeof(m_landscape)); 
@@ -278,7 +278,7 @@ void Mission::createSystems() noexcept
                 mission->m_hud.release();
         }
  
-        mission->m_hud.update(dt);
+        mission->m_hud.update(mission->m_transform, dt);
 
         if(mission->m_menu.isShown())
         {
