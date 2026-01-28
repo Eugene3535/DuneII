@@ -77,7 +77,7 @@ bool DuneII::isMouseButtonPressed(int button) const noexcept
 }
 
 
-uint32_t DuneII::getShaderProgram(const std::string& name) noexcept
+uint32_t DuneII::getShaderProgram(const std::string& name) const noexcept
 {
     if(auto it = m_shaderPrograms.find(name); it != m_shaderPrograms.end())
         return it->second.getHandle();

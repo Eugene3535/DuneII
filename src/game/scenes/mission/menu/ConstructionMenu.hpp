@@ -57,29 +57,29 @@ public:
         INVALID = 0xFF
     };
 
-    ConstructionMenu(const ivec2s& windowSize)             noexcept;
+    ConstructionMenu(const class DuneII* game)             noexcept;
     ConstructionMenu(const ConstructionMenu&)              noexcept = delete;
 	ConstructionMenu(ConstructionMenu&&)                   noexcept = delete;
 	ConstructionMenu& operator = (const ConstructionMenu&) noexcept = delete;
 	ConstructionMenu& operator = (ConstructionMenu&&)      noexcept = delete;
     ~ConstructionMenu();
 
-    void init(uint32_t frameProgram, uint32_t previewProgram) noexcept;
-    void update()  noexcept;
-    void enable()  noexcept;
-    void disable() noexcept;
-    void draw()    noexcept;
+    void init()   noexcept;
+    void update() noexcept;
+    void show()   noexcept;
+    void hide()   noexcept;
+    void draw()   noexcept;
+    void resize(int width, int height) noexcept;
 
-    bool isEnabled() const noexcept;
+    bool isShown() const noexcept;
     const Transform2D& getTransform() const noexcept;
 
 private:
-    void createFrame(uint32_t program) noexcept;
-    void createPreviews(uint32_t program) noexcept;
-    void drawFrame() noexcept;
-    void drawPreviews() noexcept;
+    void createFrame()    noexcept;
+    void createPreviews() noexcept;
+    void drawFrame()      noexcept;
+    void drawPreviews()   noexcept;
 
-    const ivec2s& m_windowSize;
     Transform2D m_transform;
 
     struct Widget
@@ -112,7 +112,7 @@ private:
 
     std::vector<vec2s> m_textureGrid;
 
-    bool m_isEnabled;
+    bool m_isShown;
 };
 
 #endif // !CONSTRUCTION_MENU_HPP

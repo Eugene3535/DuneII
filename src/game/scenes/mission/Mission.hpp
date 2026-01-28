@@ -19,6 +19,7 @@ public:
     bool load(std::string_view info)   noexcept override;
     void update(float dt)              noexcept override;
     void draw()                        noexcept override;
+    void resize(int width, int height) noexcept override;
 
 private:
     bool initLandscape() noexcept;

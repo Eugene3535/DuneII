@@ -23,13 +23,13 @@ public:
 	Scene(class DuneII* game, const Type type) noexcept;
 	virtual ~Scene();
     
-    virtual bool load(std::string_view info)         noexcept;
-    virtual void update(float dt)                    noexcept;
-    virtual void draw()                              noexcept;
-    virtual void resize(int width, int height)       noexcept;
+    virtual bool load(std::string_view info)   noexcept;
+    virtual void update(float dt)              noexcept;
+    virtual void draw()                        noexcept;
+    virtual void resize(int width, int height) noexcept;
 
     bool isLoaded() const noexcept;
-    Type getType() const noexcept;
+    Type getType()  const noexcept;
 
 protected:
     void setSpriteSizeInPixels(const Sprite& sprite, vec2 newSize, Transform2D& transform) noexcept;

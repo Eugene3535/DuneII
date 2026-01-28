@@ -19,7 +19,7 @@ Mission::Mission(DuneII* game) noexcept:
     Scene(game, Scene::MISSION),
     m_builder(m_registry, m_tileMask),
     m_hud(m_builder, m_transform),
-    m_menu(game->getWindowsSize())
+    m_menu(game)
 {
     memset(&m_landscape, 0, sizeof(m_landscape)); 
     memset(&m_buildings, 0, sizeof(m_buildings));
@@ -62,7 +62,7 @@ bool Mission::load(std::string_view info) noexcept
     if( ! (frameProgram && previewProgram) )
         return false;
 
-    m_menu.init(frameProgram, previewProgram);
+    m_menu.init();
 
     if(m_tilemap.loadFromFile(FileProvider::findPathToFile(std::string(info))))
     {
@@ -171,7 +171,7 @@ void Mission::draw() noexcept
     }
 
     {// Test construction menu
-        if(m_menu.isEnabled())
+        if(m_menu.isShown())
         {
             modelView = m_menu.getTransform().getMatrix();
             result = glms_mul(uniformMatrix, modelView);
@@ -179,6 +179,12 @@ void Mission::draw() noexcept
             m_menu.draw();
         }
     }
+}
+
+
+void Mission::resize(int width, int height) noexcept
+{
+    m_menu.resize(width, height);
 }
 
 
@@ -228,7 +234,7 @@ bool Mission::initHUD() noexcept
 
     auto showMenuForEntityCallback = [this](const entt::entity e) -> void
     {
-        m_menu.enable();
+        m_menu.show();
     };
 
     m_hud.init(crosshairs, showMenuForEntityCallback);
@@ -242,6 +248,9 @@ void Mission::createSystems() noexcept
 //  Viewport Controller
     m_systems.emplace_back([](Mission* mission, float dt)
     {
+        if(mission->m_menu.isShown())
+            return;
+
         const auto game     = mission->m_game;
         const auto cursor   = game->getCursorPosition();
         const auto viewSize = game->getWindowsSize();
@@ -299,12 +308,12 @@ void Mission::createSystems() noexcept
  
         mission->m_hud.update(cursor, dt);
 
-        if(mission->m_menu.isEnabled())
+        if(mission->m_menu.isShown())
         {
             mission->m_menu.update();
 
             if(game->isKeyPressed(GLFW_KEY_SPACE))
-                mission->m_menu.disable();
+                mission->m_menu.hide();
         }
     });
 

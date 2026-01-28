@@ -24,9 +24,9 @@ public:
     bool isKeyPressed(int key) const noexcept;
     bool isMouseButtonPressed(int button) const noexcept;
 
-    uint32_t      getShaderProgram(const std::string& name) noexcept;
-    const ivec2s& getWindowsSize()                    const noexcept;
-    const vec2s&  getCursorPosition()                 const noexcept;
+    uint32_t      getShaderProgram(const std::string& name) const noexcept;
+    const ivec2s& getWindowsSize()                          const noexcept;
+    const vec2s&  getCursorPosition()                       const noexcept;
 
     OrthogonalCamera camera;
     
@@ -48,7 +48,7 @@ private:
     Scene::Type m_nextSceneType;
     bool m_isSceneNeedToBeChanged;
 
-    std::unordered_map<std::string, ShaderProgram> m_shaderPrograms;
+    mutable std::unordered_map<std::string, ShaderProgram> m_shaderPrograms;
 };
 
 #include "game/DuneII.inl"

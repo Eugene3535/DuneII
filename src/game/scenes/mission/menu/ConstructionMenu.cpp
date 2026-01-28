@@ -1,4 +1,5 @@
 #include <cstring>
+#include <cassert>
 
 #include <glad/glad.h>
 
@@ -6,6 +7,7 @@
 #include "resources/gl_interfaces/texture/Texture.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "graphics/geometry/GeometryGenerator.hpp"
+#include "game/DuneII.hpp"
 #include "game/scenes/mission/menu/ConstructionMenu.hpp"
 
 
@@ -24,13 +26,15 @@ namespace
 }
 
 
-ConstructionMenu::ConstructionMenu(const ivec2s& windowSize) noexcept:
-    m_windowSize(windowSize),
+ConstructionMenu::ConstructionMenu(const DuneII* game) noexcept:
     m_transform(),
-    m_isEnabled(false)
+    m_isShown(false)
 {
-    memset(&m_previews, 0, sizeof(m_previews));
     memset(&m_frame, 0, sizeof(m_frame));
+    memset(&m_previews, 0, sizeof(m_previews));
+
+    m_frame.program    = game->getShaderProgram("color_outline");
+    m_previews.program = game->getShaderProgram("sprite");
 
     m_transform.setOrigin(DEFAULT_MENU_WIDTH * 0.5f, DEFAULT_MENU_HEIGHT * 0.5f);
 }
@@ -47,36 +51,31 @@ ConstructionMenu::~ConstructionMenu()
 }
 
 
-void ConstructionMenu::init(uint32_t frameProgram, uint32_t previewProgram) noexcept
+void ConstructionMenu::init() noexcept
 {
-    createFrame(frameProgram);
-    createPreviews(previewProgram);
+    assert(m_frame.program != 0);
+    assert(m_previews.program != 0);
+
+    createFrame();
+    createPreviews();
 }
 
 
 void ConstructionMenu::update() noexcept
 {
-    if(m_isEnabled)
-    {
-        float dx = m_windowSize.x * MENU_SCALE_FACTOR / DEFAULT_MENU_WIDTH;
-        float dy = m_windowSize.y * MENU_SCALE_FACTOR / DEFAULT_MENU_HEIGHT;
-        m_transform.setScale(dx, dy);
 
-        const vec2s center = { m_windowSize.x * 0.5f, m_windowSize.y * 0.5f };
-        m_transform.setPosition(center);
-    }
 }
 
 
-void ConstructionMenu::enable() noexcept
+void ConstructionMenu::show() noexcept
 {
-    m_isEnabled = true;
+    m_isShown = true;
 }
 
 
-void ConstructionMenu::disable() noexcept
+void ConstructionMenu::hide() noexcept
 {
-    m_isEnabled = false;
+    m_isShown = false;
 }
 
 
@@ -87,9 +86,18 @@ void ConstructionMenu::draw() noexcept
 }
 
 
-bool ConstructionMenu::isEnabled() const noexcept
+void ConstructionMenu::resize(int width, int height) noexcept
 {
-    return m_isEnabled;
+    float dx = width * MENU_SCALE_FACTOR / DEFAULT_MENU_WIDTH;
+    float dy = height * MENU_SCALE_FACTOR / DEFAULT_MENU_HEIGHT;
+    m_transform.setScale(dx, dy);
+    m_transform.setPosition(width * 0.5f, height * 0.5f);
+}
+
+
+bool ConstructionMenu::isShown() const noexcept
+{
+    return m_isShown;
 }
 
 
@@ -99,10 +107,8 @@ const Transform2D& ConstructionMenu::getTransform() const noexcept
 }
 
 
-void ConstructionMenu::createFrame(uint32_t program) noexcept
+void ConstructionMenu::createFrame() noexcept
 { 
-    m_frame.program = program;
-
     if(const GLint uniformColor = glGetUniformLocation(m_frame.program, "outlineColor"); uniformColor != -1)
         m_frame.uniform = uniformColor;
 
@@ -153,10 +159,8 @@ void ConstructionMenu::createFrame(uint32_t program) noexcept
 }
 
 
-void ConstructionMenu::createPreviews(uint32_t program) noexcept
+void ConstructionMenu::createPreviews() noexcept
 {
-    m_previews.program = program;
-
     glGenTextures(1, &m_previews.texture);
 
     Texture previewsTexture = {.handle = m_previews.texture };
