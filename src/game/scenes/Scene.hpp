@@ -32,7 +32,7 @@ public:
     Type getType()  const noexcept;
 
 protected:
-    void setSpriteSizeInPixels(const Sprite& sprite, vec2 newSize, Transform2D& transform) noexcept;
+    void setSpriteSizeInPixels(const mesh::Sprite& sprite, vec2 newSize, Transform2D& transform) noexcept;
 
     class DuneII* m_game;
     bool          m_isLoaded;

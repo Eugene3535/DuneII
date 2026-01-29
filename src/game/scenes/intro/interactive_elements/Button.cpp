@@ -12,7 +12,7 @@ static constexpr float under_cursor_color[] = { 200.f / 255.f, 200.f / 255.f, 20
 static constexpr float is_clicked_color[]   = { 255.f / 255.f, 255.f / 255.f, 255.f / 255.f, 255.f / 255.f };
 
 
-Button::Button(const Sprite& sprite, const int32_t uniformLocation) noexcept:
+Button::Button(const mesh::Sprite& sprite, const int32_t uniformLocation) noexcept:
     Transform2D(),
     m_sprite(sprite),
     m_uniform(uniformLocation),

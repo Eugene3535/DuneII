@@ -24,10 +24,10 @@ private:
 
     struct
     {
-        uint32_t vao;
-        Sprite   sprite;
-        uint32_t program;
-        Transform2D transform;
+        uint32_t     vao;
+        mesh::Sprite sprite;
+        uint32_t     program;
+        Transform2D  transform;
     } m_background;
     
     struct

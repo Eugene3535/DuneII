@@ -175,21 +175,21 @@ void SpriteManager::loadSpriteSheet(const std::filesystem::path& filePath, const
 }
 
 
-std::optional<Sprite> SpriteManager::getSprite(const std::string& name) const noexcept
+std::optional<mesh::Sprite> SpriteManager::getSprite(const std::string& name) const noexcept
 {
 	if(auto it = m_animations.find(name); it != m_animations.end())
 	{
 		const auto sprites = m_sprites.data();
 		const auto sprite = sprites + static_cast<ptrdiff_t>(it->second.first);
 
-		return std::make_optional<Sprite>(*sprite);
+		return std::make_optional<mesh::Sprite>(*sprite);
 	}
 
 	return std::nullopt;
 }
 
 
-std::vector<Sprite> SpriteManager::getAnimation(const std::string& name) const noexcept
+std::vector<mesh::Sprite> SpriteManager::getAnimation(const std::string& name) const noexcept
 {
 	if(auto it = m_animations.find(name); it != m_animations.end())
 	{

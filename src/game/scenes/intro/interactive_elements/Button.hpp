@@ -8,7 +8,7 @@ class Button:
     public Transform2D
 {
 public:
-    Button(const Sprite& sprite, const int32_t uniformLocation) noexcept;
+    Button(const mesh::Sprite& sprite, const int32_t uniformLocation) noexcept;
 
     void update(vec2s mousePosition, bool isClicked) noexcept;
     void draw() noexcept;
@@ -16,8 +16,8 @@ public:
     bool isSelected() const noexcept;
 
 private:
-    const Sprite  m_sprite;
-    const int32_t m_uniform;
+    const mesh::Sprite m_sprite;
+    const int32_t      m_uniform;
 
     vec2 m_bounds[2];
     const float* m_currentColor;

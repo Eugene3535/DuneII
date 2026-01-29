@@ -34,8 +34,8 @@ public:
 	
 	void loadSpriteSheet(const std::filesystem::path& filePath, const struct Texture& texture) noexcept;
 
-	std::optional<Sprite> getSprite(const std::string& name) const noexcept;
-	std::vector<Sprite> getAnimation(const std::string& name) const noexcept;
+	std::optional<mesh::Sprite> getSprite(const std::string& name) const noexcept;
+	std::vector<mesh::Sprite> getAnimation(const std::string& name) const noexcept;
 
 	void bind(bool toBind) const noexcept;
 
@@ -47,7 +47,7 @@ private:
 	uint32_t m_vbo;
 
 	std::unordered_map<std::string, sprite_range> m_animations;
-	std::vector<Sprite> m_sprites;
+	std::vector<mesh::Sprite> m_sprites;
 	std::vector<float> m_vertices;
 };
 

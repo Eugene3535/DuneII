@@ -34,25 +34,8 @@ private:
     ConstructionMenu m_menu;
     
 //  Resource section
-    struct
-    {
-        uint32_t texture;
-        uint32_t vao;
-        uint32_t vbo[2];
-        uint32_t count; // indices
-        uint32_t program;
-    } m_landscape;
-
-    struct
-    {
-        uint32_t texture;
-        uint32_t vao;
-    } m_buildings;
-
-    struct
-    {
-        float clickTimer;
-    } m_ui;
+    mesh::Landscape m_landscape;
+    mesh::Buildings m_buildings;
 
     std::vector<void(*)(Mission*, float)> m_systems;
 };

@@ -39,9 +39,9 @@ private:
     const class Builder& m_builder;
 
     SpriteManager m_sprites;
-    Sprite m_releasedCursor;
-    Sprite m_capturedCursor;
-    Sprite m_currentCursor;
+    mesh::Sprite m_releasedCursor;
+    mesh::Sprite m_capturedCursor;
+    mesh::Sprite m_currentCursor;
     Transform2D m_cursorTransform;
     uint32_t m_cursorTexture;
     uint32_t m_program;

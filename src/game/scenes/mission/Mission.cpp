@@ -21,10 +21,8 @@ Mission::Mission(DuneII* game) noexcept:
     m_hud(game, m_builder),
     m_menu(game)
 {
-    memset(&m_landscape, 0, sizeof(m_landscape)); 
-    memset(&m_buildings, 0, sizeof(m_buildings));
-
-    m_ui.clickTimer = 0.f;
+    memset(&m_landscape, 0, sizeof(mesh::Landscape)); 
+    memset(&m_buildings, 0, sizeof(mesh::Buildings));
 }
 
 
@@ -132,7 +130,6 @@ void Mission::draw() noexcept
         glBindTextureUnit(0, m_landscape.texture);
         glBindVertexArray(m_landscape.vao);
         glDrawElements(GL_TRIANGLES, m_landscape.count, GL_UNSIGNED_INT, nullptr);
-        glBindVertexArray(0);
         glBindTextureUnit(0, 0);
     }
 
@@ -147,7 +144,6 @@ void Mission::draw() noexcept
             glDrawArrays(GL_TRIANGLE_FAN, building.frame, 4);
         });
 
-        glBindVertexArray(0);
         glBindTextureUnit(0, 0);
     }
 
@@ -262,11 +258,12 @@ void Mission::createSystems() noexcept
         const auto game   = mission->m_game;
         const auto cursor = game->getCursorPosition();
 
-        mission->m_ui.clickTimer += dt;
+        static float clickTimer = 0;
+        clickTimer += dt;
 
-        if(mission->m_ui.clickTimer > 0.1f)
+        if(clickTimer > 0.1f)
         {
-            mission->m_ui.clickTimer = 0.f;
+            clickTimer = 0.f;
 
             const bool isMouseButtoLeftPressed = game->isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
             const bool isMouseButtoRightPressed = game->isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
