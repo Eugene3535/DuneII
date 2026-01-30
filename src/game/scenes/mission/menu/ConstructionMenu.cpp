@@ -61,12 +61,6 @@ void ConstructionMenu::init() noexcept
 }
 
 
-void ConstructionMenu::update() noexcept
-{
-
-}
-
-
 void ConstructionMenu::show() noexcept
 {
     m_isShown = true;
@@ -79,7 +73,7 @@ void ConstructionMenu::hide() noexcept
 }
 
 
-void ConstructionMenu::draw() noexcept
+void ConstructionMenu::draw() const noexcept
 {
     drawFrame();
     drawPreviews();
@@ -234,7 +228,7 @@ void ConstructionMenu::createPreviews() noexcept
 }
 
 
-void ConstructionMenu::drawFrame() noexcept
+void ConstructionMenu::drawFrame() const noexcept
 {
     glUseProgram(m_frame.program);
     uint32_t startFrame = 0;
@@ -270,7 +264,7 @@ void ConstructionMenu::drawFrame() noexcept
 }
 
 
-void ConstructionMenu::drawPreviews() noexcept
+void ConstructionMenu::drawPreviews() const noexcept
 {
     glUseProgram(m_previews.program);
     glBindTextureUnit(0, m_previews.texture);

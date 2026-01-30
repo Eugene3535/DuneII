@@ -3,7 +3,8 @@
 
 #include <cglm/struct/ivec2.h>
 
-
+// More info is available here
+// https://gamicus.fandom.com/wiki/List_of_structures_in_Dune_II
 struct StructureInfo
 {
     enum Type : int32_t

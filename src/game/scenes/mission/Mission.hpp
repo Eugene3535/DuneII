@@ -4,7 +4,6 @@
 #include "game/scenes/mission/tilemap/TileMap.hpp"
 #include "game/scenes/mission/builder/Builder.hpp"
 #include "game/scenes/mission/HUD/HeadUpDisplay.hpp"
-#include "game/scenes/mission/menu/ConstructionMenu.hpp"
 #include "game/scenes/Scene.hpp"
 
 
@@ -31,7 +30,6 @@ private:
     std::string      m_tileMask;
     Builder          m_builder;
     HeadUpDisplay    m_hud;
-    ConstructionMenu m_menu;
     
 //  Resource section
     mesh::Landscape m_landscape;

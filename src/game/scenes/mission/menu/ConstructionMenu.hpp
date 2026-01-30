@@ -5,9 +5,6 @@
 
 #include "graphics/transform/Transform2D.hpp"
 
-// More info is available here
-// https://gamicus.fandom.com/wiki/List_of_structures_in_Dune_II
-
 class ConstructionMenu
 {
 public:
@@ -65,10 +62,9 @@ public:
     ~ConstructionMenu();
 
     void init()   noexcept;
-    void update() noexcept;
     void show()   noexcept;
     void hide()   noexcept;
-    void draw()   noexcept;
+    void draw()   const noexcept;
     void resize(int width, int height) noexcept;
 
     bool isShown() const noexcept;
@@ -77,8 +73,8 @@ public:
 private:
     void createFrame()    noexcept;
     void createPreviews() noexcept;
-    void drawFrame()      noexcept;
-    void drawPreviews()   noexcept;
+    void drawFrame()      const noexcept;
+    void drawPreviews()   const noexcept;
 
     Transform2D m_transform;
 

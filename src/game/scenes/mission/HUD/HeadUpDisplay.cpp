@@ -1,5 +1,3 @@
-#include <cassert>
-
 #include "resources/files/FileProvider.hpp"
 #include "resources/gl_interfaces/texture/Texture.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
@@ -11,6 +9,7 @@
 HeadUpDisplay::HeadUpDisplay(const Engine* engine, const Builder& builder) noexcept:
     m_engine(engine),
     m_builder(builder),
+    m_menu(engine),
     m_cursorTexture(0),
     m_program(0)
 {
@@ -19,9 +18,7 @@ HeadUpDisplay::HeadUpDisplay(const Engine* engine, const Builder& builder) noexc
     m_selectionFrame.timer = 0.f;
     m_selectionFrame.enabled = false;
     m_selectionFrame.lastSelectedEntity = entt::null;
-    m_isClicked = false;
-
-    m_program = engine->getShaderProgram("selection");
+    m_isCaptured = false;
 }
 
 
@@ -33,9 +30,12 @@ HeadUpDisplay::~HeadUpDisplay()
 }
 
 
-bool HeadUpDisplay::init(const std::function<void(const entt::entity)>& callback) noexcept
+bool HeadUpDisplay::init() noexcept
 {
-    assert(m_program != 0);
+    m_program = m_engine->getShaderProgram("selection");
+    
+    if(!m_program)
+        return false;
 
     glGenTextures(1, &m_cursorTexture);
     Texture crosshairTexture = {.handle = m_cursorTexture };
@@ -65,7 +65,7 @@ bool HeadUpDisplay::init(const std::function<void(const entt::entity)>& callback
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float2 };
 	VertexArrayObject::createVertexInputState(m_selectionFrame.vao, m_selectionFrame.vbo, attributes);
 
-    m_showMenuForEntity = callback;
+    m_menu.init();
 
     return true;
 }
@@ -81,7 +81,7 @@ void HeadUpDisplay::update(const Transform2D& sceneTransform, float dt) noexcept
     auto cursorPosition = m_engine->getCursorPosition();
     m_cursorTransform.setPosition(cursorPosition);
 
-    if(m_isClicked)
+    if(m_isCaptured)
     {
         vec2s scenePosition = glms_vec2_negate(sceneTransform.getPosition());
         vec2s worldCoords = glms_vec2_add(scenePosition, cursorPosition);
@@ -94,7 +94,7 @@ void HeadUpDisplay::update(const Transform2D& sceneTransform, float dt) noexcept
             }           
             else
             {
-                m_showMenuForEntity(entity);
+                showMenu();
 
                 return;
             }
@@ -158,21 +158,33 @@ void HeadUpDisplay::update(const Transform2D& sceneTransform, float dt) noexcept
         }
     }
 
-    m_isClicked = false;
+    m_isCaptured = false;
 }
 
 
-void HeadUpDisplay::select() noexcept
+void HeadUpDisplay::drag() noexcept
 {
-    m_isClicked = true;
+    m_isCaptured = true;
 }
 
 
-void HeadUpDisplay::release() noexcept
+void HeadUpDisplay::drop() noexcept
 {
     m_selectionFrame.enabled = false;
     m_selectionFrame.lastSelectedEntity = entt::null;
-    m_isClicked = false;
+    m_isCaptured = false;
+}
+
+
+void HeadUpDisplay::showMenu() noexcept
+{
+    m_menu.show();
+}
+
+
+void HeadUpDisplay::hideMenu() noexcept
+{
+    m_menu.hide();
 }
 
 
@@ -196,13 +208,37 @@ void HeadUpDisplay::drawCursor() const noexcept
 }
 
 
+void HeadUpDisplay::drawMenu() const noexcept
+{
+    m_menu.draw();
+}
+
+
+void HeadUpDisplay::resize(int width, int height) noexcept
+{
+    m_menu.resize(width, height);
+}
+
+
 bool HeadUpDisplay::isSelectionEnabled() const noexcept
 {
     return m_selectionFrame.enabled;
 }
 
 
+bool HeadUpDisplay::isMenuShown() const noexcept
+{
+    return m_menu.isShown();
+}
+
+
 const Transform2D& HeadUpDisplay::getCursorTransform() const noexcept
 {
     return m_cursorTransform;
+}
+
+
+const Transform2D& HeadUpDisplay::getMenuTransform() const noexcept
+{
+    return m_menu.getTransform();
 }

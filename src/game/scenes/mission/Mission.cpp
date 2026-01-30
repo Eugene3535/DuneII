@@ -18,8 +18,7 @@
 Mission::Mission(Engine* engine) noexcept:
     Scene(engine, Scene::MISSION),
     m_builder(m_registry, m_tileMask),
-    m_hud(engine, m_builder),
-    m_menu(engine)
+    m_hud(engine, m_builder)
 {
     memset(&m_landscape, 0, sizeof(mesh::Landscape)); 
     memset(&m_buildings, 0, sizeof(mesh::Buildings));
@@ -51,14 +50,6 @@ bool Mission::load(std::string_view info) noexcept
 
     if(!initHUD())
         return false;
-
-    uint32_t frameProgram = m_engine->getShaderProgram("color_outline");
-    uint32_t previewProgram = m_engine->getShaderProgram("sprite");
-
-    if( ! (frameProgram && previewProgram) )
-        return false;
-
-    m_menu.init();
 
     if(m_tilemap.loadFromFile(FileProvider::findPathToFile(std::string(info))))
     {
@@ -161,12 +152,12 @@ void Mission::draw() noexcept
     }
 
     {// Test construction menu
-        if(m_menu.isShown())
+        if(m_hud.isMenuShown())
         {
-            modelView = m_menu.getTransform().getMatrix();
+            modelView = m_hud.getMenuTransform().getMatrix();
             result = glms_mul(uniformMatrix, modelView);
             camera.updateUniformBuffer(result.raw);
-            m_menu.draw();
+            m_hud.drawMenu();
         }
     }
 }
@@ -174,7 +165,7 @@ void Mission::draw() noexcept
 
 void Mission::resize(int width, int height) noexcept
 {
-    m_menu.resize(width, height);
+    m_hud.resize(width, height);
 }
 
 
@@ -200,12 +191,7 @@ bool Mission::initLandscape() noexcept
 
 bool Mission::initHUD() noexcept
 {
-    auto showMenuForEntityCallback = [this](const entt::entity e) -> void
-    {
-        m_menu.show();
-    };
-
-    m_hud.init(showMenuForEntityCallback);
+    m_hud.init();
 
     return true;
 }
@@ -216,7 +202,7 @@ void Mission::createSystems() noexcept
 //  Viewport Controller
     m_systems.emplace_back([](Mission* mission, float dt)
     {
-        if(mission->m_menu.isShown())
+        if(mission->m_hud.isMenuShown())
             return;
 
         const auto game     = mission->m_engine;
@@ -269,20 +255,18 @@ void Mission::createSystems() noexcept
             const bool isMouseButtoRightPressed = game->isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
 
             if(isMouseButtoLeftPressed)
-                mission->m_hud.select();
+                mission->m_hud.drag();
 
             if(isMouseButtoRightPressed)
-                mission->m_hud.release();
+                mission->m_hud.drop();
         }
  
         mission->m_hud.update(mission->m_transform, dt);
 
-        if(mission->m_menu.isShown())
+        if(mission->m_hud.isMenuShown())
         {
-            mission->m_menu.update();
-
             if(game->isKeyPressed(GLFW_KEY_SPACE))
-                mission->m_menu.hide();
+                mission->m_hud.hideMenu();
         }
     });
 
