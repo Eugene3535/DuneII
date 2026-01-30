@@ -4,8 +4,8 @@ __declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
 __declspec(dllexport) unsigned long AmdPowerXpressRequestHighPerformance = 0x00000001;
 #endif
 
-#include "game/DuneII.hpp"
-#include "app/Application.hpp"
+#include "game/Engine.hpp"
+#include "app/Game.hpp"
 
 
 int main()
@@ -14,12 +14,12 @@ int main()
     int width = 1200;
     int height = 900;
 
-    Application app;
-    DuneII game;
+    Game game;
+    Engine engine;
     int retCode = -1;
     
-    if(app.init(title, width, height))
-        retCode = app.run(game);
+    if(game.init(title, width, height))
+        retCode = game.run(engine);
 
     return retCode;
 }

@@ -1,15 +1,15 @@
-#ifndef APPLICATION_HPP
-#define APPLICATION_HPP
+#ifndef GAME_HPP
+#define GAME_HPP
 
 
-class Application final
+class Game final
 {
 public:
-	Application() noexcept;
-	~Application();
+	Game() noexcept;
+	~Game();
 
 	bool init(const char* title, int width, int height) noexcept;
-	int run(class DuneII& game) noexcept;
+	int run(class Engine& engine) noexcept;
 
 private:
 	bool initWindow(const char* title, int width, int height) noexcept;
@@ -19,4 +19,4 @@ private:
 	struct GLFWwindow* m_window;
 };
 
-#endif // !APPLICATION_HPP
+#endif // !GAME_HPP

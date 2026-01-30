@@ -7,7 +7,7 @@
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "resources/gl_interfaces/texture/Texture.hpp"
 #include "graphics/geometry/GeometryGenerator.hpp"
-#include "game/DuneII.hpp"
+#include "game/Engine.hpp"
 #include "game/scenes/pick_house/PickHouse.hpp"
 
 
@@ -21,8 +21,8 @@
 #define SWITCH_HOUSE_OUTLINE_DELAY 0.3f
 
 
-PickHouse::PickHouse(DuneII* game) noexcept:
-    Scene(game, Scene::PICK_HOUSE),
+PickHouse::PickHouse(Engine* engine) noexcept:
+    Scene(engine, Scene::PICK_HOUSE),
     m_vertexBufferObject(0),
     m_vertexArrayObjects{0, 0},
     m_selectedHouse(HouseType::ATREIDES),
@@ -70,10 +70,10 @@ bool PickHouse::load(std::string_view info) noexcept
 
 //  Shaders
     {
-        if(m_background.program = m_game->getShaderProgram("sprite"); m_background.program == 0)
+        if(m_background.program = m_engine->getShaderProgram("sprite"); m_background.program == 0)
             return false;
 
-        if(m_outline.program = m_game->getShaderProgram("color_outline"); m_outline.program == 0)
+        if(m_outline.program = m_engine->getShaderProgram("color_outline"); m_outline.program == 0)
             return false;
     }
 
@@ -169,20 +169,20 @@ void PickHouse::update(float dt) noexcept
         switch (m_selectedHouse)
         {
             case HouseType::ATREIDES:
-                if (m_game->isKeyPressed(GLFW_KEY_RIGHT))
+                if (m_engine->isKeyPressed(GLFW_KEY_RIGHT))
                     m_selectedHouse = HouseType::ORDOS;
                 break;
 
             case HouseType::ORDOS:
-                if (m_game->isKeyPressed(GLFW_KEY_LEFT))
+                if (m_engine->isKeyPressed(GLFW_KEY_LEFT))
                     m_selectedHouse = HouseType::ATREIDES;
 
-                if (m_game->isKeyPressed(GLFW_KEY_RIGHT))
+                if (m_engine->isKeyPressed(GLFW_KEY_RIGHT))
                     m_selectedHouse = HouseType::HARKONNEN;
                 break;
 
             case HouseType::HARKONNEN:
-                if (m_game->isKeyPressed(GLFW_KEY_LEFT))
+                if (m_engine->isKeyPressed(GLFW_KEY_LEFT))
                     m_selectedHouse = HouseType::ORDOS;
                 break;
 
@@ -191,12 +191,12 @@ void PickHouse::update(float dt) noexcept
         }
     }
 
-    if (m_game->isKeyPressed(GLFW_KEY_ENTER))
-        m_game->switchScene(this, Scene::MISSION);
+    if (m_engine->isKeyPressed(GLFW_KEY_ENTER))
+        m_engine->switchScene(this, Scene::MISSION);
 
     if(m_outlineNeedUpdate)
     {
-        auto windowSize = m_game->getWindowsSize();
+        auto windowSize = m_engine->getWindowsSize();
         vec2 size = { static_cast<float>(windowSize.x), static_cast<float>(windowSize.y) };
 
         float dx = size[0] / m_background.sprite.width;
@@ -232,7 +232,7 @@ void PickHouse::draw() noexcept
     if(!m_isLoaded)
         return;
 
-    auto& camera = m_game->camera;
+    auto& camera = m_engine->camera;
         
     alignas(16) mat4s MVP = camera.getModelViewProjectionMatrix();
     alignas(16) mat4s modelView;

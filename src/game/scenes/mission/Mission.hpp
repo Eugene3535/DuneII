@@ -12,7 +12,7 @@ class Mission:
     public Scene
 {
 public:
-    explicit Mission(class DuneII* game) noexcept;
+    explicit Mission(class Engine* engine) noexcept;
     ~Mission();
 
     bool load(std::string_view info)   noexcept override;

@@ -1,7 +1,7 @@
 
 
 template<class T>
-std::shared_ptr<T> DuneII::load(std::string_view info) noexcept
+std::shared_ptr<T> Engine::load(std::string_view info) noexcept
 {
     static_assert(std::is_base_of_v<Scene, T>, "A class of type T must inherit base class Scene");
 

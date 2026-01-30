@@ -8,25 +8,25 @@
 #include <GLFW/glfw3.h>
 
 #include "game/scenes/mission/Mission.hpp"
-#include "game/DuneII.hpp"
-#include "app/Application.hpp"
+#include "game/Engine.hpp"
+#include "app/Game.hpp"
 
 
-Application::Application() noexcept:
+Game::Game() noexcept:
 	m_window(nullptr)
 {
 
 }
 
 
-Application::~Application()
+Game::~Game()
 {
 	glfwDestroyWindow(m_window);
 	glfwTerminate();
 }
 
 
-bool Application::init(const char* title, int width, int height) noexcept
+bool Game::init(const char* title, int width, int height) noexcept
 {
 	if (!initWindow(title, width, height))
 		return false;
@@ -38,19 +38,19 @@ bool Application::init(const char* title, int width, int height) noexcept
 }
 
 
-int Application::run(DuneII& game) noexcept
+int Game::run(Engine& engine) noexcept
 {
 	if (!m_window)
 		return -1;
 
-	glfwSetWindowUserPointer(m_window, static_cast<void*>(&game));
+	glfwSetWindowUserPointer(m_window, static_cast<void*>(&engine));
 	
-	if(!game.init(m_window))
+	if(!engine.init(m_window))
 		return 1;
 
 	int width, height;
 	glfwGetWindowSize(m_window, &width, &height);
-	game.resize(width, height);
+	engine.resize(width, height);
 
 	float deltaTime = 0.f;
 	float lastFrame = 0.f;
@@ -63,8 +63,8 @@ int Application::run(DuneII& game) noexcept
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		game.update(deltaTime);
-		game.draw();
+		engine.update(deltaTime);
+		engine.draw();
 
 		glfwSwapBuffers(m_window);
 	}
@@ -73,7 +73,7 @@ int Application::run(DuneII& game) noexcept
 }
 
 
-bool Application::initWindow(const char* title, int width, int height) noexcept
+bool Game::initWindow(const char* title, int width, int height) noexcept
 {
 	if (glfwInit() == GLFW_TRUE)
 	{
@@ -95,7 +95,7 @@ bool Application::initWindow(const char* title, int width, int height) noexcept
 }
 
 
-void Application::checkOpenglTypes() noexcept
+void Game::checkOpenglTypes() noexcept
 {
     static_assert(std::is_same_v<GLbyte, int8_t>, "GLbyte mismatch");
     static_assert(std::is_same_v<GLubyte, uint8_t>, "GLubyte mismatch");
@@ -112,7 +112,7 @@ void Application::checkOpenglTypes() noexcept
 }
 
 
-void Application::initCallbacks() noexcept
+void Game::initCallbacks() noexcept
 {
 #ifdef DEBUG
 	printf("OpenGL Version: %s\n", glGetString(GL_VERSION));
@@ -177,14 +177,14 @@ void Application::initCallbacks() noexcept
 	{
 		glViewport(0, 0, width, height);
 
-		if(auto game = static_cast<DuneII*>(glfwGetWindowUserPointer(window)))
-			game->resize(width, height);
+		if(auto engine = static_cast<Engine*>(glfwGetWindowUserPointer(window)))
+			engine->resize(width, height);
 	});
 
 	glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double xpos, double ypos)
 	{
-		if(auto game = static_cast<DuneII*>(glfwGetWindowUserPointer(window)))
-			game->m_cursorPosition = { static_cast<float>(xpos), static_cast<float>(ypos) };
+		if(auto engine = static_cast<Engine*>(glfwGetWindowUserPointer(window)))
+			engine->m_cursorPosition = { static_cast<float>(xpos), static_cast<float>(ypos) };
 	});
 
 	glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods)

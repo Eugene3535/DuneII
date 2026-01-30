@@ -2,12 +2,12 @@
 
 #include <cglm/call/cam.h>
 
-#include "game/DuneII.hpp"
 #include "game/scenes/Scene.hpp"
+#include "game/Engine.hpp"
 
 
-Scene::Scene(DuneII* game, const Scene::Type type) noexcept:
-    m_game(game),
+Scene::Scene(Engine* engine, const Scene::Type type) noexcept:
+    m_engine(engine),
     m_isLoaded(false),
     m_type(type)
 {

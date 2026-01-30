@@ -62,8 +62,8 @@ set(DUNEII_SRC_FILES
 	${RESOURCE_SRC_FILES}
 	# src/effects/blackout/ScreenBlackoutEffect.cpp
 	${SCENE_SRC_FILES}
-	src/app/Application.cpp
-	src/game/DuneII.cpp
+	src/app/Game.cpp
+	src/game/Engine.cpp
 	src/main.cpp
 )
 
@@ -79,9 +79,9 @@ set(DUNEII_HDR_FILES
 	${RESOURCE_HDR_FILES}
 	# src/effects/blackout/ScreenBlackoutEffect.hpp
 	${SCENE_HDR_FILES}
-	src/app/Application.hpp
-	src/game/DuneII.hpp
-	src/game/DuneII.inl
+	src/app/Game.hpp
+	src/game/Engine.hpp
+	src/game/Engine.inl
 )
 
 

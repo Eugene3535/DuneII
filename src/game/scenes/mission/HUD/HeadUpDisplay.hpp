@@ -14,7 +14,7 @@
 class HeadUpDisplay
 {
 public:
-    HeadUpDisplay(const class DuneII* game, const class Builder& builder) noexcept;
+    HeadUpDisplay(const class Engine* engine, const class Builder& builder) noexcept;
     HeadUpDisplay(const HeadUpDisplay&)              noexcept = delete;
 	HeadUpDisplay(HeadUpDisplay&&)                   noexcept = delete;
 	HeadUpDisplay& operator = (const HeadUpDisplay&) noexcept = delete;
@@ -28,23 +28,23 @@ public:
     void release() noexcept;
 
     void drawSelection() const noexcept;
-    void drawCursor() const noexcept;
+    void drawCursor()    const noexcept;
 
     bool isSelectionEnabled() const noexcept;
 
     const Transform2D& getCursorTransform() const noexcept;
 
 private:
-    const class DuneII* m_game; 
+    const class Engine*  m_engine; 
     const class Builder& m_builder;
 
     SpriteManager m_sprites;
-    mesh::Sprite m_releasedCursor;
-    mesh::Sprite m_capturedCursor;
-    mesh::Sprite m_currentCursor;
-    Transform2D m_cursorTransform;
-    uint32_t m_cursorTexture;
-    uint32_t m_program;
+    mesh::Sprite  m_releasedCursor;
+    mesh::Sprite  m_capturedCursor;
+    mesh::Sprite  m_currentCursor;
+    Transform2D   m_cursorTransform;
+    uint32_t      m_cursorTexture;
+    uint32_t      m_program;
 
     struct
     {

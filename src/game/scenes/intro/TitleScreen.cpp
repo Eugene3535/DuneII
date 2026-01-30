@@ -6,7 +6,7 @@
 
 #include "resources/files/FileProvider.hpp"
 #include "resources/gl_interfaces/texture/Texture.hpp"
-#include "game/DuneII.hpp"
+#include "game/Engine.hpp"
 #include "game/scenes/intro/TitleScreen.hpp"
 
 
@@ -37,8 +37,8 @@ static bool is_show_planet;
 static bool is_intro_active_phase_end;
 
 
-TitleScreen::TitleScreen(DuneII* game) noexcept:
-    Scene(game, Scene::MAIN_MENU),
+TitleScreen::TitleScreen(Engine* engine) noexcept:
+    Scene(engine, Scene::MAIN_MENU),
     m_spriteProgram(0),
     m_buttonSpriteProgram(0),
     m_playButton(nullptr),
@@ -96,10 +96,10 @@ bool TitleScreen::load(std::string_view info) noexcept
 
 //  Shaders
     {
-        if(m_spriteProgram = m_game->getShaderProgram("sprite"); m_spriteProgram == 0)
+        if(m_spriteProgram = m_engine->getShaderProgram("sprite"); m_spriteProgram == 0)
             return false;
 
-        if(m_buttonSpriteProgram = m_game->getShaderProgram("color_sprite"); m_buttonSpriteProgram == 0)
+        if(m_buttonSpriteProgram = m_engine->getShaderProgram("color_sprite"); m_buttonSpriteProgram == 0)
             return false;
     }
     
@@ -152,15 +152,15 @@ void TitleScreen::update(float dt) noexcept
 
     if(m_isPresented)
     {
-        const bool isMouseButtonPressed = m_game->isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
-        const vec2s mousePosition = m_game->getCursorPosition();
+        const bool isMouseButtonPressed = m_engine->isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
+        const vec2s mousePosition = m_engine->getCursorPosition();
 
         m_settingsButton->update(mousePosition, isMouseButtonPressed);
         m_playButton->update(mousePosition, isMouseButtonPressed);
         m_exitButton->update(mousePosition, isMouseButtonPressed);
 
         if(m_playButton->isSelected())
-            m_game->switchScene(this, Scene::PICK_HOUSE);
+            m_engine->switchScene(this, Scene::PICK_HOUSE);
     }
 }
 
@@ -170,7 +170,7 @@ void TitleScreen::draw() noexcept
     if(!m_isLoaded)
         return;
 
-    auto& camera = m_game->camera;
+    auto& camera = m_engine->camera;
         
     alignas(16) mat4s MVP = camera.getModelViewProjectionMatrix();
     alignas(16) mat4s modelView;

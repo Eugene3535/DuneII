@@ -10,7 +10,7 @@ class TitleScreen:
     public Scene
 {
 public:
-    explicit TitleScreen(class DuneII* game) noexcept;
+    explicit TitleScreen(class Engine* engine) noexcept;
     ~TitleScreen();
 
     bool load(std::string_view info)         noexcept override;

@@ -1,5 +1,5 @@
-#ifndef DUNE_II_HPP
-#define DUNE_II_HPP
+#ifndef GAME_ENGINE_HPP
+#define GAME_ENGINE_HPP
 
 #include <string>
 #include <unordered_map>
@@ -12,12 +12,12 @@
 #include "game/scenes/Scene.hpp"
 
 
-class DuneII final
+class Engine final
 {
-    friend class Application;
+    friend class Game;
 
 public:
-    DuneII() noexcept;
+    Engine() noexcept;
 
     void switchScene(const Scene* requester, Scene::Type nextScene) noexcept;
 
@@ -51,6 +51,6 @@ private:
     mutable std::unordered_map<std::string, ShaderProgram> m_shaderPrograms;
 };
 
-#include "game/DuneII.inl"
+#include "game/Engine.inl"
 
-#endif // !DUNE_II_HPP
+#endif // !GAME_ENGINE_HPP

@@ -7,7 +7,7 @@
 #include "resources/gl_interfaces/texture/Texture.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "graphics/geometry/GeometryGenerator.hpp"
-#include "game/DuneII.hpp"
+#include "game/Engine.hpp"
 #include "game/scenes/mission/menu/ConstructionMenu.hpp"
 
 
@@ -26,15 +26,15 @@ namespace
 }
 
 
-ConstructionMenu::ConstructionMenu(const DuneII* game) noexcept:
+ConstructionMenu::ConstructionMenu(const Engine* engine) noexcept:
     m_transform(),
     m_isShown(false)
 {
     memset(&m_frame, 0, sizeof(m_frame));
     memset(&m_previews, 0, sizeof(m_previews));
 
-    m_frame.program    = game->getShaderProgram("color_outline");
-    m_previews.program = game->getShaderProgram("sprite");
+    m_frame.program    = engine->getShaderProgram("color_outline");
+    m_previews.program = engine->getShaderProgram("sprite");
 
     m_transform.setOrigin(DEFAULT_MENU_WIDTH * 0.5f, DEFAULT_MENU_HEIGHT * 0.5f);
 }

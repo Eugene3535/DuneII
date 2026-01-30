@@ -4,12 +4,12 @@
 #include "resources/gl_interfaces/texture/Texture.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "game/scenes/mission/builder/Builder.hpp"
-#include "game/DuneII.hpp"
+#include "game/Engine.hpp"
 #include "game/scenes/mission/HUD/HeadUpDisplay.hpp"
 
 
-HeadUpDisplay::HeadUpDisplay(const DuneII* game, const Builder& builder) noexcept:
-    m_game(game),
+HeadUpDisplay::HeadUpDisplay(const Engine* engine, const Builder& builder) noexcept:
+    m_engine(engine),
     m_builder(builder),
     m_cursorTexture(0),
     m_program(0)
@@ -21,7 +21,7 @@ HeadUpDisplay::HeadUpDisplay(const DuneII* game, const Builder& builder) noexcep
     m_selectionFrame.lastSelectedEntity = entt::null;
     m_isClicked = false;
 
-    m_program = game->getShaderProgram("selection");
+    m_program = engine->getShaderProgram("selection");
 }
 
 
@@ -58,9 +58,8 @@ bool HeadUpDisplay::init(const std::function<void(const entt::entity)>& callback
     m_currentCursor = m_releasedCursor;
 
 //  Selection frame
-    const float vertexData[32] = {}; // 16 vertices
     glCreateBuffers(1, &m_selectionFrame.vbo);
-	glNamedBufferData(m_selectionFrame.vbo, sizeof(vertexData), vertexData, GL_DYNAMIC_DRAW);
+	glNamedBufferData(m_selectionFrame.vbo, sizeof(float) << 5, nullptr, GL_DYNAMIC_DRAW);
 
 	glGenVertexArrays(1, &m_selectionFrame.vao);
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float2 };
@@ -79,7 +78,7 @@ void HeadUpDisplay::update(const Transform2D& sceneTransform, float dt) noexcept
     if(m_selectionFrame.timer > 0.25f)
         m_selectionFrame.timer = 0.f;
 
-    auto cursorPosition = m_game->getCursorPosition();
+    auto cursorPosition = m_engine->getCursorPosition();
     m_cursorTransform.setPosition(cursorPosition);
 
     if(m_isClicked)

@@ -10,7 +10,7 @@ class PickHouse:
     public Scene
 {
 public:
-    explicit PickHouse(class DuneII* game) noexcept;
+    explicit PickHouse(class Engine* engine) noexcept;
     ~PickHouse();
 
     bool load(std::string_view info)   noexcept override;

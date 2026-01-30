@@ -57,7 +57,7 @@ public:
         INVALID = 0xFF
     };
 
-    ConstructionMenu(const class DuneII* game)             noexcept;
+    ConstructionMenu(const class Engine* engine)           noexcept;
     ConstructionMenu(const ConstructionMenu&)              noexcept = delete;
 	ConstructionMenu(ConstructionMenu&&)                   noexcept = delete;
 	ConstructionMenu& operator = (const ConstructionMenu&) noexcept = delete;

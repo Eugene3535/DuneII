@@ -9,6 +9,7 @@
 #include "graphics/Meshes.hpp"
 #include "graphics/transform/Transform2D.hpp"
 
+
 class Scene
 {
 public:
@@ -20,7 +21,7 @@ public:
         MISSION
     };
 
-	Scene(class DuneII* game, const Type type) noexcept;
+	Scene(class Engine* engine, const Type type) noexcept;
 	virtual ~Scene();
     
     virtual bool load(std::string_view info)   noexcept;
@@ -34,7 +35,7 @@ public:
 protected:
     void setSpriteSizeInPixels(const mesh::Sprite& sprite, vec2 newSize, Transform2D& transform) noexcept;
 
-    class DuneII* m_game;
+    class Engine* m_engine;
     bool          m_isLoaded;
 
 private:

@@ -7,7 +7,7 @@
 #include "resources/files/FileProvider.hpp"
 #include "resources/gl_interfaces/texture/Texture.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
-#include "game/DuneII.hpp"
+#include "game/Engine.hpp"
 #include "game/scenes/mission/Mission.hpp"
 
 
@@ -15,11 +15,11 @@
 #define SCREEN_MARGIN 150
 
 
-Mission::Mission(DuneII* game) noexcept:
-    Scene(game, Scene::MISSION),
+Mission::Mission(Engine* engine) noexcept:
+    Scene(engine, Scene::MISSION),
     m_builder(m_registry, m_tileMask),
-    m_hud(game, m_builder),
-    m_menu(game)
+    m_hud(engine, m_builder),
+    m_menu(engine)
 {
     memset(&m_landscape, 0, sizeof(mesh::Landscape)); 
     memset(&m_buildings, 0, sizeof(mesh::Buildings));
@@ -52,8 +52,8 @@ bool Mission::load(std::string_view info) noexcept
     if(!initHUD())
         return false;
 
-    uint32_t frameProgram = m_game->getShaderProgram("color_outline");
-    uint32_t previewProgram = m_game->getShaderProgram("sprite");
+    uint32_t frameProgram = m_engine->getShaderProgram("color_outline");
+    uint32_t previewProgram = m_engine->getShaderProgram("sprite");
 
     if( ! (frameProgram && previewProgram) )
         return false;
@@ -117,7 +117,7 @@ void Mission::update(float dt) noexcept
 
 void Mission::draw() noexcept
 {
-    auto& camera = m_game->camera;
+    auto& camera = m_engine->camera;
 
     alignas(16) mat4s uniformMatrix = camera.getModelViewProjectionMatrix();
     alignas(16) mat4s modelView     = m_transform.getMatrix();
@@ -191,7 +191,7 @@ bool Mission::initLandscape() noexcept
 
     m_landscape.texture = landscapeTexture.handle;
 
-    if(m_landscape.program = m_game->getShaderProgram("tilemap"); m_landscape.program == 0)
+    if(m_landscape.program = m_engine->getShaderProgram("tilemap"); m_landscape.program == 0)
         return false;
 
     return true;
@@ -219,7 +219,7 @@ void Mission::createSystems() noexcept
         if(mission->m_menu.isShown())
             return;
 
-        const auto game     = mission->m_game;
+        const auto game     = mission->m_engine;
         const auto cursor   = game->getCursorPosition();
         const auto viewSize = game->getWindowsSize();
         const auto mapSize  = glms_ivec2_mul(mission->m_tilemap.getMapSize(), mission->m_tilemap.getTileSize());
@@ -255,8 +255,8 @@ void Mission::createSystems() noexcept
 //  HUD Controller
     m_systems.emplace_back([](Mission* mission, float dt)
     {
-        const auto game   = mission->m_game;
-        const auto cursor = game->getCursorPosition();
+        const auto game           = mission->m_engine;
+        const auto cursorPosition = game->getCursorPosition();
 
         static float clickTimer = 0;
         clickTimer += dt;

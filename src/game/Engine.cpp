@@ -6,10 +6,10 @@
 #include "game/scenes/intro/TitleScreen.hpp"
 #include "game/scenes/pick_house/PickHouse.hpp"
 #include "game/scenes/mission/Mission.hpp"
-#include "game/DuneII.hpp"
+#include "game/Engine.hpp"
 
 
-DuneII::DuneII() noexcept:
+Engine::Engine() noexcept:
     m_window(nullptr),
     m_currentScene(nullptr),
     m_nextSceneType(Scene::NONE),
@@ -20,7 +20,7 @@ DuneII::DuneII() noexcept:
 }
 
 
-void DuneII::switchScene(const Scene* requester, Scene::Type nextScene) noexcept
+void Engine::switchScene(const Scene* requester, Scene::Type nextScene) noexcept
 {
     if (!requester)
         return;
@@ -59,7 +59,7 @@ void DuneII::switchScene(const Scene* requester, Scene::Type nextScene) noexcept
 }
 
 
-bool DuneII::isKeyPressed(int key) const noexcept
+bool Engine::isKeyPressed(int key) const noexcept
 {
     if(m_window)
         return (glfwGetKey(m_window, key) == GLFW_PRESS);
@@ -68,7 +68,7 @@ bool DuneII::isKeyPressed(int key) const noexcept
 }
 
 
-bool DuneII::isMouseButtonPressed(int button) const noexcept
+bool Engine::isMouseButtonPressed(int button) const noexcept
 {
     if (m_window)
         return (glfwGetMouseButton(m_window, button) == GLFW_PRESS);
@@ -77,7 +77,7 @@ bool DuneII::isMouseButtonPressed(int button) const noexcept
 }
 
 
-uint32_t DuneII::getShaderProgram(const std::string& name) const noexcept
+uint32_t Engine::getShaderProgram(const std::string& name) const noexcept
 {
     if(auto it = m_shaderPrograms.find(name); it != m_shaderPrograms.end())
         return it->second.getHandle();
@@ -128,19 +128,19 @@ uint32_t DuneII::getShaderProgram(const std::string& name) const noexcept
 }
 
 
-const vec2s& DuneII::getCursorPosition() const noexcept
+const vec2s& Engine::getCursorPosition() const noexcept
 {
     return m_cursorPosition;
 }
 
 
-const ivec2s& DuneII::getWindowsSize() const noexcept
+const ivec2s& Engine::getWindowsSize() const noexcept
 {
     return m_windowSize;
 }
 
 
-bool DuneII::init(GLFWwindow* window) noexcept
+bool Engine::init(GLFWwindow* window) noexcept
 {
     if (!m_currentScene)
     {
@@ -156,7 +156,7 @@ bool DuneII::init(GLFWwindow* window) noexcept
 }
 
 
-void DuneII::update(float dt) noexcept
+void Engine::update(float dt) noexcept
 {
     if (!m_currentScene)
         return;
@@ -204,7 +204,7 @@ void DuneII::update(float dt) noexcept
 }
 
 
-void DuneII::draw() noexcept
+void Engine::draw() noexcept
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -213,7 +213,7 @@ void DuneII::draw() noexcept
 }
 
 
-void DuneII::resize(int width, int height) noexcept
+void Engine::resize(int width, int height) noexcept
 {
     m_windowSize = { width, height };
     camera.setupProjectionMatrix(width, height);
