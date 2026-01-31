@@ -6,7 +6,7 @@
 #include "game/scenes/mission/HUD/HeadUpDisplay.hpp"
 
 
-HeadUpDisplay::HeadUpDisplay(const Engine* engine, const Builder& builder) noexcept:
+HeadUpDisplay::HeadUpDisplay(Engine* engine, const Builder& builder) noexcept:
     m_engine(engine),
     m_builder(builder),
     m_menu(engine),

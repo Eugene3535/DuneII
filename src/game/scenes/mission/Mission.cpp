@@ -48,7 +48,7 @@ bool Mission::load(std::string_view info) noexcept
     if(!initLandscape())
         return false;
 
-    if(!initHUD())
+    if(!m_hud.init())
         return false;
 
     if(m_tilemap.loadFromFile(FileProvider::findPathToFile(std::string(info))))
@@ -184,14 +184,6 @@ bool Mission::initLandscape() noexcept
 
     if(m_landscape.program = m_engine->getShaderProgram("tilemap"); m_landscape.program == 0)
         return false;
-
-    return true;
-}
-
-
-bool Mission::initHUD() noexcept
-{
-    m_hud.init();
 
     return true;
 }

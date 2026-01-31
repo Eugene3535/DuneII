@@ -12,7 +12,7 @@
 class HeadUpDisplay
 {
 public:
-    HeadUpDisplay(const class Engine* engine, const class Builder& builder) noexcept;
+    HeadUpDisplay(class Engine* engine, const class Builder& builder) noexcept;
     HeadUpDisplay(const HeadUpDisplay&)              noexcept = delete;
 	HeadUpDisplay(HeadUpDisplay&&)                   noexcept = delete;
 	HeadUpDisplay& operator = (const HeadUpDisplay&) noexcept = delete;
@@ -40,7 +40,7 @@ public:
     const Transform2D& getMenuTransform()   const noexcept;
 
 private:
-    const class Engine*  m_engine; 
+    class Engine*  m_engine; 
     const class Builder& m_builder;
     ConstructionMenu     m_menu;
 

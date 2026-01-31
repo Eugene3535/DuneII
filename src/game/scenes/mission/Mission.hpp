@@ -21,7 +21,6 @@ public:
 
 private:
     bool initLandscape() noexcept;
-    bool initHUD() noexcept;
     void createSystems() noexcept;
 
     Transform2D      m_transform;
