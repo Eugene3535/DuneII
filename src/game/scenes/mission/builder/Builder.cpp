@@ -58,10 +58,12 @@ Builder::~Builder()
 bool Builder::loadFromTileMap(const TileMap& tilemap, const uint32_t texture) noexcept
 {
 	initStorage();
-	m_structureMap.clear();
+	m_structureMask.clear();
 	
 	m_mapSize = tilemap.getMapSize();
 	m_tileSize = tilemap.getTileSize();
+	m_structureMask.resize(m_mapSize.x * m_mapSize.y, entt::null);
+
 	glGetTextureLevelParameteriv(texture, 0, GL_TEXTURE_WIDTH, &m_textureSize.x);
 	glGetTextureLevelParameteriv(texture, 0, GL_TEXTURE_HEIGHT, &m_textureSize.y);
 
@@ -127,7 +129,7 @@ bool Builder::putStructureOnMap(const StructureInfo::Type type, const ivec2s cel
 
     const int32_t origin = cell.y * m_mapSize.x + cell.x;
 
-	if(auto found = m_structureMap.find(origin); found != m_structureMap.end())
+	if(m_structureMask[static_cast<size_t>(origin)] != entt::null)
 		return false;
 
     {// We check that the building will fit completely on the rocky soil.
@@ -183,7 +185,7 @@ bool Builder::putStructureOnMap(const StructureInfo::Type type, const ivec2s cel
 			for (int32_t j = 0; j < width; ++j)
 			{
 				m_tileMask[offset + j] = symbol;
-				m_structureMap[offset + j] = entity;
+				m_structureMask[offset + j] = entity;
 			}
 
 			offset += m_mapSize.x;
@@ -229,8 +231,8 @@ entt::entity Builder::getEntityUnderCursor(const vec2s point) const noexcept
 	const ivec2s tile = { static_cast<int>(point.x) / m_tileSize.x, static_cast<int>(point.y) / m_tileSize.y };
 	const int32_t origin = tile.y * m_mapSize.x + tile.x;
 
-	if(auto found = m_structureMap.find(origin); found != m_structureMap.end())
-		return found->second;
+	if(m_structureMask[static_cast<size_t>(origin)] != entt::null)
+		return m_structureMask[static_cast<size_t>(origin)];
 	
 	return entt::null;
 }
@@ -315,7 +317,7 @@ void Builder::updateWall(int32_t origin, int32_t level) noexcept
 		bool d = (bottom < tileCount) ? (field[bottom] == 'W') : false;
 
 		const auto texCoords = get_texcoords_of_custom_wall(compute_wall_type(a, b, c, d), m_textureSize);
-		const auto entity = m_structureMap[origin];
+		const auto entity = m_structureMask[static_cast<size_t>(origin)];
 
 		if(m_mappedStorage)
 		{

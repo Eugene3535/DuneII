@@ -1,8 +1,6 @@
 #ifndef BUILDER_HPP
 #define BUILDER_HPP
 
-#include <unordered_map>
-
 #include <entt/entity/registry.hpp>
 
 #include "game/scenes/mission/common/Structures.hpp"
@@ -26,9 +24,9 @@ private:
     void createGraphicsForEntity(const entt::entity entity) noexcept;
     void updateWall(int32_t origin, int32_t level)          noexcept;
 
-    entt::registry&                           m_registry;
-    std::string&                              m_tileMask;
-    std::unordered_map<int32_t, entt::entity> m_structureMap;
+    entt::registry&           m_registry;
+    std::string&              m_tileMask;
+    std::vector<entt::entity> m_structureMask;
 
     uint32_t m_vertexBuffer;
     void*    m_mappedStorage;
