@@ -61,9 +61,10 @@ public:
 	ConstructionMenu& operator = (ConstructionMenu&&)      noexcept = delete;
     ~ConstructionMenu();
 
-    void init()   noexcept;
-    void show()   noexcept;
-    void hide()   noexcept;
+    void init()         noexcept;
+    void showEntityInfo(Preview preview) noexcept;
+    void showEntityMenu(Preview preview)  noexcept;
+    void hide()         noexcept;
     void draw()   const noexcept;
     void resize(int width, int height) noexcept;
 

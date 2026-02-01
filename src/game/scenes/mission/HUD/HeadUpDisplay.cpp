@@ -108,21 +108,55 @@ void HeadUpDisplay::runSelection() noexcept
         return;
     }
 
+    auto convert_building_type_to_preview = [](StructureInfo::Type type) -> ConstructionMenu::Preview
+    {
+        switch (type)
+        {
+            case StructureInfo::SLAB_2x2:          return ConstructionMenu::Slab_2x2;
+            case StructureInfo::PALACE:            return ConstructionMenu::Palace;
+            case StructureInfo::VEHICLE:           return ConstructionMenu::Light_Vehicle_Factory;
+            case StructureInfo::HIGH_TECH:         return ConstructionMenu::High_Tech;
+            case StructureInfo::CONSTRUCTION_YARD: return ConstructionMenu::Construction_Yard;
+            case StructureInfo::WIND_TRAP:         return ConstructionMenu::Wind_Trap;
+            case StructureInfo::BARRACKS:          return ConstructionMenu::Barracks;
+            case StructureInfo::STARPORT:          return ConstructionMenu::Starport;
+            case StructureInfo::REFINERY:          return ConstructionMenu::Refinery;
+            case StructureInfo::REPAIR:            return ConstructionMenu::Repair;
+            case StructureInfo::TURRET:            return ConstructionMenu::Turret;
+            case StructureInfo::ROCKET_TURRET:     return ConstructionMenu::Rocket_Turret;
+            case StructureInfo::SILO:              return ConstructionMenu::Spice_Silo;
+            case StructureInfo::OUTPOST:           return ConstructionMenu::Outpost;
+        
+            default: return ConstructionMenu::Empty_Cell;
+        }
+    };
+
+    auto& registry = m_builder.getRegistry();
+
     if(m_selectionFrame.lastSelectedEntity != entity)
     {
         m_selectionFrame.lastSelectedEntity = entity;
+        m_menu.showEntityInfo(ConstructionMenu::Empty_Cell);
     }           
     else
     {
         if(m_clickTimer > BLINK_LOOP_TIME)
-            m_menu.show(/* for entity */);
+        {
+            if(StructureInfo* info = registry.try_get<StructureInfo>(entity))
+            {
+                const auto preview = convert_building_type_to_preview(info->type);
 
+                if(preview != ConstructionMenu::Empty_Cell)
+                    m_menu.showEntityMenu(preview);
+            }     
+        }
+            
         return;
     }
 
     m_clickTimer = 0;
 
-    auto& registry = m_builder.getRegistry();
+    
 
     if(StructureInfo* info = registry.try_get<StructureInfo>(entity))
     {

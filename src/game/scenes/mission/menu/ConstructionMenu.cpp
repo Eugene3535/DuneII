@@ -61,9 +61,42 @@ void ConstructionMenu::init() noexcept
 }
 
 
-void ConstructionMenu::show() noexcept
+void ConstructionMenu::showEntityInfo(Preview preview) noexcept
 {
-    m_isShown = true;
+    // side info bar
+}
+
+
+void ConstructionMenu::showEntityMenu(Preview preview) noexcept
+{
+    if(preview > ConstructionMenu::Tank)
+        return;
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_previews.vbo);
+
+    if(void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
+    {
+        const vec2s* texCoords = &m_textureGrid[preview << 2];
+        constexpr uint32_t offset = PREVIEW_CELL_COLUMNS * PREVIEW_CELL_ROWS << 2;
+        vec4s* vertices = static_cast<vec4s*>(data) + offset;
+
+        vertices[0].z = texCoords[0].x;
+        vertices[0].w = texCoords[0].y;
+
+        vertices[1].z = texCoords[1].x;
+        vertices[1].w = texCoords[1].y;
+
+        vertices[2].z = texCoords[2].x;
+        vertices[2].w = texCoords[2].y;
+
+        vertices[3].z = texCoords[3].x;
+        vertices[3].w = texCoords[3].y;
+
+        if(glUnmapBuffer(GL_ARRAY_BUFFER) == GL_TRUE)
+            m_isShown = true;
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 
@@ -213,10 +246,10 @@ void ConstructionMenu::createPreviews() noexcept
     }
     
 //  Main preview
-    vertices.push_back({ 600.f, 80.f,  texCoords[0].x, texCoords[0].y});
-    vertices.push_back({ 860.f, 80.f,  texCoords[1].x, texCoords[1].y });
-    vertices.push_back({ 860.f, 220.f, texCoords[2].x, texCoords[2].y });
-    vertices.push_back({ 600.f, 220.f, texCoords[3].x, texCoords[3].y });
+    vertices.push_back({ 590.f, 70.f,  texCoords[0].x, texCoords[0].y});
+    vertices.push_back({ 870.f, 70.f,  texCoords[1].x, texCoords[1].y });
+    vertices.push_back({ 870.f, 230.f, texCoords[2].x, texCoords[2].y });
+    vertices.push_back({ 590.f, 230.f, texCoords[3].x, texCoords[3].y });
     m_previews.cellCount = static_cast<uint32_t>(vertices.size() >> 2);
 
     glCreateBuffers(1, &m_previews.vbo);
