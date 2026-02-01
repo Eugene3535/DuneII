@@ -18,7 +18,7 @@
 Mission::Mission(Engine* engine) noexcept:
     Scene(engine, Scene::MISSION),
     m_builder(m_registry, m_tileMask),
-    m_hud(engine, m_builder)
+    m_hud(engine, m_transform, m_builder)
 {
     memset(&m_landscape, 0, sizeof(mesh::Landscape)); 
     memset(&m_buildings, 0, sizeof(mesh::Buildings));
@@ -138,7 +138,9 @@ void Mission::draw() noexcept
         glBindTextureUnit(0, 0);
     }
 
-    {// HUD
+//  HUD
+    if(!m_hud.isMenuShown())
+    {
         if(m_hud.isSelectionEnabled())
         {
             m_hud.drawSelection();
@@ -150,15 +152,12 @@ void Mission::draw() noexcept
         camera.updateUniformBuffer(result.raw);
         m_hud.drawCursor();
     }
-
-    {// Test construction menu
-        if(m_hud.isMenuShown())
-        {
-            modelView = m_hud.getMenuTransform().getMatrix();
-            result = glms_mul(uniformMatrix, modelView);
-            camera.updateUniformBuffer(result.raw);
-            m_hud.drawMenu();
-        }
+    else
+    {
+        modelView = m_hud.getMenuTransform().getMatrix();
+        result = glms_mul(uniformMatrix, modelView);
+        camera.updateUniformBuffer(result.raw);
+        m_hud.drawMenu();
     }
 }
 
@@ -233,31 +232,22 @@ void Mission::createSystems() noexcept
 //  HUD Controller
     m_systems.emplace_back([](Mission* mission, float dt)
     {
-        const auto game           = mission->m_engine;
-        const auto cursorPosition = game->getCursorPosition();
+        const Engine* engine = mission->m_engine;
 
-        static float clickTimer = 0;
-        clickTimer += dt;
+        const bool isMouseButtonLeftPressed  = engine->isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
+        const bool isMouseButtonRightPressed = engine->isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
 
-        if(clickTimer > 0.1f)
-        {
-            clickTimer = 0.f;
+        if(isMouseButtonLeftPressed)
+            mission->m_hud.runSelection();
 
-            const bool isMouseButtoLeftPressed = game->isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
-            const bool isMouseButtoRightPressed = game->isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
-
-            if(isMouseButtoLeftPressed)
-                mission->m_hud.drag();
-
-            if(isMouseButtoRightPressed)
-                mission->m_hud.drop();
-        }
+        if(isMouseButtonRightPressed)
+            mission->m_hud.cancelSelection();
  
-        mission->m_hud.update(mission->m_transform, dt);
+        mission->m_hud.update(dt);
 
         if(mission->m_hud.isMenuShown())
         {
-            if(game->isKeyPressed(GLFW_KEY_SPACE))
+            if(engine->isKeyPressed(GLFW_KEY_SPACE))
                 mission->m_hud.hideMenu();
         }
     });

@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "resources/files/FileProvider.hpp"
 #include "resources/gl_interfaces/texture/Texture.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
@@ -5,20 +7,24 @@
 #include "game/Engine.hpp"
 #include "game/scenes/mission/HUD/HeadUpDisplay.hpp"
 
+#define BLINK_PERIOD 0.125f
+#define BLINK_LOOP_TIME 0.25f
 
-HeadUpDisplay::HeadUpDisplay(Engine* engine, const Builder& builder) noexcept:
+
+HeadUpDisplay::HeadUpDisplay(Engine* engine, const Transform2D& sceneTransform, const Builder& builder) noexcept:
     m_engine(engine),
+    m_sceneTransform(sceneTransform),
     m_builder(builder),
     m_menu(engine),
     m_cursorTexture(0),
-    m_program(0)
+    m_program(0),
+    m_clickTimer(0.f)
 {
     m_selectionFrame.vbo = 0;
     m_selectionFrame.vao = 0;
-    m_selectionFrame.timer = 0.f;
+    m_selectionFrame.blinkTimer = 0.f;
     m_selectionFrame.enabled = false;
     m_selectionFrame.lastSelectedEntity = entt::null;
-    m_isCaptured = false;
 }
 
 
@@ -71,114 +77,109 @@ bool HeadUpDisplay::init() noexcept
 }
 
 
-void HeadUpDisplay::update(const Transform2D& sceneTransform, float dt) noexcept
+void HeadUpDisplay::update(float dt) noexcept
 {
-    m_selectionFrame.timer += dt;
+    m_clickTimer += dt;
+    m_selectionFrame.blinkTimer += dt;
 
-    if(m_selectionFrame.timer > 0.25f)
-        m_selectionFrame.timer = 0.f;
+    if(m_selectionFrame.blinkTimer > BLINK_LOOP_TIME)
+        m_selectionFrame.blinkTimer = 0.f;
 
-    auto cursorPosition = m_engine->getCursorPosition();
-    m_cursorTransform.setPosition(cursorPosition);
+    m_cursorTransform.setPosition(m_engine->getCursorPosition());
+}
 
-    if(m_isCaptured)
+
+void HeadUpDisplay::runSelection() noexcept
+{
+    if(m_menu.isShown())
+        return;
+
+    vec2s cursorPosition = m_engine->getCursorPosition();
+    vec2s scenePosition  = glms_vec2_negate(m_sceneTransform.getPosition());
+    vec2s worldCoords    = glms_vec2_add(scenePosition, cursorPosition);
+
+    const auto entity = m_builder.getEntityUnderCursor(worldCoords);
+
+    if(entity == entt::null)
     {
-        vec2s scenePosition = glms_vec2_negate(sceneTransform.getPosition());
-        vec2s worldCoords = glms_vec2_add(scenePosition, cursorPosition);
+        m_selectionFrame.enabled = false;
+        m_selectionFrame.lastSelectedEntity = entt::null;
 
-        if(auto entity = m_builder.getEntityUnderCursor(worldCoords); entity != entt::null)
-        {
-            if(m_selectionFrame.lastSelectedEntity != entity)
-            {
-                m_selectionFrame.lastSelectedEntity = entity;
-            }           
-            else
-            {
-                showMenu();
-
-                return;
-            }
-
-            auto& registry = m_builder.getRegistry();
-
-            if(StructureInfo* info = registry.try_get<StructureInfo>(entity))
-            {
-                bool isSelectable = ((info->type != StructureInfo::Type::SLAB_1x1) &&
-                                     (info->type != StructureInfo::Type::SLAB_2x2) && 
-                                     (info->type != StructureInfo::Type::WALL)     && 
-                                      info->type <  StructureInfo::Type::MAX);
-
-                if(isSelectable)
-                {
-                    const auto bounds = registry.get<ivec4s>(entity);
-                    glBindBuffer(GL_ARRAY_BUFFER, m_selectionFrame.vbo);
-
-                    if(void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
-                    {
-                        vec2s* vertices = static_cast<vec2s*>(data);
-                        const float offset = 12.f;
-
-                        const vec2s leftBottom  = { static_cast<float>(bounds.x), static_cast<float>(bounds.w) };
-                        const vec2s leftTop     = { static_cast<float>(bounds.x), static_cast<float>(bounds.y) };
-                        const vec2s rightTop    = { static_cast<float>(bounds.z), static_cast<float>(bounds.y) };
-                        const vec2s rightBottom = { static_cast<float>(bounds.z), static_cast<float>(bounds.w) };
-
-                        vertices[0]  = { leftBottom.x, leftBottom.y - offset };
-                        vertices[1]  = leftBottom;
-                        vertices[2]  = leftBottom;
-                        vertices[3]  = { leftBottom.x + offset, leftBottom.y };
-
-                        vertices[4]  = { leftTop.x, leftTop.y + offset };
-                        vertices[5]  = leftTop;
-                        vertices[6]  = leftTop;
-                        vertices[7]  = { leftTop.x + offset, leftTop.y };
-
-                        vertices[8]  = { rightTop.x - offset, rightTop.y };
-                        vertices[9]  = rightTop;
-                        vertices[10] = rightTop;
-                        vertices[11] = { rightTop.x, rightTop.y + offset };
-
-                        vertices[12] = { rightBottom.x, rightBottom.y - offset };
-                        vertices[13] = rightBottom;
-                        vertices[14] = rightBottom;
-                        vertices[15] = { rightBottom.x - offset, rightBottom.y };
-
-                        if(glUnmapBuffer(GL_ARRAY_BUFFER) == GL_TRUE)
-                            m_selectionFrame.enabled = true;
-                    }
-
-                    glBindBuffer(GL_ARRAY_BUFFER, 0);
-                }
-            }
-        }
-        else 
-        {
-            m_selectionFrame.enabled = false;
-            m_selectionFrame.lastSelectedEntity = entt::null;
-        }
+        return;
     }
 
-    m_isCaptured = false;
+    if(m_selectionFrame.lastSelectedEntity != entity)
+    {
+        m_selectionFrame.lastSelectedEntity = entity;
+    }           
+    else
+    {
+        if(m_clickTimer > BLINK_LOOP_TIME)
+            m_menu.show(/* for entity */);
+
+        return;
+    }
+
+    m_clickTimer = 0;
+
+    auto& registry = m_builder.getRegistry();
+
+    if(StructureInfo* info = registry.try_get<StructureInfo>(entity))
+    {
+        bool isSelectable = ((info->type != StructureInfo::Type::SLAB_1x1) &&
+                             (info->type != StructureInfo::Type::SLAB_2x2) && 
+                             (info->type != StructureInfo::Type::WALL)     && 
+                              info->type <  StructureInfo::Type::MAX);
+
+        if(isSelectable)
+        {
+            const auto bounds = registry.get<ivec4s>(entity);
+            glBindBuffer(GL_ARRAY_BUFFER, m_selectionFrame.vbo);
+
+            if(void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
+            {
+                vec2s* vertices = static_cast<vec2s*>(data);
+                const float offset = 12.f;
+
+                const vec2s leftBottom  = { static_cast<float>(bounds.x), static_cast<float>(bounds.w) };
+                const vec2s leftTop     = { static_cast<float>(bounds.x), static_cast<float>(bounds.y) };
+                const vec2s rightTop    = { static_cast<float>(bounds.z), static_cast<float>(bounds.y) };
+                const vec2s rightBottom = { static_cast<float>(bounds.z), static_cast<float>(bounds.w) };
+
+                vertices[0]  = { leftBottom.x, leftBottom.y - offset };
+                vertices[1]  = leftBottom;
+                vertices[2]  = leftBottom;
+                vertices[3]  = { leftBottom.x + offset, leftBottom.y };
+
+                vertices[4]  = { leftTop.x, leftTop.y + offset };
+                vertices[5]  = leftTop;
+                vertices[6]  = leftTop;
+                vertices[7]  = { leftTop.x + offset, leftTop.y };
+
+                vertices[8]  = { rightTop.x - offset, rightTop.y };
+                vertices[9]  = rightTop;
+                vertices[10] = rightTop;
+                vertices[11] = { rightTop.x, rightTop.y + offset };
+
+                vertices[12] = { rightBottom.x, rightBottom.y - offset };
+                vertices[13] = rightBottom;
+                vertices[14] = rightBottom;
+                vertices[15] = { rightBottom.x - offset, rightBottom.y };
+
+                if(glUnmapBuffer(GL_ARRAY_BUFFER) == GL_TRUE)
+                    m_selectionFrame.enabled = true;
+            }
+
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+        }
+    }
 }
 
 
-void HeadUpDisplay::drag() noexcept
-{
-    m_isCaptured = true;
-}
-
-
-void HeadUpDisplay::drop() noexcept
+void HeadUpDisplay::cancelSelection() noexcept
 {
     m_selectionFrame.enabled = false;
     m_selectionFrame.lastSelectedEntity = entt::null;
-    m_isCaptured = false;
-}
-
-
-void HeadUpDisplay::showMenu() noexcept
-{
-    m_menu.show();
 }
 
 
@@ -190,7 +191,7 @@ void HeadUpDisplay::hideMenu() noexcept
 
 void HeadUpDisplay::drawSelection() const noexcept
 {
-    if(m_selectionFrame.enabled && m_selectionFrame.timer < 0.125f)
+    if(m_selectionFrame.enabled && m_selectionFrame.blinkTimer < BLINK_PERIOD)
     {
         glUseProgram(m_program);
         glBindVertexArray(m_selectionFrame.vao);

@@ -12,7 +12,7 @@
 class HeadUpDisplay
 {
 public:
-    HeadUpDisplay(class Engine* engine, const class Builder& builder) noexcept;
+    HeadUpDisplay(class Engine* engine, const Transform2D& sceneTransform, const class Builder& builder) noexcept;
     HeadUpDisplay(const HeadUpDisplay&)              noexcept = delete;
 	HeadUpDisplay(HeadUpDisplay&&)                   noexcept = delete;
 	HeadUpDisplay& operator = (const HeadUpDisplay&) noexcept = delete;
@@ -20,12 +20,11 @@ public:
     ~HeadUpDisplay();
 
     bool init() noexcept;
-    void update(const Transform2D& sceneTransform, float dt) noexcept;
+    void update(float dt) noexcept;
 
-    void drag()     noexcept;
-    void drop()     noexcept;
-    void showMenu() noexcept;
-    void hideMenu() noexcept;
+    void runSelection()    noexcept;
+    void cancelSelection() noexcept;
+    void hideMenu()        noexcept;
 
     void drawSelection() const noexcept;
     void drawCursor()    const noexcept;
@@ -40,7 +39,8 @@ public:
     const Transform2D& getMenuTransform()   const noexcept;
 
 private:
-    class Engine*  m_engine; 
+    class Engine*        m_engine;
+    const Transform2D&   m_sceneTransform;
     const class Builder& m_builder;
     ConstructionMenu     m_menu;
 
@@ -52,16 +52,16 @@ private:
     uint32_t      m_cursorTexture;
     uint32_t      m_program;
 
+    float m_clickTimer;
+
     struct
     {
         uint32_t vbo;
         uint32_t vao;
-        float timer;
+        float blinkTimer;
         bool enabled;
         entt::entity lastSelectedEntity;
     } m_selectionFrame;
-
-    bool m_isCaptured;
 };
 
 #endif // !HEAD_UP_DISPLAY_HPP
