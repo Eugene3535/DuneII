@@ -54,19 +54,19 @@ public:
         INVALID = 0xFF
     };
 
-    ConstructionMenu(const class Engine* engine)           noexcept;
+    ConstructionMenu(const class Engine* engine, class Builder& builder) noexcept;
     ConstructionMenu(const ConstructionMenu&)              noexcept = delete;
 	ConstructionMenu(ConstructionMenu&&)                   noexcept = delete;
 	ConstructionMenu& operator = (const ConstructionMenu&) noexcept = delete;
 	ConstructionMenu& operator = (ConstructionMenu&&)      noexcept = delete;
     ~ConstructionMenu();
 
-    void init()         noexcept;
+    void init()                          noexcept;
     void showEntityInfo(Preview preview) noexcept;
-    void showEntityMenu(Preview preview)  noexcept;
-    void hide()         noexcept;
-    void draw()   const noexcept;
-    void resize(int width, int height) noexcept;
+    void showEntityMenu(Preview preview) noexcept;
+    void hide()                          noexcept;
+    void draw()                    const noexcept;
+    void resize(int width, int height)   noexcept;
 
     bool isShown() const noexcept;
     const Transform2D& getTransform() const noexcept;
@@ -77,6 +77,8 @@ private:
     void drawFrame()      const noexcept;
     void drawPreviews()   const noexcept;
 
+    const class Engine* m_engine;
+    class Builder& m_builder;
     Transform2D m_transform;
 
     struct Widget

@@ -1,5 +1,6 @@
 #include <glad/glad.h>
 #include <cglm/struct/ivec2.h>
+#include <cglm/call/aabb2d.h>
 
 #include "game/scenes/mission/tilemap/TileMap.hpp"
 #include "game/scenes/mission/builder/Builder.hpp"
@@ -93,13 +94,75 @@ bool Builder::loadFromTileMap(const TileMap& tilemap, const uint32_t texture) no
 	if(objects.empty())
 		return false;
 
+	struct Base
+	{
+		vec2 aabb[2];
+		bool exists;
+	};
+
+	auto get_aabb_of_base = [&objects](HouseType houseName) -> Base
+	{
+		Base base = {.exists = false};
+
+		for(const auto& object : objects)
+		{
+			if(object.name == "Base")
+			{
+				auto found = std::find_if(object.properties.begin(), object.properties.end(), [houseName](const TileMap::Object::Property& property)
+				{
+					return houseName == static_cast<HouseType>(std::stoul(property.value));
+				});
+
+				if(found != object.properties.end())
+				{
+					base.aabb[0][0] = object.coords.x;
+					base.aabb[0][1] = object.coords.y;
+					base.aabb[1][0] = object.coords.x + object.size.x;
+					base.aabb[1][1] = object.coords.y + object.size.y;
+					base.exists = true;
+
+					return base;
+				}
+			}
+		}
+
+		return base;
+	};
+
+	auto harkonnenBase = get_aabb_of_base(HouseType::HARKONNEN);		
+	auto ordosBase     = get_aabb_of_base(HouseType::ORDOS);
+	auto atreidesBase  = get_aabb_of_base(HouseType::ATREIDES);
+	// ... and other houses
+
 	for(const auto& object : objects)
 	{
 		if (object.type == "Structure")
 		{
-			const auto type = get_structure_enum(object.name);
-			const ivec2s cell = { object.bounds.x, object.bounds.y };
-			putStructureOnMap(type, cell);
+			HouseType owner = HouseType::INVALID;
+			vec2 objectAABB[2];
+			objectAABB[0][0] = object.coords.x * m_tileSize.x;
+			objectAABB[0][1] = object.coords.y * m_tileSize.y;
+			objectAABB[1][0] = (object.coords.x + object.size.x) * m_tileSize.x;
+			objectAABB[1][1] = (object.coords.y + object.size.y) * m_tileSize.y;
+
+			if(harkonnenBase.exists && glmc_aabb2d_aabb(harkonnenBase.aabb, objectAABB))
+			{
+				owner = HouseType::HARKONNEN;
+			}
+			else if(ordosBase.exists && glmc_aabb2d_aabb(ordosBase.aabb, objectAABB))
+			{
+				owner = HouseType::ORDOS;
+			}
+			else if(atreidesBase.exists && glmc_aabb2d_aabb(atreidesBase.aabb, objectAABB))
+			{
+				owner = HouseType::ATREIDES;
+			}
+
+			if(owner != HouseType::INVALID)
+			{
+				const auto type = get_structure_enum(object.name);
+				putStructureOnMap(owner, type, object.coords);
+			}
 		}
 	}
 
@@ -107,7 +170,7 @@ bool Builder::loadFromTileMap(const TileMap& tilemap, const uint32_t texture) no
 }
 
 
-bool Builder::putStructureOnMap(const StructureInfo::Type type, const ivec2s cell) noexcept
+bool Builder::putStructureOnMap(const HouseType owner, const StructureInfo::Type type, const ivec2s cell) noexcept
 {
 	if(auto size = m_registry.storage<StructureInfo>().size(); size >= STRUCTURE_LIMIT_ON_MAP)
 		return false;
@@ -172,6 +235,7 @@ bool Builder::putStructureOnMap(const StructureInfo::Type type, const ivec2s cel
 	m_registry.emplace<ivec4s>(entity, bounds);
 	
 	auto& structure = m_registry.emplace<StructureInfo>(entity);
+	structure.owner = owner;
 	structure.type = type;
 	structure.armor = structure.maxArmor = get_armor_of(type);
 	createGraphicsForEntity(entity);

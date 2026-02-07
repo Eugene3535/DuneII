@@ -11,11 +11,11 @@
 #define BLINK_LOOP_TIME 0.25f
 
 
-HeadUpDisplay::HeadUpDisplay(Engine* engine, const Transform2D& sceneTransform, const Builder& builder) noexcept:
+HeadUpDisplay::HeadUpDisplay(Engine* engine, const Transform2D& sceneTransform, Builder& builder) noexcept:
     m_engine(engine),
     m_sceneTransform(sceneTransform),
     m_builder(builder),
-    m_menu(engine),
+    m_menu(engine, builder),
     m_cursorTexture(0),
     m_program(0),
     m_clickTimer(0.f)
@@ -155,8 +155,6 @@ void HeadUpDisplay::runSelection() noexcept
     }
 
     m_clickTimer = 0;
-
-    
 
     if(StructureInfo* info = registry.try_get<StructureInfo>(entity))
     {

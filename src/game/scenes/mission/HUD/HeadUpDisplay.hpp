@@ -12,7 +12,7 @@
 class HeadUpDisplay
 {
 public:
-    HeadUpDisplay(class Engine* engine, const Transform2D& sceneTransform, const class Builder& builder) noexcept;
+    HeadUpDisplay(class Engine* engine, const Transform2D& sceneTransform, class Builder& builder) noexcept;
     HeadUpDisplay(const HeadUpDisplay&)              noexcept = delete;
 	HeadUpDisplay(HeadUpDisplay&&)                   noexcept = delete;
 	HeadUpDisplay& operator = (const HeadUpDisplay&) noexcept = delete;

@@ -3,6 +3,8 @@
 
 #include <cglm/struct/ivec2.h>
 
+#include "common/Enums.hpp"
+
 // More info is available here
 // https://gamicus.fandom.com/wiki/List_of_structures_in_Dune_II
 struct StructureInfo
@@ -27,13 +29,14 @@ struct StructureInfo
         OUTPOST,
         MAX,
         INVALID = 0xFF
-    };
+    } type;
+
+    HouseType owner;
 
     uint32_t id;
     uint32_t frame;
     ivec2s texOffset;
 
-    Type type;
     int32_t cost;
     int32_t armor;
     int32_t maxArmor;

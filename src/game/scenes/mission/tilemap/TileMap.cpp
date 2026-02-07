@@ -253,10 +253,10 @@ bool TileMap::loadObjects(const void* rootNode) noexcept
 
 			for (auto attribute = objectNode->first_attribute(); attribute != nullptr; attribute = attribute->next_attribute())
 			{
-				if (strcmp(attribute->name(), "x")      == 0) { std::from_chars(attribute->value(), attribute->value() + attribute->value_size(), object.bounds.x); }
-				if (strcmp(attribute->name(), "y")      == 0) { std::from_chars(attribute->value(), attribute->value() + attribute->value_size(), object.bounds.y); }
-				if (strcmp(attribute->name(), "width")  == 0) { std::from_chars(attribute->value(), attribute->value() + attribute->value_size(), object.bounds.z); }
-				if (strcmp(attribute->name(), "height") == 0) { std::from_chars(attribute->value(), attribute->value() + attribute->value_size(), object.bounds.w); }
+				if (strcmp(attribute->name(), "x")      == 0) { std::from_chars(attribute->value(), attribute->value() + attribute->value_size(), object.coords.x); }
+				if (strcmp(attribute->name(), "y")      == 0) { std::from_chars(attribute->value(), attribute->value() + attribute->value_size(), object.coords.y); }
+				if (strcmp(attribute->name(), "width")  == 0) { std::from_chars(attribute->value(), attribute->value() + attribute->value_size(), object.size.x);   }
+				if (strcmp(attribute->name(), "height") == 0) { std::from_chars(attribute->value(), attribute->value() + attribute->value_size(), object.size.y);   }
 				if (strcmp(attribute->name(), "name")   == 0) object.name = { attribute->value(), attribute->value_size() };
 				if (strcmp(attribute->name(), "class")  == 0) object.type = { attribute->value(), attribute->value_size() };
 			}
@@ -348,7 +348,6 @@ void TileMap::loadLandscape(const Tileset& tileset, std::span<const int32_t> til
 
 void TileMap::loadStructures(const Tileset& tileset, std::span<const int> tileIds) noexcept
 {
-//  TODO: offset to first tile (tileset.firstGID - tileNum etc ...)
 	auto get_structure_type = [](int tileNum) -> StructureInfo::Type
 	{
 		switch (tileNum) // start num of tile in grid
@@ -384,6 +383,7 @@ void TileMap::loadStructures(const Tileset& tileset, std::span<const int> tileId
 		}
 	};
 
+
 	auto get_structure_name = [](StructureInfo::Type type) -> std::string_view
 	{
 		switch (type)
@@ -409,27 +409,28 @@ void TileMap::loadStructures(const Tileset& tileset, std::span<const int> tileId
 		}
 	};
 
-	auto get_structure_tile_bounds = [](StructureInfo::Type type, int32_t x, int32_t y) -> ivec4s
+
+	auto get_structure_tile_bounds = [](StructureInfo::Type type) -> ivec2s
 	{
 		switch (type)
 		{
-            case StructureInfo::Type::SLAB_1x1:          return { x, y, 1, 1 };
-			case StructureInfo::Type::PALACE:            return { x, y, 3, 3 };
-			case StructureInfo::Type::VEHICLE:           return { x, y, 3, 2 };
-			case StructureInfo::Type::HIGH_TECH:         return { x, y, 2, 2 };
-            case StructureInfo::Type::CONSTRUCTION_YARD: return { x, y, 2, 2 };
-			case StructureInfo::Type::WIND_TRAP:         return { x, y, 2, 2 };
-            case StructureInfo::Type::BARRACKS:          return { x, y, 2, 2 };
-			case StructureInfo::Type::STARPORT:          return { x, y, 3, 3 };
-			case StructureInfo::Type::REFINERY:          return { x, y, 3, 2 };
-			case StructureInfo::Type::REPAIR:            return { x, y, 3, 2 };
-            case StructureInfo::Type::WALL:              return { x, y, 1, 1 };
-            case StructureInfo::Type::TURRET:            return { x, y, 1, 1 };
-            case StructureInfo::Type::ROCKET_TURRET:     return { x, y, 1, 1 };
-            case StructureInfo::Type::SILO:              return { x, y, 2, 2 };
-            case StructureInfo::Type::OUTPOST:           return { x, y, 2, 2 };
+            case StructureInfo::Type::SLAB_1x1:          return { 1, 1 };
+			case StructureInfo::Type::PALACE:            return { 3, 3 };
+			case StructureInfo::Type::VEHICLE:           return { 3, 2 };
+			case StructureInfo::Type::HIGH_TECH:         return { 2, 2 };
+            case StructureInfo::Type::CONSTRUCTION_YARD: return { 2, 2 };
+			case StructureInfo::Type::WIND_TRAP:         return { 2, 2 };
+            case StructureInfo::Type::BARRACKS:          return { 2, 2 };
+			case StructureInfo::Type::STARPORT:          return { 3, 3 };
+			case StructureInfo::Type::REFINERY:          return { 3, 2 };
+			case StructureInfo::Type::REPAIR:            return { 3, 2 };
+            case StructureInfo::Type::WALL:              return { 1, 1 };
+            case StructureInfo::Type::TURRET:            return { 1, 1 };
+            case StructureInfo::Type::ROCKET_TURRET:     return { 1, 1 };
+            case StructureInfo::Type::SILO:              return { 2, 2 };
+            case StructureInfo::Type::OUTPOST:           return { 2, 2 };
 
-            default: return { 0, 0, 0, 0 };
+            default: return { 0, 0 };
 		}
 	};
 
@@ -452,7 +453,8 @@ void TileMap::loadStructures(const Tileset& tileset, std::span<const int> tileId
 
 				object.name = get_structure_name(type); 
 				object.type = "Structure";
-				object.bounds = get_structure_tile_bounds(type, x, y);
+				object.coords = { x, y };
+				object.size = get_structure_tile_bounds(type);
 			}
 		}
 	}

@@ -7,6 +7,7 @@
 #include "resources/gl_interfaces/texture/Texture.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "graphics/geometry/GeometryGenerator.hpp"
+#include "game/scenes/mission/builder/Builder.hpp"
 #include "game/Engine.hpp"
 #include "game/scenes/mission/menu/ConstructionMenu.hpp"
 
@@ -26,17 +27,13 @@ namespace
 }
 
 
-ConstructionMenu::ConstructionMenu(const Engine* engine) noexcept:
+ConstructionMenu::ConstructionMenu(const Engine* engine, Builder& builder) noexcept:
+    m_engine(engine),
+    m_builder(builder),
     m_transform(),
     m_isShown(false)
 {
-    memset(&m_frame, 0, sizeof(m_frame));
-    memset(&m_previews, 0, sizeof(m_previews));
 
-    m_frame.program    = engine->getShaderProgram("color_outline");
-    m_previews.program = engine->getShaderProgram("sprite");
-
-    m_transform.setOrigin(DEFAULT_MENU_WIDTH * 0.5f, DEFAULT_MENU_HEIGHT * 0.5f);
 }
 
 
@@ -53,8 +50,15 @@ ConstructionMenu::~ConstructionMenu()
 
 void ConstructionMenu::init() noexcept
 {
+    memset(&m_frame, 0, sizeof(m_frame));
+    memset(&m_previews, 0, sizeof(m_previews));
+
+    m_frame.program = m_engine->getShaderProgram("color_outline");
+    m_previews.program = m_engine->getShaderProgram("sprite");
     assert(m_frame.program != 0);
     assert(m_previews.program != 0);
+
+    m_transform.setOrigin(DEFAULT_MENU_WIDTH * 0.5f, DEFAULT_MENU_HEIGHT * 0.5f);
 
     createFrame();
     createPreviews();
@@ -92,8 +96,7 @@ void ConstructionMenu::showEntityMenu(Preview preview) noexcept
         vertices[3].z = texCoords[3].x;
         vertices[3].w = texCoords[3].y;
 
-        if(glUnmapBuffer(GL_ARRAY_BUFFER) == GL_TRUE)
-            m_isShown = true;
+        m_isShown = (glUnmapBuffer(GL_ARRAY_BUFFER) == GL_TRUE);
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -246,7 +249,7 @@ void ConstructionMenu::createPreviews() noexcept
     }
     
 //  Main preview
-    vertices.push_back({ 590.f, 70.f,  texCoords[0].x, texCoords[0].y});
+    vertices.push_back({ 590.f, 70.f,  texCoords[0].x, texCoords[0].y });
     vertices.push_back({ 870.f, 70.f,  texCoords[1].x, texCoords[1].y });
     vertices.push_back({ 870.f, 230.f, texCoords[2].x, texCoords[2].y });
     vertices.push_back({ 590.f, 230.f, texCoords[3].x, texCoords[3].y });

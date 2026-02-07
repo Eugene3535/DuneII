@@ -24,7 +24,8 @@ public:
 
 		std::string           name;
 		std::string           type;
-		ivec4s                bounds;
+		ivec2s                coords; // presented in tiles
+		ivec2s                size;   // measured in tiles
 		std::vector<Property> properties;
 	};
 
