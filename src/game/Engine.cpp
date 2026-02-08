@@ -134,6 +134,12 @@ const vec2s& Engine::getCursorPosition() const noexcept
 }
 
 
+const GameInfo* Engine::getInfo() const noexcept
+{
+    return &m_gameInfo;
+}
+
+
 const ivec2s& Engine::getWindowsSize() const noexcept
 {
     return m_windowSize;

@@ -2,6 +2,7 @@
 #include <cglm/struct/ivec2.h>
 #include <cglm/call/aabb2d.h>
 
+#include "game/Engine.hpp"
 #include "game/scenes/mission/tilemap/TileMap.hpp"
 #include "game/scenes/mission/builder/Builder.hpp"
 
@@ -27,16 +28,17 @@ enum class WallCellType : uint32_t
 };
 
 
-static WallCellType compute_wall_type(bool left, bool top, bool right, bool bottom)                     noexcept;
-static vec4s        get_texcoords_of_custom_wall(const WallCellType type, ivec2s textureSize)           noexcept;
+static WallCellType compute_wall_type(bool left, bool top, bool right, bool bottom)                         noexcept;
+static vec4s        get_texcoords_of_custom_wall(const WallCellType type, ivec2s textureSize)               noexcept;
 static vec4s        get_texcoords_of_structure(const StructureInfo::Type type, float width, float height)   noexcept;
 static ivec4s       get_bounds_of(const StructureInfo::Type type, const ivec2s cell, const ivec2s tileSize) noexcept; // cell value must be presented in tiles, not pixels
 static int32_t      get_armor_of(const StructureInfo::Type type)                                            noexcept;
 
 
-Builder::Builder(entt::registry& registry, std::string& tileMask) noexcept:
+Builder::Builder(entt::registry& registry, std::string& tileMask, const Engine* engine) noexcept:
     m_registry(registry),
 	m_tileMask(tileMask),
+	m_engine(engine),
 	m_vertexBuffer(0),
 	m_mappedStorage(nullptr),
 	m_textureSize(glms_ivec2_zero()),
@@ -129,9 +131,9 @@ bool Builder::loadFromTileMap(const TileMap& tilemap, const uint32_t texture) no
 		return base;
 	};
 
-	auto harkonnenBase = get_aabb_of_base(HouseType::HARKONNEN);		
-	auto ordosBase     = get_aabb_of_base(HouseType::ORDOS);
-	auto atreidesBase  = get_aabb_of_base(HouseType::ATREIDES);
+	auto harkonnenBase = get_aabb_of_base(HouseType::Harkonnen);		
+	auto ordosBase     = get_aabb_of_base(HouseType::Ordos);
+	auto atreidesBase  = get_aabb_of_base(HouseType::Atreides);
 	// ... and other houses
 
 	for(const auto& object : objects)
@@ -147,15 +149,15 @@ bool Builder::loadFromTileMap(const TileMap& tilemap, const uint32_t texture) no
 
 			if(harkonnenBase.exists && glmc_aabb2d_aabb(harkonnenBase.aabb, objectAABB))
 			{
-				owner = HouseType::HARKONNEN;
+				owner = HouseType::Harkonnen;
 			}
 			else if(ordosBase.exists && glmc_aabb2d_aabb(ordosBase.aabb, objectAABB))
 			{
-				owner = HouseType::ORDOS;
+				owner = HouseType::Ordos;
 			}
 			else if(atreidesBase.exists && glmc_aabb2d_aabb(atreidesBase.aabb, objectAABB))
 			{
-				owner = HouseType::ATREIDES;
+				owner = HouseType::Atreides;
 			}
 
 			if(owner != HouseType::INVALID)
@@ -239,7 +241,22 @@ bool Builder::putStructureOnMap(const HouseType owner, const StructureInfo::Type
 	structure.type = type;
 	structure.armor = structure.maxArmor = get_armor_of(type);
 	createGraphicsForEntity(entity);
+
+	const bool hasConstructionPreviews = ((type == StructureInfo::Type::VEHICLE)           ||
+									      (type == StructureInfo::Type::HIGH_TECH)         || 
+									      (type == StructureInfo::Type::CONSTRUCTION_YARD) || 
+									      (type == StructureInfo::Type::BARRACKS)          ||
+										  (type == StructureInfo::Type::STARPORT));
 	
+	if(hasConstructionPreviews)
+	{
+		const GameInfo* info = m_engine->getInfo();
+		auto previews = info->getPreviewIconList(owner, type, 8);
+
+		if(!previews.empty())
+			m_registry.emplace<std::vector<PreviewType>>(entity, previews);
+	}
+
 	auto setup_tiles_on_mask = [this, origin, entity](int32_t width, int32_t height, char symbol = 'B') -> void
 	{
 		int32_t offset = origin;

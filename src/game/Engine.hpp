@@ -10,6 +10,7 @@
 #include "resources/gl_interfaces/shaders/ShaderProgram.hpp"
 #include "graphics/camera/OrthogonalCamera.hpp"
 #include "game/scenes/Scene.hpp"
+#include "common/info/GameInfo.hpp"
 
 
 class Engine final
@@ -28,6 +29,8 @@ public:
     const ivec2s& getWindowsSize()                          const noexcept;
     const vec2s&  getCursorPosition()                       const noexcept;
 
+    const GameInfo* getInfo() const noexcept;
+
     OrthogonalCamera camera;
     
 private:
@@ -40,15 +43,17 @@ private:
     std::shared_ptr<T> load(std::string_view info) noexcept;
 
     struct GLFWwindow* m_window;
-    ivec2s m_windowSize;
-    vec2s m_cursorPosition;
+    ivec2s             m_windowSize;
+    vec2s              m_cursorPosition;
 
     std::unordered_map<Scene::Type, std::shared_ptr<Scene>> m_scenes;
-    std::shared_ptr<Scene> m_currentScene;
-    Scene::Type m_nextSceneType;
-    bool m_isSceneNeedToBeChanged;
+    std::shared_ptr<Scene>                                  m_currentScene;
+    Scene::Type                                             m_nextSceneType;
+    bool                                                    m_isSceneNeedToBeChanged;
 
     mutable std::unordered_map<std::string, ShaderProgram> m_shaderPrograms;
+
+    GameInfo m_gameInfo;
 };
 
 #include "game/Engine.inl"

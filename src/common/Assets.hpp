@@ -1,5 +1,5 @@
-#ifndef ASSETS_HPP
-#define ASSETS_HPP
+#ifndef DEFINES_HPP
+#define DEFINES_HPP
 
 
 // Images
@@ -46,5 +46,4 @@
 #define FINALE_FLAC          "19-Finale.flac"
 #define CREDIT_ROLL_FLAC     "20-Credit-Roll.flac"
 
-
-#endif // !ASSETS_HPP
+#endif // !DEFINES_HPP

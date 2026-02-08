@@ -12,8 +12,8 @@
 #include "game/scenes/mission/menu/ConstructionMenu.hpp"
 
 
-#define PREVIEW_CELL_COLUMNS 3
-#define PREVIEW_CELL_ROWS 5
+#define PREVIEW_ICON_COLUMNS 3
+#define PREVIEW_ICON_ROWS 6
 
 #define DEFAULT_MENU_WIDTH  920.f
 #define DEFAULT_MENU_HEIGHT 800.f
@@ -65,36 +65,107 @@ void ConstructionMenu::init() noexcept
 }
 
 
-void ConstructionMenu::showEntityInfo(Preview preview) noexcept
+void ConstructionMenu::showEntityInfo(PreviewType preview) noexcept
 {
     // side info bar
 }
 
 
-void ConstructionMenu::showEntityMenu(Preview preview) noexcept
+void ConstructionMenu::showEntityMenu(PreviewType mainPreview, std::span<PreviewType> menu) noexcept
 {
-    if(preview > ConstructionMenu::Tank)
+    if(mainPreview >= PreviewType::MAX)
         return;
 
     glBindBuffer(GL_ARRAY_BUFFER, m_previews.vbo);
 
     if(void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
     {
-        const vec2s* texCoords = &m_textureGrid[preview << 2];
-        constexpr uint32_t offset = PREVIEW_CELL_COLUMNS * PREVIEW_CELL_ROWS << 2;
-        vec4s* vertices = static_cast<vec4s*>(data) + offset;
+        {// Main preview
+            const size_t index = static_cast<size_t>(mainPreview) << 2;
+            const vec2s* texCoords = &m_textureGrid[index];
+            constexpr uint32_t offset = PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS << 2;
+            vec4s* vertices = static_cast<vec4s*>(data) + offset;
 
-        vertices[0].z = texCoords[0].x;
-        vertices[0].w = texCoords[0].y;
+            vertices[0].z = texCoords[0].x;
+            vertices[0].w = texCoords[0].y;
 
-        vertices[1].z = texCoords[1].x;
-        vertices[1].w = texCoords[1].y;
+            vertices[1].z = texCoords[1].x;
+            vertices[1].w = texCoords[1].y;
 
-        vertices[2].z = texCoords[2].x;
-        vertices[2].w = texCoords[2].y;
+            vertices[2].z = texCoords[2].x;
+            vertices[2].w = texCoords[2].y;
 
-        vertices[3].z = texCoords[3].x;
-        vertices[3].w = texCoords[3].y;
+            vertices[3].z = texCoords[3].x;
+            vertices[3].w = texCoords[3].y;
+        }
+
+        // Others previews (if exists)
+        if(!menu.empty())
+        {
+            for (size_t i = 0; i < PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS; ++i)
+            {
+                if(i < menu.size())
+                {
+                    const size_t index     = static_cast<size_t>(menu[i]) << 2;
+                    const vec2s* texCoords = &m_textureGrid[index];
+                    const uint32_t offset  = i << 2;
+                    vec4s* vertices        = static_cast<vec4s*>(data) + offset;
+
+                    vertices[0].z = texCoords[0].x;
+                    vertices[0].w = texCoords[0].y;
+
+                    vertices[1].z = texCoords[1].x;
+                    vertices[1].w = texCoords[1].y;
+
+                    vertices[2].z = texCoords[2].x;
+                    vertices[2].w = texCoords[2].y;
+
+                    vertices[3].z = texCoords[3].x;
+                    vertices[3].w = texCoords[3].y;
+                }
+                else
+                {
+                    const size_t index     = static_cast<size_t>(PreviewType::Empty_Cell) << 2;
+                    const vec2s* texCoords = &m_textureGrid[index];
+                    const uint32_t offset  = i << 2;
+                    vec4s* vertices        = static_cast<vec4s*>(data) + offset;
+
+                    vertices[0].z = texCoords[0].x;
+                    vertices[0].w = texCoords[0].y;
+
+                    vertices[1].z = texCoords[1].x;
+                    vertices[1].w = texCoords[1].y;
+
+                    vertices[2].z = texCoords[2].x;
+                    vertices[2].w = texCoords[2].y;
+
+                    vertices[3].z = texCoords[3].x;
+                    vertices[3].w = texCoords[3].y;
+                }
+            }
+        }
+        else
+        {
+            for (size_t i = 0; i < PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS; ++i)
+            {
+                const size_t index     = static_cast<size_t>(PreviewType::Empty_Cell) << 2;
+                const vec2s* texCoords = &m_textureGrid[index];
+                const uint32_t offset  = i << 2;
+                vec4s* vertices        = static_cast<vec4s*>(data) + offset;
+
+                vertices[0].z = texCoords[0].x;
+                vertices[0].w = texCoords[0].y;
+
+                vertices[1].z = texCoords[1].x;
+                vertices[1].w = texCoords[1].y;
+
+                vertices[2].z = texCoords[2].x;
+                vertices[2].w = texCoords[2].y;
+
+                vertices[3].z = texCoords[3].x;
+                vertices[3].w = texCoords[3].y;
+            }
+        }
 
         m_isShown = (glUnmapBuffer(GL_ARRAY_BUFFER) == GL_TRUE);
     }
@@ -204,7 +275,7 @@ void ConstructionMenu::createPreviews() noexcept
     const int32_t spriteHeight = previewsTexture.height / rows;
     const vec2s ratio = { 1.f / previewsTexture.width, 1.f / previewsTexture.height };
 
-    m_textureGrid.reserve((PREVIEW_CELL_COLUMNS * PREVIEW_CELL_ROWS) << 2);
+    m_textureGrid.reserve((PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS) << 2);
 
     for (int32_t y = 0; y < rows; ++y)
     {
@@ -225,16 +296,18 @@ void ConstructionMenu::createPreviews() noexcept
     }
 
     std::vector<vec4s> vertices;
-    vertices.reserve((PREVIEW_CELL_COLUMNS * PREVIEW_CELL_ROWS + 1) << 2); // +1 for major preview in the right-top corner
+    vertices.reserve((PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS + 1) << 2); // +1 for major preview in the right-top corner
 
     const vec2s cellSize = { 150.f, 100.f };
     const vec2s startPos = { 50.f, 50.f };
     const float indent = 10.f;
-    const vec2s* texCoords = &m_textureGrid[Empty_Cell << 2]; // offset to gray color cell (empty preview)
 
-    for (int32_t y = 0; y < PREVIEW_CELL_ROWS; ++y)
+    const size_t index = static_cast<size_t>(PreviewType::Empty_Cell) << 2;
+    const vec2s* texCoords = &m_textureGrid[index]; // offset to gray color cell (empty preview)
+
+    for (int32_t y = 0; y < PREVIEW_ICON_ROWS; ++y)
     {
-        for (int32_t x = 0; x < PREVIEW_CELL_COLUMNS; ++x)
+        for (int32_t x = 0; x < PREVIEW_ICON_COLUMNS; ++x)
         {
             const float left   = startPos.x + cellSize.x * x + indent * x;
             const float top    = startPos.y + cellSize.y * y + indent * y;

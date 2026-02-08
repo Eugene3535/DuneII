@@ -17,7 +17,7 @@
 
 Mission::Mission(Engine* engine) noexcept:
     Scene(engine, Scene::MISSION),
-    m_builder(m_registry, m_tileMask),
+    m_builder(m_registry, m_tileMask, engine),
     m_hud(engine, m_transform, m_builder)
 {
     memset(&m_landscape, 0, sizeof(mesh::Landscape)); 

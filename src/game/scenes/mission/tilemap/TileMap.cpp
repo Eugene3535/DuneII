@@ -1,7 +1,6 @@
 #include <array>
 #include <cstring>
 #include <algorithm>
-#include <charconv>
 
 #include "RapidXML/rapidxml.hpp"
 #include "RapidXML/rapidxml_utils.hpp"
@@ -154,10 +153,10 @@ bool TileMap::loadLayers(const void* rootNode) noexcept
 			auto firstGID  = tilesetNode->first_attribute("firstgid");
 
 			Tileset& tileset  = tilesets[index];
-			std::from_chars(tileCount->value(), tileCount->value() + tileCount->value_size(), tileset.tileCount);
-			std::from_chars(columns->value(), columns->value() + columns->value_size(), tileset.columns);
-			std::from_chars(firstGID->value(), firstGID->value() + firstGID->value_size(), tileset.firstGID);
-			tileset.rows  = (tileset.tileCount > 0) ? tileset.tileCount / tileset.columns : 0;
+			tileset.tileCount = (tileCount != nullptr) ? atoi(tileCount->value()) : 0;
+			tileset.columns   = (columns != nullptr) ? atoi(columns->value()) : 0;
+			tileset.firstGID  = (firstGID != nullptr) ? atoi(firstGID->value()) : 0;
+			tileset.rows      = (tileset.tileCount > 0) ? tileset.tileCount / tileset.columns : 0;
 
 			++index;
 		}
@@ -176,39 +175,17 @@ bool TileMap::loadLayers(const void* rootNode) noexcept
 			continue;
 
 		std::string csv(dataNode->value(), dataNode->value_size());
-		std::vector<int> tileIDs = std::move([] (const std::string& csvStr) -> std::vector<int>
-		{
-			const size_t tileCount = std::count_if(csvStr.begin(), csvStr.end(), 
-				[](const char c) { return c == ','; });
+		std::string token;
+		std::istringstream iss(csv);
+		std::vector<int> tileIDs;
 
-			std::vector<int> result(tileCount + 1);
-			const char* begin = csvStr.data();
-			const char* end = begin + csvStr.size();
-			size_t tile = 0;
-			
-			while (begin < end) 
-			{	
-				while(!isdigit(*begin)) ++begin;
+		const size_t tileCount = std::count_if(csv.begin(), csv.end(),
+			[](const char c) { return c == ','; });
 
-				if(begin >= end)
-					break;
+		tileIDs.reserve(tileCount + 1);
 
-				const char* comma = begin;
-
-				while ((*comma) && (*comma != ',')) ++comma;
-				
-				int value;
-				auto [next, ec] = std::from_chars(begin, comma, value);
-				
-				if (ec == std::errc()) 
-				{
-					result[tile++] = value;
-					begin = next;
-				}
-			}
-			
-			return result;
-		}(csv));
+		while (std::getline(iss, token, ','))
+			tileIDs.push_back(std::stoi(token));
 
 		const auto minMaxElems = std::minmax_element(tileIDs.begin(), tileIDs.end());
 		const int minTile = *minMaxElems.first;
@@ -253,12 +230,12 @@ bool TileMap::loadObjects(const void* rootNode) noexcept
 
 			for (auto attribute = objectNode->first_attribute(); attribute != nullptr; attribute = attribute->next_attribute())
 			{
-				if (strcmp(attribute->name(), "x")      == 0) { std::from_chars(attribute->value(), attribute->value() + attribute->value_size(), object.coords.x); }
-				if (strcmp(attribute->name(), "y")      == 0) { std::from_chars(attribute->value(), attribute->value() + attribute->value_size(), object.coords.y); }
-				if (strcmp(attribute->name(), "width")  == 0) { std::from_chars(attribute->value(), attribute->value() + attribute->value_size(), object.size.x);   }
-				if (strcmp(attribute->name(), "height") == 0) { std::from_chars(attribute->value(), attribute->value() + attribute->value_size(), object.size.y);   }
-				if (strcmp(attribute->name(), "name")   == 0) object.name = { attribute->value(), attribute->value_size() };
-				if (strcmp(attribute->name(), "class")  == 0) object.type = { attribute->value(), attribute->value_size() };
+				if (strcmp(attribute->name(), "x") == 0)      { object.coords.x = atoi(attribute->value()); continue; }
+				if (strcmp(attribute->name(), "y") == 0)      { object.coords.y = atoi(attribute->value()); continue; }
+				if (strcmp(attribute->name(), "width") == 0)  { object.size.x   = atoi(attribute->value()); continue; }
+				if (strcmp(attribute->name(), "height") == 0) { object.size.y   = atoi(attribute->value()); continue; }
+				if (strcmp(attribute->name(), "name")   == 0)   object.name     = { attribute->value(), attribute->value_size() };
+				if (strcmp(attribute->name(), "class")  == 0)   object.type     = { attribute->value(), attribute->value_size() };
 			}
 
 			if (const auto propertiesNode = objectNode->first_node("properties"); propertiesNode != nullptr)

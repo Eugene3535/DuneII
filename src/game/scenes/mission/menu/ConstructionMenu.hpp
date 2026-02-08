@@ -2,58 +2,15 @@
 #define CONSTRUCTION_MENU_HPP
 
 #include <vector>
+#include <span>
 
+#include "common/Enums.hpp"
 #include "graphics/transform/Transform2D.hpp"
+
 
 class ConstructionMenu
 {
 public:
-    enum Preview : uint32_t
-    {
-        WOR = 0,
-        Wind_Trap,
-        Wall,
-        Death_Hand,
-        Quad,
-        Harvester,
-        Light_Vehicle_Factory,
-        Starport,
-        Turret,
-        Slab_2x2,
-        Raider_Trike,
-        MCV,
-        House_of_IX,
-        Spice_Silo,
-        Rocket_Turret,
-        Construction_Yard,
-        Launcher,
-        Carryall,
-        High_Tech,
-        Repair,
-        Refinery,
-        Barracks,
-        Siege_Tank,
-        Starport_Intro,
-        Heavy_Vehicle_Factory,
-        Palace,
-        Outpost,
-        Fremen,
-        Sonic_Tank,
-        Devastator,
-        Saboteur,
-        Sandworm,
-        Trooper,
-        Troopers,
-        Trike,
-        Deviator,
-        Ornithopter,
-        Infantry,
-        Tank,
-        Empty_Cell,
-        MAX,
-        INVALID = 0xFF
-    };
-
     ConstructionMenu(const class Engine* engine, class Builder& builder) noexcept;
     ConstructionMenu(const ConstructionMenu&)              noexcept = delete;
 	ConstructionMenu(ConstructionMenu&&)                   noexcept = delete;
@@ -61,12 +18,12 @@ public:
 	ConstructionMenu& operator = (ConstructionMenu&&)      noexcept = delete;
     ~ConstructionMenu();
 
-    void init()                          noexcept;
-    void showEntityInfo(Preview preview) noexcept;
-    void showEntityMenu(Preview preview) noexcept;
-    void hide()                          noexcept;
-    void draw()                    const noexcept;
-    void resize(int width, int height)   noexcept;
+    void init()                              noexcept;
+    void showEntityInfo(PreviewType preview) noexcept;
+    void showEntityMenu(PreviewType mainPreview, std::span<PreviewType> menu) noexcept;
+    void hide()                              noexcept;
+    void draw()                        const noexcept;
+    void resize(int width, int height)       noexcept;
 
     bool isShown() const noexcept;
     const Transform2D& getTransform() const noexcept;
@@ -78,8 +35,8 @@ private:
     void drawPreviews()   const noexcept;
 
     const class Engine* m_engine;
-    class Builder& m_builder;
-    Transform2D m_transform;
+    class Builder&      m_builder;
+    Transform2D         m_transform;
 
     struct Widget
     {

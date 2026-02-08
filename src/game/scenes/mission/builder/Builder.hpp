@@ -9,7 +9,7 @@
 class Builder
 {
 public:
-    Builder(entt::registry& registry, std::string& tileMask) noexcept;
+    Builder(entt::registry& registry, std::string& tileMask, const class Engine* engine) noexcept;
     ~Builder();
 
     bool loadFromTileMap(const class TileMap& tilemap, const uint32_t texture) noexcept;
@@ -26,6 +26,7 @@ private:
 
     entt::registry&           m_registry;
     std::string&              m_tileMask;
+    const class Engine*       m_engine;
     std::vector<entt::entity> m_structureMask;
 
     uint32_t m_vertexBuffer;

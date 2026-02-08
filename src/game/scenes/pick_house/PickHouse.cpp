@@ -25,7 +25,7 @@ PickHouse::PickHouse(Engine* engine) noexcept:
     Scene(engine, Scene::PICK_HOUSE),
     m_vertexBufferObject(0),
     m_vertexArrayObjects{0, 0},
-    m_selectedHouse(HouseType::ATREIDES),
+    m_selectedHouse(HouseType::Atreides),
     m_timer(0.f),
     m_outlineNeedUpdate(true)
 {
@@ -168,22 +168,22 @@ void PickHouse::update(float dt) noexcept
 
         switch (m_selectedHouse)
         {
-            case HouseType::ATREIDES:
+            case HouseType::Atreides:
                 if (m_engine->isKeyPressed(GLFW_KEY_RIGHT))
-                    m_selectedHouse = HouseType::ORDOS;
+                    m_selectedHouse = HouseType::Ordos;
                 break;
 
-            case HouseType::ORDOS:
+            case HouseType::Ordos:
                 if (m_engine->isKeyPressed(GLFW_KEY_LEFT))
-                    m_selectedHouse = HouseType::ATREIDES;
+                    m_selectedHouse = HouseType::Atreides;
 
                 if (m_engine->isKeyPressed(GLFW_KEY_RIGHT))
-                    m_selectedHouse = HouseType::HARKONNEN;
+                    m_selectedHouse = HouseType::Harkonnen;
                 break;
 
-            case HouseType::HARKONNEN:
+            case HouseType::Harkonnen:
                 if (m_engine->isKeyPressed(GLFW_KEY_LEFT))
-                    m_selectedHouse = HouseType::ORDOS;
+                    m_selectedHouse = HouseType::Ordos;
                 break;
 
             default:
@@ -205,15 +205,15 @@ void PickHouse::update(float dt) noexcept
 
         switch (m_selectedHouse)
         {
-            case HouseType::ATREIDES:
+            case HouseType::Atreides:
                 outlinePositionX = ATREIDES_OUTLINE_POSITION_X * dx;
             break;
 
-            case HouseType::ORDOS:
+            case HouseType::Ordos:
                 outlinePositionX = ORDOS_OUTLINE_POSITION_X * dx;
             break;
 
-            case HouseType::HARKONNEN:
+            case HouseType::Harkonnen:
                 outlinePositionX = HARKONNEN_OUTLINE_POSITION_X * dx;
             break;
             
@@ -272,15 +272,15 @@ void PickHouse::resize(int width, int height) noexcept
 
     switch (m_selectedHouse)
     {
-        case HouseType::ATREIDES:
+        case HouseType::Atreides:
             outlinePositionX = ATREIDES_OUTLINE_POSITION_X * dx;
         break;
 
-        case HouseType::ORDOS:
+        case HouseType::Ordos:
             outlinePositionX = ORDOS_OUTLINE_POSITION_X * dx;
         break;
 
-        case HouseType::HARKONNEN:
+        case HouseType::Harkonnen:
             outlinePositionX = HARKONNEN_OUTLINE_POSITION_X * dx;
         break;
         

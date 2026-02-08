@@ -55,6 +55,7 @@ set(SCENE_HDR_FILES
 # Common
 set(DUNEII_SRC_FILES
 	src/common/ExternalMath.cpp
+	src/common/info/GameInfo.cpp
 	src/graphics/transform/Transform2D.cpp
 	src/graphics/camera/OrthogonalCamera.cpp
 	src/graphics/sprites/SpriteManager.cpp
@@ -71,6 +72,7 @@ set(DUNEII_HDR_FILES
 	src/common/Assets.hpp
 	src/common/Enums.hpp
 	src/common/ExternalMath.hpp
+	src/common/info/GameInfo.hpp
 	src/graphics/Meshes.hpp
 	src/graphics/transform/Transform2D.hpp
 	src/graphics/camera/OrthogonalCamera.hpp
