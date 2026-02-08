@@ -78,92 +78,52 @@ void ConstructionMenu::showEntityMenu(PreviewType mainPreview, std::span<Preview
 
     glBindBuffer(GL_ARRAY_BUFFER, m_previews.vbo);
 
+    auto setup_tex_coords = [this](void* data, PreviewType preview, uint32_t offset) -> void
+    {
+        const size_t index = static_cast<size_t>(preview) << 2;
+        const vec2s* texCoords = &m_textureGrid[index];
+        vec4s* vertices = static_cast<vec4s*>(data) + offset;
+
+        vertices[0].z = texCoords[0].x;
+        vertices[0].w = texCoords[0].y;
+
+        vertices[1].z = texCoords[1].x;
+        vertices[1].w = texCoords[1].y;
+
+        vertices[2].z = texCoords[2].x;
+        vertices[2].w = texCoords[2].y;
+
+        vertices[3].z = texCoords[3].x;
+        vertices[3].w = texCoords[3].y;
+    };
+
+    constexpr size_t previewCount = PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS;
+
     if(void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
     {
-        {// Main preview
-            const size_t index = static_cast<size_t>(mainPreview) << 2;
-            const vec2s* texCoords = &m_textureGrid[index];
-            constexpr uint32_t offset = PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS << 2;
-            vec4s* vertices = static_cast<vec4s*>(data) + offset;
-
-            vertices[0].z = texCoords[0].x;
-            vertices[0].w = texCoords[0].y;
-
-            vertices[1].z = texCoords[1].x;
-            vertices[1].w = texCoords[1].y;
-
-            vertices[2].z = texCoords[2].x;
-            vertices[2].w = texCoords[2].y;
-
-            vertices[3].z = texCoords[3].x;
-            vertices[3].w = texCoords[3].y;
-        }
+        // Main preview
+        setup_tex_coords(data, mainPreview, (previewCount << 2));
 
         // Others previews (if exists)
         if(!menu.empty())
         {
-            for (size_t i = 0; i < PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS; ++i)
+            for (size_t i = 0; i < previewCount; ++i)
             {
                 if(i < menu.size())
                 {
-                    const size_t index     = static_cast<size_t>(menu[i]) << 2;
-                    const vec2s* texCoords = &m_textureGrid[index];
-                    const uint32_t offset  = i << 2;
-                    vec4s* vertices        = static_cast<vec4s*>(data) + offset;
-
-                    vertices[0].z = texCoords[0].x;
-                    vertices[0].w = texCoords[0].y;
-
-                    vertices[1].z = texCoords[1].x;
-                    vertices[1].w = texCoords[1].y;
-
-                    vertices[2].z = texCoords[2].x;
-                    vertices[2].w = texCoords[2].y;
-
-                    vertices[3].z = texCoords[3].x;
-                    vertices[3].w = texCoords[3].y;
+                    setup_tex_coords(data, menu[i], (i << 2));
                 }
                 else
                 {
-                    const size_t index     = static_cast<size_t>(PreviewType::Empty_Cell) << 2;
-                    const vec2s* texCoords = &m_textureGrid[index];
-                    const uint32_t offset  = i << 2;
-                    vec4s* vertices        = static_cast<vec4s*>(data) + offset;
-
-                    vertices[0].z = texCoords[0].x;
-                    vertices[0].w = texCoords[0].y;
-
-                    vertices[1].z = texCoords[1].x;
-                    vertices[1].w = texCoords[1].y;
-
-                    vertices[2].z = texCoords[2].x;
-                    vertices[2].w = texCoords[2].y;
-
-                    vertices[3].z = texCoords[3].x;
-                    vertices[3].w = texCoords[3].y;
+                    setup_tex_coords(data, PreviewType::Empty_Cell, (i << 2));
                 }
             }
         }
         else
         {
-            for (size_t i = 0; i < PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS; ++i)
+            for (size_t i = 0; i < previewCount; ++i)
             {
-                const size_t index     = static_cast<size_t>(PreviewType::Empty_Cell) << 2;
-                const vec2s* texCoords = &m_textureGrid[index];
-                const uint32_t offset  = i << 2;
-                vec4s* vertices        = static_cast<vec4s*>(data) + offset;
-
-                vertices[0].z = texCoords[0].x;
-                vertices[0].w = texCoords[0].y;
-
-                vertices[1].z = texCoords[1].x;
-                vertices[1].w = texCoords[1].y;
-
-                vertices[2].z = texCoords[2].x;
-                vertices[2].w = texCoords[2].y;
-
-                vertices[3].z = texCoords[3].x;
-                vertices[3].w = texCoords[3].y;
+               setup_tex_coords(data, PreviewType::Empty_Cell, (i << 2));
             }
         }
 
