@@ -76,8 +76,6 @@ void ConstructionMenu::showEntityMenu(PreviewType mainPreview, std::span<Preview
     if(mainPreview >= PreviewType::MAX)
         return;
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_previews.vbo);
-
     auto setup_tex_coords = [this](void* data, PreviewType preview, uint32_t offset) -> void
     {
         const size_t index = static_cast<size_t>(preview) << 2;
@@ -98,6 +96,8 @@ void ConstructionMenu::showEntityMenu(PreviewType mainPreview, std::span<Preview
     };
 
     constexpr size_t previewCount = PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS;
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_previews.vbo);
 
     if(void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
     {

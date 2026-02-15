@@ -1,7 +1,11 @@
 #include <array>
+#include <unordered_set>
+#include <cassert>
 
 #include "common/info/GameInfo.hpp"
 
+
+// All available entities are:
 
 // PreviewType::WOR,
 // PreviewType::Wind_Trap,
@@ -41,8 +45,7 @@
 // PreviewType::Deviator,
 // PreviewType::Ornithopter,
 // PreviewType::Infantry,
-// PreviewType::Tank,
-// PreviewType::Empty_Cell
+// PreviewType::Tank
 
 
 static constexpr std::array<PreviewType, 14> get_construction_yard_previews() noexcept
@@ -130,6 +133,9 @@ std::vector<PreviewType> GameInfo::getPreviewIconList(HouseType house, Structure
 {
     std::vector<PreviewType> previews;
 
+	assert(mission > 0);
+	assert(mission < 10);
+
 	switch (building)
 	{
 		case StructureInfo::VEHICLE:
@@ -161,5 +167,279 @@ std::vector<PreviewType> GameInfo::getPreviewIconList(HouseType house, Structure
 			break;
 	}
 
-    return previews;
+	std::unordered_set<PreviewType> toRemove; // Filtering available entities by mission, excluding 8 and 9 (all entities are available)
+											  // No research is conducted in missions 8 and 9.
+
+	switch (mission)
+	{
+		case 1:                                                           // MISSION 1
+			switch (building)
+			{
+				case StructureInfo::VEHICLE: toRemove.insert({
+				                                              PreviewType::Wind_Trap,
+				                                              PreviewType::Slab_2x2,
+				                                              PreviewType::Refinery
+						                                    });
+				break;
+
+				case StructureInfo::HIGH_TECH:
+
+				break;
+
+				case StructureInfo::CONSTRUCTION_YARD:
+
+				break;
+
+				case StructureInfo::BARRACKS:
+
+				break;
+
+				case StructureInfo::STARPORT:
+
+				break;
+
+				default:
+					break;
+			}
+		break;
+
+		case 2:                                                           // MISSION 2
+			switch (building)
+			{
+				case StructureInfo::VEHICLE: toRemove.insert({
+				                                              PreviewType::Wind_Trap,
+				                                              PreviewType::Light_Vehicle_Factory,
+				                                              PreviewType::Slab_2x2,
+				                                              PreviewType::Spice_Silo,
+				                                              PreviewType::Refinery,
+				                                              PreviewType::Barracks,
+				                                              PreviewType::Outpost
+						                                    });
+
+				break;
+
+				case StructureInfo::HIGH_TECH:
+
+				break;
+
+				case StructureInfo::CONSTRUCTION_YARD:
+
+				break;
+
+				case StructureInfo::BARRACKS:
+
+				break;
+
+				case StructureInfo::STARPORT:
+
+				break;
+
+				default:
+					break;
+			}
+		break;
+
+		case 3:                                                           // MISSION 3
+			switch (building)
+			{
+				case StructureInfo::VEHICLE: toRemove.insert({
+				                                              PreviewType::Wind_Trap,
+				                                              PreviewType::Light_Vehicle_Factory,
+				                                              PreviewType::Slab_2x2,
+				                                              PreviewType::Spice_Silo,
+				                                              PreviewType::Refinery,
+				                                              PreviewType::Barracks,
+				                                              PreviewType::Outpost
+						                                    });
+
+				break;
+
+				case StructureInfo::HIGH_TECH:
+
+				break;
+
+				case StructureInfo::CONSTRUCTION_YARD:
+
+				break;
+
+				case StructureInfo::BARRACKS:
+
+				break;
+
+				case StructureInfo::STARPORT:
+
+				break;
+
+				default:
+					break;
+			}
+		break;
+
+		case 4:                                                           // MISSION 4
+			switch (building)
+			{
+				case StructureInfo::VEHICLE:  toRemove.insert({
+				                                              PreviewType::Wind_Trap,
+															  PreviewType::Wall,
+				                                              PreviewType::Light_Vehicle_Factory,
+				                                              PreviewType::Slab_2x2,
+				                                              PreviewType::Spice_Silo,
+				                                              PreviewType::Refinery,
+				                                              PreviewType::Barracks,
+				                                              PreviewType::Outpost
+						                                    });
+				break;
+
+				case StructureInfo::HIGH_TECH:
+
+				break;
+
+				case StructureInfo::CONSTRUCTION_YARD:
+
+				break;
+
+				case StructureInfo::BARRACKS:
+
+				break;
+
+				case StructureInfo::STARPORT:
+
+				break;
+
+				default:
+					break;
+			}
+		break;
+
+		case 5:                                                           // MISSION 5
+			switch (building)
+			{
+				case StructureInfo::VEHICLE: toRemove.insert({
+				                                              PreviewType::Wind_Trap,
+				                                              PreviewType::Wall,
+				                                              PreviewType::Light_Vehicle_Factory,
+				                                              PreviewType::Turret,
+				                                              PreviewType::Slab_2x2,
+				                                              PreviewType::Spice_Silo,
+				                                              PreviewType::High_Tech,
+				                                              PreviewType::Repair,
+				                                              PreviewType::Refinery,
+				                                              PreviewType::Barracks,
+				                                              PreviewType::Outpost
+						                                    });
+
+				break;
+
+				case StructureInfo::HIGH_TECH:
+
+				break;
+
+				case StructureInfo::CONSTRUCTION_YARD:
+
+				break;
+
+				case StructureInfo::BARRACKS:
+
+				break;
+
+				case StructureInfo::STARPORT:
+
+				break;
+
+				default:
+					break;
+			}
+		break;
+
+		case 6:                                                           // MISSION 6
+			switch (building)
+			{
+				case StructureInfo::VEHICLE: toRemove.insert({
+				                                              PreviewType::Wind_Trap,
+				                                              PreviewType::Wall,
+				                                              PreviewType::Light_Vehicle_Factory,
+				                                              PreviewType::Turret,
+				                                              PreviewType::Slab_2x2,
+				                                              PreviewType::Spice_Silo,
+				                                              PreviewType::Rocket_Turret,
+				                                              PreviewType::High_Tech,
+				                                              PreviewType::Repair,
+				                                              PreviewType::Refinery,
+				                                              PreviewType::Barracks,
+				                                              PreviewType::Outpost
+						                                    });
+
+				break;
+
+				case StructureInfo::HIGH_TECH:
+
+				break;
+
+				case StructureInfo::CONSTRUCTION_YARD:
+
+				break;
+
+				case StructureInfo::BARRACKS:
+
+				break;
+
+				case StructureInfo::STARPORT:
+
+				break;
+
+				default:
+					break;
+			}
+		break;
+
+		case 7:                                                           // MISSION 7
+			switch (building)
+			{
+				case StructureInfo::VEHICLE: toRemove.insert({
+				                                              PreviewType::Wind_Trap,
+				                                              PreviewType::Wall,
+				                                              PreviewType::Light_Vehicle_Factory,
+				                                              PreviewType::Starport,
+				                                              PreviewType::Turret,
+				                                              PreviewType::Slab_2x2,
+				                                              PreviewType::Spice_Silo,
+				                                              PreviewType::Rocket_Turret,
+				                                              PreviewType::High_Tech,
+				                                              PreviewType::Repair,
+				                                              PreviewType::Refinery,
+				                                              PreviewType::Barracks,
+				                                              PreviewType::Outpost
+						                                    });
+
+				break;
+
+				case StructureInfo::HIGH_TECH:
+
+				break;
+
+				case StructureInfo::CONSTRUCTION_YARD:
+
+				break;
+
+				case StructureInfo::BARRACKS:
+
+				break;
+
+				case StructureInfo::STARPORT:
+
+				break;
+
+				default:
+					break;
+			}
+		break;
+		
+		default:
+			break;
+	}
+
+	previews.erase(std::remove_if(previews.begin(), previews.end(),
+   	    [&toRemove](PreviewType preview) { return toRemove.contains(preview); }), previews.end());
+
+	return previews;
 }
