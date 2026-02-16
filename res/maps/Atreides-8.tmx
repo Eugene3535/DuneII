@@ -213,7 +213,7 @@
  <objectgroup id="3" name="Objects">
   <object id="1" name="Base" x="27" y="31" width="808" height="451">
    <properties>
-    <property name="House" type="int" value="0"/>
+    <property name="House" type="int" value="2"/>
    </properties>
   </object>
   <object id="2" name="Base" x="1595" y="219.5" width="422" height="358">
@@ -223,7 +223,7 @@
   </object>
   <object id="3" name="Base" x="463" y="1243" width="332" height="310">
    <properties>
-    <property name="House" type="int" value="2"/>
+    <property name="House" type="int" value="0"/>
    </properties>
   </object>
  </objectgroup>

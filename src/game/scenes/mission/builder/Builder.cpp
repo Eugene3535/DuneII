@@ -131,9 +131,9 @@ bool Builder::loadFromTileMap(const TileMap& tilemap, const uint32_t texture) no
 		return base;
 	};
 
-	auto harkonnenBase = get_aabb_of_base(HouseType::Harkonnen);		
-	auto ordosBase     = get_aabb_of_base(HouseType::Ordos);
 	auto atreidesBase  = get_aabb_of_base(HouseType::Atreides);
+	auto ordosBase     = get_aabb_of_base(HouseType::Ordos);
+	auto harkonnenBase = get_aabb_of_base(HouseType::Harkonnen);		
 	// ... and other houses
 
 	for(const auto& object : objects)
