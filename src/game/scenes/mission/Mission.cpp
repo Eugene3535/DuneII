@@ -20,23 +20,12 @@ Mission::Mission(Engine* engine) noexcept:
     m_tilemap(m_registry, engine),
     m_hud(engine, m_transform, m_tilemap)
 {
-    memset(&m_landscape, 0, sizeof(mesh::Landscape)); 
-    memset(&m_buildings, 0, sizeof(mesh::Buildings));
-}
 
+}
 
 Mission::~Mission()
 {
-    if (m_isLoaded)
-    {
-        GLuint textures[]            = { m_landscape.texture, m_buildings.texture };
-        GLuint vertexArrayObjects[]  = { m_landscape.vao, m_buildings.vao         };
-        GLuint vertexBufferObjects[] = { m_landscape.vbo[0], m_landscape.vbo[1]   };
 
-        glDeleteTextures(std::size(textures), textures);
-        glDeleteVertexArrays(std::size(vertexArrayObjects), vertexArrayObjects);
-        glDeleteBuffers(std::size(vertexBufferObjects), vertexBufferObjects);
-    }
 }
 
 
@@ -45,49 +34,12 @@ bool Mission::load(std::string_view info) noexcept
     if(m_isLoaded)
         return true;
 
-    if(!initLandscape())
-        return false;
-
     if(!m_hud.init())
         return false;
 
     if(m_mapLoader.loadFromFile(FileProvider::findPathToFile(std::string(info))))
     {
-        auto vertices = m_mapLoader.getVertices();
-        glBindBuffer(GL_ARRAY_BUFFER, m_landscape.vbo[0]);
-        glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertices.size_bytes()), vertices.data(), GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        auto indices = m_mapLoader.getIndices();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_landscape.vbo[1]);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(indices.size_bytes()), indices.data(), GL_STATIC_DRAW);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-        const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
-        VertexArrayObject::createVertexInputState(m_landscape.vao, m_landscape.vbo[0], attributes);
-        
-        glBindVertexArray(m_landscape.vao);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_landscape.vbo[1]);
-        glBindVertexArray(0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-        m_landscape.vao = m_landscape.vao;
-        m_landscape.count = indices.size();
-
-        glGenTextures(1, &m_buildings.texture);
-        glGenVertexArrays(1, &m_buildings.vao);
-
-        VertexArrayObject::createVertexInputState(m_buildings.vao, m_tilemap.getVertexBuffer(), attributes);
-
-        Texture buildingTexture = {.handle = m_buildings.texture };
-
-        if(!buildingTexture.loadFromFile(FileProvider::findPathToFile(STRUCTURES_PNG)))
-            return false;
-
-        auto mapSize  = m_mapLoader.getMapSize();
-        auto tileSize = m_mapLoader.getTileSize();
-
-        if(!m_tilemap.createFromLoader(m_mapLoader, buildingTexture.handle))
+        if(!m_tilemap.createFromLoader(m_mapLoader))
             return false;
     }
 
@@ -115,27 +67,7 @@ void Mission::draw() noexcept
 
     camera.updateUniformBuffer(result.raw);
 
-    {// Landscape
-        glUseProgram(m_landscape.program);
-        glBindTextureUnit(0, m_landscape.texture);
-        glBindVertexArray(m_landscape.vao);
-        glDrawElements(GL_TRIANGLES, m_landscape.count, GL_UNSIGNED_INT, nullptr);
-        glBindTextureUnit(0, 0);
-    }
-
-    {// Structures
-        glBindTextureUnit(0, m_buildings.texture);
-        glBindVertexArray(m_buildings.vao);
-
-        auto view = m_registry.view<const StructureInfo>();
-
-        view.each([](const StructureInfo& building) 
-        {
-            glDrawArrays(GL_TRIANGLE_FAN, building.frame, 4);
-        });
-
-        glBindTextureUnit(0, 0);
-    }
+    m_tilemap.draw();
 
 //  HUD
     if(!m_hud.isMenuShown())
@@ -143,7 +75,10 @@ void Mission::draw() noexcept
         if(m_hud.isSelectionEnabled())
         {
             m_hud.drawSelection();
-            glUseProgram(m_landscape.program);
+
+//  !!! FIX ME NOW
+            auto prog = m_engine->getShaderProgram("tilemap");
+            glUseProgram(prog);
         }
  
         modelView = m_hud.getCursorTransform().getMatrix();
@@ -164,26 +99,6 @@ void Mission::draw() noexcept
 void Mission::resize(int width, int height) noexcept
 {
     m_hud.resize(width, height);
-}
-
-
-bool Mission::initLandscape() noexcept
-{
-    glGenTextures(1, &m_landscape.texture);
-    glGenBuffers(2, m_landscape.vbo);
-    glGenVertexArrays(1, &m_landscape.vao);
-
-    Texture landscapeTexture = {.handle = m_landscape.texture };
-
-    if(!landscapeTexture.loadFromFile(FileProvider::findPathToFile(LANDSCAPE_PNG)))
-        return false;
-
-    m_landscape.texture = landscapeTexture.handle;
-
-    if(m_landscape.program = m_engine->getShaderProgram("tilemap"); m_landscape.program == 0)
-        return false;
-
-    return true;
 }
 
 

@@ -20,18 +20,13 @@ public:
     void resize(int width, int height) noexcept override;
 
 private:
-    bool initLandscape() noexcept;
     void createSystems() noexcept;
 
-    Transform2D      m_transform;
-    TiledMapLoader   m_mapLoader;
-    entt::registry   m_registry;
-    Tilemap          m_tilemap;
-    HeadUpDisplay    m_hud;
-    
-//  Resource section
-    mesh::Landscape m_landscape;
-    mesh::Buildings m_buildings;
+    Transform2D    m_transform;
+    TiledMapLoader m_mapLoader;
+    entt::registry m_registry;
+    Tilemap        m_tilemap;
+    HeadUpDisplay  m_hud;
 
     std::vector<void(*)(Mission*, float)> m_systems;
 };

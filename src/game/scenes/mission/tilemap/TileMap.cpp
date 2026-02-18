@@ -4,6 +4,9 @@
 #include <cglm/struct/ivec2.h>
 #include <cglm/call/aabb2d.h>
 
+#include "resources/files/FileProvider.hpp"
+#include "resources/gl_interfaces/texture/Texture.hpp"
+#include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "game/Engine.hpp"
 #include "game/scenes/mission/loader/TiledMapLoader.hpp"
 #include "game/scenes/mission/tilemap/Tilemap.hpp"
@@ -46,22 +49,20 @@ Tilemap::Tilemap(entt::registry& registry, const Engine* engine) noexcept:
 	m_mapSize(glms_ivec2_zero()),
 	m_tileSize(glms_ivec2_zero())
 {
-	glCreateBuffers(1, &m_vertexBuffer);
+	memset(&m_landscape, 0, sizeof(mesh::Landscape)); 
+    memset(&m_buildings, 0, sizeof(mesh::Buildings));
 }
 
 
 Tilemap::~Tilemap()
 {
-	if(m_mappedStorage)
-		glUnmapNamedBuffer(m_vertexBuffer);
-		
-    glDeleteBuffers(1, &m_vertexBuffer);
+	cleanupGraphicsResources();
 }
 
 
-bool Tilemap::createFromLoader(const TiledMapLoader& loader, const uint32_t texture) noexcept
+bool Tilemap::createFromLoader(const TiledMapLoader& loader) noexcept
 {
-	initStorage();
+	createGraphicsResources(loader.getVertices(), loader.getIndices());
 	m_structureMask.clear();
 	
 	m_mapSize = loader.getMapSize();
@@ -69,8 +70,8 @@ bool Tilemap::createFromLoader(const TiledMapLoader& loader, const uint32_t text
 	m_tileMask = loader.getTileMask();
 	m_structureMask.resize(m_mapSize.x * m_mapSize.y, entt::null);
 
-	glGetTextureLevelParameteriv(texture, 0, GL_TEXTURE_WIDTH, &m_textureSize.x);
-	glGetTextureLevelParameteriv(texture, 0, GL_TEXTURE_HEIGHT, &m_textureSize.y);
+	glGetTextureLevelParameteriv(m_buildings.texture, 0, GL_TEXTURE_WIDTH, &m_textureSize.x);
+	glGetTextureLevelParameteriv(m_buildings.texture, 0, GL_TEXTURE_HEIGHT, &m_textureSize.y);
 
 	auto get_structure_enum = [](const std::string& name) -> StructureInfo::Type
 	{
@@ -303,6 +304,30 @@ bool Tilemap::putStructure(const HouseType owner, const StructureInfo::Type type
 }
 
 
+void Tilemap::draw() const noexcept
+{
+//  Landscape
+	glUseProgram(m_landscape.program);
+	glBindTextureUnit(0, m_landscape.texture);
+	glBindVertexArray(m_landscape.vao);
+	glDrawElements(GL_TRIANGLES, m_landscape.count, GL_UNSIGNED_INT, nullptr);
+	glBindTextureUnit(0, 0);
+
+//  Structures
+	glBindTextureUnit(0, m_buildings.texture);
+	glBindVertexArray(m_buildings.vao);
+
+	auto view = m_registry.view<const StructureInfo>();
+
+	view.each([](const StructureInfo& building) 
+	{
+		glDrawArrays(GL_TRIANGLE_FAN, building.frame, 4);
+	});
+
+	glBindTextureUnit(0, 0);
+}
+
+
 uint32_t Tilemap::getVertexBuffer() const noexcept
 {
 	return m_vertexBuffer;
@@ -327,10 +352,12 @@ entt::registry& Tilemap::getRegistry() const noexcept
 }
 
 
-void Tilemap::initStorage() noexcept
+bool Tilemap::createGraphicsResources(std::span<const vec4s> vertices, std::span<const uint32_t> indices) noexcept
 {
 	if(m_mappedStorage)
-		return;
+		return true;
+
+	glCreateBuffers(1, &m_vertexBuffer);
 
 	glNamedBufferStorage(
 		m_vertexBuffer,
@@ -351,6 +378,68 @@ void Tilemap::initStorage() noexcept
 		GL_MAP_COHERENT_BIT |
 		GL_MAP_UNSYNCHRONIZED_BIT
 	);
+
+	glGenTextures(1, &m_landscape.texture);
+    glGenBuffers(2, m_landscape.vbo);
+    glGenVertexArrays(1, &m_landscape.vao);
+
+    Texture landscapeTexture = {.handle = m_landscape.texture };
+
+    if(!landscapeTexture.loadFromFile(FileProvider::findPathToFile(LANDSCAPE_PNG)))
+        return false;
+
+    m_landscape.texture = landscapeTexture.handle;
+
+    if(m_landscape.program = m_engine->getShaderProgram("tilemap"); m_landscape.program == 0)
+        return false;
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_landscape.vbo[0]);
+	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertices.size_bytes()), vertices.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_landscape.vbo[1]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(indices.size_bytes()), indices.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
+	VertexArrayObject::createVertexInputState(m_landscape.vao, m_landscape.vbo[0], attributes);
+	
+	glBindVertexArray(m_landscape.vao);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_landscape.vbo[1]);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	m_landscape.vao = m_landscape.vao;
+	m_landscape.count = indices.size();
+
+	glGenTextures(1, &m_buildings.texture);
+	glGenVertexArrays(1, &m_buildings.vao);
+
+	VertexArrayObject::createVertexInputState(m_buildings.vao, m_vertexBuffer, attributes);
+
+	Texture buildingTexture = {.handle = m_buildings.texture };
+
+	if(!buildingTexture.loadFromFile(FileProvider::findPathToFile(STRUCTURES_PNG)))
+		return false;
+
+	return true;
+}
+
+
+void Tilemap::cleanupGraphicsResources() noexcept
+{
+	GLuint textures[]            = { m_landscape.texture, m_buildings.texture };
+	GLuint vertexArrayObjects[]  = { m_landscape.vao, m_buildings.vao         };
+	GLuint vertexBufferObjects[] = { m_landscape.vbo[0], m_landscape.vbo[1]   };
+
+	glDeleteTextures(std::size(textures), textures);
+	glDeleteVertexArrays(std::size(vertexArrayObjects), vertexArrayObjects);
+	glDeleteBuffers(std::size(vertexBufferObjects), vertexBufferObjects);
+
+	if(m_mappedStorage)
+		glUnmapNamedBuffer(m_vertexBuffer);
+		
+    glDeleteBuffers(1, &m_vertexBuffer);
 }
 
 
