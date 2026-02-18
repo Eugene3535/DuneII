@@ -22,7 +22,6 @@ public:
 private:
     void createSystems() noexcept;
 
-    Transform2D    m_transform;
     TiledMapLoader m_mapLoader;
     entt::registry m_registry;
     Tilemap        m_tilemap;

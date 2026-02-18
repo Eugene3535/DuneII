@@ -11,9 +11,8 @@
 #define BLINK_LOOP_TIME 0.25f
 
 
-HeadUpDisplay::HeadUpDisplay(Engine* engine, const Transform2D& sceneTransform, Tilemap& tilemap) noexcept:
+HeadUpDisplay::HeadUpDisplay(Engine* engine,  Tilemap& tilemap) noexcept:
     m_engine(engine),
-    m_sceneTransform(sceneTransform),
     m_tilemap(tilemap),
     m_menu(engine, tilemap),
     m_cursorTexture(0),
@@ -97,7 +96,7 @@ void HeadUpDisplay::runSelection() noexcept
         return;
 
     vec2s cursorPosition = m_engine->getCursorPosition();
-    vec2s scenePosition  = glms_vec2_negate(m_sceneTransform.getPosition());
+    vec2s scenePosition  = glms_vec2_negate(m_tilemap.getPosition());
     vec2s worldCoords    = glms_vec2_add(scenePosition, cursorPosition);
 
     const auto entity = m_tilemap.getEntityUnderCursor(worldCoords);

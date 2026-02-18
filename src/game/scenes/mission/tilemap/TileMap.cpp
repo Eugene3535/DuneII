@@ -41,6 +41,7 @@ static int32_t      get_armor_of(const StructureInfo::Type type)                
 
 
 Tilemap::Tilemap(entt::registry& registry, const Engine* engine) noexcept:
+	Transform2D(),
     m_registry(registry),
 	m_engine(engine),
 	m_vertexBuffer(0),
@@ -49,8 +50,7 @@ Tilemap::Tilemap(entt::registry& registry, const Engine* engine) noexcept:
 	m_mapSize(glms_ivec2_zero()),
 	m_tileSize(glms_ivec2_zero())
 {
-	memset(&m_landscape, 0, sizeof(mesh::Landscape)); 
-    memset(&m_buildings, 0, sizeof(mesh::Buildings));
+
 }
 
 
@@ -357,6 +357,9 @@ bool Tilemap::createGraphicsResources(std::span<const vec4s> vertices, std::span
 	if(m_mappedStorage)
 		return true;
 
+	memset(&m_landscape, 0, sizeof(mesh::Landscape)); 
+    memset(&m_buildings, 0, sizeof(mesh::Buildings));
+
 	glCreateBuffers(1, &m_vertexBuffer);
 
 	glNamedBufferStorage(
@@ -428,18 +431,17 @@ bool Tilemap::createGraphicsResources(std::span<const vec4s> vertices, std::span
 
 void Tilemap::cleanupGraphicsResources() noexcept
 {
-	GLuint textures[]            = { m_landscape.texture, m_buildings.texture };
-	GLuint vertexArrayObjects[]  = { m_landscape.vao, m_buildings.vao         };
-	GLuint vertexBufferObjects[] = { m_landscape.vbo[0], m_landscape.vbo[1]   };
+	GLuint textures[]            = { m_landscape.texture, m_buildings.texture               };
+	GLuint vertexArrayObjects[]  = { m_landscape.vao, m_buildings.vao                       };
+	GLuint vertexBufferObjects[] = { m_vertexBuffer, m_landscape.vbo[0], m_landscape.vbo[1] };
 
 	glDeleteTextures(std::size(textures), textures);
 	glDeleteVertexArrays(std::size(vertexArrayObjects), vertexArrayObjects);
-	glDeleteBuffers(std::size(vertexBufferObjects), vertexBufferObjects);
 
 	if(m_mappedStorage)
 		glUnmapNamedBuffer(m_vertexBuffer);
 		
-    glDeleteBuffers(1, &m_vertexBuffer);
+    glDeleteBuffers(std::size(vertexBufferObjects), vertexBufferObjects);
 }
 
 

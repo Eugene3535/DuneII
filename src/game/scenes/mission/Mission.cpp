@@ -18,7 +18,7 @@
 Mission::Mission(Engine* engine) noexcept:
     Scene(engine, Scene::MISSION),
     m_tilemap(m_registry, engine),
-    m_hud(engine, m_transform, m_tilemap)
+    m_hud(engine, m_tilemap)
 {
 
 }
@@ -62,7 +62,7 @@ void Mission::draw() noexcept
     auto& camera = m_engine->camera;
 
     alignas(16) mat4s uniformMatrix = camera.getModelViewProjectionMatrix();
-    alignas(16) mat4s modelView     = m_transform.getMatrix();
+    alignas(16) mat4s modelView     = m_tilemap.getMatrix();
     alignas(16) mat4s result        = glms_mul(uniformMatrix, modelView);
 
     camera.updateUniformBuffer(result.raw);
@@ -115,7 +115,7 @@ void Mission::createSystems() noexcept
         const bool is_near_the_bottom_edge = (cursor.y > (viewSize.y - SCREEN_MARGIN) && cursor.y < viewSize.y);
 
         const float velocity = dt * CAMERA_VELOCITY;
-        vec2s scenePosition = mission->m_transform.getPosition();
+        vec2s scenePosition = mission->m_tilemap.getPosition();
 
         if(is_near_the_left_edge)
             scenePosition.x += velocity;
@@ -134,7 +134,7 @@ void Mission::createSystems() noexcept
         if(scenePosition.x < (viewSize.x - mapSize.x)) scenePosition.x = viewSize.x - mapSize.x;
         if(scenePosition.y < (viewSize.y - mapSize.y)) scenePosition.y = viewSize.y - mapSize.y;
 
-        mission->m_transform.setPosition(scenePosition);
+        mission->m_tilemap.setPosition(scenePosition);
     });
 
 //  HUD Controller

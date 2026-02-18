@@ -3,10 +3,12 @@
 
 #include <entt/entity/registry.hpp>
 
+#include "graphics/transform/Transform2D.hpp"
 #include "game/scenes/mission/common/Structures.hpp"
 
 
-class Tilemap
+class Tilemap final:
+    public Transform2D
 {
 public:
     Tilemap(entt::registry& registry, const class Engine* engine) noexcept;
