@@ -73,14 +73,8 @@ void Mission::draw() noexcept
     if(!m_hud.isMenuShown())
     {
         if(m_hud.isSelectionEnabled())
-        {
             m_hud.drawSelection();
-
-//  !!! FIX ME NOW
-            auto prog = m_engine->getShaderProgram("tilemap");
-            glUseProgram(prog);
-        }
- 
+        
         modelView = m_hud.getCursorTransform().getMatrix();
         result = glms_mul(uniformMatrix, modelView);
         camera.updateUniformBuffer(result.raw);

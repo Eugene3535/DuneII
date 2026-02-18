@@ -50,7 +50,8 @@ private:
     mesh::Sprite  m_currentCursor;
     Transform2D   m_cursorTransform;
     uint32_t      m_cursorTexture;
-    uint32_t      m_program;
+    uint32_t      m_cursorProgram;
+    uint32_t      m_tilemapProgram;
 
     float m_clickTimer;
 

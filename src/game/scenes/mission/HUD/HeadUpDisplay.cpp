@@ -17,7 +17,8 @@ HeadUpDisplay::HeadUpDisplay(Engine* engine, const Transform2D& sceneTransform, 
     m_tilemap(tilemap),
     m_menu(engine, tilemap),
     m_cursorTexture(0),
-    m_program(0),
+    m_cursorProgram(0),
+    m_tilemapProgram(0),
     m_clickTimer(0.f)
 {
     m_selectionFrame.vbo = 0;
@@ -38,9 +39,10 @@ HeadUpDisplay::~HeadUpDisplay()
 
 bool HeadUpDisplay::init() noexcept
 {
-    m_program = m_engine->getShaderProgram("selection");
+    m_cursorProgram = m_engine->getShaderProgram("selection");
+    m_tilemapProgram = m_engine->getShaderProgram("tilemap");
     
-    if(!m_program)
+    if(!(m_cursorProgram && m_tilemapProgram))
         return false;
 
     glGenTextures(1, &m_cursorTexture);
@@ -243,9 +245,11 @@ void HeadUpDisplay::drawSelection() const noexcept
 {
     if(m_selectionFrame.enabled && m_selectionFrame.blinkTimer < BLINK_PERIOD)
     {
-        glUseProgram(m_program);
+        glUseProgram(m_cursorProgram);
         glBindVertexArray(m_selectionFrame.vao);
         glDrawArrays(GL_LINES, 0, 16);
+
+        glUseProgram(m_tilemapProgram); // return to default tilemap shader
     }
 }
 
