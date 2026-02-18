@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <cglm/struct/ivec2.h>
 #include <cglm/call/aabb2d.h>
+#include "cglm/struct/affine-mat.h"
 
 #include "resources/files/FileProvider.hpp"
 #include "resources/gl_interfaces/texture/Texture.hpp"
@@ -40,10 +41,10 @@ static ivec4s       get_bounds_of(const StructureInfo::Type type, const ivec2s c
 static int32_t      get_armor_of(const StructureInfo::Type type)                                            noexcept;
 
 
-Tilemap::Tilemap(entt::registry& registry, const Engine* engine) noexcept:
+Tilemap::Tilemap(Engine* engine, entt::registry& registry) noexcept:
 	Transform2D(),
-    m_registry(registry),
 	m_engine(engine),
+    m_registry(registry),
 	m_vertexBuffer(0),
 	m_mappedStorage(nullptr),
 	m_textureSize(glms_ivec2_zero()),
@@ -306,6 +307,13 @@ bool Tilemap::putStructure(const HouseType owner, const StructureInfo::Type type
 
 void Tilemap::draw() const noexcept
 {
+    auto& camera = m_engine->camera;
+
+    alignas(16) mat4s uniformMatrix = camera.getModelViewProjectionMatrix();
+    alignas(16) mat4s modelView     = getMatrix();
+    alignas(16) mat4s result        = glms_mul(uniformMatrix, modelView);
+    camera.updateUniformBuffer(result.raw);
+
 //  Landscape
 	glUseProgram(m_landscape.program);
 	glBindTextureUnit(0, m_landscape.texture);
@@ -325,12 +333,6 @@ void Tilemap::draw() const noexcept
 	});
 
 	glBindTextureUnit(0, 0);
-}
-
-
-uint32_t Tilemap::getVertexBuffer() const noexcept
-{
-	return m_vertexBuffer;
 }
 
 

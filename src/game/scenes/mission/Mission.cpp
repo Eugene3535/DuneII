@@ -17,7 +17,7 @@
 
 Mission::Mission(Engine* engine) noexcept:
     Scene(engine, Scene::MISSION),
-    m_tilemap(m_registry, engine),
+    m_tilemap(engine, m_registry),
     m_hud(engine, m_tilemap)
 {
 
@@ -59,34 +59,8 @@ void Mission::update(float dt) noexcept
 
 void Mission::draw() noexcept
 {
-    auto& camera = m_engine->camera;
-
-    alignas(16) mat4s uniformMatrix = camera.getModelViewProjectionMatrix();
-    alignas(16) mat4s modelView     = m_tilemap.getMatrix();
-    alignas(16) mat4s result        = glms_mul(uniformMatrix, modelView);
-
-    camera.updateUniformBuffer(result.raw);
-
     m_tilemap.draw();
-
-//  HUD
-    if(!m_hud.isMenuShown())
-    {
-        if(m_hud.isSelectionEnabled())
-            m_hud.drawSelection();
-        
-        modelView = m_hud.getCursorTransform().getMatrix();
-        result = glms_mul(uniformMatrix, modelView);
-        camera.updateUniformBuffer(result.raw);
-        m_hud.drawCursor();
-    }
-    else
-    {
-        modelView = m_hud.getMenuTransform().getMatrix();
-        result = glms_mul(uniformMatrix, modelView);
-        camera.updateUniformBuffer(result.raw);
-        m_hud.drawMenu();
-    }
+    m_hud.draw();
 }
 
 

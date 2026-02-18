@@ -19,24 +19,16 @@ public:
 	HeadUpDisplay& operator = (HeadUpDisplay&&)      noexcept = delete;
     ~HeadUpDisplay();
 
-    bool init() noexcept;
-    void update(float dt) noexcept;
+    bool init()            noexcept;
+    void update(float dt)  noexcept;
+    void draw()      const noexcept;
 
-    void runSelection()    noexcept;
-    void cancelSelection() noexcept;
-    void hideMenu()        noexcept;
-
-    void drawSelection() const noexcept;
-    void drawCursor()    const noexcept;
-    void drawMenu()      const noexcept;
-
+    void hideMenu()                    noexcept;
+    void runSelection()                noexcept;
+    void cancelSelection()             noexcept;
     void resize(int width, int height) noexcept;
 
-    bool isSelectionEnabled() const noexcept;
-    bool isMenuShown()        const noexcept;
-
-    const Transform2D& getCursorTransform() const noexcept;
-    const Transform2D& getMenuTransform()   const noexcept;
+    bool isMenuShown() const noexcept;
 
 private:
     class Engine*        m_engine;

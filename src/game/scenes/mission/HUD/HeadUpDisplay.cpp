@@ -1,5 +1,7 @@
 #include <algorithm>
 
+#include "cglm/struct/affine-mat.h"
+
 #include "resources/files/FileProvider.hpp"
 #include "resources/gl_interfaces/texture/Texture.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
@@ -88,6 +90,55 @@ void HeadUpDisplay::update(float dt) noexcept
 
     m_cursorTransform.setPosition(m_engine->getCursorPosition());
 }
+
+
+void HeadUpDisplay::draw() const noexcept
+{
+    m_tilemap.draw();
+
+    auto& camera = m_engine->camera;
+
+    alignas(16) mat4s uniformMatrix = camera.getModelViewProjectionMatrix();
+    alignas(16) mat4s modelView     = m_tilemap.getMatrix();
+    alignas(16) mat4s result        = glms_mul(uniformMatrix, modelView);
+
+//  HUD
+    if(!m_menu.isShown())
+    {
+        if(m_selectionFrame.enabled && m_selectionFrame.blinkTimer < BLINK_PERIOD)
+        {
+            glUseProgram(m_cursorProgram);
+            glBindVertexArray(m_selectionFrame.vao);
+            glDrawArrays(GL_LINES, 0, 16);
+
+            glUseProgram(m_tilemapProgram); // return to default tilemap shader
+        }
+        
+        modelView = m_cursorTransform.getMatrix();
+        result = glms_mul(uniformMatrix, modelView);
+        camera.updateUniformBuffer(result.raw);
+        
+//  Draw cursor
+        m_sprites.bind(true);
+        glBindTextureUnit(0, m_cursorTexture);
+        glDrawArrays(GL_TRIANGLE_FAN, m_currentCursor.frame, 4);
+        glBindTextureUnit(0, 0);
+    }
+    else
+    {
+        modelView = m_menu.getTransform().getMatrix();
+        result = glms_mul(uniformMatrix, modelView);
+        camera.updateUniformBuffer(result.raw);
+        m_menu.draw();
+    }
+}
+
+
+void HeadUpDisplay::hideMenu() noexcept
+{
+    m_menu.hide();
+}
+
 
 
 void HeadUpDisplay::runSelection() noexcept
@@ -234,65 +285,13 @@ void HeadUpDisplay::cancelSelection() noexcept
 }
 
 
-void HeadUpDisplay::hideMenu() noexcept
-{
-    m_menu.hide();
-}
-
-
-void HeadUpDisplay::drawSelection() const noexcept
-{
-    if(m_selectionFrame.enabled && m_selectionFrame.blinkTimer < BLINK_PERIOD)
-    {
-        glUseProgram(m_cursorProgram);
-        glBindVertexArray(m_selectionFrame.vao);
-        glDrawArrays(GL_LINES, 0, 16);
-
-        glUseProgram(m_tilemapProgram); // return to default tilemap shader
-    }
-}
-
-
-void HeadUpDisplay::drawCursor() const noexcept
-{
-    m_sprites.bind(true);
-    glBindTextureUnit(0, m_cursorTexture);
-    glDrawArrays(GL_TRIANGLE_FAN, m_currentCursor.frame, 4);
-    glBindTextureUnit(0, 0);
-}
-
-
-void HeadUpDisplay::drawMenu() const noexcept
-{
-    m_menu.draw();
-}
-
-
 void HeadUpDisplay::resize(int width, int height) noexcept
 {
     m_menu.resize(width, height);
 }
 
 
-bool HeadUpDisplay::isSelectionEnabled() const noexcept
-{
-    return m_selectionFrame.enabled;
-}
-
-
 bool HeadUpDisplay::isMenuShown() const noexcept
 {
     return m_menu.isShown();
-}
-
-
-const Transform2D& HeadUpDisplay::getCursorTransform() const noexcept
-{
-    return m_cursorTransform;
-}
-
-
-const Transform2D& HeadUpDisplay::getMenuTransform() const noexcept
-{
-    return m_menu.getTransform();
 }

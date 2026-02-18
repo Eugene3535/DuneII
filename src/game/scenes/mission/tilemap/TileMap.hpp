@@ -11,7 +11,7 @@ class Tilemap final:
     public Transform2D
 {
 public:
-    Tilemap(entt::registry& registry, const class Engine* engine) noexcept;
+    Tilemap(class Engine* engine, entt::registry& registry) noexcept;
     ~Tilemap();
 
     bool createFromLoader(const class TiledMapLoader& loader) noexcept;
@@ -19,7 +19,6 @@ public:
 
     void draw() const noexcept;
 
-    uint32_t        getVertexBuffer()                       const noexcept;
     entt::entity    getEntityUnderCursor(const vec2s point) const noexcept;
     entt::registry& getRegistry()                           const noexcept;
 
@@ -30,9 +29,10 @@ private:
     void createGraphicsForEntity(const entt::entity entity) noexcept;
     void updateWall(int32_t origin, int32_t level)          noexcept;
 
-    entt::registry&           m_registry;
+    Engine*         m_engine;
+    entt::registry& m_registry;
+
     std::string               m_tileMask;
-    const class Engine*       m_engine;
     std::vector<entt::entity> m_structureMask;
 
     uint32_t m_vertexBuffer;
