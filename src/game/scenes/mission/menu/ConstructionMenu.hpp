@@ -11,7 +11,7 @@
 class ConstructionMenu
 {
 public:
-    ConstructionMenu(const class Engine* engine, class Builder& builder) noexcept;
+    ConstructionMenu(const class Engine* engine, class Tilemap& tilemap) noexcept;
     ConstructionMenu(const ConstructionMenu&)              noexcept = delete;
 	ConstructionMenu(ConstructionMenu&&)                   noexcept = delete;
 	ConstructionMenu& operator = (const ConstructionMenu&) noexcept = delete;
@@ -35,7 +35,7 @@ private:
     void drawPreviews()   const noexcept;
 
     const class Engine* m_engine;
-    class Builder&      m_builder;
+    class Tilemap&      m_tilemap;
     Transform2D         m_transform;
 
     struct Widget

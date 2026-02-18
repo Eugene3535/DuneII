@@ -12,7 +12,7 @@
 class HeadUpDisplay
 {
 public:
-    HeadUpDisplay(class Engine* engine, const Transform2D& sceneTransform, class Builder& builder) noexcept;
+    HeadUpDisplay(class Engine* engine, const Transform2D& sceneTransform, class Tilemap& tilemap) noexcept;
     HeadUpDisplay(const HeadUpDisplay&)              noexcept = delete;
 	HeadUpDisplay(HeadUpDisplay&&)                   noexcept = delete;
 	HeadUpDisplay& operator = (const HeadUpDisplay&) noexcept = delete;
@@ -41,7 +41,7 @@ public:
 private:
     class Engine*        m_engine;
     const Transform2D&   m_sceneTransform;
-    const class Builder& m_builder;
+    const class Tilemap& m_tilemap;
     ConstructionMenu     m_menu;
 
     SpriteManager m_sprites;

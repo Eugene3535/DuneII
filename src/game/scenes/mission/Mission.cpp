@@ -17,8 +17,8 @@
 
 Mission::Mission(Engine* engine) noexcept:
     Scene(engine, Scene::MISSION),
-    m_builder(m_registry, m_tileMask, engine),
-    m_hud(engine, m_transform, m_builder)
+    m_tilemap(m_registry, engine),
+    m_hud(engine, m_transform, m_tilemap)
 {
     memset(&m_landscape, 0, sizeof(mesh::Landscape)); 
     memset(&m_buildings, 0, sizeof(mesh::Buildings));
@@ -51,14 +51,14 @@ bool Mission::load(std::string_view info) noexcept
     if(!m_hud.init())
         return false;
 
-    if(m_tilemap.loadFromFile(FileProvider::findPathToFile(std::string(info))))
+    if(m_mapLoader.loadFromFile(FileProvider::findPathToFile(std::string(info))))
     {
-        auto vertices = m_tilemap.getVertices();
+        auto vertices = m_mapLoader.getVertices();
         glBindBuffer(GL_ARRAY_BUFFER, m_landscape.vbo[0]);
         glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertices.size_bytes()), vertices.data(), GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        auto indices = m_tilemap.getIndices();
+        auto indices = m_mapLoader.getIndices();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_landscape.vbo[1]);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(indices.size_bytes()), indices.data(), GL_STATIC_DRAW);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -77,18 +77,17 @@ bool Mission::load(std::string_view info) noexcept
         glGenTextures(1, &m_buildings.texture);
         glGenVertexArrays(1, &m_buildings.vao);
 
-        VertexArrayObject::createVertexInputState(m_buildings.vao, m_builder.getVertexBuffer(), attributes);
+        VertexArrayObject::createVertexInputState(m_buildings.vao, m_tilemap.getVertexBuffer(), attributes);
 
         Texture buildingTexture = {.handle = m_buildings.texture };
 
         if(!buildingTexture.loadFromFile(FileProvider::findPathToFile(STRUCTURES_PNG)))
             return false;
 
-        m_tileMask    = m_tilemap.getTileMask();
-        auto mapSize  = m_tilemap.getMapSize();
-        auto tileSize = m_tilemap.getTileSize();
+        auto mapSize  = m_mapLoader.getMapSize();
+        auto tileSize = m_mapLoader.getTileSize();
 
-        if(!m_builder.loadFromTileMap(m_tilemap, buildingTexture.handle))
+        if(!m_tilemap.createFromLoader(m_mapLoader, buildingTexture.handle))
             return false;
     }
 
@@ -199,7 +198,7 @@ void Mission::createSystems() noexcept
         const auto game     = mission->m_engine;
         const auto cursor   = game->getCursorPosition();
         const auto viewSize = game->getWindowsSize();
-        const auto mapSize  = glms_ivec2_mul(mission->m_tilemap.getMapSize(), mission->m_tilemap.getTileSize());
+        const auto mapSize  = glms_ivec2_mul(mission->m_mapLoader.getMapSize(), mission->m_mapLoader.getTileSize());
 
         const bool is_near_the_left_edge   = (cursor.x > 0 && cursor.x < SCREEN_MARGIN);
         const bool is_near_the_top_edge    = (cursor.y > 0 && cursor.y < SCREEN_MARGIN);

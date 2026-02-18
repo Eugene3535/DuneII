@@ -1,8 +1,8 @@
 #ifndef MISSION_HPP
 #define MISSION_HPP
 
-#include "game/scenes/mission/tilemap/TileMap.hpp"
-#include "game/scenes/mission/builder/Builder.hpp"
+#include "game/scenes/mission/loader/TiledMapLoader.hpp"
+#include "game/scenes/mission/tilemap/Tilemap.hpp"
 #include "game/scenes/mission/HUD/HeadUpDisplay.hpp"
 #include "game/scenes/Scene.hpp"
 
@@ -24,10 +24,9 @@ private:
     void createSystems() noexcept;
 
     Transform2D      m_transform;
-    TileMap          m_tilemap;
+    TiledMapLoader   m_mapLoader;
     entt::registry   m_registry;
-    std::string      m_tileMask;
-    Builder          m_builder;
+    Tilemap          m_tilemap;
     HeadUpDisplay    m_hud;
     
 //  Resource section

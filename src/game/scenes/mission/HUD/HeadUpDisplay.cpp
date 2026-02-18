@@ -3,7 +3,7 @@
 #include "resources/files/FileProvider.hpp"
 #include "resources/gl_interfaces/texture/Texture.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
-#include "game/scenes/mission/builder/Builder.hpp"
+#include "game/scenes/mission/tilemap/Tilemap.hpp"
 #include "game/Engine.hpp"
 #include "game/scenes/mission/HUD/HeadUpDisplay.hpp"
 
@@ -11,11 +11,11 @@
 #define BLINK_LOOP_TIME 0.25f
 
 
-HeadUpDisplay::HeadUpDisplay(Engine* engine, const Transform2D& sceneTransform, Builder& builder) noexcept:
+HeadUpDisplay::HeadUpDisplay(Engine* engine, const Transform2D& sceneTransform, Tilemap& tilemap) noexcept:
     m_engine(engine),
     m_sceneTransform(sceneTransform),
-    m_builder(builder),
-    m_menu(engine, builder),
+    m_tilemap(tilemap),
+    m_menu(engine, tilemap),
     m_cursorTexture(0),
     m_program(0),
     m_clickTimer(0.f)
@@ -98,7 +98,7 @@ void HeadUpDisplay::runSelection() noexcept
     vec2s scenePosition  = glms_vec2_negate(m_sceneTransform.getPosition());
     vec2s worldCoords    = glms_vec2_add(scenePosition, cursorPosition);
 
-    const auto entity = m_builder.getEntityUnderCursor(worldCoords);
+    const auto entity = m_tilemap.getEntityUnderCursor(worldCoords);
 
     if(entity == entt::null)
     {
@@ -131,7 +131,7 @@ void HeadUpDisplay::runSelection() noexcept
         }
     };
 
-    auto& registry = m_builder.getRegistry();
+    auto& registry = m_tilemap.getRegistry();
 
     if(m_selectionFrame.lastSelectedEntity != entity)
     {

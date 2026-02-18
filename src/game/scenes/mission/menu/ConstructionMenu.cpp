@@ -7,7 +7,7 @@
 #include "resources/gl_interfaces/texture/Texture.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "graphics/geometry/GeometryGenerator.hpp"
-#include "game/scenes/mission/builder/Builder.hpp"
+#include "game/scenes/mission/tilemap/Tilemap.hpp"
 #include "game/Engine.hpp"
 #include "game/scenes/mission/menu/ConstructionMenu.hpp"
 
@@ -27,9 +27,9 @@ namespace
 }
 
 
-ConstructionMenu::ConstructionMenu(const Engine* engine, Builder& builder) noexcept:
+ConstructionMenu::ConstructionMenu(const Engine* engine, Tilemap& tilemap) noexcept:
     m_engine(engine),
-    m_builder(builder),
+    m_tilemap(tilemap),
     m_transform(),
     m_isShown(false)
 {
@@ -212,7 +212,7 @@ void ConstructionMenu::createFrame() noexcept
 
 //  Unload to GPU
     glCreateBuffers(1, &m_frame.vbo);
-    glNamedBufferData(m_frame.vbo, buffer.size() * sizeof(float), buffer.data(), GL_STATIC_DRAW);
+    glNamedBufferData(m_frame.vbo, buffer.size() * sizeof(float), buffer.data(), GL_DYNAMIC_DRAW);
 
     glGenVertexArrays(1, &m_frame.vao);
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float2 };
