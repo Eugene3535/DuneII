@@ -94,8 +94,6 @@ void HeadUpDisplay::update(float dt) noexcept
 
 void HeadUpDisplay::draw() const noexcept
 {
-    m_tilemap.draw();
-
     auto& camera = m_engine->camera;
 
     alignas(16) mat4s uniformMatrix = camera.getModelViewProjectionMatrix();
@@ -103,7 +101,7 @@ void HeadUpDisplay::draw() const noexcept
     alignas(16) mat4s result        = glms_mul(uniformMatrix, modelView);
 
 //  HUD
-    if(!m_menu.isShown())
+    if(!m_menu.isShown()) // Move viewport and draw cursor
     {
         if(m_selectionFrame.enabled && m_selectionFrame.blinkTimer < BLINK_PERIOD)
         {
@@ -118,7 +116,6 @@ void HeadUpDisplay::draw() const noexcept
         result = glms_mul(uniformMatrix, modelView);
         camera.updateUniformBuffer(result.raw);
         
-//  Draw cursor
         m_sprites.bind(true);
         glBindTextureUnit(0, m_cursorTexture);
         glDrawArrays(GL_TRIANGLE_FAN, m_currentCursor.frame, 4);
@@ -138,7 +135,6 @@ void HeadUpDisplay::hideMenu() noexcept
 {
     m_menu.hide();
 }
-
 
 
 void HeadUpDisplay::runSelection() noexcept
