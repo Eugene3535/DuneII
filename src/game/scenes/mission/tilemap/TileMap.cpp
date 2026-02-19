@@ -384,6 +384,17 @@ bool Tilemap::createGraphicsResources(std::span<const vec4s> vertices, std::span
 		GL_MAP_UNSYNCHRONIZED_BIT
 	);
 
+	glGenTextures(1, &m_buildings.texture);
+	glGenVertexArrays(1, &m_buildings.vao);
+
+	const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
+	VertexArrayObject::createVertexInputState(m_buildings.vao, m_vertexBuffer, attributes);
+
+	Texture buildingTexture = {.handle = m_buildings.texture };
+
+	if(!buildingTexture.loadFromFile(FileProvider::findPathToFile(STRUCTURES_PNG)))
+		return false;
+
 	glGenTextures(1, &m_landscape.texture);
     glGenBuffers(2, m_landscape.vbo);
     glGenVertexArrays(1, &m_landscape.vao);
@@ -406,7 +417,6 @@ bool Tilemap::createGraphicsResources(std::span<const vec4s> vertices, std::span
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(indices.size_bytes()), indices.data(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
 	VertexArrayObject::createVertexInputState(m_landscape.vao, m_landscape.vbo[0], attributes);
 	
 	glBindVertexArray(m_landscape.vao);
@@ -416,16 +426,6 @@ bool Tilemap::createGraphicsResources(std::span<const vec4s> vertices, std::span
 
 	m_landscape.vao = m_landscape.vao;
 	m_landscape.count = indices.size();
-
-	glGenTextures(1, &m_buildings.texture);
-	glGenVertexArrays(1, &m_buildings.vao);
-
-	VertexArrayObject::createVertexInputState(m_buildings.vao, m_vertexBuffer, attributes);
-
-	Texture buildingTexture = {.handle = m_buildings.texture };
-
-	if(!buildingTexture.loadFromFile(FileProvider::findPathToFile(STRUCTURES_PNG)))
-		return false;
 
 	return true;
 }

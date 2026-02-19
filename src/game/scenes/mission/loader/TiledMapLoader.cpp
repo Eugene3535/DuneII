@@ -153,9 +153,9 @@ bool TiledMapLoader::loadLayers(const void* rootNode) noexcept
 			auto firstGID  = tilesetNode->first_attribute("firstgid");
 
 			Tileset& tileset  = tilesets[index];
-			tileset.tileCount = (tileCount != nullptr) ? atoi(tileCount->value()) : 0;
-			tileset.columns   = (columns != nullptr) ? atoi(columns->value()) : 0;
-			tileset.firstGID  = (firstGID != nullptr) ? atoi(firstGID->value()) : 0;
+			tileset.tileCount = (tileCount != nullptr)  ? atoi(tileCount->value())            : 0;
+			tileset.columns   = (columns != nullptr)    ? atoi(columns->value())              : 0;
+			tileset.firstGID  = (firstGID != nullptr)   ? atoi(firstGID->value())             : 0;
 			tileset.rows      = (tileset.tileCount > 0) ? tileset.tileCount / tileset.columns : 0;
 
 			++index;
@@ -494,7 +494,7 @@ char convert_tile_num_to_char(int32_t index) noexcept
 
 	switch (index)
 	{
-//      rocky soil
+//  Rocky soil
 		case 1:   return 'R';
 		case 2:   return 'R';
 		case 3:   return 'R';
@@ -521,7 +521,7 @@ char convert_tile_num_to_char(int32_t index) noexcept
 		case 82:  return 'R';
 		case 83:  return 'R';
 		case 101: return 'R';
-//      sandy soil
+//  Sandy soil
 		case 6:   return 'S';
 		case 7:   return 'S';
 		case 8:   return 'S';
