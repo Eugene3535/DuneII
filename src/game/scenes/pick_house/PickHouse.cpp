@@ -18,7 +18,7 @@
 
 #define DEFAULT_OUTLINE_WIDTH 80.f
 #define DEFAULT_OUTLINE_HEIGHT 16.f
-#define SWITCH_HOUSE_OUTLINE_DELAY 0.3f
+#define SWITCH_HOUSE_OUTLINE_DELAY 0.1f
 
 
 PickHouse::PickHouse(Engine* engine) noexcept:
@@ -29,13 +29,13 @@ PickHouse::PickHouse(Engine* engine) noexcept:
     m_timer(0.f),
     m_outlineNeedUpdate(true)
 {
-    m_background.vao     = 0;
+    m_background.vertexArrayObject = 0;
     m_background.program = 0;
     m_background.sprite.frame = 0;
 
-    m_outline.vao     = 0;
+    m_outline.vertexArrayObject = 0;
     m_outline.program = 0;
-    m_outline.count   = 0;
+    m_outline.count = 0;
 }
 
 
@@ -56,8 +56,8 @@ bool PickHouse::load(std::string_view info) noexcept
     glGenVertexArrays(2, m_vertexArrayObjects);
     glCreateBuffers(1, &m_vertexBufferObject);
 
-    m_background.vao = m_vertexArrayObjects[0];
-    m_outline.vao = m_vertexArrayObjects[1];
+    m_background.vertexArrayObject = m_vertexArrayObjects[0];
+    m_outline.vertexArrayObject = m_vertexArrayObjects[1];
 
 //  Textures
     Texture housesTexture = {.handle = m_background.sprite.texture };
@@ -143,10 +143,10 @@ bool PickHouse::load(std::string_view info) noexcept
     glNamedBufferData(m_vertexBufferObject, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 
     const std::array<VertexBufferLayout::Attribute, 1> spriteAttributes{ VertexBufferLayout::Attribute::Float4 };
-    VertexArrayObject::createVertexInputState(m_background.vao, m_vertexBufferObject, spriteAttributes);
+    VertexArrayObject::createVertexInputState(m_background.vertexArrayObject, m_vertexBufferObject, spriteAttributes);
 
     const std::array<VertexBufferLayout::Attribute, 1> outlineAttributes{ VertexBufferLayout::Attribute::Float2 };
-    VertexArrayObject::createVertexInputState(m_outline.vao, m_vertexBufferObject, outlineAttributes);
+    VertexArrayObject::createVertexInputState(m_outline.vertexArrayObject, m_vertexBufferObject, outlineAttributes);
 
     m_isLoaded = true;
 
@@ -244,7 +244,7 @@ void PickHouse::draw() noexcept
     camera.updateUniformBuffer(result.raw);
 
     glUseProgram(m_background.program);
-    glBindVertexArray(m_background.vao);
+    glBindVertexArray(m_background.vertexArrayObject);
     glBindTextureUnit(0, m_background.sprite.texture);
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4); // 4 float per vertex in sprite VAO !!!
     glBindTextureUnit(0, 0);
@@ -255,7 +255,7 @@ void PickHouse::draw() noexcept
     camera.updateUniformBuffer(result.raw);
 
     glUseProgram(m_outline.program);
-    glBindVertexArray(m_outline.vao);
+    glBindVertexArray(m_outline.vertexArrayObject);
     glDrawArrays(GL_TRIANGLE_STRIP, 8, m_outline.count); // 2 float per vertex in outline VAO !!!
     glBindVertexArray(0);
 }

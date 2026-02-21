@@ -100,7 +100,6 @@ void HeadUpDisplay::draw() const noexcept
     alignas(16) mat4s modelView     = m_tilemap.getMatrix();
     alignas(16) mat4s result        = glms_mul(uniformMatrix, modelView);
 
-//  HUD
     if(!m_menu.isShown()) // Move viewport and draw cursor
     {
         if(m_selectionFrame.enabled && m_selectionFrame.blinkTimer < BLINK_PERIOD)

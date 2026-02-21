@@ -17,7 +17,7 @@
 
 #define DEFAULT_MENU_WIDTH  920.f
 #define DEFAULT_MENU_HEIGHT 800.f
-#define MENU_SCALE_FACTOR 0.9f
+#define MENU_SCALE_FACTOR 0.7f
 
 namespace
 {
@@ -329,10 +329,10 @@ void ConstructionMenu::createPreviews() noexcept
     m_previewCells.cellCount = static_cast<uint32_t>(vertices.size() >> 2);
 
 //  Side bar entity preview
-    vertices.push_back({ 800.f, 100.f,  texCoords[0].x, texCoords[0].y });
-    vertices.push_back({ 950.f, 100.f,  texCoords[1].x, texCoords[1].y });
-    vertices.push_back({ 950.f, 200.f, texCoords[2].x, texCoords[2].y });
-    vertices.push_back({ 800.f, 200.f, texCoords[3].x, texCoords[3].y });
+    vertices.push_back({ 950.f,  -100.f,  texCoords[0].x, texCoords[0].y });
+    vertices.push_back({ 1100.f, -100.f,  texCoords[1].x, texCoords[1].y });
+    vertices.push_back({ 1100.f,  0.f,    texCoords[2].x, texCoords[2].y });
+    vertices.push_back({ 950.f,   0.f,    texCoords[3].x, texCoords[3].y });
 
     glCreateBuffers(1, &m_previewCells.vertexBufferObject);
     glNamedBufferData(m_previewCells.vertexBufferObject, vertices.size() * sizeof(vec4s), vertices.data(), GL_DYNAMIC_DRAW);

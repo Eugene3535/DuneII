@@ -24,7 +24,7 @@ private:
 
     struct
     {
-        uint32_t     vao;
+        uint32_t     vertexArrayObject;
         mesh::Sprite sprite;
         uint32_t     program;
         Transform2D  transform;
@@ -32,7 +32,7 @@ private:
     
     struct
     {
-        uint32_t vao;
+        uint32_t vertexArrayObject;
         uint32_t program;
         uint32_t count;
         Transform2D transform;
