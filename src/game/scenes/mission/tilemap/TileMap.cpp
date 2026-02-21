@@ -45,8 +45,6 @@ Tilemap::Tilemap(Engine* engine, entt::registry& registry) noexcept:
 	Transform2D(),
 	m_engine(engine),
     m_registry(registry),
-	m_vertexBuffer(0),
-	m_mappedStorage(nullptr),
 	m_textureSize(glms_ivec2_zero()),
 	m_mapSize(glms_ivec2_zero()),
 	m_tileSize(glms_ivec2_zero())
@@ -317,13 +315,13 @@ void Tilemap::draw() const noexcept
 //  Landscape
 	glUseProgram(m_landscape.program);
 	glBindTextureUnit(0, m_landscape.texture);
-	glBindVertexArray(m_landscape.vao);
+	glBindVertexArray(m_landscape.vertexArrayObject);
 	glDrawElements(GL_TRIANGLES, m_landscape.count, GL_UNSIGNED_INT, nullptr);
 	glBindTextureUnit(0, 0);
 
 //  Structures
 	glBindTextureUnit(0, m_buildings.texture);
-	glBindVertexArray(m_buildings.vao);
+	glBindVertexArray(m_buildings.vertexArrayObject);
 
 	auto view = m_registry.view<const StructureInfo>();
 
@@ -356,16 +354,66 @@ entt::registry& Tilemap::getRegistry() const noexcept
 
 bool Tilemap::createGraphicsResources(std::span<const vec4s> vertices, std::span<const uint32_t> indices) noexcept
 {
-	if(m_mappedStorage)
-		return true;
+	memset(&m_landscape, 0, sizeof(m_landscape)); 
+    memset(&m_buildings, 0, sizeof(m_buildings));
 
-	memset(&m_landscape, 0, sizeof(mesh::Landscape)); 
-    memset(&m_buildings, 0, sizeof(mesh::Buildings));
+	const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
 
-	glCreateBuffers(1, &m_vertexBuffer);
+//  Landscape
+	glGenBuffers(2, m_landscape.vertexBufferObjects);
+	glBindBuffer(GL_ARRAY_BUFFER, m_landscape.vertexBufferObjects[0]);
 
 	glNamedBufferStorage(
-		m_vertexBuffer,
+		m_landscape.vertexBufferObjects[0],
+		static_cast<GLsizeiptr>(vertices.size_bytes()),
+		vertices.data(),
+		GL_DYNAMIC_STORAGE_BIT |
+		GL_MAP_WRITE_BIT | 
+		GL_MAP_PERSISTENT_BIT | 
+		GL_MAP_COHERENT_BIT
+	);
+
+	m_landscape.mappedStorage = glMapNamedBufferRange(
+		m_landscape.vertexBufferObjects[0],
+		0, 
+		static_cast<GLsizeiptr>(vertices.size_bytes()),
+		GL_MAP_WRITE_BIT |
+		GL_MAP_PERSISTENT_BIT |
+		GL_MAP_COHERENT_BIT |
+		GL_MAP_UNSYNCHRONIZED_BIT
+	);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glGenTextures(1, &m_landscape.texture);
+    glGenVertexArrays(1, &m_landscape.vertexArrayObject);
+
+    Texture landscapeTexture = {.handle = m_landscape.texture };
+
+    if(!landscapeTexture.loadFromFile(FileProvider::findPathToFile(LANDSCAPE_PNG)))
+        return false;
+
+    if(m_landscape.program = m_engine->getShaderProgram("tilemap"); m_landscape.program == 0)
+        return false;
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_landscape.vertexBufferObjects[1]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(indices.size_bytes()), indices.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	VertexArrayObject::createVertexInputState(m_landscape.vertexArrayObject, m_landscape.vertexBufferObjects[0], attributes);
+	
+	glBindVertexArray(m_landscape.vertexArrayObject);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_landscape.vertexBufferObjects[1]);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	m_landscape.count = indices.size();
+
+//  Buildings
+	glCreateBuffers(1, &m_buildings.vertexBufferObject);
+
+	glNamedBufferStorage(
+		m_buildings.vertexBufferObject,
 		STRUCTURE_LIMIT_ON_MAP * sizeof(vec4s) * 4,
 		nullptr,
 		GL_DYNAMIC_STORAGE_BIT |
@@ -374,8 +422,8 @@ bool Tilemap::createGraphicsResources(std::span<const vec4s> vertices, std::span
 		GL_MAP_COHERENT_BIT
 	);
 
-	m_mappedStorage = glMapNamedBufferRange(
-		m_vertexBuffer,
+	m_buildings.mappedStorage = glMapNamedBufferRange(
+		m_buildings.vertexBufferObject,
 		0, 
 		STRUCTURE_LIMIT_ON_MAP * sizeof(vec4s) * 4,
 		GL_MAP_WRITE_BIT |
@@ -384,48 +432,14 @@ bool Tilemap::createGraphicsResources(std::span<const vec4s> vertices, std::span
 		GL_MAP_UNSYNCHRONIZED_BIT
 	);
 
+	glGenVertexArrays(1, &m_buildings.vertexArrayObject);
+	VertexArrayObject::createVertexInputState(m_buildings.vertexArrayObject, m_buildings.vertexBufferObject, attributes);
+
 	glGenTextures(1, &m_buildings.texture);
-	glGenVertexArrays(1, &m_buildings.vao);
-
-	const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
-	VertexArrayObject::createVertexInputState(m_buildings.vao, m_vertexBuffer, attributes);
-
 	Texture buildingTexture = {.handle = m_buildings.texture };
 
 	if(!buildingTexture.loadFromFile(FileProvider::findPathToFile(STRUCTURES_PNG)))
 		return false;
-
-	glGenTextures(1, &m_landscape.texture);
-    glGenBuffers(2, m_landscape.vbo);
-    glGenVertexArrays(1, &m_landscape.vao);
-
-    Texture landscapeTexture = {.handle = m_landscape.texture };
-
-    if(!landscapeTexture.loadFromFile(FileProvider::findPathToFile(LANDSCAPE_PNG)))
-        return false;
-
-    m_landscape.texture = landscapeTexture.handle;
-
-    if(m_landscape.program = m_engine->getShaderProgram("tilemap"); m_landscape.program == 0)
-        return false;
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_landscape.vbo[0]);
-	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertices.size_bytes()), vertices.data(), GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_landscape.vbo[1]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(indices.size_bytes()), indices.data(), GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	VertexArrayObject::createVertexInputState(m_landscape.vao, m_landscape.vbo[0], attributes);
-	
-	glBindVertexArray(m_landscape.vao);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_landscape.vbo[1]);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	m_landscape.vao = m_landscape.vao;
-	m_landscape.count = indices.size();
 
 	return true;
 }
@@ -433,23 +447,26 @@ bool Tilemap::createGraphicsResources(std::span<const vec4s> vertices, std::span
 
 void Tilemap::cleanupGraphicsResources() noexcept
 {
-	GLuint textures[]            = { m_landscape.texture, m_buildings.texture               };
-	GLuint vertexArrayObjects[]  = { m_landscape.vao, m_buildings.vao                       };
-	GLuint vertexBufferObjects[] = { m_vertexBuffer, m_landscape.vbo[0], m_landscape.vbo[1] };
+	GLuint textures[]            = { m_landscape.texture, m_buildings.texture                                                               };
+	GLuint vertexArrayObjects[]  = { m_landscape.vertexArrayObject, m_buildings.vertexArrayObject                                           };
+	GLuint vertexBufferObjects[] = { m_buildings.vertexBufferObject, m_landscape.vertexBufferObjects[0], m_landscape.vertexBufferObjects[1] };
 
 	glDeleteTextures(std::size(textures), textures);
 	glDeleteVertexArrays(std::size(vertexArrayObjects), vertexArrayObjects);
 
-	if(m_mappedStorage)
-		glUnmapNamedBuffer(m_vertexBuffer);
-		
-    glDeleteBuffers(std::size(vertexBufferObjects), vertexBufferObjects);
+	if(m_landscape.mappedStorage)
+		glUnmapNamedBuffer(m_landscape.vertexBufferObjects[0]);
+
+	if(m_buildings.mappedStorage)
+		glUnmapNamedBuffer(m_buildings.vertexBufferObject);
+
+	glDeleteBuffers(std::size(vertexBufferObjects), vertexBufferObjects);
 }
 
 
 void Tilemap::createGraphicsForEntity(const entt::entity entity) noexcept
 {
-	if(m_mappedStorage)
+	if(m_buildings.mappedStorage)
 	{
 		const uint32_t id = m_registry.storage<StructureInfo>().size() - 1;
 
@@ -468,7 +485,7 @@ void Tilemap::createGraphicsForEntity(const entt::entity entity) noexcept
 			static_cast<float>(bounds.x), static_cast<float>(bounds.w), texCoords.x, texCoords.w
 		};
 
-		float* bytes = static_cast<float*>(m_mappedStorage);
+		float* bytes = static_cast<float*>(m_buildings.mappedStorage);
 		bytes += id * std::size(vertices);
 		memcpy(bytes, vertices, sizeof(vertices));
 	}
@@ -495,11 +512,11 @@ void Tilemap::updateWall(int32_t origin, int32_t level) noexcept
 		const auto texCoords = get_texcoords_of_custom_wall(compute_wall_type(a, b, c, d), m_textureSize);
 		const auto entity = m_structureMask[static_cast<size_t>(origin)];
 
-		if(m_mappedStorage)
+		if(m_buildings.mappedStorage)
 		{
 			const auto& building = m_registry.get<StructureInfo>(entity);
 
-			float* bytes = static_cast<float*>(m_mappedStorage);
+			float* bytes = static_cast<float*>(m_buildings.mappedStorage);
 			bytes += building.id * 16; // TODO: fix magic num
 
 			bytes[2] = texCoords.x;

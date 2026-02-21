@@ -35,22 +35,22 @@ private:
     std::string               m_tileMask;
     std::vector<entt::entity> m_structureMask;
 
-    uint32_t m_vertexBuffer;
-    void*    m_mappedStorage;
-
     struct
 	{
 		uint32_t texture;
-		uint32_t vao;
-		uint32_t vbo[2];
+		uint32_t vertexArrayObject;
+		uint32_t vertexBufferObjects[2];
 		uint32_t count; // indices
+        void*    mappedStorage;
 		uint32_t program;
 	} m_landscape;
 
     struct
 	{
-		uint32_t texture;
-		uint32_t vao;
+        uint32_t texture;
+        uint32_t vertexBufferObject;
+        uint32_t vertexArrayObject;
+        void*    mappedStorage;
 	} m_buildings;
 
     ivec2s m_textureSize;
