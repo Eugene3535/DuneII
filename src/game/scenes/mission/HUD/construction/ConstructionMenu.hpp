@@ -19,10 +19,10 @@ public:
     ~ConstructionMenu();
 
     void init()                              noexcept;
-    void showEntityInfo(PreviewType preview) noexcept;
+    void showEntityView(PreviewType preview) noexcept;
     void showEntityMenu(PreviewType mainPreview, std::span<PreviewType> menu) noexcept;
     void hide()                              noexcept;
-    void draw()                        const noexcept;
+    void draw(bool onlyEntityView)           const noexcept;
     void resize(int width, int height)       noexcept;
 
     bool isShown() const noexcept;
@@ -33,6 +33,7 @@ private:
     void createPreviews() noexcept;
     void drawFrame()      const noexcept;
     void drawPreviews()   const noexcept;
+    void drawEntityView() const noexcept;
 
     const class Engine* m_engine;
     class Tilemap&      m_tilemap;
@@ -46,8 +47,8 @@ private:
 
     struct
     {
-        uint32_t vao;
-        uint32_t vbo;
+        uint32_t vertexArrayObject;
+        uint32_t vertexBufferObject;
         uint32_t program;
         int32_t  uniform;
 
@@ -61,10 +62,10 @@ private:
     {
         uint32_t program;
         uint32_t texture;
-        uint32_t vao;
-        uint32_t vbo;
+        uint32_t vertexArrayObject;
+        uint32_t vertexBufferObject;
         uint32_t cellCount;
-    } m_previews;
+    } m_previewCells;
 
     std::vector<vec2s> m_textureGrid;
 

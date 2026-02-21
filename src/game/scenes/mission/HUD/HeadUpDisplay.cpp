@@ -120,13 +120,21 @@ void HeadUpDisplay::draw() const noexcept
         glBindTextureUnit(0, m_cursorTexture);
         glDrawArrays(GL_TRIANGLE_FAN, m_currentCursor.frame, 4);
         glBindTextureUnit(0, 0);
+
+        if(m_selectionFrame.lastSelectedEntity != entt::null)
+        {
+            modelView = m_menu.getTransform().getMatrix();
+            result = glms_mul(uniformMatrix, modelView);
+            camera.updateUniformBuffer(result.raw);
+            m_menu.draw(true);
+        }
     }
     else
     {
         modelView = m_menu.getTransform().getMatrix();
         result = glms_mul(uniformMatrix, modelView);
         camera.updateUniformBuffer(result.raw);
-        m_menu.draw();
+        m_menu.draw(false);
     }
 }
 
@@ -184,7 +192,6 @@ void HeadUpDisplay::runSelection() noexcept
     if(m_selectionFrame.lastSelectedEntity != entity)
     {
         m_selectionFrame.lastSelectedEntity = entity;
-        m_menu.showEntityInfo(PreviewType::Empty_Cell);
     }           
     else
     {
@@ -231,6 +238,11 @@ void HeadUpDisplay::runSelection() noexcept
 
         if(isSelectable)
         {
+            const auto entityView = convert_building_type_to_preview(info->type);
+
+            if(entityView != PreviewType::Empty_Cell)
+                m_menu.showEntityView(entityView);
+
             const auto bounds = registry.get<ivec4s>(entity);
             glBindBuffer(GL_ARRAY_BUFFER, m_selectionFrame.vbo);
 

@@ -6,7 +6,7 @@
 #include "graphics/Meshes.hpp"
 #include "graphics/transform/Transform2D.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
-#include "game/scenes/mission/menu/ConstructionMenu.hpp"
+#include "game/scenes/mission/HUD/construction/ConstructionMenu.hpp"
 
 
 class HeadUpDisplay
@@ -33,7 +33,8 @@ public:
 private:
     class Engine*        m_engine;
     const class Tilemap& m_tilemap;
-    ConstructionMenu     m_menu;
+
+    ConstructionMenu m_menu;
 
     SpriteManager m_sprites;
     mesh::Sprite  m_releasedCursor;

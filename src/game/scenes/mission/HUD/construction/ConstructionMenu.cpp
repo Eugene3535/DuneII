@@ -9,7 +9,7 @@
 #include "graphics/geometry/GeometryGenerator.hpp"
 #include "game/scenes/mission/tilemap/Tilemap.hpp"
 #include "game/Engine.hpp"
-#include "game/scenes/mission/menu/ConstructionMenu.hpp"
+#include "game/scenes/mission/HUD/construction/ConstructionMenu.hpp"
 
 
 #define PREVIEW_ICON_COLUMNS 3
@@ -39,24 +39,24 @@ ConstructionMenu::ConstructionMenu(const Engine* engine, Tilemap& tilemap) noexc
 
 ConstructionMenu::~ConstructionMenu()
 {
-    glDeleteTextures(1, &m_previews.texture);
-    glDeleteVertexArrays(1, &m_previews.vao);
-	glDeleteBuffers(1, &m_previews.vbo);
+    glDeleteTextures(1, &m_previewCells.texture);
+    glDeleteVertexArrays(1, &m_previewCells.vertexArrayObject);
+	glDeleteBuffers(1, &m_previewCells.vertexBufferObject);
 	
-    glDeleteVertexArrays(1, &m_frame.vao);
-	glDeleteBuffers(1, &m_frame.vbo);
+    glDeleteVertexArrays(1, &m_frame.vertexArrayObject);
+	glDeleteBuffers(1, &m_frame.vertexBufferObject);
 }
 
 
 void ConstructionMenu::init() noexcept
 {
     memset(&m_frame, 0, sizeof(m_frame));
-    memset(&m_previews, 0, sizeof(m_previews));
+    memset(&m_previewCells, 0, sizeof(m_previewCells));
 
     m_frame.program = m_engine->getShaderProgram("color_outline");
-    m_previews.program = m_engine->getShaderProgram("sprite");
+    m_previewCells.program = m_engine->getShaderProgram("sprite");
     assert(m_frame.program != 0);
-    assert(m_previews.program != 0);
+    assert(m_previewCells.program != 0);
 
     m_transform.setOrigin(DEFAULT_MENU_WIDTH * 0.5f, DEFAULT_MENU_HEIGHT * 0.5f);
 
@@ -65,9 +65,42 @@ void ConstructionMenu::init() noexcept
 }
 
 
-void ConstructionMenu::showEntityInfo(PreviewType preview) noexcept
+void ConstructionMenu::showEntityView(PreviewType preview) noexcept
 {
-    // side info bar
+    if(preview >= PreviewType::MAX)
+        return;
+
+    auto setup_tex_coords = [this](void* data, PreviewType preview, uint32_t offset) -> void
+    {
+        const size_t index = static_cast<size_t>(preview) << 2;
+        const vec2s* texCoords = &m_textureGrid[index];
+        vec4s* vertices = static_cast<vec4s*>(data) + offset;
+
+        vertices[0].z = texCoords[0].x;
+        vertices[0].w = texCoords[0].y;
+
+        vertices[1].z = texCoords[1].x;
+        vertices[1].w = texCoords[1].y;
+
+        vertices[2].z = texCoords[2].x;
+        vertices[2].w = texCoords[2].y;
+
+        vertices[3].z = texCoords[3].x;
+        vertices[3].w = texCoords[3].y;
+    };
+
+    constexpr size_t previewCount = PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS;
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_previewCells.vertexBufferObject);
+
+    if(void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
+    {
+        setup_tex_coords(data, preview, ((previewCount + 1) << 2));
+
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 
@@ -97,7 +130,7 @@ void ConstructionMenu::showEntityMenu(PreviewType mainPreview, std::span<Preview
 
     constexpr size_t previewCount = PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS;
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_previews.vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, m_previewCells.vertexBufferObject);
 
     if(void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
     {
@@ -140,10 +173,17 @@ void ConstructionMenu::hide() noexcept
 }
 
 
-void ConstructionMenu::draw() const noexcept
+void ConstructionMenu::draw(bool onlyEntityView) const noexcept
 {
-    drawFrame();
-    drawPreviews();
+    if(onlyEntityView)
+    {
+        drawEntityView();
+    }    
+    else
+    {
+        drawFrame();
+        drawPreviews();
+    }
 }
 
 
@@ -211,20 +251,20 @@ void ConstructionMenu::createFrame() noexcept
     createRectangle({580.f, 600.f, 300.f, 50.f}, m_frame.entityWidgetParams[2].background, m_frame.entityWidgetParams[2].outline);
 
 //  Unload to GPU
-    glCreateBuffers(1, &m_frame.vbo);
-    glNamedBufferData(m_frame.vbo, buffer.size() * sizeof(float), buffer.data(), GL_DYNAMIC_DRAW);
+    glCreateBuffers(1, &m_frame.vertexBufferObject);
+    glNamedBufferData(m_frame.vertexBufferObject, buffer.size() * sizeof(float), buffer.data(), GL_DYNAMIC_DRAW);
 
-    glGenVertexArrays(1, &m_frame.vao);
+    glGenVertexArrays(1, &m_frame.vertexArrayObject);
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float2 };
-    VertexArrayObject::createVertexInputState(m_frame.vao, m_frame.vbo, attributes);
+    VertexArrayObject::createVertexInputState(m_frame.vertexArrayObject, m_frame.vertexBufferObject, attributes);
 }
 
 
 void ConstructionMenu::createPreviews() noexcept
 {
-    glGenTextures(1, &m_previews.texture);
+    glGenTextures(1, &m_previewCells.texture);
 
-    Texture previewsTexture = {.handle = m_previews.texture };
+    Texture previewsTexture = {.handle = m_previewCells.texture };
 
     if(!previewsTexture.loadFromFile(FileProvider::findPathToFile(PREVIEWS_PNG)))
         return;
@@ -286,14 +326,20 @@ void ConstructionMenu::createPreviews() noexcept
     vertices.push_back({ 870.f, 70.f,  texCoords[1].x, texCoords[1].y });
     vertices.push_back({ 870.f, 230.f, texCoords[2].x, texCoords[2].y });
     vertices.push_back({ 590.f, 230.f, texCoords[3].x, texCoords[3].y });
-    m_previews.cellCount = static_cast<uint32_t>(vertices.size() >> 2);
+    m_previewCells.cellCount = static_cast<uint32_t>(vertices.size() >> 2);
 
-    glCreateBuffers(1, &m_previews.vbo);
-    glNamedBufferData(m_previews.vbo, vertices.size() * sizeof(vec4s), vertices.data(), GL_STATIC_DRAW);
+//  Side bar entity preview
+    vertices.push_back({ 800.f, 100.f,  texCoords[0].x, texCoords[0].y });
+    vertices.push_back({ 950.f, 100.f,  texCoords[1].x, texCoords[1].y });
+    vertices.push_back({ 950.f, 200.f, texCoords[2].x, texCoords[2].y });
+    vertices.push_back({ 800.f, 200.f, texCoords[3].x, texCoords[3].y });
 
-    glGenVertexArrays(1, &m_previews.vao);
+    glCreateBuffers(1, &m_previewCells.vertexBufferObject);
+    glNamedBufferData(m_previewCells.vertexBufferObject, vertices.size() * sizeof(vec4s), vertices.data(), GL_DYNAMIC_DRAW);
+
+    glGenVertexArrays(1, &m_previewCells.vertexArrayObject);
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
-    VertexArrayObject::createVertexInputState(m_previews.vao, m_previews.vbo, attributes);
+    VertexArrayObject::createVertexInputState(m_previewCells.vertexArrayObject, m_previewCells.vertexBufferObject, attributes);
 }
 
 
@@ -302,7 +348,7 @@ void ConstructionMenu::drawFrame() const noexcept
     glUseProgram(m_frame.program);
     uint32_t startFrame = 0;
 
-    glBindVertexArray(m_frame.vao);
+    glBindVertexArray(m_frame.vertexArrayObject);
 
     glUniform4fv(m_frame.uniform, 1, background_color);
     glDrawArrays(GL_TRIANGLE_FAN, 0, m_frame.rootWidget.background);
@@ -335,12 +381,22 @@ void ConstructionMenu::drawFrame() const noexcept
 
 void ConstructionMenu::drawPreviews() const noexcept
 {
-    glUseProgram(m_previews.program);
-    glBindTextureUnit(0, m_previews.texture);
-    glBindVertexArray(m_previews.vao);
+    glUseProgram(m_previewCells.program);
+    glBindTextureUnit(0, m_previewCells.texture);
+    glBindVertexArray(m_previewCells.vertexArrayObject);
 
-    for (uint32_t i = 0; i < m_previews.cellCount; ++i)
+    for (uint32_t i = 0; i < m_previewCells.cellCount; ++i)
         glDrawArrays(GL_TRIANGLE_FAN, i << 2, 4);
     
+    glBindTextureUnit(0, 0);
+}
+
+
+void ConstructionMenu::drawEntityView() const noexcept
+{
+    glUseProgram(m_previewCells.program);
+    glBindTextureUnit(0, m_previewCells.texture);
+    glBindVertexArray(m_previewCells.vertexArrayObject);
+    glDrawArrays(GL_TRIANGLE_FAN, m_previewCells.cellCount << 2, 4);
     glBindTextureUnit(0, 0);
 }
