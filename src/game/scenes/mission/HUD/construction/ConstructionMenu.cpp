@@ -239,16 +239,16 @@ void ConstructionMenu::createFrame() noexcept
 //  Background
     createRectangle({0.f, 0.f, DEFAULT_MENU_WIDTH, DEFAULT_MENU_HEIGHT}, m_frame.rootWidget.background, m_frame.rootWidget.outline);
 
-//  Entity presentation цidget
-    createRectangle({580.f, 50.f, 300.f, 200.f}, m_frame.entityWidget.background, m_frame.entityWidget.outline);
+//  Entity presentation widget
+    createRectangle({580.f, 100.f, 300.f, 200.f}, m_frame.entityWidget.background, m_frame.entityWidget.outline);
 
-//  Entity цidget label
-    createRectangle({580.f, 265.f, 300.f, 50.f}, m_frame.entityWidgetLabel.background, m_frame.entityWidgetLabel.outline);
+//  Entity widget label
+    createRectangle({580.f, 315.f, 300.f, 50.f}, m_frame.entityWidgetLabel.background, m_frame.entityWidgetLabel.outline);
 
 //  Entity property labels
-    createRectangle({580.f, 400.f, 300.f, 50.f}, m_frame.entityWidgetParams[0].background, m_frame.entityWidgetParams[0].outline);
-    createRectangle({580.f, 500.f, 300.f, 50.f}, m_frame.entityWidgetParams[1].background, m_frame.entityWidgetParams[1].outline);
-    createRectangle({580.f, 600.f, 300.f, 50.f}, m_frame.entityWidgetParams[2].background, m_frame.entityWidgetParams[2].outline);
+    createRectangle({580.f, 450.f, 300.f, 50.f}, m_frame.entityWidgetParams[0].background, m_frame.entityWidgetParams[0].outline);
+    createRectangle({580.f, 550.f, 300.f, 50.f}, m_frame.entityWidgetParams[1].background, m_frame.entityWidgetParams[1].outline);
+    createRectangle({580.f, 650.f, 300.f, 50.f}, m_frame.entityWidgetParams[2].background, m_frame.entityWidgetParams[2].outline);
 
 //  Unload to GPU
     glCreateBuffers(1, &m_frame.vertexBufferObject);
@@ -299,7 +299,7 @@ void ConstructionMenu::createPreviews() noexcept
     vertices.reserve((PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS + 1) << 2); // +1 for major preview in the right-top corner
 
     const vec2s cellSize = { 150.f, 100.f };
-    const vec2s startPos = { 50.f, 50.f };
+    const vec2s startPos = { 50.f, 100.f };
     const float indent = 10.f;
 
     const size_t index = static_cast<size_t>(PreviewType::Empty_Cell) << 2;
@@ -322,10 +322,10 @@ void ConstructionMenu::createPreviews() noexcept
     }
     
 //  Main preview
-    vertices.push_back({ 590.f, 70.f,  texCoords[0].x, texCoords[0].y });
-    vertices.push_back({ 870.f, 70.f,  texCoords[1].x, texCoords[1].y });
-    vertices.push_back({ 870.f, 230.f, texCoords[2].x, texCoords[2].y });
-    vertices.push_back({ 590.f, 230.f, texCoords[3].x, texCoords[3].y });
+    vertices.push_back({ 590.f, 120.f,  texCoords[0].x, texCoords[0].y });
+    vertices.push_back({ 870.f, 120.f,  texCoords[1].x, texCoords[1].y });
+    vertices.push_back({ 870.f, 280.f,  texCoords[2].x, texCoords[2].y });
+    vertices.push_back({ 590.f, 280.f,  texCoords[3].x, texCoords[3].y });
     m_previewCells.cellCount = static_cast<uint32_t>(vertices.size() >> 2);
 
 //  Side bar entity preview
