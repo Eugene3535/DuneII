@@ -49,10 +49,10 @@ private:
 
     struct
     {
-        uint32_t vbo;
-        uint32_t vao;
-        float blinkTimer;
-        bool enabled;
+        uint32_t     vertexBufferObject;
+        uint32_t     vertexArrayObject;
+        float        blinkTimer;
+        bool         enabled;
         entt::entity lastSelectedEntity;
     } m_selectionFrame;
 };

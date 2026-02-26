@@ -22,8 +22,8 @@ HeadUpDisplay::HeadUpDisplay(Engine* engine,  Tilemap& tilemap) noexcept:
     m_tilemapProgram(0),
     m_clickTimer(0.f)
 {
-    m_selectionFrame.vbo = 0;
-    m_selectionFrame.vao = 0;
+    m_selectionFrame.vertexBufferObject = 0;
+    m_selectionFrame.vertexArrayObject = 0;
     m_selectionFrame.blinkTimer = 0.f;
     m_selectionFrame.enabled = false;
     m_selectionFrame.lastSelectedEntity = entt::null;
@@ -33,8 +33,8 @@ HeadUpDisplay::HeadUpDisplay(Engine* engine,  Tilemap& tilemap) noexcept:
 HeadUpDisplay::~HeadUpDisplay()
 {
     glDeleteTextures(1, &m_cursorTexture);
-    glDeleteVertexArrays(1, &m_selectionFrame.vao);
-    glDeleteBuffers(1, &m_selectionFrame.vbo);
+    glDeleteVertexArrays(1, &m_selectionFrame.vertexArrayObject);
+    glDeleteBuffers(1, &m_selectionFrame.vertexBufferObject);
 }
 
 
@@ -67,12 +67,12 @@ bool HeadUpDisplay::init() noexcept
     m_currentCursor = m_releasedCursor;
 
 //  Selection frame
-    glCreateBuffers(1, &m_selectionFrame.vbo);
-	glNamedBufferData(m_selectionFrame.vbo, sizeof(float) << 5, nullptr, GL_DYNAMIC_DRAW);
+    glCreateBuffers(1, &m_selectionFrame.vertexBufferObject);
+	glNamedBufferData(m_selectionFrame.vertexBufferObject, sizeof(float) << 5, nullptr, GL_DYNAMIC_DRAW);
 
-	glGenVertexArrays(1, &m_selectionFrame.vao);
+	glGenVertexArrays(1, &m_selectionFrame.vertexArrayObject);
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float2 };
-	VertexArrayObject::createVertexInputState(m_selectionFrame.vao, m_selectionFrame.vbo, attributes);
+	VertexArrayObject::createVertexInputState(m_selectionFrame.vertexArrayObject, m_selectionFrame.vertexBufferObject, attributes);
 
     m_menu.init();
 
@@ -105,7 +105,7 @@ void HeadUpDisplay::draw() const noexcept
         if(m_selectionFrame.enabled && m_selectionFrame.blinkTimer < BLINK_PERIOD)
         {
             glUseProgram(m_cursorProgram);
-            glBindVertexArray(m_selectionFrame.vao);
+            glBindVertexArray(m_selectionFrame.vertexArrayObject);
             glDrawArrays(GL_LINES, 0, 16);
 
             glUseProgram(m_tilemapProgram); // return to default tilemap shader
@@ -120,7 +120,7 @@ void HeadUpDisplay::draw() const noexcept
         glDrawArrays(GL_TRIANGLE_FAN, m_currentCursor.frame, 4);
         glBindTextureUnit(0, 0);
 
-        if(m_selectionFrame.lastSelectedEntity != entt::null)
+        if(m_selectionFrame.enabled && (m_selectionFrame.lastSelectedEntity != entt::null))
         {
             modelView = m_menu.getTransform().getMatrix();
             result = glms_mul(uniformMatrix, modelView);
@@ -243,7 +243,7 @@ void HeadUpDisplay::runSelection() noexcept
                 m_menu.showEntityView(entityView);
 
             const auto bounds = registry.get<ivec4s>(entity);
-            glBindBuffer(GL_ARRAY_BUFFER, m_selectionFrame.vbo);
+            glBindBuffer(GL_ARRAY_BUFFER, m_selectionFrame.vertexBufferObject);
 
             if(void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
             {
