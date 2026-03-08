@@ -39,29 +39,36 @@ ConstructionMenu::ConstructionMenu(const Engine* engine, Tilemap& tilemap) noexc
 
 ConstructionMenu::~ConstructionMenu()
 {
+    glDeleteTextures(3, m_userElements.textures);
     glDeleteTextures(1, &m_previewCells.texture);
+
+    glDeleteVertexArrays(1, &m_userElements.vertexArrayObject);
+	glDeleteBuffers(1, &m_userElements.vertexBufferObject);
+
     glDeleteVertexArrays(1, &m_previewCells.vertexArrayObject);
 	glDeleteBuffers(1, &m_previewCells.vertexBufferObject);
-	
-    glDeleteVertexArrays(1, &m_frame.vertexArrayObject);
-	glDeleteBuffers(1, &m_frame.vertexBufferObject);
+
+    glDeleteVertexArrays(1, &m_frames.vertexArrayObject);
+	glDeleteBuffers(1, &m_frames.vertexBufferObject);
 }
 
 
 void ConstructionMenu::init() noexcept
 {
-    memset(&m_frame, 0, sizeof(m_frame));
+    memset(&m_frames, 0, sizeof(m_frames));
     memset(&m_previewCells, 0, sizeof(m_previewCells));
+    memset(&m_userElements, 0, sizeof(m_userElements));
 
-    m_frame.program = m_engine->getShaderProgram("color_outline");
+    m_frames.program = m_engine->getShaderProgram("color_outline");
     m_previewCells.program = m_engine->getShaderProgram("sprite");
-    assert(m_frame.program != 0);
+    assert(m_frames.program != 0);
     assert(m_previewCells.program != 0);
 
     m_transform.setOrigin(DEFAULT_MENU_WIDTH * 0.5f, DEFAULT_MENU_HEIGHT * 0.5f);
 
-    createFrame();
+    createFrames();
     createPreviews();
+    createUserElements();
 }
 
 
@@ -181,8 +188,9 @@ void ConstructionMenu::draw(bool onlyEntityView) const noexcept
     }    
     else
     {
-        drawFrame();
+        drawFrames();
         drawPreviews();
+        drawUserElements();
     }
 }
 
@@ -208,12 +216,11 @@ const Transform2D& ConstructionMenu::getTransform() const noexcept
 }
 
 
-void ConstructionMenu::createFrame() noexcept
+void ConstructionMenu::createFrames() noexcept
 { 
-    if(const GLint uniformColor = glGetUniformLocation(m_frame.program, "outlineColor"); uniformColor != -1)
-        m_frame.uniform = uniformColor;
+    if(const GLint uniformColor = glGetUniformLocation(m_frames.program, "outlineColor"); uniformColor != -1)
+        m_frames.uniform = uniformColor;
 
-    GeometryGenerator generator;
     std::vector<float> buffer;
     const float thickness = 5.f;
     const float radius = 10.f;
@@ -237,26 +244,26 @@ void ConstructionMenu::createFrame() noexcept
     };
 
 //  Background
-    createRectangle({0.f, 0.f, DEFAULT_MENU_WIDTH, DEFAULT_MENU_HEIGHT}, m_frame.rootWidget.background, m_frame.rootWidget.outline);
+    createRectangle({0.f, 0.f, DEFAULT_MENU_WIDTH, DEFAULT_MENU_HEIGHT}, m_frames.rootWidget.background, m_frames.rootWidget.outline);
 
 //  Entity presentation widget
-    createRectangle({580.f, 100.f, 300.f, 200.f}, m_frame.entityWidget.background, m_frame.entityWidget.outline);
+    createRectangle({580.f, 100.f, 300.f, 200.f}, m_frames.entityWidget.background, m_frames.entityWidget.outline);
 
 //  Entity widget label
-    createRectangle({580.f, 315.f, 300.f, 50.f}, m_frame.entityWidgetLabel.background, m_frame.entityWidgetLabel.outline);
+    createRectangle({580.f, 315.f, 300.f, 50.f}, m_frames.entityWidgetLabel.background, m_frames.entityWidgetLabel.outline);
 
 //  Entity property labels
-    createRectangle({580.f, 450.f, 300.f, 50.f}, m_frame.entityWidgetParams[0].background, m_frame.entityWidgetParams[0].outline);
-    createRectangle({580.f, 550.f, 300.f, 50.f}, m_frame.entityWidgetParams[1].background, m_frame.entityWidgetParams[1].outline);
-    createRectangle({580.f, 650.f, 300.f, 50.f}, m_frame.entityWidgetParams[2].background, m_frame.entityWidgetParams[2].outline);
+    createRectangle({580.f, 450.f, 300.f, 50.f}, m_frames.entityWidgetParams[0].background, m_frames.entityWidgetParams[0].outline);
+    createRectangle({580.f, 550.f, 300.f, 50.f}, m_frames.entityWidgetParams[1].background, m_frames.entityWidgetParams[1].outline);
+    createRectangle({580.f, 650.f, 300.f, 50.f}, m_frames.entityWidgetParams[2].background, m_frames.entityWidgetParams[2].outline);
 
 //  Unload to GPU
-    glCreateBuffers(1, &m_frame.vertexBufferObject);
-    glNamedBufferData(m_frame.vertexBufferObject, buffer.size() * sizeof(float), buffer.data(), GL_DYNAMIC_DRAW);
+    glCreateBuffers(1, &m_frames.vertexBufferObject);
+    glNamedBufferData(m_frames.vertexBufferObject, buffer.size() * sizeof(float), buffer.data(), GL_DYNAMIC_DRAW);
 
-    glGenVertexArrays(1, &m_frame.vertexArrayObject);
+    glGenVertexArrays(1, &m_frames.vertexArrayObject);
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float2 };
-    VertexArrayObject::createVertexInputState(m_frame.vertexArrayObject, m_frame.vertexBufferObject, attributes);
+    VertexArrayObject::createVertexInputState(m_frames.vertexArrayObject, m_frames.vertexBufferObject, attributes);
 }
 
 
@@ -343,38 +350,122 @@ void ConstructionMenu::createPreviews() noexcept
 }
 
 
-void ConstructionMenu::drawFrame() const noexcept
+void ConstructionMenu::createUserElements() noexcept
 {
-    glUseProgram(m_frame.program);
+    glGenTextures(3, m_userElements.textures);
+
+    uint32_t currentTexture = 0;
+
+    for (const auto textureName : { BUTTON_EXIT_RU_PNG, BUTTON_REPAIR_RU_PNG, BUTTON_STOP_RU_PNG })
+    {
+        Texture texture = {.handle = m_userElements.textures[currentTexture++] };
+
+        if(!texture.loadFromFile(FileProvider::findPathToFile(textureName)))
+            return;
+    }
+
+    std::array<float, 48> vertices; // 3 sprites * 4 vertices * 4 float (position + tex coords)
+
+    vec4s posFrame = { 50.f, 30.f, 150.f, 50.f };
+    const float offset = 160.f;
+
+    for (size_t i = 0; i < 3; ++i)
+    {
+        GLint width, height;
+        glGetTextureLevelParameteriv(m_userElements.textures[i], 0, GL_TEXTURE_WIDTH, &width);
+        glGetTextureLevelParameteriv(m_userElements.textures[i], 0, GL_TEXTURE_HEIGHT, &height);
+
+        auto quad = vertices.data() + (i << 4);
+
+//  Positions
+        quad[0] = posFrame.x + i * offset;
+        quad[1] = posFrame.y;
+
+        quad[4] = posFrame.x + posFrame.z + i * offset;
+        quad[5] = posFrame.y;
+
+        quad[8] = posFrame.x + posFrame.z + i * offset;
+        quad[9] = posFrame.y + posFrame.w;
+
+        quad[12] = posFrame.x + i * offset;
+        quad[13] = posFrame.y + posFrame.w;
+
+//  Texture coords
+        const ivec4s texFrame = { 0, 0, width, height };
+        const vec2s ratio = { 1.f / static_cast<float>(width), 1.f / static_cast<float>(height) };
+
+        const float left   = texFrame.x * ratio.x;
+        const float top    = texFrame.y * ratio.y;
+        const float right  = (texFrame.x + texFrame.z) * ratio.x;
+        const float bottom = (texFrame.y + texFrame.w) * ratio.y;
+
+        quad[2] = left;
+        quad[3] = top;
+
+        quad[6] = right;
+        quad[7] = top;
+
+        quad[10] = right;
+        quad[11] = bottom;
+
+        quad[14] = left;
+        quad[15] = bottom;
+
+//  Assign sprite
+        mesh::Sprite* button = &m_userElements.buttonExit;
+        if(i == 1) button = &m_userElements.buttonRepair;
+        if(i == 2) button = &m_userElements.buttonStop;
+
+        button->texture = m_userElements.textures[i];
+        button->frame   = (i << 2);
+        button->width   = width;
+        button->height  = height;
+    }
+    
+    glCreateBuffers(1, &m_userElements.vertexBufferObject);
+    glNamedBufferData(m_userElements.vertexBufferObject, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+
+    glGenVertexArrays(1, &m_userElements.vertexArrayObject);
+    const std::array<VertexBufferLayout::Attribute, 1> attributes = { VertexBufferLayout::Attribute::Float4 };
+    VertexArrayObject::createVertexInputState(m_userElements.vertexArrayObject, m_userElements.vertexBufferObject, attributes);
+
+    m_userElements.program = m_previewCells.program;
+    m_userElements.selectionFrame.program = m_frames.program;
+}
+
+
+void ConstructionMenu::drawFrames() const noexcept
+{
+    glUseProgram(m_frames.program);
     uint32_t startFrame = 0;
 
-    glBindVertexArray(m_frame.vertexArrayObject);
+    glBindVertexArray(m_frames.vertexArrayObject);
 
-    glUniform4fv(m_frame.uniform, 1, background_color);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, m_frame.rootWidget.background);
-    glUniform4fv(m_frame.uniform, 1, outline_color);
-    glDrawArrays(GL_TRIANGLE_STRIP, m_frame.rootWidget.background, m_frame.rootWidget.outline);
-    startFrame = m_frame.rootWidget.background + m_frame.rootWidget.outline;
+    glUniform4fv(m_frames.uniform, 1, background_color);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, m_frames.rootWidget.background);
+    glUniform4fv(m_frames.uniform, 1, outline_color);
+    glDrawArrays(GL_TRIANGLE_STRIP, m_frames.rootWidget.background, m_frames.rootWidget.outline);
+    startFrame = m_frames.rootWidget.background + m_frames.rootWidget.outline;
 
-    glUniform4fv(m_frame.uniform, 1, cell_background_color);
-    glDrawArrays(GL_TRIANGLE_FAN, startFrame, m_frame.entityWidget.background);
-    glUniform4fv(m_frame.uniform, 1, outline_color);
-    glDrawArrays(GL_TRIANGLE_STRIP, startFrame + m_frame.entityWidget.background, m_frame.entityWidget.outline);
-    startFrame += m_frame.entityWidget.background + m_frame.entityWidget.outline;
+    glUniform4fv(m_frames.uniform, 1, cell_background_color);
+    glDrawArrays(GL_TRIANGLE_FAN, startFrame, m_frames.entityWidget.background);
+    glUniform4fv(m_frames.uniform, 1, outline_color);
+    glDrawArrays(GL_TRIANGLE_STRIP, startFrame + m_frames.entityWidget.background, m_frames.entityWidget.outline);
+    startFrame += m_frames.entityWidget.background + m_frames.entityWidget.outline;
 
-    glUniform4fv(m_frame.uniform, 1, cell_background_color);
-    glDrawArrays(GL_TRIANGLE_FAN, startFrame, m_frame.entityWidgetLabel.background);
-    glUniform4fv(m_frame.uniform, 1, outline_color);
-    glDrawArrays(GL_TRIANGLE_STRIP, startFrame + m_frame.entityWidgetLabel.background, m_frame.entityWidgetLabel.outline);
-    startFrame += m_frame.entityWidgetLabel.background + m_frame.entityWidgetLabel.outline;
+    glUniform4fv(m_frames.uniform, 1, cell_background_color);
+    glDrawArrays(GL_TRIANGLE_FAN, startFrame, m_frames.entityWidgetLabel.background);
+    glUniform4fv(m_frames.uniform, 1, outline_color);
+    glDrawArrays(GL_TRIANGLE_STRIP, startFrame + m_frames.entityWidgetLabel.background, m_frames.entityWidgetLabel.outline);
+    startFrame += m_frames.entityWidgetLabel.background + m_frames.entityWidgetLabel.outline;
 
     for (uint32_t i = 0; i < 3; ++i)
     {
-        glUniform4fv(m_frame.uniform, 1, cell_background_color);
-        glDrawArrays(GL_TRIANGLE_FAN, startFrame, m_frame.entityWidgetParams[i].background);
-        glUniform4fv(m_frame.uniform, 1, outline_color);
-        glDrawArrays(GL_TRIANGLE_STRIP, startFrame + m_frame.entityWidgetParams[i].background, m_frame.entityWidgetParams[i].outline);
-        startFrame += m_frame.entityWidgetParams[i].background + m_frame.entityWidgetParams[i].outline;
+        glUniform4fv(m_frames.uniform, 1, cell_background_color);
+        glDrawArrays(GL_TRIANGLE_FAN, startFrame, m_frames.entityWidgetParams[i].background);
+        glUniform4fv(m_frames.uniform, 1, outline_color);
+        glDrawArrays(GL_TRIANGLE_STRIP, startFrame + m_frames.entityWidgetParams[i].background, m_frames.entityWidgetParams[i].outline);
+        startFrame += m_frames.entityWidgetParams[i].background + m_frames.entityWidgetParams[i].outline;
     }
 }
 
@@ -398,5 +489,22 @@ void ConstructionMenu::drawEntityView() const noexcept
     glBindTextureUnit(0, m_previewCells.texture);
     glBindVertexArray(m_previewCells.vertexArrayObject);
     glDrawArrays(GL_TRIANGLE_FAN, m_previewCells.cellCount << 2, 4);
+    glBindTextureUnit(0, 0);
+}
+
+
+void ConstructionMenu::drawUserElements() const noexcept
+{
+    glBindVertexArray(m_userElements.vertexArrayObject);
+
+    glBindTextureUnit(0, m_userElements.buttonExit.texture);
+    glDrawArrays(GL_TRIANGLE_FAN, m_userElements.buttonExit.frame, 4);
+
+    glBindTextureUnit(0, m_userElements.buttonRepair.texture);
+    glDrawArrays(GL_TRIANGLE_FAN, m_userElements.buttonRepair.frame, 4);
+
+    glBindTextureUnit(0, m_userElements.buttonStop.texture);
+    glDrawArrays(GL_TRIANGLE_FAN, m_userElements.buttonStop.frame, 4);
+
     glBindTextureUnit(0, 0);
 }

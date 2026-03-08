@@ -2,16 +2,24 @@
 #define DEFINES_HPP
 
 
-// Images
+// Textures
 #define STRUCTURES_PNG           "Structures.png"
 #define FLAGS_PNG                "Flags.png"
 #define CROSSHAIRS_TILESHEET_PNG "crosshairs_tilesheet.png"
 #define SPACE_JPG                "space.jpg"
 #define DUNE_PNG                 "dune.png"
 #define LANDSCAPE_PNG            "Landscape.png"
+
 #define BUTTON_PLAY_PNG          "button_play.png"
+#define BUTTON_EXIT_EN_PNG       "button_exit_en.png"
 #define BUTTON_EXIT_RU_PNG       "button_exit_ru.png"
 #define BUTTON_SETTINGS_RU_PNG   "button_settings_ru.png"
+#define BUTTON_SETTINGS_EN_PNG   "button_settings_en.png"
+#define BUTTON_REPAIR_RU_PNG     "button_repair_ru.png"
+#define BUTTON_REPAIR_EN_PNG     "button_repair_en.png"
+#define BUTTON_STOP_RU_PNG       "button_stop_ru.png"
+#define BUTTON_STOP_EN_PNG       "button_stop_en.png"
+
 #define HOUSES_PNG               "Houses.png"
 #define OUTLINE_PNG              "Outline.png"
 #define PREVIEWS_PNG             "Previews.png"

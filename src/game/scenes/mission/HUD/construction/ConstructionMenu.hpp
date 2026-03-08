@@ -29,11 +29,14 @@ public:
     const Transform2D& getTransform() const noexcept;
 
 private:
-    void createFrame()    noexcept;
-    void createPreviews() noexcept;
-    void drawFrame()      const noexcept;
-    void drawPreviews()   const noexcept;
-    void drawEntityView() const noexcept;
+    void createFrames()       noexcept;
+    void createPreviews()     noexcept;
+    void createUserElements() noexcept;
+
+    void drawFrames()       const noexcept;
+    void drawPreviews()     const noexcept;
+    void drawEntityView()   const noexcept;
+    void drawUserElements() const noexcept;
 
     const class Engine* m_engine;
     class Tilemap&      m_tilemap;
@@ -47,8 +50,8 @@ private:
 
     struct
     {
-        uint32_t vertexArrayObject;
         uint32_t vertexBufferObject;
+        uint32_t vertexArrayObject;
         uint32_t program;
         int32_t  uniform;
 
@@ -56,19 +59,38 @@ private:
         Widget entityWidget;
         Widget entityWidgetLabel;
         Widget entityWidgetParams[3];
-    } m_frame;
+    } m_frames;
 
     struct
     {
         uint32_t program;
         uint32_t texture;
-        uint32_t vertexArrayObject;
         uint32_t vertexBufferObject;
+        uint32_t vertexArrayObject;
         uint32_t cellCount;
     } m_previewCells;
 
-    std::vector<vec2s> m_textureGrid;
+    struct 
+    {        
+        uint32_t program;
+        uint32_t textures[3];
+        uint32_t vertexBufferObject;
+        uint32_t vertexArrayObject;
+        mesh::Sprite buttonExit;
+        mesh::Sprite buttonRepair;
+        mesh::Sprite buttonStop;
+        struct
+        {
+            uint32_t vertexBufferObject;
+            uint32_t vertexArrayObject;
+            uint32_t program;
+            uint32_t count;
+            Transform2D transform;
+        } selectionFrame;
 
+    } m_userElements;
+    
+    std::vector<vec2s> m_textureGrid;
     bool m_isShown;
 };
 
