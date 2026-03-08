@@ -2,6 +2,7 @@
 #include <cassert>
 
 #include <glad/glad.h>
+#include "cglm/struct/affine-mat.h"
 
 #include "resources/files/FileProvider.hpp"
 #include "resources/gl_interfaces/texture/Texture.hpp"
@@ -24,6 +25,14 @@ namespace
     constexpr float background_color[]      = { 155.f / 255.f, 160.f / 255.f, 163.f / 255.f, 1.f };
     constexpr float outline_color[]         = { 170.f / 255.f, 199.f / 255.f, 207.f / 255.f, 1.f };
     constexpr float cell_background_color[] = { 116.f / 255.f, 120.f / 255.f, 121.f / 255.f, 1.f };
+    constexpr float selection_frame_color[] = { 1.f, 0.f, 0.f, 1.f };
+
+    void set_sprite_size_in_pixels(const mesh::Sprite& sprite, const vec2s newSize, Transform2D& transform) noexcept
+    {
+        float dx = newSize.x / sprite.width;
+        float dy = newSize.y / sprite.height;
+        transform.setScale(dx, dy);
+    }
 }
 
 
@@ -44,7 +53,8 @@ ConstructionMenu::~ConstructionMenu()
 
     glDeleteVertexArrays(1, &m_userElements.vertexArrayObject);
 	glDeleteBuffers(1, &m_userElements.vertexBufferObject);
-
+    glDeleteBuffers(1, &m_userElements.selectionFrame.vertexArrayObject);
+    
     glDeleteVertexArrays(1, &m_previewCells.vertexArrayObject);
 	glDeleteBuffers(1, &m_previewCells.vertexBufferObject);
 
@@ -219,7 +229,7 @@ const Transform2D& ConstructionMenu::getTransform() const noexcept
 void ConstructionMenu::createFrames() noexcept
 { 
     if(const GLint uniformColor = glGetUniformLocation(m_frames.program, "outlineColor"); uniformColor != -1)
-        m_frames.uniform = uniformColor;
+        m_frames.uniformColor = uniformColor;
 
     std::vector<float> buffer;
     const float thickness = 5.f;
@@ -364,9 +374,9 @@ void ConstructionMenu::createUserElements() noexcept
             return;
     }
 
-    std::array<float, 48> vertices; // 3 sprites * 4 vertices * 4 float (position + tex coords)
+    std::vector<float> vertices;
 
-    vec4s posFrame = { 50.f, 30.f, 150.f, 50.f };
+    const vec4s posFrame = { 50.f, 30.f, 150.f, 50.f };
     const float offset = 160.f;
 
     for (size_t i = 0; i < 3; ++i)
@@ -375,7 +385,7 @@ void ConstructionMenu::createUserElements() noexcept
         glGetTextureLevelParameteriv(m_userElements.textures[i], 0, GL_TEXTURE_WIDTH, &width);
         glGetTextureLevelParameteriv(m_userElements.textures[i], 0, GL_TEXTURE_HEIGHT, &height);
 
-        auto quad = vertices.data() + (i << 4);
+        std::array<float, 16> quad;
 
 //  Positions
         quad[0] = posFrame.x + i * offset;
@@ -420,14 +430,45 @@ void ConstructionMenu::createUserElements() noexcept
         button->frame   = (i << 2);
         button->width   = width;
         button->height  = height;
+
+        vertices.insert(vertices.end(), quad.begin(), quad.end());
     }
-    
+
+    {// Outline
+        GeometryGenerator generator;
+        const float thickness = 3;
+
+        auto outlineVertices = generator.createOutline(4, [posFrame](size_t index) -> vec2s
+        {
+            switch (index)
+            {
+                default:
+                case 0: return { posFrame.x,              posFrame.y              };
+                case 1: return { posFrame.x + posFrame.z, posFrame.y              };
+                case 2: return { posFrame.x + posFrame.z, posFrame.y + posFrame.w };
+                case 3: return { posFrame.x,              posFrame.y + posFrame.w };
+            }
+        }, thickness);
+
+        vertices.insert(vertices.end(), outlineVertices.begin(), outlineVertices.end());
+        m_userElements.selectionFrame.count = (outlineVertices.size() >> 1);
+    }
+
+//  Unload to GPU
     glCreateBuffers(1, &m_userElements.vertexBufferObject);
     glNamedBufferData(m_userElements.vertexBufferObject, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 
-    glGenVertexArrays(1, &m_userElements.vertexArrayObject);
-    const std::array<VertexBufferLayout::Attribute, 1> attributes = { VertexBufferLayout::Attribute::Float4 };
-    VertexArrayObject::createVertexInputState(m_userElements.vertexArrayObject, m_userElements.vertexBufferObject, attributes);
+    {// Vertex array object for buttons
+        glGenVertexArrays(1, &m_userElements.vertexArrayObject);
+        const std::array<VertexBufferLayout::Attribute, 1> attributes = { VertexBufferLayout::Attribute::Float4 };
+        VertexArrayObject::createVertexInputState(m_userElements.vertexArrayObject, m_userElements.vertexBufferObject, attributes);
+    }
+
+    {// Vertex array object for selection frame
+        glGenVertexArrays(1, &m_userElements.selectionFrame.vertexArrayObject);
+        const std::array<VertexBufferLayout::Attribute, 1> attributes = { VertexBufferLayout::Attribute::Float2 };
+        VertexArrayObject::createVertexInputState(m_userElements.selectionFrame.vertexArrayObject, m_userElements.vertexBufferObject, attributes);
+    }
 
     m_userElements.program = m_previewCells.program;
     m_userElements.selectionFrame.program = m_frames.program;
@@ -441,29 +482,29 @@ void ConstructionMenu::drawFrames() const noexcept
 
     glBindVertexArray(m_frames.vertexArrayObject);
 
-    glUniform4fv(m_frames.uniform, 1, background_color);
+    glUniform4fv(m_frames.uniformColor, 1, background_color);
     glDrawArrays(GL_TRIANGLE_FAN, 0, m_frames.rootWidget.background);
-    glUniform4fv(m_frames.uniform, 1, outline_color);
+    glUniform4fv(m_frames.uniformColor, 1, outline_color);
     glDrawArrays(GL_TRIANGLE_STRIP, m_frames.rootWidget.background, m_frames.rootWidget.outline);
     startFrame = m_frames.rootWidget.background + m_frames.rootWidget.outline;
 
-    glUniform4fv(m_frames.uniform, 1, cell_background_color);
+    glUniform4fv(m_frames.uniformColor, 1, cell_background_color);
     glDrawArrays(GL_TRIANGLE_FAN, startFrame, m_frames.entityWidget.background);
-    glUniform4fv(m_frames.uniform, 1, outline_color);
+    glUniform4fv(m_frames.uniformColor, 1, outline_color);
     glDrawArrays(GL_TRIANGLE_STRIP, startFrame + m_frames.entityWidget.background, m_frames.entityWidget.outline);
     startFrame += m_frames.entityWidget.background + m_frames.entityWidget.outline;
 
-    glUniform4fv(m_frames.uniform, 1, cell_background_color);
+    glUniform4fv(m_frames.uniformColor, 1, cell_background_color);
     glDrawArrays(GL_TRIANGLE_FAN, startFrame, m_frames.entityWidgetLabel.background);
-    glUniform4fv(m_frames.uniform, 1, outline_color);
+    glUniform4fv(m_frames.uniformColor, 1, outline_color);
     glDrawArrays(GL_TRIANGLE_STRIP, startFrame + m_frames.entityWidgetLabel.background, m_frames.entityWidgetLabel.outline);
     startFrame += m_frames.entityWidgetLabel.background + m_frames.entityWidgetLabel.outline;
 
     for (uint32_t i = 0; i < 3; ++i)
     {
-        glUniform4fv(m_frames.uniform, 1, cell_background_color);
+        glUniform4fv(m_frames.uniformColor, 1, cell_background_color);
         glDrawArrays(GL_TRIANGLE_FAN, startFrame, m_frames.entityWidgetParams[i].background);
-        glUniform4fv(m_frames.uniform, 1, outline_color);
+        glUniform4fv(m_frames.uniformColor, 1, outline_color);
         glDrawArrays(GL_TRIANGLE_STRIP, startFrame + m_frames.entityWidgetParams[i].background, m_frames.entityWidgetParams[i].outline);
         startFrame += m_frames.entityWidgetParams[i].background + m_frames.entityWidgetParams[i].outline;
     }
@@ -495,6 +536,7 @@ void ConstructionMenu::drawEntityView() const noexcept
 
 void ConstructionMenu::drawUserElements() const noexcept
 {
+//  Draw buttons
     glBindVertexArray(m_userElements.vertexArrayObject);
 
     glBindTextureUnit(0, m_userElements.buttonExit.texture);
@@ -507,4 +549,12 @@ void ConstructionMenu::drawUserElements() const noexcept
     glDrawArrays(GL_TRIANGLE_FAN, m_userElements.buttonStop.frame, 4);
 
     glBindTextureUnit(0, 0);
+
+//  Draw selection frame
+    glUseProgram(m_userElements.selectionFrame.program);
+    glUniform4fv(m_frames.uniformColor, 1, selection_frame_color);
+
+    glBindVertexArray(m_userElements.selectionFrame.vertexArrayObject);
+    glDrawArrays(GL_TRIANGLE_STRIP, 24, m_userElements.selectionFrame.count); // Recalculating the offset: 2 float per vertex in outline VAO !!!
+    glBindVertexArray(0);
 }

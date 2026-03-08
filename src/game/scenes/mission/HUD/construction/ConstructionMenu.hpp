@@ -53,7 +53,7 @@ private:
         uint32_t vertexBufferObject;
         uint32_t vertexArrayObject;
         uint32_t program;
-        int32_t  uniform;
+        int32_t  uniformColor;
 
         Widget rootWidget;
         Widget entityWidget;
@@ -79,13 +79,12 @@ private:
         mesh::Sprite buttonExit;
         mesh::Sprite buttonRepair;
         mesh::Sprite buttonStop;
+        
         struct
         {
-            uint32_t vertexBufferObject;
             uint32_t vertexArrayObject;
             uint32_t program;
             uint32_t count;
-            Transform2D transform;
         } selectionFrame;
 
     } m_userElements;

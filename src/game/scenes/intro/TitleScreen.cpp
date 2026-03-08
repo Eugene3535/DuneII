@@ -226,20 +226,20 @@ void TitleScreen::resize(int width, int height) noexcept
     if(!m_isLoaded)
         return;
     
-    vec2 size = { static_cast<float>(width), static_cast<float>(height) };
+    vec2s size = { static_cast<float>(width), static_cast<float>(height) };
     setSpriteSizeInPixels(m_space, size, m_spaceTransform);
 
     if(m_isPresented)
     {
         {// space and planet
-            vec2 planetScale = { size[0] / PLANET_SCALE_FACTOR_WIDTH, size[1] / PLANET_SCALE_FACTOR_HEIGHT };
+            vec2s planetScale = { size.x / PLANET_SCALE_FACTOR_WIDTH, size.y / PLANET_SCALE_FACTOR_HEIGHT };
             setSpriteSizeInPixels(m_planet, planetScale, m_planetTransform);
-            m_planetTransform.setPosition(size[0] / PLANET_POSITION_FACTOR_X, size[1] / PLANET_POSITION_FACTOR_Y);
+            m_planetTransform.setPosition(size.x / PLANET_POSITION_FACTOR_X, size.y / PLANET_POSITION_FACTOR_Y);
         }
 
         {// buttons (size)
-            const float width = size[0] / BUTTON_SCALE_FACTOR_WIDTH;
-            const float height = size[1] / BUTTON_SCALE_FACTOR_HEIGHT;
+            const float width = size.x / BUTTON_SCALE_FACTOR_WIDTH;
+            const float height = size.y / BUTTON_SCALE_FACTOR_HEIGHT;
 
             m_settingsButton->resize(width, height);
             m_playButton->resize(width, width); // <- this is not a typo
@@ -247,9 +247,9 @@ void TitleScreen::resize(int width, int height) noexcept
         }
 
         {// buttons (positions)
-            const float centerX = size[0] / BUTTON_POSITION_FACTOR_X;
-            const float centerY = size[1] / BUTTON_POSITION_FACTOR_Y;
-            const float offset = size[0] / BUTTON_SCALE_FACTOR_WIDTH * PLANET_POSITION_FACTOR_X;
+            const float centerX = size.x / BUTTON_POSITION_FACTOR_X;
+            const float centerY = size.y / BUTTON_POSITION_FACTOR_Y;
+            const float offset = size.x / BUTTON_SCALE_FACTOR_WIDTH * PLANET_POSITION_FACTOR_X;
 
             m_settingsButton->setPosition(centerX - offset, centerY);
             m_playButton->setPosition(centerX, centerY);

@@ -16,8 +16,6 @@
 #define HARKONNEN_OUTLINE_POSITION_X 208.f
 #define OUTLINE_POSITION_Y 136.f
 
-#define DEFAULT_OUTLINE_WIDTH 80.f
-#define DEFAULT_OUTLINE_HEIGHT 16.f
 #define SWITCH_HOUSE_OUTLINE_DELAY 0.1f
 
 
@@ -122,7 +120,7 @@ bool PickHouse::load(std::string_view info) noexcept
 //  Outline
     {
         GeometryGenerator generator;
-        const vec2s outlineSize = { DEFAULT_OUTLINE_WIDTH, DEFAULT_OUTLINE_HEIGHT };
+        const vec2s outlineSize = { 80.f, 16.f };
 
         auto outlineVertices = generator.createOutline(4, [outlineSize](size_t index) -> vec2s
         {
@@ -196,11 +194,11 @@ void PickHouse::update(float dt) noexcept
 
     if(m_outlineNeedUpdate)
     {
-        auto windowSize = m_engine->getWindowsSize();
-        vec2 size = { static_cast<float>(windowSize.x), static_cast<float>(windowSize.y) };
+        const auto windowSize = m_engine->getWindowsSize();
+        vec2s size = { static_cast<float>(windowSize.x), static_cast<float>(windowSize.y) };
 
-        float dx = size[0] / m_background.sprite.width;
-        float dy = size[1] / m_background.sprite.height;
+        float dx = size.x / m_background.sprite.width;
+        float dy = size.y / m_background.sprite.height;
         float outlinePositionX = 0;
 
         switch (m_selectedHouse)
@@ -263,11 +261,11 @@ void PickHouse::draw() noexcept
 
 void PickHouse::resize(int width, int height) noexcept
 {
-    vec2 size = { static_cast<float>(width), static_cast<float>(height) };
+    vec2s size = { static_cast<float>(width), static_cast<float>(height) };
     setSpriteSizeInPixels(m_background.sprite, size, m_background.transform);
 
-    float dx = size[0] / m_background.sprite.width;
-    float dy = size[1] / m_background.sprite.height;
+    float dx = size.x / m_background.sprite.width;
+    float dy = size.y / m_background.sprite.height;
     float outlinePositionX = 0;
 
     switch (m_selectedHouse)

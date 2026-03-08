@@ -54,12 +54,12 @@ Scene::Type Scene::getType() const noexcept
 }
 
 
-void Scene::setSpriteSizeInPixels(const mesh::Sprite& sprite, vec2 newSize, Transform2D& transform) noexcept
+void Scene::setSpriteSizeInPixels(const mesh::Sprite& sprite, const vec2s newSize, Transform2D& transform) noexcept
 {
     assert(sprite.width > 0);
     assert(sprite.height > 0);
 
-    float dx = newSize[0] / sprite.width;
-    float dy = newSize[1] / sprite.height;
+    float dx = newSize.x / sprite.width;
+    float dy = newSize.y / sprite.height;
     transform.setScale(dx, dy);
 }
