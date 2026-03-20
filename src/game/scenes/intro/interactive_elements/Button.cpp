@@ -1,87 +1,82 @@
-#include <cassert>
-
-#include <glad/glad.h>
-#include <cglm/call/vec2.h>
-#include <cglm/call/aabb2d.h>
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/RenderTarget.hpp>
 
 #include "game/scenes/intro/interactive_elements/Button.hpp"
 
 
-static constexpr float normal_color[]       = { 150.f / 255.f, 150.f / 255.f, 150.f / 255.f, 150.f / 255.f };
-static constexpr float under_cursor_color[] = { 200.f / 255.f, 200.f / 255.f, 200.f / 255.f, 200.f / 255.f };
-static constexpr float is_clicked_color[]   = { 255.f / 255.f, 255.f / 255.f, 255.f / 255.f, 255.f / 255.f };
-
-
-Button::Button(const mesh::Sprite& sprite, const int32_t uniformLocation) noexcept:
-    Transform2D(),
-    m_sprite(sprite),
-    m_uniform(uniformLocation),
-    m_bounds(),
-    m_currentColor(normal_color),
+Button::Button(const sf::Texture* texture) noexcept:
+    m_sprite(*texture),
     m_boundsNeedUpdate(true),
-    m_isSelected(false)
+    m_isPressed(false)
 {
-    setOrigin(sprite.width * 0.5f, sprite.height * 0.5f);
+    m_sprite.setOrigin(sf::Vector2f(texture->getSize()) * 0.5f);
+    m_sprite.setColor(m_normalColor);
 }
 
 
-void Button::update(vec2s mousePosition, bool isClicked) noexcept
+void Button::update(const sf::Vector2f& mousePosition, bool isClicked) noexcept
 {
     if(m_boundsNeedUpdate)
     {
-        vec2s position = getPosition();
-        vec2s scale = getScale();
-        const vec2s size = { static_cast<float>(m_sprite.width) * scale.x, static_cast<float>(m_sprite.height) * scale.y };
-
-        position.x -= size.x * 0.5f;
-        position.y -= size.y * 0.5f;
-        glmc_vec2_copy(position.raw, m_bounds[0]);
-
-        position.x += size.x;
-        position.y += size.y;
-        glmc_vec2_copy(position.raw, m_bounds[1]);
-
+        m_bounds = m_sprite.getGlobalBounds();
         m_boundsNeedUpdate = false;
     }
 
-    m_isSelected = false;
+    sf::Color color { m_normalColor };
+    const bool isUnderCursor = m_bounds.contains(mousePosition);
+    m_isPressed = false;
 
-    m_currentColor = normal_color;
-    const bool isUnderCursor = glmc_aabb2d_point(m_bounds, mousePosition.raw);
+    if(isClicked)
+    {
+        if(isUnderCursor)
+        {
+            color = m_clickedColor;
+            m_isPressed = true;
+        }
+    }
+    else
+    {
+        if(isUnderCursor)
+            color = m_underCursorColor;
+    }
 
-    if(isUnderCursor)
-        m_currentColor = isClicked ? is_clicked_color : under_cursor_color;
-
-    if(isClicked && isUnderCursor)
-        m_isSelected = true;
+    m_sprite.setColor(color);
 }
 
 
-void Button::draw() noexcept
+void Button::setPosition(const sf::Vector2f& position) noexcept
 {
-    assert(m_uniform != -1);
-
-    glUniform4fv(m_uniform, 1, m_currentColor);
-    glBindTexture(GL_TEXTURE_2D, m_sprite.texture);
-    glDrawArrays(GL_TRIANGLE_FAN, m_sprite.frame, 4);
-    glBindTexture(GL_TEXTURE_2D, 0);
-}
-
-
-void Button::resize(int width, int height) noexcept
-{
-    assert(m_sprite.width > 0);
-    assert(m_sprite.height > 0);
-
-    float dx = static_cast<float>(width) / m_sprite.width;
-    float dy = static_cast<float>(height) / m_sprite.height;
-    setScale(dx, dy);
-
+    m_sprite.setPosition(position);
     m_boundsNeedUpdate = true;
 }
 
 
-bool Button::isSelected() const noexcept
+void Button::setSize(const sf::Vector2f& newSize) noexcept
 {
-    return m_isSelected;
+    if (const auto& rect = m_sprite.getTextureRect(); rect.size.x > 0 && rect.size.y > 0)
+    {
+        float dx = newSize.x / rect.size.x;
+        float dy = newSize.y / rect.size.y;
+        m_sprite.setScale({dx, dy});
+        m_boundsNeedUpdate = true;
+    }
+}
+
+
+bool Button::isPressed() const noexcept
+{
+    return m_isPressed;
+}
+
+
+sf::Sprite& Button::getSprite() noexcept
+{
+    return m_sprite;
+}
+
+
+void Button::draw(sf::RenderTarget& target, sf::RenderStates states) const
+{
+    states.blendMode = sf::BlendAlpha;
+    target.draw(m_sprite, states);
 }

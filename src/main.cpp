@@ -1,25 +1,49 @@
-#ifdef _WIN32
-#include <windows.h>
-__declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
-__declspec(dllexport) unsigned long AmdPowerXpressRequestHighPerformance = 0x00000001;
-#endif
-
-#include "game/Engine.hpp"
-#include "app/Game.hpp"
+#include "game/DuneII.hpp"
 
 
 int main()
 {
-    const char title[] = "Dune II: The Battle For Arrakis";
-    int width = 1200;
-    int height = 900;
+    const uint32_t defaultScreenWidth = 1200;
+    const uint32_t defaultScreenHeight = 900;
 
-    Game game;
-    Engine engine;
-    int retCode = -1;
-    
-    if(game.init(title, width, height))
-        retCode = game.run(engine);
+	sf::VideoMode videoMode({defaultScreenWidth, defaultScreenHeight}, 32);
+	const sf::String title("Dune II: The Battle For Arrakis");
 
-    return retCode;
+	sf::RenderWindow window(videoMode, title);
+	window.setVerticalSyncEnabled(true);
+
+	sf::Clock clock;
+
+    DuneII game(window);
+
+    if(!game.init(/* GameState& state */))
+        return -1;
+
+	while (window.isOpen())
+	{
+        while (const auto event = window.pollEvent())
+        {
+            if (event->is<sf::Event::Closed>())
+            {
+                window.close();
+            }
+            else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
+            {
+                if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
+                    window.close();
+            }
+
+            if (const auto* resized = event->getIf<sf::Event::Resized>())
+                game.resize(resized->size);
+        }
+
+        const auto dt = clock.restart();
+        game.update(dt);
+
+        window.clear();
+        window.draw(game);
+        window.display();
+	}
+
+	return 0;
 }

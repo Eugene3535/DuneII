@@ -1,5 +1,15 @@
-#ifndef DEFINES_HPP
-#define DEFINES_HPP
+#ifndef ASSET_MANAGER_HPP
+#define ASSET_MANAGER_HPP
+
+#include <unordered_map>
+#include <type_traits>
+
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Font.hpp>
+#include <SFML/Audio/SoundBuffer.hpp>
+#include <SFML/Audio/Music.hpp>
+
+#include "resources/files/FileProvider.hpp"
 
 
 // Textures
@@ -54,4 +64,24 @@
 #define FINALE_FLAC          "19-Finale.flac"
 #define CREDIT_ROLL_FLAC     "20-Credit-Roll.flac"
 
-#endif // !DEFINES_HPP
+
+class AssetManager final
+{
+public:
+    template<class T>
+    T* get(const std::string& filename) noexcept;
+
+private:
+    template<class T>
+    T* tryLoadFromFile(const std::string& filename, std::unordered_map<std::string, T>& container) noexcept;
+
+private:
+    std::unordered_map<std::string, sf::Texture>     m_textures;
+    std::unordered_map<std::string, sf::Font>        m_fonts;
+    std::unordered_map<std::string, sf::SoundBuffer> m_sounds;
+    std::unordered_map<std::string, sf::Music>       m_music;
+};
+
+#include "resources/files/assets/AssetManager.inl"
+
+#endif // !ASSET_MANAGER_HPP

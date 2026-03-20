@@ -4,13 +4,13 @@
 #include <cstdint>
 #include <string_view>
 
-#include <cglm/struct/vec2.h>
+#include <SFML/System/Time.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/View.hpp>
 
-#include "graphics/Meshes.hpp"
-#include "graphics/transform/Transform2D.hpp"
 
-
-class Scene
+class Scene:
+    public sf::Drawable
 {
 public:
     enum Type : uint32_t
@@ -21,24 +21,27 @@ public:
         MISSION
     };
 
-	Scene(class Engine* engine, const Type type) noexcept;
+	Scene(class DuneII* game, const Type type) noexcept;
 	virtual ~Scene();
-    
-    virtual bool load(std::string_view info)   noexcept;
-    virtual void update(float dt)              noexcept;
-    virtual void draw()                        noexcept;
-    virtual void resize(int width, int height) noexcept;
+
+    virtual bool load(std::string_view data) noexcept;
+    virtual void update(sf::Time dt)         noexcept;
+    virtual void resize(sf::Vector2u size)   noexcept;
 
     bool isLoaded() const noexcept;
     Type getType()  const noexcept;
 
 protected:
-    void setSpriteSizeInPixels(const mesh::Sprite& sprite, const vec2s newSize, Transform2D& transform) noexcept;
+    void setSpriteSizeInPixels(sf::Sprite& sprite, sf::Vector2f size) noexcept;
 
-    class Engine* m_engine;
+    class DuneII* m_game;
     bool          m_isLoaded;
 
+    sf::View m_view;
+
 private:
+    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+
     const Type m_type;
 };
 

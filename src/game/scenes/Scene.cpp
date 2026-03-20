@@ -1,13 +1,9 @@
-#include <cassert>
-
-#include <cglm/call/cam.h>
-
+#include "game/DuneII.hpp"
 #include "game/scenes/Scene.hpp"
-#include "game/Engine.hpp"
 
 
-Scene::Scene(Engine* engine, const Scene::Type type) noexcept:
-    m_engine(engine),
+Scene::Scene(DuneII* game, const Scene::Type type) noexcept:
+    m_game(game),
     m_isLoaded(false),
     m_type(type)
 {
@@ -18,27 +14,22 @@ Scene::Scene(Engine* engine, const Scene::Type type) noexcept:
 Scene::~Scene() = default;
 
 
-bool Scene::load(std::string_view info) noexcept
+bool Scene::load(std::string_view data) noexcept
 {
     return false;
 }
 
 
-void Scene::update(float dt) noexcept
+void Scene::update(sf::Time dt) noexcept
 {
 
 }
 
 
-void Scene::draw() noexcept
+void Scene::resize(sf::Vector2u size) noexcept
 {
-
-}
-
-
-void Scene::resize(int width, int height) noexcept
-{
-
+    m_view.setCenter(sf::Vector2f(size) * 0.5f);
+    m_view.setSize(sf::Vector2f(size));
 }
 
 
@@ -54,12 +45,18 @@ Scene::Type Scene::getType() const noexcept
 }
 
 
-void Scene::setSpriteSizeInPixels(const mesh::Sprite& sprite, const vec2s newSize, Transform2D& transform) noexcept
+void Scene::setSpriteSizeInPixels(sf::Sprite& sprite, sf::Vector2f size) noexcept
 {
-    assert(sprite.width > 0);
-    assert(sprite.height > 0);
+    if (const auto& rect = sprite.getTextureRect(); rect.size.x > 0 && rect.size.y > 0)
+    {
+        float dx = size.x / static_cast<float>(rect.size.x);
+        float dy = size.y / static_cast<float>(rect.size.y);
+        sprite.setScale({dx, dy});
+    }
+}
 
-    float dx = newSize.x / sprite.width;
-    float dy = newSize.y / sprite.height;
-    transform.setScale(dx, dy);
+
+void Scene::draw(sf::RenderTarget& target, sf::RenderStates states) const
+{
+
 }

@@ -1,39 +1,40 @@
 #ifndef TITLE_SCREEN_HPP
 #define TITLE_SCREEN_HPP
 
-#include "graphics/sprites/SpriteManager.hpp"
-#include "game/scenes/intro/interactive_elements/Button.hpp"
+#include <memory>
+
 #include "game/scenes/Scene.hpp"
 
+
+namespace sf
+{
+    class Text;
+    class Music;
+}
 
 class TitleScreen:
     public Scene
 {
 public:
-    explicit TitleScreen(class Engine* engine) noexcept;
+    explicit TitleScreen(class DuneII* game) noexcept;
     ~TitleScreen();
 
-    bool load(std::string_view info)         noexcept override;
-    void update(float dt)                    noexcept override;
-    void draw()                              noexcept override;
-    void resize(int width, int height)       noexcept override;
+    bool load(std::string_view data) noexcept override;
+    void update(sf::Time dt)         noexcept override;
+    void resize(sf::Vector2u size)   noexcept override;
 
 private:
-    GLuint m_textures[5];
+    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
-    GLuint m_spriteProgram;
-    GLuint m_buttonSpriteProgram;
+    std::unique_ptr<sf::Sprite> m_space;
+    std::unique_ptr<sf::Sprite> m_planet;
 
-    mesh::Sprite m_space;
-    Transform2D  m_spaceTransform;
-    mesh::Sprite m_planet;
-    Transform2D  m_planetTransform;
+    std::unique_ptr<class Button> m_play;
+    std::unique_ptr<class Button> m_exit;
+    std::unique_ptr<class Button> m_settings;
 
-    SpriteManager m_sprites;
-    Button*       m_playButton;
-    Button*       m_exitButton;
-    Button*       m_settingsButton;
-    char m_memoryPool[sizeof(Button) * 3];
+    std::unique_ptr<class sf::Text> m_info;
+    class sf::Music* m_theme;
 
     bool m_isPresented;
 };

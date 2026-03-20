@@ -1,29 +1,35 @@
 #ifndef BUTTON_HPP
 #define BUTTON_HPP
 
-#include "graphics/Meshes.hpp"
-#include "graphics/transform/Transform2D.hpp"
+#include <SFML/Graphics/Sprite.hpp>
 
 class Button:
-    public Transform2D
+    public sf::Drawable
 {
 public:
-    Button(const mesh::Sprite& sprite, const int32_t uniformLocation) noexcept;
+    Button(const sf::Texture* texture) noexcept;
 
-    void update(vec2s mousePosition, bool isClicked) noexcept;
-    void draw() noexcept;
-    void resize(int width, int height) noexcept;
-    bool isSelected() const noexcept;
+    void update(const sf::Vector2f& mousePosition, bool isClicked) noexcept;
+
+    void setPosition(const sf::Vector2f& position) noexcept;
+    void setSize(const sf::Vector2f& newSize) noexcept;
+
+    bool isPressed() const noexcept;
+
+    sf::Sprite& getSprite() noexcept;
 
 private:
-    const mesh::Sprite m_sprite;
-    const int32_t      m_uniform;
+    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
-    vec2 m_bounds[2];
-    const float* m_currentColor;
+    static constexpr sf::Color m_normalColor      { 150, 150, 150, 150 };
+    static constexpr sf::Color m_underCursorColor { 200, 200, 200, 200 };
+    static constexpr sf::Color m_clickedColor     { sf::Color::White   };
 
+    sf::Sprite    m_sprite;
+    sf::FloatRect m_bounds;
+    
     bool m_boundsNeedUpdate;
-    bool m_isSelected;
+    bool m_isPressed;
 };
 
 #endif // !BUTTON_HPP
