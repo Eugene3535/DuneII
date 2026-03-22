@@ -1,7 +1,5 @@
-#include <SFML/Graphics/Sprite.hpp>
-
-
 #include "resources/files/FileProvider.hpp"
+#include "graphics/quad/Quad.hpp"
 #include "game/DuneII.hpp"
 #include "game/scenes/mission/loader/TiledMapLoader.hpp"
 #include "game/scenes/mission/tilemap/Tilemap.hpp"
@@ -231,8 +229,8 @@ bool Tilemap::putStructure(const HouseType owner, const StructureInfo::Type type
 	structure.armor = structure.maxArmor = get_armor_of(type);
 
 	const sf::IntRect textureRect = get_texcoords_of_structure(type);
-	auto& sprite = m_registry.emplace<sf::Sprite>(entity, *m_structureTexture, textureRect);
-	sprite.setPosition(sf::Vector2f(point));
+	auto& quad = m_registry.emplace<Quad>(entity, m_structureTexture, textureRect);
+	quad.setPosition(sf::Vector2f(point));
 
 	const bool hasConstructionPreviews = ((type == StructureInfo::Type::VEHICLE)           ||
 									      (type == StructureInfo::Type::HIGH_TECH)         || 
@@ -323,11 +321,11 @@ void Tilemap::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	states.texture = m_landscapeTexture;
 	target.draw(m_vertexBuffer, states);
 
-	auto view = m_registry.view<StructureInfo, sf::Sprite>();
+	auto view = m_registry.view<StructureInfo, Quad>();
 
-	view.each([&target, &states](StructureInfo& building, sf::Sprite& sprite) 
+	view.each([&target, &states](StructureInfo& building, Quad& quad) 
 	{
-		target.draw(sprite, states);
+		target.draw(quad, states);
 	});
 }
 
@@ -354,9 +352,9 @@ void Tilemap::updateWall(int32_t origin, int32_t level) noexcept
 
 		if (entity != entt::null)
 		{
-			auto view = m_registry.view<sf::Sprite>();
-			auto& sprite = view.get<sf::Sprite>(entity);
-			sprite.setTextureRect(textureRect);
+			auto view = m_registry.view<Quad>();
+			auto& quad = view.get<Quad>(entity);
+			quad.setTextureRect(textureRect);
 		}
 		
 		if (a) updateWall(left, level - 1);

@@ -1,0 +1,41 @@
+#ifndef QUAD_HPP
+#define QUAD_HPP
+
+#include <SFML/Graphics/Drawable.hpp>
+#include <SFML/Graphics/Vertex.hpp>
+#include <SFML/Graphics/RenderStates.hpp>
+
+namespace sf
+{
+	class Texture;
+}
+
+class Quad : 
+	public sf::Drawable
+{
+public:
+	Quad() noexcept;
+	Quad(const class sf::Texture* texture) noexcept;
+	Quad(const class sf::Texture* texture, const sf::IntRect& rectangle) noexcept;
+
+	void setTexture(const class sf::Texture* texture) noexcept;
+	void setTextureRect(const sf::IntRect& rectangle) noexcept;
+	void setColor(const class sf::Color& color)       noexcept;
+	void setScale(float scale)                        noexcept;
+	void setDefaultScale()                            noexcept;
+	void setPosition(const sf::Vector2f& point)       noexcept;
+
+	sf::Color           getColor()    const noexcept;
+	const sf::Vector2f& getPosition() const noexcept;
+	const sf::Vector2f& getSize()     const noexcept;
+
+private:
+	void draw(class sf::RenderTarget& target, sf::RenderStates states) const;
+
+	sf::Vertex   m_vertices[4u];
+	sf::Vector2f m_size;
+	const class  sf::Texture* m_texture;
+};
+
+
+#endif // !QUAD_HPP
