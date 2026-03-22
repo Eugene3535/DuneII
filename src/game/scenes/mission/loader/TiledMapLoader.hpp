@@ -6,8 +6,8 @@
 #include <span>
 #include <filesystem>
 
-#include <cglm/struct/ivec2.h>
-#include <cglm/struct/ivec4.h>
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Vertex.hpp>
 
 
 class TiledMapLoader
@@ -24,8 +24,8 @@ public:
 
 		std::string           name;
 		std::string           type;
-		ivec2s                coords; // presented in tiles
-		ivec2s                size;   // measured in tiles
+		sf::Vector2i          coords; // presented in tiles
+		sf::Vector2i          size;   // measured in tiles
 		std::vector<Property> properties;
 	};
 
@@ -37,13 +37,12 @@ public:
 
 	std::string_view getTitle() const noexcept;
 
-	std::span<const vec4s>    getVertices() const noexcept;
-	std::span<const uint32_t> getIndices()  const noexcept;
-	std::span<const Object>   getObjects()  const noexcept;
-	std::string_view          getTileMask() const noexcept;
+	std::span<const sf::Vertex> getVertices() const noexcept;
+	std::span<const Object>     getObjects()  const noexcept;
+	std::string_view            getTileMask() const noexcept;
 
-	ivec2s getMapSize()  const noexcept;
-	ivec2s getTileSize() const noexcept;
+	sf::Vector2i getMapSize()  const noexcept;
+	sf::Vector2i getTileSize() const noexcept;
 	
 private:
     bool loadLayers(const void* rootNode) noexcept;
@@ -53,13 +52,12 @@ private:
 
 	std::string m_title;
 
-	std::vector<vec4s>    m_vertices;
-	std::vector<uint32_t> m_indices;
-	std::vector<Object>   m_objects;
-	std::string           m_tileMask;
+	std::vector<sf::Vertex> m_vertices;
+	std::vector<Object>     m_objects;
+	std::string             m_tileMask;
 	
-	ivec2s m_mapSize;
-	ivec2s m_tileSize;
+	sf::Vector2i m_mapSize;
+	sf::Vector2i m_tileSize;
 };
 
 #endif // !TILED_MAP_LOADER_HPP

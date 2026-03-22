@@ -8,7 +8,7 @@
 
 #include "resources/files/assets/AssetManager.hpp"
 #include "game/scenes/Scene.hpp"
-// #include "common/info/GameInfo.hpp"
+#include "common/info/GameInfo.hpp"
 
 
 class DuneII final: public sf::Drawable 
@@ -22,7 +22,7 @@ public:
 
     void switchScene(const Scene* requester, Scene::Type nextScene) noexcept;
 
-    // const GameInfo* getInfo() const noexcept;
+    const GameInfo& getInfo() const noexcept;
 
     sf::RenderWindow& window;
     AssetManager assets;
@@ -38,7 +38,7 @@ private:
     Scene::Type                                             m_nextSceneType;
     bool                                                    m_isSceneNeedToBeChanged;
 
-    // GameInfo m_gameInfo;
+    GameInfo m_gameInfo;
 };
 
 #include <game/DuneII.inl>

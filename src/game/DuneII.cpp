@@ -1,6 +1,6 @@
 #include "game/scenes/intro/TitleScreen.hpp"
 #include "game/scenes/pick_house/PickHouse.hpp"
-// #include "game/scenes/mission/Mission.hpp"
+#include "game/scenes/mission/Mission.hpp"
 #include "game/DuneII.hpp"
 
 
@@ -19,10 +19,10 @@ bool DuneII::init(/* GameState& state */) noexcept
 }
 
 
-// const GameInfo* DuneII::getInfo() const noexcept
-// {
-//     return &m_gameInfo;
-// }
+const GameInfo& DuneII::getInfo() const noexcept
+{
+    return m_gameInfo;
+}
 
 
 void DuneII::update(sf::Time dt) noexcept
@@ -94,10 +94,7 @@ void DuneII::switchScene(const Scene* requester, Scene::Type nextScene) noexcept
 
             case Scene::Type::MISSION:
             {
-                // if (auto missionScene = load<Mission>("Atreides-8.tmx"))
-                //     m_currentScene = missionScene;
-
-                // glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+                load<Mission>("Atreides-8.tmx");
             }
             break;
 

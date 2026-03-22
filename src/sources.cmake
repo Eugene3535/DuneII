@@ -16,11 +16,11 @@ set(SCENE_SRC_FILES
 	src/game/scenes/intro/interactive_elements/Button.cpp
 	src/game/scenes/intro/TitleScreen.cpp
 	src/game/scenes/pick_house/PickHouse.cpp
-	# src/game/scenes/mission/tilemap/Tilemap.cpp
-	# src/game/scenes/mission/loader/TiledMapLoader.cpp
+	src/game/scenes/mission/tilemap/Tilemap.cpp
+	src/game/scenes/mission/loader/TiledMapLoader.cpp
 	# src/game/scenes/mission/HUD/construction/ConstructionMenu.cpp
 	# src/game/scenes/mission/HUD/HeadUpDisplay.cpp
-	# src/game/scenes/mission/Mission.cpp
+	src/game/scenes/mission/Mission.cpp
 )
 
 set(SCENE_HDR_FILES
@@ -28,20 +28,20 @@ set(SCENE_HDR_FILES
 	src/game/scenes/intro/interactive_elements/Button.hpp
 	src/game/scenes/intro/TitleScreen.hpp
 	src/game/scenes/pick_house/PickHouse.hpp
-	# src/game/scenes/mission/common/Structures.hpp
+	src/game/scenes/mission/common/Structures.hpp
 	# src/game/scenes/mission/common/Units.hpp
-	# src/game/scenes/mission/tilemap/Tilemap.hpp
-	# src/game/scenes/mission/loader/TiledMapLoader.hpp
+	src/game/scenes/mission/tilemap/Tilemap.hpp
+	src/game/scenes/mission/loader/TiledMapLoader.hpp
 	# src/game/scenes/mission/HUD/construction/ConstructionMenu.hpp
 	# src/game/scenes/mission/HUD/HeadUpDisplay.hpp
-	# src/game/scenes/mission/Mission.hpp
+	src/game/scenes/mission/Mission.hpp
 )
 
 
 # Common
 set(DUNEII_SRC_FILES
 	# src/common/ExternalMath.cpp
-	# src/common/info/GameInfo.cpp
+	src/common/info/GameInfo.cpp
 	# src/graphics/transform/Transform2D.cpp
 	# src/graphics/camera/OrthogonalCamera.cpp
 	# src/graphics/sprites/SpriteManager.cpp
@@ -58,7 +58,7 @@ set(DUNEII_HDR_FILES
 	# src/common/Assets.hpp
 	# src/common/Enums.hpp
 	# src/common/ExternalMath.hpp
-	# src/common/info/GameInfo.hpp
+	src/common/info/GameInfo.hpp
 	# src/graphics/Meshes.hpp
 	# src/graphics/transform/Transform2D.hpp
 	# src/graphics/camera/OrthogonalCamera.hpp

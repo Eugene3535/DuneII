@@ -1,13 +1,5 @@
-#include <cstring>
 
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-#include "cglm/struct/affine-mat.h"
-
-#include "resources/files/FileProvider.hpp"
-#include "resources/gl_interfaces/texture/Texture.hpp"
-#include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
-#include "game/Engine.hpp"
+#include "game/DuneII.hpp"
 #include "game/scenes/mission/Mission.hpp"
 
 
@@ -15,29 +7,26 @@
 #define SCREEN_MARGIN 150
 
 
-Mission::Mission(Engine* engine) noexcept:
-    Scene(engine, Scene::MISSION),
-    m_tilemap(engine, m_registry),
-    m_hud(engine, m_tilemap)
+Mission::Mission(DuneII* game) noexcept:
+    Scene(game, Scene::MISSION),
+    m_tilemap(game, m_registry)
+    // m_hud(engine, m_tilemap)
 {
 
 }
 
-Mission::~Mission()
-{
-
-}
+Mission::~Mission() = default;
 
 
-bool Mission::load(std::string_view info) noexcept
+bool Mission::load(std::string_view data) noexcept
 {
     if(m_isLoaded)
         return true;
 
-    if(!m_hud.init())
-        return false;
+    // if(!m_hud.init())
+    //     return false;
 
-    if(m_mapLoader.loadFromFile(FileProvider::findPathToFile(std::string(info))))
+    if(m_mapLoader.loadFromFile(FileProvider::findPathToFile(std::string(data))))
     {
         if(!m_tilemap.createFromLoader(m_mapLoader))
             return false;
@@ -49,90 +38,88 @@ bool Mission::load(std::string_view info) noexcept
 }
 
 
-void Mission::update(float dt) noexcept
+void Mission::update(sf::Time dt) noexcept
 {
-    if (m_isLoaded)
-        for(auto system : m_systems)
-            system(this, dt);
+    for(auto system : m_systems)
+        system(this, dt);
 }
 
 
-void Mission::draw() noexcept
+void Mission::resize(sf::Vector2u size) noexcept
 {
-    m_tilemap.draw();
-    m_hud.draw();
+    // m_hud.resize(width, height);
 }
 
 
-void Mission::resize(int width, int height) noexcept
+void Mission::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    m_hud.resize(width, height);
+    target.draw(m_tilemap, states);
 }
 
 
 void Mission::createSystems() noexcept
 {
 //  Viewport Controller
-    m_systems.emplace_back([](Mission* mission, float dt)
-    {
-        if(mission->m_hud.isMenuShown())
-            return;
+    // m_systems.emplace_back([](Mission* mission, float dt)
+    // {
+    //     if(mission->m_hud.isMenuShown())
+    //         return;
 
-        const auto game     = mission->m_engine;
-        const auto cursor   = game->getCursorPosition();
-        const auto viewSize = game->getWindowsSize();
-        const auto mapSize  = glms_ivec2_mul(mission->m_mapLoader.getMapSize(), mission->m_mapLoader.getTileSize());
+    //     const auto game     = mission->m_engine;
+    //     const auto cursor   = game->getCursorPosition();
+    //     const auto viewSize = game->getWindowsSize();
+    //     const auto mapSize  = glms_ivec2_mul(mission->m_mapLoader.getMapSize(), mission->m_mapLoader.getTileSize());
 
-        const bool is_near_the_left_edge   = (cursor.x > 0 && cursor.x < SCREEN_MARGIN);
-        const bool is_near_the_top_edge    = (cursor.y > 0 && cursor.y < SCREEN_MARGIN);
-        const bool is_near_the_right_edge  = (cursor.x > (viewSize.x - SCREEN_MARGIN) && cursor.x < viewSize.x);
-        const bool is_near_the_bottom_edge = (cursor.y > (viewSize.y - SCREEN_MARGIN) && cursor.y < viewSize.y);
+    //     const bool is_near_the_left_edge   = (cursor.x > 0 && cursor.x < SCREEN_MARGIN);
+    //     const bool is_near_the_top_edge    = (cursor.y > 0 && cursor.y < SCREEN_MARGIN);
+    //     const bool is_near_the_right_edge  = (cursor.x > (viewSize.x - SCREEN_MARGIN) && cursor.x < viewSize.x);
+    //     const bool is_near_the_bottom_edge = (cursor.y > (viewSize.y - SCREEN_MARGIN) && cursor.y < viewSize.y);
 
-        const float velocity = dt * CAMERA_VELOCITY;
-        vec2s scenePosition = mission->m_tilemap.getPosition();
+    //     const float velocity = dt * CAMERA_VELOCITY;
+    //     vec2s scenePosition = mission->m_tilemap.getPosition();
 
-        if(is_near_the_left_edge)
-            scenePosition.x += velocity;
+    //     if(is_near_the_left_edge)
+    //         scenePosition.x += velocity;
         
-        if(is_near_the_top_edge)
-            scenePosition.y += velocity;
+    //     if(is_near_the_top_edge)
+    //         scenePosition.y += velocity;
         
-        if(is_near_the_right_edge)
-            scenePosition.x -= velocity;
+    //     if(is_near_the_right_edge)
+    //         scenePosition.x -= velocity;
         
-        if(is_near_the_bottom_edge)
-            scenePosition.y -= velocity;
+    //     if(is_near_the_bottom_edge)
+    //         scenePosition.y -= velocity;
 
-        if(scenePosition.x > 0)                        scenePosition.x = 0;
-        if(scenePosition.y > 0)                        scenePosition.y = 0;
-        if(scenePosition.x < (viewSize.x - mapSize.x)) scenePosition.x = viewSize.x - mapSize.x;
-        if(scenePosition.y < (viewSize.y - mapSize.y)) scenePosition.y = viewSize.y - mapSize.y;
+    //     if(scenePosition.x > 0)                        scenePosition.x = 0;
+    //     if(scenePosition.y > 0)                        scenePosition.y = 0;
+    //     if(scenePosition.x < (viewSize.x - mapSize.x)) scenePosition.x = viewSize.x - mapSize.x;
+    //     if(scenePosition.y < (viewSize.y - mapSize.y)) scenePosition.y = viewSize.y - mapSize.y;
 
-        mission->m_tilemap.setPosition(scenePosition);
-    });
+    //     mission->m_tilemap.setPosition(scenePosition);
+    // });
 
 //  HUD Controller
-    m_systems.emplace_back([](Mission* mission, float dt)
-    {
-        const Engine* engine = mission->m_engine;
+    // m_systems.emplace_back([](Mission* mission, float dt)
+    // {
+    //     const Engine* engine = mission->m_engine;
 
-        const bool isMouseButtonLeftPressed  = engine->isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
-        const bool isMouseButtonRightPressed = engine->isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
+    //     const bool isMouseButtonLeftPressed  = engine->isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
+    //     const bool isMouseButtonRightPressed = engine->isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
 
-        if(isMouseButtonLeftPressed)
-            mission->m_hud.runSelection();
+    //     if(isMouseButtonLeftPressed)
+    //         mission->m_hud.runSelection();
 
-        if(isMouseButtonRightPressed)
-            mission->m_hud.cancelSelection();
+    //     if(isMouseButtonRightPressed)
+    //         mission->m_hud.cancelSelection();
  
-        mission->m_hud.update(dt);
+    //     mission->m_hud.update(dt);
 
-        if(mission->m_hud.isMenuShown())
-        {
-            if(engine->isKeyPressed(GLFW_KEY_SPACE))
-                mission->m_hud.hideMenu();
-        }
-    });
+    //     if(mission->m_hud.isMenuShown())
+    //     {
+    //         if(engine->isKeyPressed(GLFW_KEY_SPACE))
+    //             mission->m_hud.hideMenu();
+    //     }
+    // });
 
     m_isLoaded = true;
 }
