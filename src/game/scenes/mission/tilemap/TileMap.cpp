@@ -99,7 +99,7 @@ bool Tilemap::createFromLoader(const TiledMapLoader& loader) noexcept
 	if(objects.empty())
 		return false;
 
-	auto get_aabb_of_base = [&objects](HouseType houseName) -> std::optional<sf::IntRect>
+	auto get_aabb_of_base = [&objects](HouseType houseName) -> sf::IntRect
 	{
 		for(const auto& object : objects)
 		{
@@ -111,11 +111,11 @@ bool Tilemap::createFromLoader(const TiledMapLoader& loader) noexcept
 				});
 
 				if(found != object.properties.end())
-					return std::make_optional<sf::IntRect>(object.coords, object.size);
+					return sf::IntRect(object.coords, object.size);
 			}
 		}
 
-		return std::nullopt;
+		return sf::IntRect();
 	};
 
 	auto atreidesBase  = get_aabb_of_base(HouseType::Atreides);
@@ -130,20 +130,17 @@ bool Tilemap::createFromLoader(const TiledMapLoader& loader) noexcept
 			HouseType owner = HouseType::INVALID;
 			const sf::IntRect objectAABB(object.coords, object.size);
 
-			if(harkonnenBase.has_value())
+			if(harkonnenBase != sf::IntRect() && harkonnenBase.findIntersection(objectAABB))
 			{
-				if (harkonnenBase.value().findIntersection(objectAABB))
-					owner = HouseType::Harkonnen;
+				owner = HouseType::Harkonnen;
 			}
-			else if(ordosBase.has_value())
+			else if(ordosBase != sf::IntRect() && ordosBase.findIntersection(objectAABB))
 			{
-				if(ordosBase.value().findIntersection(objectAABB))
-					owner = HouseType::Ordos;
+				owner = HouseType::Ordos;
 			}
-			else if(atreidesBase.has_value())
+			else if(atreidesBase != sf::IntRect() && atreidesBase.findIntersection(objectAABB))
 			{
-				if (atreidesBase.value().findIntersection(objectAABB))
-					owner = HouseType::Atreides;
+				owner = HouseType::Atreides;
 			}
 
 			if(owner != HouseType::INVALID)
@@ -311,13 +308,6 @@ entt::registry& Tilemap::getRegistry() const noexcept
 
 void Tilemap::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-//     auto& camera = m_game->camera;
-
-//     alignas(16) mat4s uniformMatrix = camera.getModelViewProjectionMatrix();
-//     alignas(16) mat4s modelView     = getMatrix();
-//     alignas(16) mat4s result        = glms_mul(uniformMatrix, modelView);
-//     camera.updateUniformBuffer(result.raw);
-
 	states.texture = m_landscapeTexture;
 	target.draw(m_vertexBuffer, states);
 

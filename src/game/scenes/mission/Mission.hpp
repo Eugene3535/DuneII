@@ -25,6 +25,9 @@ private:
     TiledMapLoader m_mapLoader;
     entt::registry m_registry;
     Tilemap        m_tilemap;
+
+    sf::IntRect  m_viewport;
+    sf::Vector2i m_viewPosition;
     // HeadUpDisplay  m_hud;
 
     std::vector<void(*)(Mission*, sf::Time dt)> m_systems;

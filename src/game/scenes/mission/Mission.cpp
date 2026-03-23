@@ -3,10 +3,6 @@
 #include "game/scenes/mission/Mission.hpp"
 
 
-#define CAMERA_VELOCITY 600
-#define SCREEN_MARGIN 150
-
-
 Mission::Mission(DuneII* game) noexcept:
     Scene(game, Scene::MISSION),
     m_tilemap(game, m_registry)
@@ -47,12 +43,14 @@ void Mission::update(sf::Time dt) noexcept
 
 void Mission::resize(sf::Vector2u size) noexcept
 {
+    Scene::resize(size);
     // m_hud.resize(width, height);
 }
 
 
 void Mission::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
+    target.setView(m_view);
     target.draw(m_tilemap, states);
 }
 
@@ -60,43 +58,50 @@ void Mission::draw(sf::RenderTarget& target, sf::RenderStates states) const
 void Mission::createSystems() noexcept
 {
 //  Viewport Controller
-    // m_systems.emplace_back([](Mission* mission, float dt)
-    // {
-    //     if(mission->m_hud.isMenuShown())
-    //         return;
+    m_systems.emplace_back([](Mission* mission, sf::Time dt)
+    {
+        // if(mission->m_hud.isMenuShown())
+        //     return;
 
-    //     const auto game     = mission->m_engine;
-    //     const auto cursor   = game->getCursorPosition();
-    //     const auto viewSize = game->getWindowsSize();
-    //     const auto mapSize  = glms_ivec2_mul(mission->m_mapLoader.getMapSize(), mission->m_mapLoader.getTileSize());
+        const int32_t CAMERA_VELOCITY = 600;
+        const int32_t SCREEN_MARGIN = 150;
 
-    //     const bool is_near_the_left_edge   = (cursor.x > 0 && cursor.x < SCREEN_MARGIN);
-    //     const bool is_near_the_top_edge    = (cursor.y > 0 && cursor.y < SCREEN_MARGIN);
-    //     const bool is_near_the_right_edge  = (cursor.x > (viewSize.x - SCREEN_MARGIN) && cursor.x < viewSize.x);
-    //     const bool is_near_the_bottom_edge = (cursor.y > (viewSize.y - SCREEN_MARGIN) && cursor.y < viewSize.y);
+        const sf::Vector2i tileSize = mission->m_mapLoader.getTileSize();
+        sf::Vector2i mapSize = mission->m_mapLoader.getMapSize();
+        mapSize.x *= tileSize.x;
+        mapSize.y *= tileSize.y;
 
-    //     const float velocity = dt * CAMERA_VELOCITY;
-    //     vec2s scenePosition = mission->m_tilemap.getPosition();
+        auto& viewPosition = mission->m_viewPosition;
+        float cameraVelocity = dt.asSeconds() * CAMERA_VELOCITY;
 
-    //     if(is_near_the_left_edge)
-    //         scenePosition.x += velocity;
+        sf::Vector2i mousePosition  = sf::Mouse::getPosition(mission->m_game->window);
+        const sf::Vector2i viewSize = static_cast<sf::Vector2i>(mission->m_view.getSize());
+
+        bool isNearTheLeftEdge   = (mousePosition.x > 0 && mousePosition.x < SCREEN_MARGIN);
+        bool isNearTheTopEdge    = (mousePosition.y > 0 && mousePosition.y < SCREEN_MARGIN);
+        bool isNearTheRightEdge  = (mousePosition.x > (viewSize.x - SCREEN_MARGIN) && mousePosition.x < viewSize.x);
+        bool isNearTheBottomEdge = (mousePosition.y > (viewSize.y - SCREEN_MARGIN) && mousePosition.y < viewSize.y);
+
+        if(isNearTheLeftEdge)
+            viewPosition.x -= cameraVelocity;
         
-    //     if(is_near_the_top_edge)
-    //         scenePosition.y += velocity;
+        if(isNearTheTopEdge)
+            viewPosition.y -= cameraVelocity;
         
-    //     if(is_near_the_right_edge)
-    //         scenePosition.x -= velocity;
+        if(isNearTheRightEdge)
+            viewPosition.x += cameraVelocity;
         
-    //     if(is_near_the_bottom_edge)
-    //         scenePosition.y -= velocity;
+        if(isNearTheBottomEdge)
+            viewPosition.y += cameraVelocity;            
+        
+        if(viewPosition.x < 0)                      viewPosition.x = 0;
+        if(viewPosition.y < 0)                      viewPosition.y = 0;
+        if(viewPosition.x + viewSize.x > mapSize.x) viewPosition.x = mapSize.x - viewSize.x;
+        if(viewPosition.y + viewSize.y > mapSize.y) viewPosition.y = mapSize.y - viewSize.y;
 
-    //     if(scenePosition.x > 0)                        scenePosition.x = 0;
-    //     if(scenePosition.y > 0)                        scenePosition.y = 0;
-    //     if(scenePosition.x < (viewSize.x - mapSize.x)) scenePosition.x = viewSize.x - mapSize.x;
-    //     if(scenePosition.y < (viewSize.y - mapSize.y)) scenePosition.y = viewSize.y - mapSize.y;
-
-    //     mission->m_tilemap.setPosition(scenePosition);
-    // });
+        mission->m_view.setCenter(static_cast<sf::Vector2f>(viewPosition + sf::Vector2i(viewSize.x >> 1, viewSize.y >> 1)));
+        mission->m_viewport = sf::IntRect({viewPosition.x, viewPosition.y}, {viewSize.x, viewSize.y});
+    });
 
 //  HUD Controller
     // m_systems.emplace_back([](Mission* mission, float dt)
