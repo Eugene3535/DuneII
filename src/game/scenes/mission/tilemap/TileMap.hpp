@@ -18,7 +18,7 @@ public:
     ~Tilemap();
 
     bool createFromLoader(const class TiledMapLoader& loader) noexcept;
-    bool putStructure(const HouseType owner, const StructureInfo::Type type, const sf::Vector2i point) noexcept; // cell must be in tiles
+    bool putStructure(const HouseType owner, const StructureInfo::Type type, const sf::Vector2i point) noexcept;
 
     entt::entity    getEntityUnderCursor(const sf::Vector2f point) const noexcept;
     entt::registry& getRegistry()                                  const noexcept;
