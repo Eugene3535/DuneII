@@ -18,8 +18,9 @@ set(SCENE_SRC_FILES
 	src/game/scenes/pick_house/PickHouse.cpp
 	src/game/scenes/mission/tilemap/Tilemap.cpp
 	src/game/scenes/mission/loader/TiledMapLoader.cpp
+	src/game/scenes/mission/HUD/selection/Cursor.cpp
 	# src/game/scenes/mission/HUD/construction/ConstructionMenu.cpp
-	# src/game/scenes/mission/HUD/HeadUpDisplay.cpp
+	src/game/scenes/mission/HUD/HeadUpDisplay.cpp
 	src/game/scenes/mission/Mission.cpp
 )
 
@@ -32,8 +33,9 @@ set(SCENE_HDR_FILES
 	# src/game/scenes/mission/common/Units.hpp
 	src/game/scenes/mission/tilemap/Tilemap.hpp
 	src/game/scenes/mission/loader/TiledMapLoader.hpp
+	src/game/scenes/mission/HUD/selection/Cursor.hpp
 	# src/game/scenes/mission/HUD/construction/ConstructionMenu.hpp
-	# src/game/scenes/mission/HUD/HeadUpDisplay.hpp
+	src/game/scenes/mission/HUD/HeadUpDisplay.hpp
 	src/game/scenes/mission/Mission.hpp
 )
 
@@ -43,8 +45,6 @@ set(DUNEII_SRC_FILES
 	# src/common/ExternalMath.cpp
 	src/common/info/GameInfo.cpp
 	src/graphics/quad/Quad.cpp
-	# src/graphics/transform/Transform2D.cpp
-	# src/graphics/camera/OrthogonalCamera.cpp
 	src/graphics/animation/AnimationManager.cpp
 	# src/graphics/geometry/GeometryGenerator.cpp
 	src/graphics/effects/blackout/ScreenBlackoutEffect.cpp
@@ -61,9 +61,6 @@ set(DUNEII_HDR_FILES
 	# src/common/ExternalMath.hpp
 	src/common/info/GameInfo.hpp
 	src/graphics/quad/Quad.hpp
-	# src/graphics/Meshes.hpp
-	# src/graphics/transform/Transform2D.hpp
-	# src/graphics/camera/OrthogonalCamera.hpp
 	src/graphics/animation/AnimationManager.hpp
 	# src/graphics/geometry/GeometryGenerator.hpp
 	src/graphics/effects/blackout/ScreenBlackoutEffect.hpp

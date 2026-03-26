@@ -288,9 +288,9 @@ bool Tilemap::putStructure(const HouseType owner, const StructureInfo::Type type
 }
 
 
-entt::entity Tilemap::getEntityUnderCursor(const sf::Vector2f point) const noexcept
+entt::entity Tilemap::getEntityUnderCursor(const sf::Vector2i point) const noexcept
 {
-	const sf::Vector2i tile = { static_cast<int>(point.x) / m_tileSize.x, static_cast<int>(point.y) / m_tileSize.y };
+	const sf::Vector2i tile = { point.x / m_tileSize.x, point.y / m_tileSize.y };
 	const int32_t origin = tile.y * m_mapSize.x + tile.x;
 
 	if(m_structureMask[static_cast<size_t>(origin)] != entt::null)

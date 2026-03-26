@@ -5,8 +5,8 @@
 
 Mission::Mission(DuneII* game) noexcept:
     Scene(game, Scene::MISSION),
-    m_tilemap(game, m_registry)
-    // m_hud(engine, m_tilemap)
+    m_tilemap(game, m_registry),
+    m_hud(game, m_tilemap)
 {
 
 }
@@ -19,8 +19,8 @@ bool Mission::load(std::string_view data) noexcept
     if(m_isLoaded)
         return true;
 
-    // if(!m_hud.init())
-    //     return false;
+    if(!m_hud.load(data))
+        return false;
 
     if(m_mapLoader.loadFromFile(FileProvider::findPathToFile(std::string(data))))
     {
@@ -44,7 +44,7 @@ void Mission::update(sf::Time dt) noexcept
 void Mission::resize(sf::Vector2u size) noexcept
 {
     Scene::resize(size);
-    // m_hud.resize(width, height);
+    m_hud.resize(size);
 }
 
 
@@ -52,6 +52,7 @@ void Mission::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     target.setView(m_view);
     target.draw(m_tilemap, states);
+    target.draw(m_hud, states);
 }
 
 
@@ -101,6 +102,63 @@ void Mission::createSystems() noexcept
 
         mission->m_view.setCenter(static_cast<sf::Vector2f>(viewPosition + sf::Vector2i(viewSize.x >> 1, viewSize.y >> 1)));
         mission->m_viewport = sf::IntRect({viewPosition.x, viewPosition.y}, {viewSize.x, viewSize.y});
+    });
+
+    //  CursorController
+    m_systems.emplace_back([](Mission* mission, sf::Time dt)
+    {
+        static constexpr int32_t cooldown = 4;
+        static int timer = 0;
+
+        sf::Vector2i mousePosition = sf::Mouse::getPosition(mission->m_game->window);
+        const auto worldPosition = mission->m_game->window.mapPixelToCoords(mousePosition);
+
+        auto& cursor = mission->m_hud.cursor;
+
+        cursor.update(worldPosition, dt);
+
+        if(timer > cooldown)
+        {
+            timer = 0;
+
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+            {
+                if(auto entity = mission->m_tilemap.getEntityUnderCursor(static_cast<sf::Vector2i>(worldPosition)); entity != entt::null)
+                {
+                    // if(auto [structure, bounds] = mission->m_registry.try_get<Structure, sf::IntRect>(entity.value()); structure != nullptr)
+                    // {
+                    //     bool can_be_highlighted = 
+                    //                 ((structure->type != StructureType::SLAB_1x1) &&
+                    //                 ( structure->type != StructureType::SLAB_2x2) && 
+                    //                 ( structure->type != StructureType::WALL)     && 
+                    //                 structure->type < StructureType::MAX);
+
+                    //     if(can_be_highlighted)
+                    //     {
+                    //         mission->m_cursor.setVertexFrame(*bounds);
+                    //         mission->m_cursor.select();
+                    //     }
+                    //     else
+                    //     {
+                    //         mission->m_cursor.release();
+                    //     }
+                    // }
+                }
+                else
+                {
+                    cursor.release();
+                }
+
+                //m_cursor.capture(); // for units
+            }
+
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
+            {
+                cursor.release();
+            }
+        }
+
+        ++timer;
     });
 
 //  HUD Controller

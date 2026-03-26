@@ -18,7 +18,8 @@ public:
         NONE = 0,
         MAIN_MENU,
         PICK_HOUSE,
-        MISSION
+        MISSION,
+        HUD
     };
 
 	Scene(class DuneII* game, const Type type) noexcept;

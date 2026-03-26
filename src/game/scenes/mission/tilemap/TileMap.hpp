@@ -20,7 +20,7 @@ public:
     bool createFromLoader(const class TiledMapLoader& loader) noexcept;
     bool putStructure(const HouseType owner, const StructureInfo::Type type, const sf::Vector2i point) noexcept;
 
-    entt::entity    getEntityUnderCursor(const sf::Vector2f point) const noexcept;
+    entt::entity    getEntityUnderCursor(const sf::Vector2i point) const noexcept;
     entt::registry& getRegistry()                                  const noexcept;
 
 private:

@@ -1,4 +1,3 @@
-#include <SFML/Graphics/Texture.hpp>
 #include "RapidXML/rapidxml_utils.hpp"
 
 #include "graphics/animation/AnimationManager.hpp"
@@ -8,9 +7,9 @@ AnimationManager::AnimationManager() noexcept = default;
 AnimationManager::~AnimationManager() = default;
 
 
-void AnimationManager::addFrame(const std::string& name, const sf::Texture& texture) noexcept
+void AnimationManager::addFrame(const std::string& name, const sf::Vector2u textureSize) noexcept
 {
-	const sf::IntRect textureFrame = { { 0, 0 }, sf::Vector2i(texture.getSize()) };
+	const sf::IntRect textureFrame = { { 0, 0 }, sf::Vector2i(textureSize) };
 	addFrame(name, textureFrame);
 }
 
@@ -22,15 +21,15 @@ void AnimationManager::addFrame(const std::string& name, const sf::IntRect& fram
 }
 
 
-void AnimationManager::createLinearAnimaton(const std::string& name, const sf::Texture& texture, uint32_t duration) noexcept
+void AnimationManager::createLinearAnimaton(const std::string& name, const sf::Vector2u textureSize, uint32_t duration) noexcept
 {
 	if(auto it = m_frames.find(name); it == m_frames.end())
 	{
 		auto& frames = m_frames[name];
 		frames.reserve(duration);
 
-		const int32_t frameHeight = texture.getSize().y;
-		const int32_t frameWidth = texture.getSize().x / duration;
+		const int32_t frameHeight = textureSize.y;
+		const int32_t frameWidth = textureSize.x / duration;
 	
 		for (int32_t i = 0; i < duration; ++i)
 			frames.emplace_back(sf::IntRect({ i * frameWidth, 0 }, { frameWidth, frameHeight }));
@@ -38,14 +37,14 @@ void AnimationManager::createLinearAnimaton(const std::string& name, const sf::T
 }
 
 
-void AnimationManager::createGridAnimaton(const std::string& name, const sf::Texture& texture, uint32_t columns, uint32_t rows) noexcept
+void AnimationManager::createGridAnimaton(const std::string& name, const sf::Vector2u textureSize, uint32_t columns, uint32_t rows) noexcept
 {
 	if(auto it = m_frames.find(name); it == m_frames.end())
 	{
 		auto& frames = m_frames[name];
 		frames.reserve(columns * rows);
 
-		const sf::Vector2i size  = sf::Vector2i(texture.getSize());
+		const sf::Vector2i size  = sf::Vector2i(textureSize);
 		const int32_t frameWidth  = size.x / static_cast<int32_t>(columns);
 		const int32_t frameHeight = size.y / static_cast<int32_t>(rows);
 	
@@ -66,7 +65,7 @@ void AnimationManager::createCustomAnimaton(const std::string& name, std::span<c
 }
 
 
-void AnimationManager::loadSpriteSheet(const std::filesystem::path& filePath, const sf::Texture& texture) noexcept
+void AnimationManager::loadSpriteSheet(const std::filesystem::path& filePath) noexcept
 {
 	auto document = std::make_unique<rapidxml::xml_document<char>>();
 	rapidxml::file<char> xmlFile(filePath.string().c_str());

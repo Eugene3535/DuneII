@@ -40,7 +40,7 @@
 
 
 // Animation xml
-#define CURSOR_FRAME_XML "CursorFrames.xml"
+#define CURSOR_FRAMES_XML "Cursors.xml"
 
 
 // Music files

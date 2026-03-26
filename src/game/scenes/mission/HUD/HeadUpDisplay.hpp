@@ -3,54 +3,42 @@
 
 #include <entt/entity/fwd.hpp>
 
-#include "graphics/Meshes.hpp"
-#include "graphics/transform/Transform2D.hpp"
-#include "graphics/sprites/SpriteManager.hpp"
-#include "game/scenes/mission/HUD/construction/ConstructionMenu.hpp"
+#include "game/scenes/Scene.hpp"
+#include "game/scenes/mission/HUD/selection/Cursor.hpp"
+//#include "game/scenes/mission/HUD/construction/ConstructionMenu.hpp"
 
 
-class HeadUpDisplay
+class HeadUpDisplay:
+    public Scene
 {
 public:
-    HeadUpDisplay(class Engine* engine, class Tilemap& tilemap) noexcept;
-    HeadUpDisplay(const HeadUpDisplay&)              noexcept = delete;
-	HeadUpDisplay(HeadUpDisplay&&)                   noexcept = delete;
-	HeadUpDisplay& operator = (const HeadUpDisplay&) noexcept = delete;
-	HeadUpDisplay& operator = (HeadUpDisplay&&)      noexcept = delete;
+    HeadUpDisplay(class DuneII* game, const class Tilemap& tilemap) noexcept;
     ~HeadUpDisplay();
 
-    bool init()            noexcept;
-    void update(float dt)  noexcept;
-    void draw()      const noexcept;
+    bool load(std::string_view data) noexcept override;
+    void update(sf::Time dt)         noexcept override;
+    void resize(sf::Vector2u size)   noexcept override;
 
-    void hideMenu()                    noexcept;
-    void runSelection()                noexcept;
-    void cancelSelection()             noexcept;
-    void resize(int width, int height) noexcept;
+    void hideMenu()        noexcept;
+    void runSelection()    noexcept;
+    void cancelSelection() noexcept;
 
     bool isMenuShown() const noexcept;
 
+    Cursor cursor;
+
 private:
-    class Engine*        m_engine;
+    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+
     const class Tilemap& m_tilemap;
 
-    ConstructionMenu m_menu;
 
-    SpriteManager m_sprites;
-    mesh::Sprite  m_releasedCursor;
-    mesh::Sprite  m_capturedCursor;
-    mesh::Sprite  m_currentCursor;
-    Transform2D   m_cursorTransform;
-    uint32_t      m_cursorTexture;
-    uint32_t      m_cursorProgram;
-    uint32_t      m_tilemapProgram;
+    //ConstructionMenu m_menu;
 
     float m_clickTimer;
 
     struct
     {
-        uint32_t     vertexBufferObject;
-        uint32_t     vertexArrayObject;
         float        blinkTimer;
         bool         enabled;
         entt::entity lastSelectedEntity;

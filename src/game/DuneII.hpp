@@ -7,6 +7,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 
 #include "resources/files/assets/AssetManager.hpp"
+#include "graphics/animation/AnimationManager.hpp"
 #include "game/scenes/Scene.hpp"
 #include "common/info/GameInfo.hpp"
 
@@ -25,7 +26,9 @@ public:
     const GameInfo& getInfo() const noexcept;
 
     sf::RenderWindow& window;
+
     AssetManager assets;
+    AnimationManager animations;
     
 private:
     template<class T>

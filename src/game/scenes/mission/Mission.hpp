@@ -3,7 +3,7 @@
 
 #include "game/scenes/mission/loader/TiledMapLoader.hpp"
 #include "game/scenes/mission/tilemap/Tilemap.hpp"
-// #include "game/scenes/mission/HUD/HeadUpDisplay.hpp"
+#include "game/scenes/mission/HUD/HeadUpDisplay.hpp"
 #include "game/scenes/Scene.hpp"
 
 
@@ -28,7 +28,7 @@ private:
 
     sf::IntRect  m_viewport;
     sf::Vector2i m_viewPosition;
-    // HeadUpDisplay  m_hud;
+    HeadUpDisplay  m_hud;
 
     std::vector<void(*)(Mission*, sf::Time dt)> m_systems;
 };
