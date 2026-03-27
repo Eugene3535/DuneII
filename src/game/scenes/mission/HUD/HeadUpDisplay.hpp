@@ -25,14 +25,13 @@ public:
 
     bool isMenuShown() const noexcept;
 
-    Cursor cursor;
-
 private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+    void updateCursor(sf::Time dt) noexcept;
 
     const class Tilemap& m_tilemap;
 
-
+    Cursor m_cursor;
     //ConstructionMenu m_menu;
 
     float m_clickTimer;

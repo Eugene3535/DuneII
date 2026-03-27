@@ -38,6 +38,8 @@ void Mission::update(sf::Time dt) noexcept
 {
     for(auto system : m_systems)
         system(this, dt);
+
+    m_hud.update(dt);
 }
 
 
@@ -104,62 +106,6 @@ void Mission::createSystems() noexcept
         mission->m_viewport = sf::IntRect({viewPosition.x, viewPosition.y}, {viewSize.x, viewSize.y});
     });
 
-    //  CursorController
-    m_systems.emplace_back([](Mission* mission, sf::Time dt)
-    {
-        static constexpr int32_t cooldown = 4;
-        static int timer = 0;
-
-        sf::Vector2i mousePosition = sf::Mouse::getPosition(mission->m_game->window);
-        const auto worldPosition = mission->m_game->window.mapPixelToCoords(mousePosition);
-
-        auto& cursor = mission->m_hud.cursor;
-
-        cursor.update(worldPosition, dt);
-
-        if(timer > cooldown)
-        {
-            timer = 0;
-
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
-            {
-                if(auto entity = mission->m_tilemap.getEntityUnderCursor(static_cast<sf::Vector2i>(worldPosition)); entity != entt::null)
-                {
-                    // if(auto [structure, bounds] = mission->m_registry.try_get<Structure, sf::IntRect>(entity.value()); structure != nullptr)
-                    // {
-                    //     bool can_be_highlighted = 
-                    //                 ((structure->type != StructureType::SLAB_1x1) &&
-                    //                 ( structure->type != StructureType::SLAB_2x2) && 
-                    //                 ( structure->type != StructureType::WALL)     && 
-                    //                 structure->type < StructureType::MAX);
-
-                    //     if(can_be_highlighted)
-                    //     {
-                    //         mission->m_cursor.setVertexFrame(*bounds);
-                    //         mission->m_cursor.select();
-                    //     }
-                    //     else
-                    //     {
-                    //         mission->m_cursor.release();
-                    //     }
-                    // }
-                }
-                else
-                {
-                    cursor.release();
-                }
-
-                //m_cursor.capture(); // for units
-            }
-
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
-            {
-                cursor.release();
-            }
-        }
-
-        ++timer;
-    });
 
 //  HUD Controller
     // m_systems.emplace_back([](Mission* mission, float dt)

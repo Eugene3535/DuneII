@@ -25,7 +25,7 @@ HeadUpDisplay::~HeadUpDisplay() = default;
 
 bool HeadUpDisplay::load(std::string_view data) noexcept
 {
-    if(!cursor.load(m_game->animations, m_game->assets))
+    if(!m_cursor.load(m_game->animations, m_game->assets))
         return false;
 
     m_game->window.setMouseCursorVisible(false);
@@ -36,13 +36,7 @@ bool HeadUpDisplay::load(std::string_view data) noexcept
 
 void HeadUpDisplay::update(sf::Time dt) noexcept
 {
-    // m_clickTimer += dt;
-    // m_selectionFrame.blinkTimer += dt;
-
-    // if(m_selectionFrame.blinkTimer > BLINK_LOOP_TIME)
-    //     m_selectionFrame.blinkTimer = 0.f;
-
-    // m_cursorTransform.setPosition(m_engine->getCursorPosition());
+    updateCursor(dt);
 }
 
 
@@ -215,7 +209,7 @@ bool HeadUpDisplay::isMenuShown() const noexcept
 
 void HeadUpDisplay::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    target.draw(cursor, states);
+    target.draw(m_cursor, states);
 
     // auto& camera = m_engine->camera;
 
@@ -258,4 +252,57 @@ void HeadUpDisplay::draw(sf::RenderTarget& target, sf::RenderStates states) cons
     //     camera.updateUniformBuffer(result.raw);
     //     m_menu.draw(false);
     // }
+}
+
+
+void HeadUpDisplay::updateCursor(sf::Time dt) noexcept
+{
+    static constexpr int32_t cooldown = 4;
+    static int timer = 0;
+
+    sf::Vector2i mousePosition = sf::Mouse::getPosition(m_game->window);
+    const auto worldPosition = m_game->window.mapPixelToCoords(mousePosition);
+
+    m_cursor.update(worldPosition, dt);
+
+    if(timer > cooldown)
+    {
+        timer = 0;
+
+        if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+        {
+            if(auto entity = m_tilemap.getEntityUnderCursor(static_cast<sf::Vector2i>(worldPosition)); entity != entt::null)
+            {
+                // if(auto [structure, bounds] = mission->m_registry.try_get<Structure, sf::IntRect>(entity.value()); structure != nullptr)
+                // {
+                //     bool can_be_highlighted = 
+                //                 ((structure->type != StructureType::SLAB_1x1) &&
+                //                 ( structure->type != StructureType::SLAB_2x2) && 
+                //                 ( structure->type != StructureType::WALL)     && 
+                //                 structure->type < StructureType::MAX);
+
+                //     if(can_be_highlighted)
+                //     {
+                //         mission->m_cursor.setVertexFrame(*bounds);
+                //         mission->m_cursor.select();
+                //     }
+                //     else
+                //     {
+                //         mission->m_cursor.release();
+                //     }
+                // }
+            }
+            else
+            {
+                m_cursor.release();
+            }
+
+            //m_cursor.capture(); // for units
+        }
+
+        if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
+            m_cursor.release();
+    }
+
+    ++timer;
 }
