@@ -108,27 +108,22 @@ void Mission::createSystems() noexcept
 
 
 //  HUD Controller
-    // m_systems.emplace_back([](Mission* mission, float dt)
-    // {
-    //     const Engine* engine = mission->m_engine;
+    m_systems.emplace_back([](Mission* mission, sf::Time dt)
+    {
+        if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+            mission->m_hud.runSelection();
 
-    //     const bool isMouseButtonLeftPressed  = engine->isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
-    //     const bool isMouseButtonRightPressed = engine->isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
-
-    //     if(isMouseButtonLeftPressed)
-    //         mission->m_hud.runSelection();
-
-    //     if(isMouseButtonRightPressed)
-    //         mission->m_hud.cancelSelection();
+        if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
+            mission->m_hud.cancelSelection();
  
-    //     mission->m_hud.update(dt);
+        mission->m_hud.update(dt);
 
-    //     if(mission->m_hud.isMenuShown())
-    //     {
-    //         if(engine->isKeyPressed(GLFW_KEY_SPACE))
-    //             mission->m_hud.hideMenu();
-    //     }
-    // });
+        if(mission->m_hud.isMenuShown())
+        {
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
+                mission->m_hud.hideMenu();
+        }
+    });
 
     m_isLoaded = true;
 }

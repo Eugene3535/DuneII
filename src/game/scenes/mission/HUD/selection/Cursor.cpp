@@ -8,8 +8,8 @@
 #define FRAME_RELEASED "Released"
 #define FRAME_CAPTURED "Captured"
 
-constexpr static sf::Time blink_period    = sf::milliseconds(0.125f);
-constexpr static sf::Time blink_loop_time = sf::milliseconds(0.25f);
+constexpr static sf::Time blink_period    = sf::milliseconds(250);
+constexpr static sf::Time blink_loop_time = sf::milliseconds(500);
 
 
 Cursor::Cursor() noexcept:
@@ -95,7 +95,7 @@ void Cursor::update(const sf::Vector2f& position, sf::Time dt) noexcept
 
 void Cursor::setVertexFrame(const sf::IntRect& frame) noexcept
 {
-    static constexpr float offset = 12.f;
+    const float offset = 12.f;
 
     const auto leftBottom  = sf::Vector2f(frame.position.x, frame.position.y + frame.size.y);
     const auto leftTop     = sf::Vector2f(frame.position.x, frame.position.y);

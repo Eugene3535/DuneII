@@ -26,11 +26,11 @@ enum class WallCellType : uint32_t
 };
 
 
-static WallCellType compute_wall_type(bool left, bool top, bool right, bool bottom)                                     noexcept;
-static sf::IntRect  get_texcoords_of_custom_wall(const WallCellType type)                                               noexcept;
-static sf::IntRect  get_texcoords_of_structure(const StructureInfo::Type type)                                          noexcept;
-static sf::IntRect  get_bounds_of(const StructureInfo::Type type, const sf::Vector2i cell, const sf::Vector2i tileSize) noexcept; // cell value must be presented in tiles, not pixels
-static int32_t      get_armor_of(const StructureInfo::Type type)                                                        noexcept;
+static WallCellType compute_wall_type(bool left, bool top, bool right, bool bottom)         noexcept;
+static sf::IntRect  get_texcoords_of_custom_wall(const WallCellType type)                   noexcept;
+static sf::IntRect  get_texcoords_of_structure(const StructureInfo::Type type)              noexcept;
+static sf::IntRect  get_bounds_of(const StructureInfo::Type type, const sf::Vector2i point) noexcept;
+static int32_t      get_armor_of(const StructureInfo::Type type)                            noexcept;
 
 
 Tilemap::Tilemap(DuneII* game, entt::registry& registry) noexcept:
@@ -163,16 +163,16 @@ bool Tilemap::putStructure(const HouseType owner, const StructureInfo::Type type
 	if(type >= StructureInfo::Type::MAX)
         return false;
 
-    const auto bounds = get_bounds_of(type, point, m_tileSize);
+    const auto bounds = get_bounds_of(type, point);
 
     {// out of bounds (in pixels) ?
         const int32_t mapWidth  = m_mapSize.x * m_tileSize.x;
         const int32_t mapHeight = m_mapSize.y * m_tileSize.y;
 
-        if(bounds.position.x < 0)     return false;
-        if(bounds.position.y < 0)     return false;
-        if(bounds.size.x > mapWidth)  return false;
-        if(bounds.size.y > mapHeight) return false;
+        if(bounds.position.x < 0)                         return false;
+        if(bounds.position.y < 0)                         return false;
+        if(bounds.position.x + bounds.size.x > mapWidth)  return false;
+        if(bounds.position.y + bounds.size.y > mapHeight) return false;
     }
 
 	const sf::Vector2i cell = { point.x / m_tileSize.x, point.y / m_tileSize.y };
@@ -235,14 +235,14 @@ bool Tilemap::putStructure(const HouseType owner, const StructureInfo::Type type
 									      (type == StructureInfo::Type::BARRACKS)          ||
 										  (type == StructureInfo::Type::STARPORT));
 	
-	// if(hasConstructionPreviews)
-	// {
-	// 	const GameInfo& info = m_game->getInfo();
-	// 	auto previews = info->getPreviewIconList(owner, type, 8);
+	if(hasConstructionPreviews)
+	{
+		const GameInfo& info = m_game->getInfo();
+		auto previews = info.getPreviewIconList(owner, type, 8);
 
-	// 	if(!previews.empty())
-	// 		m_registry.emplace<std::vector<PreviewType>>(entity, previews);
-	// }
+		if(!previews.empty())
+			m_registry.emplace<std::vector<PreviewType>>(entity, previews);
+	}
 
 	auto setup_tiles_on_mask = [this, origin, entity](int32_t width, int32_t height, char symbol = 'B') -> void
 	{
@@ -420,25 +420,25 @@ sf::IntRect get_texcoords_of_structure(const StructureInfo::Type type) noexcept
 }
 
 
-sf::IntRect get_bounds_of(const StructureInfo::Type type, const sf::Vector2i cell, const sf::Vector2i tileSize) noexcept
+sf::IntRect get_bounds_of(const StructureInfo::Type type, const sf::Vector2i point) noexcept
 {
 	switch (type)
 	{
-		case StructureInfo::Type::SLAB_1x1:          return { { cell.x, cell.y }, { cell.x + 32, cell.y + 32 } };
-		case StructureInfo::Type::PALACE:            return { { cell.x, cell.y }, { cell.x + 96, cell.y + 96 } };
-		case StructureInfo::Type::VEHICLE:           return { { cell.x, cell.y }, { cell.x + 96, cell.y + 64 } };
-		case StructureInfo::Type::HIGH_TECH:         return { { cell.x, cell.y }, { cell.x + 64, cell.y + 64 } };
-		case StructureInfo::Type::CONSTRUCTION_YARD: return { { cell.x, cell.y }, { cell.x + 64, cell.y + 64 } };
-		case StructureInfo::Type::WIND_TRAP:         return { { cell.x, cell.y }, { cell.x + 64, cell.y + 64 } };
-		case StructureInfo::Type::BARRACKS:          return { { cell.x, cell.y }, { cell.x + 64, cell.y + 64 } };
-		case StructureInfo::Type::STARPORT:          return { { cell.x, cell.y }, { cell.x + 96, cell.y + 96 } };
-		case StructureInfo::Type::REFINERY:          return { { cell.x, cell.y }, { cell.x + 96, cell.y + 64 } };
-		case StructureInfo::Type::REPAIR:            return { { cell.x, cell.y }, { cell.x + 96, cell.y + 64 } };
-		case StructureInfo::Type::WALL:              return { { cell.x, cell.y }, { cell.x + 32, cell.y + 32 } };
-		case StructureInfo::Type::TURRET:            return { { cell.x, cell.y }, { cell.x + 32, cell.y + 32 } };
-		case StructureInfo::Type::ROCKET_TURRET:     return { { cell.x, cell.y }, { cell.x + 32, cell.y + 32 } };
-		case StructureInfo::Type::SILO:              return { { cell.x, cell.y }, { cell.x + 64, cell.y + 64 } };
-		case StructureInfo::Type::OUTPOST:           return { { cell.x, cell.y }, { cell.x + 64, cell.y + 64 } }; 
+		case StructureInfo::Type::SLAB_1x1:          return { { point.x, point.y }, { 32, 32 } };
+		case StructureInfo::Type::PALACE:            return { { point.x, point.y }, { 96, 96 } };
+		case StructureInfo::Type::VEHICLE:           return { { point.x, point.y }, { 96, 64 } };
+		case StructureInfo::Type::HIGH_TECH:         return { { point.x, point.y }, { 64, 64 } };
+		case StructureInfo::Type::CONSTRUCTION_YARD: return { { point.x, point.y }, { 64, 64 } };
+		case StructureInfo::Type::WIND_TRAP:         return { { point.x, point.y }, { 64, 64 } };
+		case StructureInfo::Type::BARRACKS:          return { { point.x, point.y }, { 64, 64 } };
+		case StructureInfo::Type::STARPORT:          return { { point.x, point.y }, { 96, 96 } };
+		case StructureInfo::Type::REFINERY:          return { { point.x, point.y }, { 96, 64 } };
+		case StructureInfo::Type::REPAIR:            return { { point.x, point.y }, { 96, 64 } };
+		case StructureInfo::Type::WALL:              return { { point.x, point.y }, { 32, 32 } };
+		case StructureInfo::Type::TURRET:            return { { point.x, point.y }, { 32, 32 } };
+		case StructureInfo::Type::ROCKET_TURRET:     return { { point.x, point.y }, { 32, 32 } };
+		case StructureInfo::Type::SILO:              return { { point.x, point.y }, { 64, 64 } };
+		case StructureInfo::Type::OUTPOST:           return { { point.x, point.y }, { 64, 64 } }; 
 
 		default: return { { 0, 0 }, { 32, 32 } };
 	}

@@ -57,44 +57,43 @@ void HeadUpDisplay::runSelection() noexcept
     // if(m_menu.isShown())
     //     return;
 
-    // vec2s cursorPosition = m_engine->getCursorPosition();
-    // vec2s scenePosition  = glms_vec2_negate(m_tilemap.getPosition());
-    // vec2s worldCoords    = glms_vec2_add(scenePosition, cursorPosition);
+    const sf::Vector2i mousePosition = sf::Mouse::getPosition(m_game->window);
+    const sf::Vector2i worldPosition = sf::Vector2i(m_game->window.mapPixelToCoords(mousePosition));
 
-    // const auto entity = m_tilemap.getEntityUnderCursor(worldCoords);
+    const auto entity = m_tilemap.getEntityUnderCursor(worldPosition);
 
-    // if(entity == entt::null)
-    // {
-    //     m_selectionFrame.enabled = false;
-    //     m_selectionFrame.lastSelectedEntity = entt::null;
+    if(entity == entt::null)
+    {
+        m_selectionFrame.enabled = false;
+        m_selectionFrame.lastSelectedEntity = entt::null;
 
-    //     return;
-    // }
+        return;
+    }
 
-    // auto convert_building_type_to_preview = [](StructureInfo::Type type) -> PreviewType
-    // {
-    //     switch (type)
-    //     {
-    //         case StructureInfo::SLAB_2x2:          return PreviewType::Slab_2x2;
-    //         case StructureInfo::PALACE:            return PreviewType::Palace;
-    //         case StructureInfo::VEHICLE:           return PreviewType::Light_Vehicle_Factory;
-    //         case StructureInfo::HIGH_TECH:         return PreviewType::High_Tech;
-    //         case StructureInfo::CONSTRUCTION_YARD: return PreviewType::Construction_Yard;
-    //         case StructureInfo::WIND_TRAP:         return PreviewType::Wind_Trap;
-    //         case StructureInfo::BARRACKS:          return PreviewType::Barracks;
-    //         case StructureInfo::STARPORT:          return PreviewType::Starport;
-    //         case StructureInfo::REFINERY:          return PreviewType::Refinery;
-    //         case StructureInfo::REPAIR:            return PreviewType::Repair;
-    //         case StructureInfo::TURRET:            return PreviewType::Turret;
-    //         case StructureInfo::ROCKET_TURRET:     return PreviewType::Rocket_Turret;
-    //         case StructureInfo::SILO:              return PreviewType::Spice_Silo;
-    //         case StructureInfo::OUTPOST:           return PreviewType::Outpost;
+    auto convert_building_type_to_preview = [](StructureInfo::Type type) -> PreviewType
+    {
+        switch (type)
+        {
+            case StructureInfo::SLAB_2x2:          return PreviewType::Slab_2x2;
+            case StructureInfo::PALACE:            return PreviewType::Palace;
+            case StructureInfo::VEHICLE:           return PreviewType::Light_Vehicle_Factory;
+            case StructureInfo::HIGH_TECH:         return PreviewType::High_Tech;
+            case StructureInfo::CONSTRUCTION_YARD: return PreviewType::Construction_Yard;
+            case StructureInfo::WIND_TRAP:         return PreviewType::Wind_Trap;
+            case StructureInfo::BARRACKS:          return PreviewType::Barracks;
+            case StructureInfo::STARPORT:          return PreviewType::Starport;
+            case StructureInfo::REFINERY:          return PreviewType::Refinery;
+            case StructureInfo::REPAIR:            return PreviewType::Repair;
+            case StructureInfo::TURRET:            return PreviewType::Turret;
+            case StructureInfo::ROCKET_TURRET:     return PreviewType::Rocket_Turret;
+            case StructureInfo::SILO:              return PreviewType::Spice_Silo;
+            case StructureInfo::OUTPOST:           return PreviewType::Outpost;
         
-    //         default: return PreviewType::Empty_Cell;
-    //     }
-    // };
+            default: return PreviewType::Empty_Cell;
+        }
+    };
 
-    // auto& registry = m_tilemap.getRegistry();
+    auto& registry = m_tilemap.getRegistry();
 
     // if(m_selectionFrame.lastSelectedEntity != entity)
     // {
@@ -134,62 +133,31 @@ void HeadUpDisplay::runSelection() noexcept
     //     return;
     // }
 
-    // m_clickTimer = 0;
+    m_clickTimer = 0;
 
-    // if(StructureInfo* info = registry.try_get<StructureInfo>(entity))
-    // {
-    //     bool isSelectable = ((info->type != StructureInfo::Type::SLAB_1x1) &&
-    //                          (info->type != StructureInfo::Type::SLAB_2x2) && 
-    //                          (info->type != StructureInfo::Type::WALL)     && 
-    //                           info->type <  StructureInfo::Type::MAX);
+    auto [info, bounds] = registry.try_get<StructureInfo, sf::IntRect>(entity);
 
-    //     if(isSelectable)
-    //     {
-    //         const auto entityView = convert_building_type_to_preview(info->type);
+    if(info)
+    {
+        bool isSelectable = ((info->type != StructureInfo::Type::SLAB_1x1) &&
+                             (info->type != StructureInfo::Type::SLAB_2x2) && 
+                             (info->type != StructureInfo::Type::WALL)     && 
+                              info->type <  StructureInfo::Type::MAX);
 
-    //         if(entityView != PreviewType::Empty_Cell)
-    //             m_menu.showEntityView(entityView);
+        if(isSelectable)
+        {
+            const auto entityView = convert_building_type_to_preview(info->type);
 
-    //         const auto bounds = registry.get<ivec4s>(entity);
-    //         glBindBuffer(GL_ARRAY_BUFFER, m_selectionFrame.vertexBufferObject);
+            // if(entityView != PreviewType::Empty_Cell)
+            //     m_menu.showEntityView(entityView);
 
-    //         if(void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
-    //         {
-    //             vec2s* vertices = static_cast<vec2s*>(data);
-    //             const float offset = 12.f;
-
-    //             const vec2s leftBottom  = { static_cast<float>(bounds.x), static_cast<float>(bounds.w) };
-    //             const vec2s leftTop     = { static_cast<float>(bounds.x), static_cast<float>(bounds.y) };
-    //             const vec2s rightTop    = { static_cast<float>(bounds.z), static_cast<float>(bounds.y) };
-    //             const vec2s rightBottom = { static_cast<float>(bounds.z), static_cast<float>(bounds.w) };
-
-    //             vertices[0]  = { leftBottom.x, leftBottom.y - offset };
-    //             vertices[1]  = leftBottom;
-    //             vertices[2]  = leftBottom;
-    //             vertices[3]  = { leftBottom.x + offset, leftBottom.y };
-
-    //             vertices[4]  = { leftTop.x, leftTop.y + offset };
-    //             vertices[5]  = leftTop;
-    //             vertices[6]  = leftTop;
-    //             vertices[7]  = { leftTop.x + offset, leftTop.y };
-
-    //             vertices[8]  = { rightTop.x - offset, rightTop.y };
-    //             vertices[9]  = rightTop;
-    //             vertices[10] = rightTop;
-    //             vertices[11] = { rightTop.x, rightTop.y + offset };
-
-    //             vertices[12] = { rightBottom.x, rightBottom.y - offset };
-    //             vertices[13] = rightBottom;
-    //             vertices[14] = rightBottom;
-    //             vertices[15] = { rightBottom.x - offset, rightBottom.y };
-
-    //             if(glUnmapBuffer(GL_ARRAY_BUFFER) == GL_TRUE)
-    //                 m_selectionFrame.enabled = true;
-    //         }
-
-    //         glBindBuffer(GL_ARRAY_BUFFER, 0);
-    //     }
-    // }
+            if (bounds)
+            {
+                m_cursor.setVertexFrame(*bounds);
+                m_cursor.select();
+            }
+        }
+    }
 }
 
 
