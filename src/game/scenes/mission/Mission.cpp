@@ -63,8 +63,8 @@ void Mission::createSystems() noexcept
 //  Viewport Controller
     m_systems.emplace_back([](Mission* mission, sf::Time dt)
     {
-        // if(mission->m_hud.isMenuShown())
-        //     return;
+        if(mission->m_hud.isMenuShown())
+            return;
 
         const int32_t CAMERA_VELOCITY = 600;
         const int32_t SCREEN_MARGIN = 150;

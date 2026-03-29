@@ -5,14 +5,14 @@
 
 #include "game/scenes/Scene.hpp"
 #include "game/scenes/mission/HUD/selection/Cursor.hpp"
-//#include "game/scenes/mission/HUD/construction/ConstructionMenu.hpp"
+#include "game/scenes/mission/HUD/construction/ConstructionMenu.hpp"
 
 
 class HeadUpDisplay:
     public Scene
 {
 public:
-    HeadUpDisplay(class DuneII* game, const class Tilemap& tilemap) noexcept;
+    HeadUpDisplay(class DuneII* game, class Tilemap& tilemap) noexcept;
     ~HeadUpDisplay();
 
     bool load(std::string_view data) noexcept override;
@@ -27,21 +27,14 @@ public:
 
 private:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
-    void updateCursor(sf::Time dt) noexcept;
 
     const class Tilemap& m_tilemap;
 
     Cursor m_cursor;
-    //ConstructionMenu m_menu;
+    ConstructionMenu m_menu;
 
-    float m_clickTimer;
-
-    struct
-    {
-        float        blinkTimer;
-        bool         enabled;
-        entt::entity lastSelectedEntity;
-    } m_selectionFrame;
+    sf::Time m_clickTimer;
+    entt::entity m_lastSelectedEntity;
 };
 
 #endif // !HEAD_UP_DISPLAY_HPP

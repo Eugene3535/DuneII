@@ -19,7 +19,7 @@ set(SCENE_SRC_FILES
 	src/game/scenes/mission/tilemap/Tilemap.cpp
 	src/game/scenes/mission/loader/TiledMapLoader.cpp
 	src/game/scenes/mission/HUD/selection/Cursor.cpp
-	# src/game/scenes/mission/HUD/construction/ConstructionMenu.cpp
+	src/game/scenes/mission/HUD/construction/ConstructionMenu.cpp
 	src/game/scenes/mission/HUD/HeadUpDisplay.cpp
 	src/game/scenes/mission/Mission.cpp
 )
@@ -34,7 +34,7 @@ set(SCENE_HDR_FILES
 	src/game/scenes/mission/tilemap/Tilemap.hpp
 	src/game/scenes/mission/loader/TiledMapLoader.hpp
 	src/game/scenes/mission/HUD/selection/Cursor.hpp
-	# src/game/scenes/mission/HUD/construction/ConstructionMenu.hpp
+	src/game/scenes/mission/HUD/construction/ConstructionMenu.hpp
 	src/game/scenes/mission/HUD/HeadUpDisplay.hpp
 	src/game/scenes/mission/Mission.hpp
 )
@@ -46,7 +46,6 @@ set(DUNEII_SRC_FILES
 	src/common/info/GameInfo.cpp
 	src/graphics/quad/Quad.cpp
 	src/graphics/animation/AnimationManager.cpp
-	# src/graphics/geometry/GeometryGenerator.cpp
 	src/graphics/effects/blackout/ScreenBlackoutEffect.cpp
 	src/graphics/effects/particles/ParticleSystem.cpp
 	${RESOURCE_SRC_FILES}
@@ -62,7 +61,6 @@ set(DUNEII_HDR_FILES
 	src/common/info/GameInfo.hpp
 	src/graphics/quad/Quad.hpp
 	src/graphics/animation/AnimationManager.hpp
-	# src/graphics/geometry/GeometryGenerator.hpp
 	src/graphics/effects/blackout/ScreenBlackoutEffect.hpp
 	src/graphics/effects/particles/ParticleSystem.hpp
 	${RESOURCE_HDR_FILES}

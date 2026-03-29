@@ -19,7 +19,8 @@ public:
         MAIN_MENU,
         PICK_HOUSE,
         MISSION,
-        HUD
+        HUD,
+        CONSTRUCTION_MENU
     };
 
 	Scene(class DuneII* game, const Type type) noexcept;
