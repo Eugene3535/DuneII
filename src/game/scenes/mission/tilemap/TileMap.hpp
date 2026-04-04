@@ -1,44 +1,61 @@
 #ifndef TILEMAP_HPP
 #define TILEMAP_HPP
 
-#include <vector>
-
-#include <SFML/System/Vector2.hpp>
-#include <SFML/Graphics/VertexBuffer.hpp>
 #include <entt/entity/registry.hpp>
 
+#include "graphics/transform/Transform2D.hpp"
 #include "game/scenes/mission/common/Structures.hpp"
 
 
 class Tilemap final:
-    public sf::Drawable
+    public Transform2D
 {
 public:
-    Tilemap(class DuneII* game, entt::registry& registry) noexcept;
+    Tilemap(class Engine* engine, entt::registry& registry) noexcept;
     ~Tilemap();
 
     bool createFromLoader(const class TiledMapLoader& loader) noexcept;
-    bool putStructure(const HouseType owner, const StructureInfo::Type type, const sf::Vector2i point) noexcept;
+    bool putStructure(const HouseType owner, const StructureInfo::Type type, const ivec2s cell)  noexcept; // cell must be in tiles
 
-    entt::entity    getEntityUnderCursor(const sf::Vector2i point) const noexcept;
-    entt::registry& getRegistry()                                  const noexcept;
+    void draw() const noexcept;
+
+    entt::entity    getEntityUnderCursor(const vec2s point) const noexcept;
+    entt::registry& getRegistry()                           const noexcept;
 
 private:
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
-    void updateWall(int32_t origin, int32_t level) noexcept;
+    bool createGraphicsResources(std::span<const vec4s> vertices, std::span<const uint32_t> indices) noexcept;
+    void cleanupGraphicsResources() noexcept;
 
-    DuneII*         m_game;
+    void createGraphicsForEntity(const entt::entity entity) noexcept;
+    void updateWall(int32_t origin, int32_t level)          noexcept;
+
+    Engine*         m_engine;
     entt::registry& m_registry;
 
     std::string               m_tileMask;
     std::vector<entt::entity> m_structureMask;
 
-    sf::VertexBuffer   m_vertexBuffer;
-	const sf::Texture* m_landscapeTexture;
-    const sf::Texture* m_structureTexture;
+    struct
+	{
+		uint32_t texture;
+		uint32_t vertexArrayObject;
+		uint32_t vertexBufferObject;
+        uint32_t indexBufferObject;
+		uint32_t count; // indices
+		uint32_t program;
+	} m_landscape;
 
-    sf::Vector2i m_mapSize;
-    sf::Vector2i m_tileSize;
+    struct
+	{
+        uint32_t texture;
+        uint32_t vertexBufferObject;
+        uint32_t vertexArrayObject;
+        void*    mappedStorage;
+	} m_buildings;
+
+    ivec2s m_textureSize;
+    ivec2s m_mapSize;
+    ivec2s m_tileSize;
 };
 
 #endif // !TILEMAP_HPP

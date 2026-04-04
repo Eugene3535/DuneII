@@ -1,6 +1,5 @@
 .vscode
 .vs
-.cache
 build
 out
 tmp

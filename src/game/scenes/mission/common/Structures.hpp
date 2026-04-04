@@ -1,6 +1,8 @@
 #ifndef STRUCTURE_HPP
 #define STRUCTURE_HPP
 
+#include <cglm/struct/ivec2.h>
+
 #include "common/Enums.hpp"
 
 // More info is available here
@@ -33,6 +35,7 @@ struct StructureInfo
 
     uint32_t id;
     uint32_t frame;
+    ivec2s texOffset;
 
     int32_t cost;
     int32_t armor;

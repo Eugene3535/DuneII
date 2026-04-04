@@ -1,28 +1,43 @@
+#include <cstring>
 
-#include "game/DuneII.hpp"
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+#include "cglm/struct/affine-mat.h"
+
+#include "resources/files/FileProvider.hpp"
+#include "resources/gl_interfaces/texture/Texture.hpp"
+#include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
+#include "game/Engine.hpp"
 #include "game/scenes/mission/Mission.hpp"
 
 
-Mission::Mission(DuneII* game) noexcept:
-    Scene(game, Scene::MISSION),
-    m_tilemap(game, m_registry),
-    m_hud(game, m_tilemap)
+#define CAMERA_VELOCITY 600
+#define SCREEN_MARGIN 150
+
+
+Mission::Mission(Engine* engine) noexcept:
+    Scene(engine, Scene::MISSION),
+    m_tilemap(engine, m_registry),
+    m_hud(engine, m_tilemap)
 {
 
 }
 
-Mission::~Mission() = default;
+Mission::~Mission()
+{
+
+}
 
 
-bool Mission::load(std::string_view data) noexcept
+bool Mission::load(std::string_view info) noexcept
 {
     if(m_isLoaded)
         return true;
 
-    if(!m_hud.load(data))
+    if(!m_hud.init())
         return false;
 
-    if(m_mapLoader.loadFromFile(FileProvider::findPathToFile(std::string(data))))
+    if(m_mapLoader.loadFromFile(FileProvider::findPathToFile(std::string(info))))
     {
         if(!m_tilemap.createFromLoader(m_mapLoader))
             return false;
@@ -34,93 +49,87 @@ bool Mission::load(std::string_view data) noexcept
 }
 
 
-void Mission::update(sf::Time dt) noexcept
+void Mission::update(float dt) noexcept
 {
-    for(auto system : m_systems)
-        system(this, dt);
-
-    m_hud.update(dt);
+    if (m_isLoaded)
+        for(auto system : m_systems)
+            system(this, dt);
 }
 
 
-void Mission::resize(sf::Vector2u size) noexcept
+void Mission::draw() noexcept
 {
-    Scene::resize(size);
-    m_hud.resize(size);
+    m_tilemap.draw();
+    m_hud.draw();
 }
 
 
-void Mission::draw(sf::RenderTarget& target, sf::RenderStates states) const
+void Mission::resize(int width, int height) noexcept
 {
-    target.setView(m_view);
-    target.draw(m_tilemap, states);
-    target.draw(m_hud, states);
+    m_hud.resize(width, height);
 }
 
 
 void Mission::createSystems() noexcept
 {
 //  Viewport Controller
-    m_systems.emplace_back([](Mission* mission, sf::Time dt)
+    m_systems.emplace_back([](Mission* mission, float dt)
     {
         if(mission->m_hud.isMenuShown())
             return;
 
-        const int32_t CAMERA_VELOCITY = 600;
-        const int32_t SCREEN_MARGIN = 150;
+        const auto game     = mission->m_engine;
+        const auto cursor   = game->getCursorPosition();
+        const auto viewSize = game->getWindowsSize();
+        const auto mapSize  = glms_ivec2_mul(mission->m_mapLoader.getMapSize(), mission->m_mapLoader.getTileSize());
 
-        const sf::Vector2i tileSize = mission->m_mapLoader.getTileSize();
-        sf::Vector2i mapSize = mission->m_mapLoader.getMapSize();
-        mapSize.x *= tileSize.x;
-        mapSize.y *= tileSize.y;
+        const bool is_near_the_left_edge   = (cursor.x > 0 && cursor.x < SCREEN_MARGIN);
+        const bool is_near_the_top_edge    = (cursor.y > 0 && cursor.y < SCREEN_MARGIN);
+        const bool is_near_the_right_edge  = (cursor.x > (viewSize.x - SCREEN_MARGIN) && cursor.x < viewSize.x);
+        const bool is_near_the_bottom_edge = (cursor.y > (viewSize.y - SCREEN_MARGIN) && cursor.y < viewSize.y);
 
-        auto& viewPosition = mission->m_viewPosition;
-        float cameraVelocity = dt.asSeconds() * CAMERA_VELOCITY;
+        const float velocity = dt * CAMERA_VELOCITY;
+        vec2s scenePosition = mission->m_tilemap.getPosition();
 
-        sf::Vector2i mousePosition  = sf::Mouse::getPosition(mission->m_game->window);
-        const sf::Vector2i viewSize = static_cast<sf::Vector2i>(mission->m_view.getSize());
-
-        bool isNearTheLeftEdge   = (mousePosition.x > 0 && mousePosition.x < SCREEN_MARGIN);
-        bool isNearTheTopEdge    = (mousePosition.y > 0 && mousePosition.y < SCREEN_MARGIN);
-        bool isNearTheRightEdge  = (mousePosition.x > (viewSize.x - SCREEN_MARGIN) && mousePosition.x < viewSize.x);
-        bool isNearTheBottomEdge = (mousePosition.y > (viewSize.y - SCREEN_MARGIN) && mousePosition.y < viewSize.y);
-
-        if(isNearTheLeftEdge)
-            viewPosition.x -= cameraVelocity;
+        if(is_near_the_left_edge)
+            scenePosition.x += velocity;
         
-        if(isNearTheTopEdge)
-            viewPosition.y -= cameraVelocity;
+        if(is_near_the_top_edge)
+            scenePosition.y += velocity;
         
-        if(isNearTheRightEdge)
-            viewPosition.x += cameraVelocity;
+        if(is_near_the_right_edge)
+            scenePosition.x -= velocity;
         
-        if(isNearTheBottomEdge)
-            viewPosition.y += cameraVelocity;            
-        
-        if(viewPosition.x < 0)                      viewPosition.x = 0;
-        if(viewPosition.y < 0)                      viewPosition.y = 0;
-        if(viewPosition.x + viewSize.x > mapSize.x) viewPosition.x = mapSize.x - viewSize.x;
-        if(viewPosition.y + viewSize.y > mapSize.y) viewPosition.y = mapSize.y - viewSize.y;
+        if(is_near_the_bottom_edge)
+            scenePosition.y -= velocity;
 
-        mission->m_view.setCenter(static_cast<sf::Vector2f>(viewPosition + sf::Vector2i(viewSize.x >> 1, viewSize.y >> 1)));
-        mission->m_viewport = sf::IntRect({viewPosition.x, viewPosition.y}, {viewSize.x, viewSize.y});
+        if(scenePosition.x > 0)                        scenePosition.x = 0;
+        if(scenePosition.y > 0)                        scenePosition.y = 0;
+        if(scenePosition.x < (viewSize.x - mapSize.x)) scenePosition.x = viewSize.x - mapSize.x;
+        if(scenePosition.y < (viewSize.y - mapSize.y)) scenePosition.y = viewSize.y - mapSize.y;
+
+        mission->m_tilemap.setPosition(scenePosition);
     });
 
-
 //  HUD Controller
-    m_systems.emplace_back([](Mission* mission, sf::Time dt)
+    m_systems.emplace_back([](Mission* mission, float dt)
     {
-        if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+        const Engine* engine = mission->m_engine;
+
+        const bool isMouseButtonLeftPressed  = engine->isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
+        const bool isMouseButtonRightPressed = engine->isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
+
+        if(isMouseButtonLeftPressed)
             mission->m_hud.runSelection();
 
-        if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
+        if(isMouseButtonRightPressed)
             mission->m_hud.cancelSelection();
  
         mission->m_hud.update(dt);
 
         if(mission->m_hud.isMenuShown())
         {
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
+            if(engine->isKeyPressed(GLFW_KEY_SPACE))
                 mission->m_hud.hideMenu();
         }
     });

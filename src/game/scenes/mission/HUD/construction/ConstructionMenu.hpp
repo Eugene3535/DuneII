@@ -1,55 +1,95 @@
 #ifndef CONSTRUCTION_MENU_HPP
 #define CONSTRUCTION_MENU_HPP
 
-#include <array>
+#include <vector>
 #include <span>
 
-#include <SFML/Graphics/RectangleShape.hpp>
-
 #include "common/Enums.hpp"
-#include "game/scenes/Scene.hpp"
+#include "graphics/transform/Transform2D.hpp"
 
 
-class ConstructionMenu:
-    public Scene
+class ConstructionMenu
 {
 public:
-    ConstructionMenu(class DuneII* game, class Tilemap& tilemap) noexcept;
+    ConstructionMenu(const class Engine* engine, class Tilemap& tilemap) noexcept;
+    ConstructionMenu(const ConstructionMenu&)              noexcept = delete;
+	ConstructionMenu(ConstructionMenu&&)                   noexcept = delete;
+	ConstructionMenu& operator = (const ConstructionMenu&) noexcept = delete;
+	ConstructionMenu& operator = (ConstructionMenu&&)      noexcept = delete;
     ~ConstructionMenu();
 
-    bool load(std::string_view data)         noexcept override;
+    void init()                              noexcept;
     void showEntityView(PreviewType preview) noexcept;
     void showEntityMenu(PreviewType mainPreview, std::span<PreviewType> menu) noexcept;
-    void hide()                    noexcept;
-    void resize(sf::Vector2u size) noexcept override;
+    void hide()                              noexcept;
+    void draw(bool onlyEntityView)           const noexcept;
+    void resize(int width, int height)       noexcept;
 
-    bool isPreviewShown() const noexcept;
-    bool isMenuShown() const noexcept;
+    bool isShown() const noexcept;
+    const Transform2D& getTransform() const noexcept;
 
 private:
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+    void createFrames()       noexcept;
+    void createPreviews()     noexcept;
+    void createUserElements() noexcept;
 
-    void createFrames()   noexcept;
-    bool createPreviews() noexcept;
-    bool createButtons()  noexcept;
+    void drawFrames()       const noexcept;
+    void drawPreviews()     const noexcept;
+    void drawEntityView()   const noexcept;
+    void drawUserElements() const noexcept;
 
-    class Tilemap& m_tilemap;
+    const class Engine* m_engine;
+    class Tilemap&      m_tilemap;
+    Transform2D         m_transform;
 
-    sf::RectangleShape m_rootShape;
-    sf::RectangleShape m_entityShape;
-    sf::RectangleShape m_entityShapeLabel;
-    sf::RectangleShape m_entityShapeParams[3];
+    struct Widget
+    {
+        uint32_t background;
+        uint32_t outline;
+    };
 
-    std::array<sf::RectangleShape, 18> m_previews;
-    sf::RectangleShape m_mainPreview;
-    sf::RectangleShape m_sideBarEntityPreview;
+    struct
+    {
+        uint32_t vertexBufferObject;
+        uint32_t vertexArrayObject;
+        uint32_t program;
+        int32_t  uniformColor;
 
-    sf::RectangleShape m_buttonExit;
-    sf::RectangleShape m_buttonRepair;
-    sf::RectangleShape m_buttonStop;
+        Widget rootWidget;
+        Widget entityWidget;
+        Widget entityWidgetLabel;
+        Widget entityWidgetParams[3];
+    } m_frames;
+
+    struct
+    {
+        uint32_t program;
+        uint32_t texture;
+        uint32_t vertexBufferObject;
+        uint32_t vertexArrayObject;
+        uint32_t cellCount;
+    } m_previewCells;
+
+    struct 
+    {        
+        uint32_t program;
+        uint32_t textures[3];
+        uint32_t vertexBufferObject;
+        uint32_t vertexArrayObject;
+        mesh::Sprite buttonExit;
+        mesh::Sprite buttonRepair;
+        mesh::Sprite buttonStop;
+        
+        struct
+        {
+            uint32_t vertexArrayObject;
+            uint32_t program;
+            uint32_t count;
+        } selectionFrame;
+
+    } m_userElements;
     
-    std::span<const sf::IntRect> m_textureGrid;
-    bool m_isOnlyEntityView;
+    std::vector<vec2s> m_textureGrid;
     bool m_isShown;
 };
 

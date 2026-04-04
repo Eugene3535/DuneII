@@ -1,0 +1,26 @@
+#ifndef VERTEX_ARRAY_OBJECT_HPP
+#define VERTEX_ARRAY_OBJECT_HPP
+
+#include "resources/gl_interfaces/buffers/GlBuffer.hpp"
+#include "resources/gl_interfaces/vao/attributes/VertexBufferLayout.hpp"
+
+class VertexArrayObject final
+{
+public:
+    VertexArrayObject() noexcept;
+    VertexArrayObject(GLuint handle) noexcept;
+
+    void setup(GLuint handle) noexcept;
+
+    static void createVertexInputState(GLuint vao, GLuint vbo, std::span<const VertexBufferLayout::Attribute> attributes) noexcept;
+
+    GLuint getHandle()     const noexcept;
+    GLuint getIndexCount() const noexcept;
+
+private:
+    GLuint m_handle;
+    GLuint m_attributeCount;
+    GLuint m_indexCount;
+};
+
+#endif // !VERTEX_ARRAY_OBJECT_HPP

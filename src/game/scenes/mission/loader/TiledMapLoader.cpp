@@ -20,9 +20,9 @@ struct Tileset
 
 static char convert_tile_num_to_char(int32_t index) noexcept;
 
-
-
-TiledMapLoader::TiledMapLoader() noexcept
+TiledMapLoader::TiledMapLoader() noexcept:
+	m_mapSize(glms_ivec2_zero()),
+	m_tileSize(glms_ivec2_zero())
 {
 
 }
@@ -60,7 +60,8 @@ bool TiledMapLoader::loadFromFile(const std::filesystem::path &filePath) noexcep
 		if( ! (mapWidth && mapHeight && tileWidth && tileHeight) )
 			return false;
 
-		m_vertices.reserve(mapWidth * mapHeight * 6);
+		m_vertices.reserve(mapWidth * mapHeight * 4);
+		m_indices.reserve(mapWidth * mapHeight * 6);
 		m_tileMask.resize(mapWidth * mapHeight);
 
 		m_mapSize  = { mapWidth,  mapHeight  };
@@ -85,10 +86,11 @@ void TiledMapLoader::reset() noexcept
 {
 	m_title.clear();
 	m_vertices.clear();
+	m_indices.clear();
 	m_objects.clear();
 	m_tileMask.clear();
-	m_mapSize = { 0, 0 };
-	m_tileSize = { 0, 0 };
+	m_mapSize = glms_ivec2_zero();
+	m_tileSize = glms_ivec2_zero();
 }
 
 
@@ -98,9 +100,15 @@ std::string_view TiledMapLoader::getTitle() const noexcept
 }
 
 
-std::span<const sf::Vertex> TiledMapLoader::getVertices() const noexcept
+std::span<const vec4s> TiledMapLoader::getVertices() const noexcept
 {
 	return m_vertices;
+}
+
+
+std::span<const uint32_t> TiledMapLoader::getIndices() const noexcept
+{
+	return m_indices;
 }
 
 
@@ -116,13 +124,13 @@ std::string_view TiledMapLoader::getTileMask() const noexcept
 }
 
 
-sf::Vector2i TiledMapLoader::getMapSize()  const noexcept
+ivec2s TiledMapLoader::getMapSize()  const noexcept
 {
 	return m_mapSize;
 }
 
 
-sf::Vector2i TiledMapLoader::getTileSize() const noexcept
+ivec2s TiledMapLoader::getTileSize() const noexcept
 {
 	return m_tileSize;
 }
@@ -255,11 +263,18 @@ bool TiledMapLoader::loadObjects(const void* rootNode) noexcept
 
 void TiledMapLoader::loadLandscape(const Tileset& tileset, std::span<const int32_t> tileIds) noexcept
 {
+	vec2s ratio;
+	{
+		const int32_t textureWidth  = tileset.columns * m_tileSize.x;
+		const int32_t textureHeight = tileset.rows * m_tileSize.y;
+		ratio.x = 1.f / textureWidth;
+		ratio.y = 1.f / textureHeight;
+	}
+
 	const int32_t mapWidth   = m_mapSize.x;
 	const int32_t mapHeight  = m_mapSize.y;
 	const int32_t tileWidth  = m_tileSize.x;
 	const int32_t tileHeight = m_tileSize.x;
-	const int32_t columns    = tileset.columns;
 
 	size_t tileIndex = 0;
 
@@ -267,27 +282,42 @@ void TiledMapLoader::loadLandscape(const Tileset& tileset, std::span<const int32
 	{
 		for (int32_t x = 0; x < mapWidth; ++x)
 		{
-			const int32_t tileID = tileIds[tileIndex];
-			m_tileMask[tileIndex++] = convert_tile_num_to_char(tileID);
-
-//  Vertex XY coords				
-			const float vX = static_cast<float>(x * tileWidth);
-			const float vY = static_cast<float>(y * tileHeight);
-
-//  Left-top coords of the tile in texture grid
+			const int32_t tileID = tileIds[y * mapWidth + x];
 			const int32_t tileNum = tileID - tileset.firstGID;
-			const int32_t top = (tileNum >= columns) ? tileNum / columns : 0;
-			const int32_t left = tileNum % columns;
-			const sf::Vector2f point(left * tileWidth, top * tileHeight);
 
-//  First triangle
-			m_vertices.emplace_back(sf::Vector2f(vX, vY),                          sf::Color::White, point);
-			m_vertices.emplace_back(sf::Vector2f(vX + tileWidth, vY),              sf::Color::White, sf::Vector2f(point.x + tileWidth, point.y));
-			m_vertices.emplace_back(sf::Vector2f(vX + tileWidth, vY + tileHeight), sf::Color::White, sf::Vector2f(point.x + tileWidth, point.y + tileHeight));
-//  Second triangle
-			m_vertices.emplace_back(sf::Vector2f(vX, vY),                          sf::Color::White, point);
-			m_vertices.emplace_back(sf::Vector2f(vX + tileWidth, vY + tileHeight), sf::Color::White, sf::Vector2f(point.x + tileWidth, point.y + tileHeight));
-			m_vertices.emplace_back(sf::Vector2f(vX, vY + tileHeight),             sf::Color::White, sf::Vector2f(point.x, point.y + tileHeight));
+			m_tileMask[tileIndex] = convert_tile_num_to_char(tileID);
+			++tileIndex;
+
+			const int32_t tileY = (tileNum >= tileset.columns) ? tileNum / tileset.columns : 0;
+			const int32_t tileX = tileNum % tileset.columns;
+
+			const int32_t positionX = tileX * tileWidth;
+			const int32_t positionY = tileY * tileHeight;
+//  Texture coords
+			const float left   = positionX * ratio.x;
+			const float top    = positionY * ratio.y;
+			const float right  = (positionX + tileWidth) * ratio.x;
+			const float bottom = (positionY + tileHeight) * ratio.y;
+//  Vertices
+			const vec2s leftBottom  = { static_cast<float>(x) * tileWidth,              static_cast<float>(y) * tileHeight + tileHeight };
+			const vec2s rightBootom = { static_cast<float>(x) * tileWidth + tileWidth,  static_cast<float>(y) * tileHeight + tileHeight };
+			const vec2s rightTop    = { static_cast<float>(x) * tileWidth + tileWidth,  static_cast<float>(y) * tileHeight };
+			const vec2s leftTop     = { static_cast<float>(x) * tileWidth,              static_cast<float>(y) * tileHeight };
+
+			const uint32_t index = static_cast<uint32_t>(m_vertices.size());
+
+			m_vertices.push_back({ leftBottom.x,  leftBottom.y,  left,  bottom });
+			m_vertices.push_back({ rightBootom.x, rightBootom.y, right, bottom });
+			m_vertices.push_back({ rightTop.x,    rightTop.y,    right, top    });
+			m_vertices.push_back({ leftTop.x,     leftTop.y,     left,  top    });
+
+			m_indices.push_back(index);
+			m_indices.push_back(index + 1);
+			m_indices.push_back(index + 2);
+
+			m_indices.push_back(index);
+			m_indices.push_back(index + 2);
+			m_indices.push_back(index + 3);
 		}
 	}
 }
@@ -357,27 +387,27 @@ void TiledMapLoader::loadStructures(const Tileset& tileset, std::span<const int>
 	};
 
 
-	auto get_structure_size = [this](StructureInfo::Type type) -> sf::Vector2i
+	auto get_structure_tile_bounds = [](StructureInfo::Type type) -> ivec2s
 	{
 		switch (type)
 		{
-            case StructureInfo::Type::SLAB_1x1:          return { 1 * m_tileSize.x, 1 * m_tileSize.y };
-			case StructureInfo::Type::PALACE:            return { 3 * m_tileSize.x, 3 * m_tileSize.y };
-			case StructureInfo::Type::VEHICLE:           return { 3 * m_tileSize.x, 2 * m_tileSize.y };
-			case StructureInfo::Type::HIGH_TECH:         return { 2 * m_tileSize.x, 2 * m_tileSize.y };
-            case StructureInfo::Type::CONSTRUCTION_YARD: return { 2 * m_tileSize.x, 2 * m_tileSize.y };
-			case StructureInfo::Type::WIND_TRAP:         return { 2 * m_tileSize.x, 2 * m_tileSize.y };
-            case StructureInfo::Type::BARRACKS:          return { 2 * m_tileSize.x, 2 * m_tileSize.y };
-			case StructureInfo::Type::STARPORT:          return { 3 * m_tileSize.x, 3 * m_tileSize.y };
-			case StructureInfo::Type::REFINERY:          return { 3 * m_tileSize.x, 2 * m_tileSize.y };
-			case StructureInfo::Type::REPAIR:            return { 3 * m_tileSize.x, 2 * m_tileSize.y };
-            case StructureInfo::Type::WALL:              return { 1 * m_tileSize.x, 1 * m_tileSize.y };
-            case StructureInfo::Type::TURRET:            return { 1 * m_tileSize.x, 1 * m_tileSize.y };
-            case StructureInfo::Type::ROCKET_TURRET:     return { 1 * m_tileSize.x, 1 * m_tileSize.y };
-            case StructureInfo::Type::SILO:              return { 2 * m_tileSize.x, 2 * m_tileSize.y };
-            case StructureInfo::Type::OUTPOST:           return { 2 * m_tileSize.x, 2 * m_tileSize.y };
+            case StructureInfo::Type::SLAB_1x1:          return { 1, 1 };
+			case StructureInfo::Type::PALACE:            return { 3, 3 };
+			case StructureInfo::Type::VEHICLE:           return { 3, 2 };
+			case StructureInfo::Type::HIGH_TECH:         return { 2, 2 };
+            case StructureInfo::Type::CONSTRUCTION_YARD: return { 2, 2 };
+			case StructureInfo::Type::WIND_TRAP:         return { 2, 2 };
+            case StructureInfo::Type::BARRACKS:          return { 2, 2 };
+			case StructureInfo::Type::STARPORT:          return { 3, 3 };
+			case StructureInfo::Type::REFINERY:          return { 3, 2 };
+			case StructureInfo::Type::REPAIR:            return { 3, 2 };
+            case StructureInfo::Type::WALL:              return { 1, 1 };
+            case StructureInfo::Type::TURRET:            return { 1, 1 };
+            case StructureInfo::Type::ROCKET_TURRET:     return { 1, 1 };
+            case StructureInfo::Type::SILO:              return { 2, 2 };
+            case StructureInfo::Type::OUTPOST:           return { 2, 2 };
 
-            default: return { 32, 32 };
+            default: return { 0, 0 };
 		}
 	};
 
@@ -400,8 +430,8 @@ void TiledMapLoader::loadStructures(const Tileset& tileset, std::span<const int>
 
 				object.name = get_structure_name(type); 
 				object.type = "Structure";
-				object.coords = { x * m_tileSize.x, y * m_tileSize.y };
-				object.size = get_structure_size(type);
+				object.coords = { x, y };
+				object.size = get_structure_tile_bounds(type);
 			}
 		}
 	}

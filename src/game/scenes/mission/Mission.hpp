@@ -11,26 +11,23 @@ class Mission:
     public Scene
 {
 public:
-    explicit Mission(class DuneII* game) noexcept;
+    explicit Mission(class Engine* engine) noexcept;
     ~Mission();
 
-    bool load(std::string_view data) noexcept override;
-    void update(sf::Time dt)         noexcept override;
-    void resize(sf::Vector2u size)   noexcept override;
+    bool load(std::string_view info)   noexcept override;
+    void update(float dt)              noexcept override;
+    void draw()                        noexcept override;
+    void resize(int width, int height) noexcept override;
 
 private:
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
     void createSystems() noexcept;
 
     TiledMapLoader m_mapLoader;
     entt::registry m_registry;
     Tilemap        m_tilemap;
-
-    sf::IntRect  m_viewport;
-    sf::Vector2i m_viewPosition;
     HeadUpDisplay  m_hud;
 
-    std::vector<void(*)(Mission*, sf::Time dt)> m_systems;
+    std::vector<void(*)(Mission*, float)> m_systems;
 };
 
 #endif // !MISSION_HPP

@@ -26,13 +26,21 @@ else()
 	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 endif()
 
-set(SFML_BUILD_NETWORK OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
+set(CGLM_USE_TESTS OFF CACHE BOOL "Enable tests" FORCE)
 
 include(src/sources.cmake)
 
 add_executable(${PROJECT_NAME} ${DUNEII_ALL_FILES})
-add_subdirectory(${EXTERNAL_SOURCE_DIR}/sfml sfml)
+add_subdirectory(${EXTERNAL_SOURCE_DIR}/glfw glfw)
+add_subdirectory(${EXTERNAL_SOURCE_DIR}/glad/core glad)
+add_subdirectory(${EXTERNAL_SOURCE_DIR}/cglm cglm)
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/entt entt)
+
+target_sources(${PROJECT_NAME} PRIVATE ${SHADER_FILES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE
 	${PROJECT_SOURCE_DIR}/src
@@ -41,10 +49,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-	SFML::System
-	SFML::Window
-	SFML::Graphics 
-	SFML::Audio
+	glfw
+	glad
+	cglm
 	EnTT::EnTT
 )
 
@@ -54,21 +61,17 @@ else()
     target_compile_options(${PROJECT_NAME} PRIVATE -fno-rtti)  
 endif()
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG>)
+target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG> CGLM_USE_ANONYMOUS_STRUCT)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
 if(MSVC)
 	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${DUNEII_ALL_FILES})
 	set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 	set_target_properties(${PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/$<CONFIG>/bin/$<CONFIG>)
-
-	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/sfml/bin $<TARGET_FILE_DIR:${PROJECT_NAME}>
-		VERBATIM
-	)
 endif()
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "${CMAKE_SOURCE_DIR}/res" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/res"
+	COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "${CMAKE_SOURCE_DIR}/res"         "$<TARGET_FILE_DIR:${PROJECT_NAME}>/res"
+	COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "${CMAKE_SOURCE_DIR}/src/shaders" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/res/shaders"
 	VERBATIM
 )
