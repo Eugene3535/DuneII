@@ -32,9 +32,9 @@ private:
     
     struct
     {
-        uint32_t vertexArrayObject;
-        uint32_t program;
-        uint32_t count;
+        uint32_t    vertexArrayObject;
+        uint32_t    program;
+        uint32_t    count;
         Transform2D transform;
     } m_outline;
 

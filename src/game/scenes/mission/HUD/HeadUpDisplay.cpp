@@ -1,5 +1,7 @@
 #include <algorithm>
 
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
 #include "cglm/struct/affine-mat.h"
 
 #include "resources/files/FileProvider.hpp"
@@ -89,6 +91,33 @@ void HeadUpDisplay::update(float dt) noexcept
         m_selectionFrame.blinkTimer = 0.f;
 
     m_cursorTransform.setPosition(m_engine->getCursorPosition());
+
+    if(m_menu.isShown())
+    {
+        if(m_clickTimer > BLINK_LOOP_TIME)
+        {
+            if(m_engine->isKeyPressed(GLFW_KEY_W))
+            {
+                m_menu.updateSelection('W');
+                m_clickTimer = 0;
+            }
+            else if(m_engine->isKeyPressed(GLFW_KEY_A))
+            {
+                m_menu.updateSelection('A');
+                m_clickTimer = 0;
+            }
+            else if(m_engine->isKeyPressed(GLFW_KEY_S))
+            {
+                m_menu.updateSelection('S');
+                m_clickTimer = 0;
+            }
+            else if(m_engine->isKeyPressed(GLFW_KEY_D))
+            {
+                m_menu.updateSelection('D');
+                m_clickTimer = 0;
+            }
+        }
+    }
 }
 
 

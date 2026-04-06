@@ -26,17 +26,10 @@ namespace
     constexpr float outline_color[]         = { 170.f / 255.f, 199.f / 255.f, 207.f / 255.f, 1.f };
     constexpr float cell_background_color[] = { 116.f / 255.f, 120.f / 255.f, 121.f / 255.f, 1.f };
     constexpr float selection_frame_color[] = { 1.f, 0.f, 0.f, 1.f };
-
-    void set_sprite_size_in_pixels(const mesh::Sprite& sprite, const vec2s newSize, Transform2D& transform) noexcept
-    {
-        float dx = newSize.x / sprite.width;
-        float dy = newSize.y / sprite.height;
-        transform.setScale(dx, dy);
-    }
 }
 
 
-ConstructionMenu::ConstructionMenu(const Engine* engine, Tilemap& tilemap) noexcept:
+ConstructionMenu::ConstructionMenu(Engine* engine, Tilemap& tilemap) noexcept:
     m_engine(engine),
     m_tilemap(tilemap),
     m_transform(),
@@ -75,6 +68,7 @@ void ConstructionMenu::init() noexcept
     assert(m_previewCells.program != 0);
 
     m_transform.setOrigin(DEFAULT_MENU_WIDTH * 0.5f, DEFAULT_MENU_HEIGHT * 0.5f);
+    m_userElements.selectionFrame.transform.setScale(1.f, 1.f);
 
     createFrames();
     createPreviews();
@@ -181,6 +175,51 @@ void ConstructionMenu::showEntityMenu(PreviewType mainPreview, std::span<Preview
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+//  Reset selection frame to start position
+    m_userElements.selectionFrame.row = 0; 
+}
+
+
+void ConstructionMenu::updateSelection(char keyCode) noexcept
+{
+    constexpr vec2s startPos = { 98.f, 46.f };
+    const float offset = 62;
+
+    const auto windowSize = m_engine->getWindowsSize();
+    vec2s size = { static_cast<float>(windowSize.x), static_cast<float>(windowSize.y) };
+
+    float dx = size.x / m_userElements.buttonExit.width;
+    float dy = size.y / m_userElements.buttonExit.height;
+
+    switch (keyCode)
+    {
+        case 'W':
+
+        break;
+
+        case 'A':
+            m_userElements.selectionFrame.row--;
+        break;
+
+        case 'S':
+
+        break;
+
+        case 'D':
+            m_userElements.selectionFrame.row++;
+        break;
+    
+        default:
+            break;
+    }
+
+    m_userElements.selectionFrame.row = std::clamp(m_userElements.selectionFrame.row, 0, 2);
+
+    const float outlinePositionX = startPos.x + offset * m_userElements.selectionFrame.row;
+
+    m_userElements.selectionFrame.transform.setPosition(outlinePositionX * dx, startPos.y * dy);
+    m_userElements.selectionFrame.transform.setScale(dx, dy);
 }
 
 
@@ -207,10 +246,22 @@ void ConstructionMenu::draw(bool onlyEntityView) const noexcept
 
 void ConstructionMenu::resize(int width, int height) noexcept
 {
+//  Main menu
     float dx = width * MENU_SCALE_FACTOR / DEFAULT_MENU_WIDTH;
     float dy = height * MENU_SCALE_FACTOR / DEFAULT_MENU_HEIGHT;
     m_transform.setScale(dx, dy);
     m_transform.setPosition(width * 0.5f, height * 0.5f);
+
+//  Selection frame
+    constexpr vec2s startPos = { 98.f, 46.f };
+    const auto windowSize = m_engine->getWindowsSize();
+    vec2s size = { static_cast<float>(windowSize.x), static_cast<float>(windowSize.y) };
+
+    dx = size.x / m_userElements.buttonExit.width;
+    dy = size.y / m_userElements.buttonExit.height;
+
+    m_userElements.selectionFrame.transform.setPosition(startPos.x * dx, startPos.y * dy);
+    m_userElements.selectionFrame.transform.setScale(dx, dy);
 }
 
 
@@ -436,17 +487,17 @@ void ConstructionMenu::createUserElements() noexcept
 
     {// Outline
         GeometryGenerator generator;
-        const float thickness = 3;
+        const float thickness = 1;
 
         auto outlineVertices = generator.createOutline(4, [posFrame](size_t index) -> vec2s
         {
             switch (index)
             {
                 default:
-                case 0: return { posFrame.x,              posFrame.y              };
-                case 1: return { posFrame.x + posFrame.z, posFrame.y              };
-                case 2: return { posFrame.x + posFrame.z, posFrame.y + posFrame.w };
-                case 3: return { posFrame.x,              posFrame.y + posFrame.w };
+                case 0: return { 0.f,  0.f  };
+                case 1: return { 56.f, 0.f  };
+                case 2: return { 56.f, 9.f };
+                case 3: return { 0.f,  9.f };
             }
         }, thickness);
 
@@ -551,6 +602,12 @@ void ConstructionMenu::drawUserElements() const noexcept
     glBindTextureUnit(0, 0);
 
 //  Draw selection frame
+    auto& camera = m_engine->camera;
+    alignas(16) mat4s mvp = camera.getModelViewProjectionMatrix();
+    alignas(16) mat4s modelView = m_userElements.selectionFrame.transform.getMatrix();
+    alignas(16) mat4s result = glms_mul(mvp, modelView);
+    camera.updateUniformBuffer(result.raw);
+
     glUseProgram(m_userElements.selectionFrame.program);
     glUniform4fv(m_frames.uniformColor, 1, selection_frame_color);
 

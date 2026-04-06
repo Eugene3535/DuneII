@@ -11,7 +11,7 @@
 class ConstructionMenu
 {
 public:
-    ConstructionMenu(const class Engine* engine, class Tilemap& tilemap) noexcept;
+    ConstructionMenu(class Engine* engine, class Tilemap& tilemap) noexcept;
     ConstructionMenu(const ConstructionMenu&)              noexcept = delete;
 	ConstructionMenu(ConstructionMenu&&)                   noexcept = delete;
 	ConstructionMenu& operator = (const ConstructionMenu&) noexcept = delete;
@@ -21,8 +21,9 @@ public:
     void init()                              noexcept;
     void showEntityView(PreviewType preview) noexcept;
     void showEntityMenu(PreviewType mainPreview, std::span<PreviewType> menu) noexcept;
+    void updateSelection(char keyCode)       noexcept;
     void hide()                              noexcept;
-    void draw(bool onlyEntityView)           const noexcept;
+    void draw(bool onlyEntityView)     const noexcept;
     void resize(int width, int height)       noexcept;
 
     bool isShown() const noexcept;
@@ -38,9 +39,9 @@ private:
     void drawEntityView()   const noexcept;
     void drawUserElements() const noexcept;
 
-    const class Engine* m_engine;
-    class Tilemap&      m_tilemap;
-    Transform2D         m_transform;
+    class Engine*  m_engine;
+    class Tilemap& m_tilemap;
+    Transform2D    m_transform;
 
     struct Widget
     {
@@ -85,6 +86,9 @@ private:
             uint32_t vertexArrayObject;
             uint32_t program;
             uint32_t count;
+            Transform2D transform;
+            int32_t row;
+            int32_t column;
         } selectionFrame;
 
     } m_userElements;

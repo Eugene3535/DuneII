@@ -129,7 +129,7 @@ bool PickHouse::load(std::string_view info) noexcept
                 default:
                 case 0: return { 0, 0 };
                 case 1: return { outlineSize.x, 0 };
-                case 2: return { outlineSize.x, outlineSize.y };
+                case 2: return outlineSize;
                 case 3: return { 0, outlineSize.y };
             }
         });
