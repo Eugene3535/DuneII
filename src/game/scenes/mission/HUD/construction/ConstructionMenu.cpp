@@ -177,7 +177,8 @@ void ConstructionMenu::showEntityMenu(PreviewType mainPreview, std::span<Preview
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 //  Reset selection frame to start position
-    m_userElements.selectionFrame.row = 0; 
+    m_userElements.selectionFrame.row = 0;
+    updateSelection('A');
 }
 
 
