@@ -2,8 +2,6 @@
 #include <cstdio>
 #endif
 
-#include <type_traits>
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -63,8 +61,6 @@ int Game::run(Engine& engine) noexcept
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		auto start = std::chrono::high_resolution_clock::now();
-
 		engine.update(deltaTime);
 		engine.draw();
 
@@ -86,7 +82,7 @@ bool Game::initWindow(const char* title, int width, int height) noexcept
 		if (m_window = glfwCreateWindow(width, height, title, nullptr, nullptr))
 		{
 			glfwMakeContextCurrent(m_window);
-			glfwSwapInterval(0);
+			glfwSwapInterval(1);
 
 			if (gladLoadGL())
 				return true;

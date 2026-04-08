@@ -155,7 +155,11 @@ bool Engine::init(GLFWwindow* window) noexcept
 
         glClearColor(0.f, 0.f, 0.f, 1.f);
 
+#ifdef DEBUG
+        m_currentScene = load<Mission>("Atreides-8.tmx");
+#else
         m_currentScene = load<TitleScreen>({});
+#endif
     }
 
     return m_currentScene ? true : false;

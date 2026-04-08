@@ -86,7 +86,6 @@ private:
             uint32_t vertexArrayObject;
             uint32_t program;
             uint32_t count;
-            Transform2D transform;
             int32_t row;
             int32_t column;
         } selectionFrame;

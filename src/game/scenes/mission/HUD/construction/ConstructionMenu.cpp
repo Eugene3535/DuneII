@@ -68,7 +68,6 @@ void ConstructionMenu::init() noexcept
     assert(m_previewCells.program != 0);
 
     m_transform.setOrigin(DEFAULT_MENU_WIDTH * 0.5f, DEFAULT_MENU_HEIGHT * 0.5f);
-    m_userElements.selectionFrame.transform.setScale(1.f, 1.f);
 
     createFrames();
     createPreviews();
@@ -177,50 +176,75 @@ void ConstructionMenu::showEntityMenu(PreviewType mainPreview, std::span<Preview
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 //  Reset selection frame to start position
-    m_userElements.selectionFrame.row = 0;
+    m_userElements.selectionFrame.row = 1;
+    m_userElements.selectionFrame.column = 0;
     updateSelection('A');
 }
 
 
 void ConstructionMenu::updateSelection(char keyCode) noexcept
 {
-    constexpr vec2s startPos = { 98.f, 46.f };
-    const float offset = 62;
-
-    const auto windowSize = m_engine->getWindowsSize();
-    vec2s size = { static_cast<float>(windowSize.x), static_cast<float>(windowSize.y) };
-
-    float dx = size.x / m_userElements.buttonExit.width;
-    float dy = size.y / m_userElements.buttonExit.height;
-
+    const int32_t oldRow = m_userElements.selectionFrame.row;
+    const int32_t oldColumn = m_userElements.selectionFrame.column;
+    
     switch (keyCode)
     {
-        case 'W':
-
-        break;
-
-        case 'A':
-            m_userElements.selectionFrame.row--;
-        break;
-
-        case 'S':
-
-        break;
-
-        case 'D':
-            m_userElements.selectionFrame.row++;
-        break;
+        case 'W': m_userElements.selectionFrame.row--;    break;
+        case 'A': m_userElements.selectionFrame.column--; break;
+        case 'S': m_userElements.selectionFrame.row++;    break;
+        case 'D': m_userElements.selectionFrame.column++; break;
     
         default:
             break;
     }
 
-    m_userElements.selectionFrame.row = std::clamp(m_userElements.selectionFrame.row, 0, 2);
+    bool needUpdateOutline = // We check that the position of the frame has not changed, and that the frame is located within the grid.
+        ((oldRow + oldColumn) != (m_userElements.selectionFrame.row + m_userElements.selectionFrame.column)) &&
+        ((m_userElements.selectionFrame.row > -1) && (m_userElements.selectionFrame.row < PREVIEW_ICON_COLUMNS)) &&
+        ((m_userElements.selectionFrame.column > -1) && (m_userElements.selectionFrame.column < PREVIEW_ICON_COLUMNS));
 
-    const float outlinePositionX = startPos.x + offset * m_userElements.selectionFrame.row;
+//  Returning to the grid limits
+    m_userElements.selectionFrame.row    = std::clamp(m_userElements.selectionFrame.row,    0, PREVIEW_ICON_ROWS - 1);
+    m_userElements.selectionFrame.column = std::clamp(m_userElements.selectionFrame.column, 0, PREVIEW_ICON_COLUMNS - 1);
 
-    m_userElements.selectionFrame.transform.setPosition(outlinePositionX * dx, startPos.y * dy);
-    m_userElements.selectionFrame.transform.setScale(dx, dy);
+    if (!needUpdateOutline)
+        return;
+
+    auto switch_button_outline = [this](void* data, uint32_t buttonIndex) -> void
+    {
+        constexpr vec4s startFrame = { 50.f, 30.f, 150.f, 50.f };
+        const float thickness = 2;
+
+        GeometryGenerator generator;
+
+        auto outlineVertices = generator.createOutline(4, [startFrame, buttonIndex](size_t index) -> vec2s
+        {
+            const float offset = 160.f;
+
+            switch (index)
+            {
+                case 0: return { startFrame.x + buttonIndex * offset,                startFrame.y                };
+                case 1: return { startFrame.x + startFrame.z + buttonIndex * offset, startFrame.y                };
+                case 2: return { startFrame.x + startFrame.z + buttonIndex * offset, startFrame.y + startFrame.w };
+                case 3: return { startFrame.x + buttonIndex * offset,                startFrame.y + startFrame.w };
+
+                default: return { 0.f, 0.f };
+            }
+        }, thickness);
+
+        float* vertices = static_cast<float*>(data) + 48; // TODO: fix magic num
+        memcpy(vertices, outlineVertices.data(), sizeof(float) * outlineVertices.size());
+    };
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_userElements.vertexBufferObject);
+
+    if(void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
+    {
+        switch_button_outline(data, m_userElements.selectionFrame.column);
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 
@@ -252,17 +276,6 @@ void ConstructionMenu::resize(int width, int height) noexcept
     float dy = height * MENU_SCALE_FACTOR / DEFAULT_MENU_HEIGHT;
     m_transform.setScale(dx, dy);
     m_transform.setPosition(width * 0.5f, height * 0.5f);
-
-//  Selection frame
-    constexpr vec2s startPos = { 98.f, 46.f };
-    const auto windowSize = m_engine->getWindowsSize();
-    vec2s size = { static_cast<float>(windowSize.x), static_cast<float>(windowSize.y) };
-
-    dx = size.x / m_userElements.buttonExit.width;
-    dy = size.y / m_userElements.buttonExit.height;
-
-    m_userElements.selectionFrame.transform.setPosition(startPos.x * dx, startPos.y * dy);
-    m_userElements.selectionFrame.transform.setScale(dx, dy);
 }
 
 
@@ -368,7 +381,7 @@ void ConstructionMenu::createPreviews() noexcept
     vertices.reserve((PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS + 1) << 2); // +1 for major preview in the right-top corner
 
     const vec2s cellSize = { 150.f, 100.f };
-    const vec2s startPos = { 50.f, 100.f };
+    const vec2s startPos = { 50.f, 100.f  };
     const float indent = 10.f;
 
     const size_t index = static_cast<size_t>(PreviewType::Empty_Cell) << 2;
@@ -395,6 +408,7 @@ void ConstructionMenu::createPreviews() noexcept
     vertices.push_back({ 870.f, 120.f,  texCoords[1].x, texCoords[1].y });
     vertices.push_back({ 870.f, 280.f,  texCoords[2].x, texCoords[2].y });
     vertices.push_back({ 590.f, 280.f,  texCoords[3].x, texCoords[3].y });
+
     m_previewCells.cellCount = static_cast<uint32_t>(vertices.size() >> 2);
 
 //  Side bar entity preview
@@ -427,8 +441,7 @@ void ConstructionMenu::createUserElements() noexcept
     }
 
     std::vector<float> vertices;
-
-    const vec4s posFrame = { 50.f, 30.f, 150.f, 50.f };
+    constexpr vec4s posFrame = { 50.f, 30.f, 150.f, 50.f };
     const float offset = 160.f;
 
     for (size_t i = 0; i < 3; ++i)
@@ -488,17 +501,18 @@ void ConstructionMenu::createUserElements() noexcept
 
     {// Outline
         GeometryGenerator generator;
-        const float thickness = 1;
+        const float thickness = 2;
 
         auto outlineVertices = generator.createOutline(4, [posFrame](size_t index) -> vec2s
         {
             switch (index)
             {
-                default:
-                case 0: return { 0.f,  0.f  };
-                case 1: return { 56.f, 0.f  };
-                case 2: return { 56.f, 9.f };
-                case 3: return { 0.f,  9.f };
+                case 0: return { static_cast<float>(posFrame.x),              static_cast<float>(posFrame.y)              };
+                case 1: return { static_cast<float>(posFrame.x + posFrame.z), static_cast<float>(posFrame.y)              };
+                case 2: return { static_cast<float>(posFrame.x + posFrame.z), static_cast<float>(posFrame.y + posFrame.w) };
+                case 3: return { static_cast<float>(posFrame.x),              static_cast<float>(posFrame.y + posFrame.w) };
+
+                default: return { 0.f, 0.f };
             }
         }, thickness);
 
@@ -603,12 +617,6 @@ void ConstructionMenu::drawUserElements() const noexcept
     glBindTextureUnit(0, 0);
 
 //  Draw selection frame
-    auto& camera = m_engine->camera;
-    alignas(16) mat4s mvp = camera.getModelViewProjectionMatrix();
-    alignas(16) mat4s modelView = m_userElements.selectionFrame.transform.getMatrix();
-    alignas(16) mat4s result = glms_mul(mvp, modelView);
-    camera.updateUniformBuffer(result.raw);
-
     glUseProgram(m_userElements.selectionFrame.program);
     glUniform4fv(m_frames.uniformColor, 1, selection_frame_color);
 
