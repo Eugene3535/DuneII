@@ -176,13 +176,13 @@ void ConstructionMenu::showEntityMenu(PreviewType mainPreview, std::span<Preview
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 //  Reset selection frame to start position
-    m_userElements.selectionFrame.row = 1;
+    m_userElements.selectionFrame.row = 0;
     m_userElements.selectionFrame.column = 0;
-    updateSelection('A');
+    updateSelection('A', true);
 }
 
 
-void ConstructionMenu::updateSelection(char keyCode) noexcept
+void ConstructionMenu::updateSelection(char keyCode, bool isForced) noexcept
 {
     const int32_t oldRow = m_userElements.selectionFrame.row;
     const int32_t oldColumn = m_userElements.selectionFrame.column;
@@ -207,7 +207,7 @@ void ConstructionMenu::updateSelection(char keyCode) noexcept
     m_userElements.selectionFrame.row    = std::clamp(m_userElements.selectionFrame.row,    0, PREVIEW_ICON_ROWS - 1);
     m_userElements.selectionFrame.column = std::clamp(m_userElements.selectionFrame.column, 0, PREVIEW_ICON_COLUMNS - 1);
 
-    if (!needUpdateOutline)
+    if ( (!needUpdateOutline) && (!isForced) )
         return;
 
     auto switch_button_outline = [this](void* data, uint32_t buttonIndex) -> void
@@ -522,7 +522,7 @@ void ConstructionMenu::createUserElements() noexcept
 
 //  Unload to GPU
     glCreateBuffers(1, &m_userElements.vertexBufferObject);
-    glNamedBufferData(m_userElements.vertexBufferObject, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+    glNamedBufferData(m_userElements.vertexBufferObject, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
 
     {// Vertex array object for buttons
         glGenVertexArrays(1, &m_userElements.vertexArrayObject);

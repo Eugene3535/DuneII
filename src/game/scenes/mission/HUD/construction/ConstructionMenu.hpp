@@ -18,15 +18,15 @@ public:
 	ConstructionMenu& operator = (ConstructionMenu&&)      noexcept = delete;
     ~ConstructionMenu();
 
-    void init()                              noexcept;
-    void showEntityView(PreviewType preview) noexcept;
+    void init()                                                               noexcept;
+    void showEntityView(PreviewType preview)                                  noexcept;
     void showEntityMenu(PreviewType mainPreview, std::span<PreviewType> menu) noexcept;
-    void updateSelection(char keyCode)       noexcept;
-    void hide()                              noexcept;
-    void draw(bool onlyEntityView)     const noexcept;
-    void resize(int width, int height)       noexcept;
+    void updateSelection(char keyCode, bool isForced = false)                 noexcept;
+    void hide()                                                               noexcept;
+    void draw(bool onlyEntityView)                                      const noexcept;
+    void resize(int width, int height)                                        noexcept;
 
-    bool isShown() const noexcept;
+    bool isShown()                    const noexcept;
     const Transform2D& getTransform() const noexcept;
 
 private:
