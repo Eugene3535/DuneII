@@ -69,6 +69,8 @@ private:
         uint32_t vertexBufferObject;
         uint32_t vertexArrayObject;
         uint32_t cellCount;
+        uint32_t cellWidth;
+        uint32_t cellHeight;
     } m_previewCells;
 
     struct 

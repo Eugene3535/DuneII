@@ -200,7 +200,7 @@ void ConstructionMenu::updateSelection(char keyCode, bool isForced) noexcept
 
     bool needUpdateOutline = // We check that the position of the frame has not changed, and that the frame is located within the grid.
         ((oldRow + oldColumn) != (m_userElements.selectionFrame.row + m_userElements.selectionFrame.column)) &&
-        ((m_userElements.selectionFrame.row > -1) && (m_userElements.selectionFrame.row < PREVIEW_ICON_COLUMNS)) &&
+        ((m_userElements.selectionFrame.row > -1) && (m_userElements.selectionFrame.row < PREVIEW_ICON_ROWS)) &&
         ((m_userElements.selectionFrame.column > -1) && (m_userElements.selectionFrame.column < PREVIEW_ICON_COLUMNS));
 
 //  Returning to the grid limits
@@ -236,11 +236,64 @@ void ConstructionMenu::updateSelection(char keyCode, bool isForced) noexcept
         memcpy(vertices, outlineVertices.data(), sizeof(float) * outlineVertices.size());
     };
 
+    auto switch_preview_outline = [this](void* data) -> void
+    {
+        const int32_t column = m_userElements.selectionFrame.column;
+        const int32_t row = m_userElements.selectionFrame.row - 1;
+
+        constexpr vec2s startPos = { 50.f, 100.f  };
+        constexpr vec2s cellSize = { 150.f, 100.f };
+
+        const float indent = 10.f;
+        const float thickness = 4;
+
+        const float left   = startPos.x + cellSize.x * column + indent * column;
+        const float top    = startPos.y + cellSize.y * row + indent * row;
+        const float right  = left + cellSize.x;
+        const float bottom = top + cellSize.y;
+
+        const std::array<vec2s, 4> newFrameVertices = 
+        {
+            left,  top,
+            right, top,
+            right, bottom,
+            left,  bottom
+        };
+
+        GeometryGenerator generator;
+
+        auto outlineVertices = generator.createOutline(4, [&newFrameVertices](size_t index) -> vec2s
+        {
+            const float offset = 160.f;
+
+            switch (index)
+            {
+                case 0: return newFrameVertices[0];
+                case 1: return newFrameVertices[1];
+                case 2: return newFrameVertices[2];
+                case 3: return newFrameVertices[3];
+
+                default: return { 0.f, 0.f };
+            }
+        }, thickness);
+
+        float* vertices = static_cast<float*>(data) + 48; // TODO: fix magic num
+        memcpy(vertices, outlineVertices.data(), sizeof(float) * outlineVertices.size());
+    };
+
     glBindBuffer(GL_ARRAY_BUFFER, m_userElements.vertexBufferObject);
 
     if(void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
     {
-        switch_button_outline(data, m_userElements.selectionFrame.column);
+        if (m_userElements.selectionFrame.row)
+        {
+            switch_preview_outline(data);
+        }
+        else
+        {
+            switch_button_outline(data, m_userElements.selectionFrame.column);
+        }
+
         glUnmapBuffer(GL_ARRAY_BUFFER);
     }
 
@@ -354,7 +407,7 @@ void ConstructionMenu::createPreviews() noexcept
     const int32_t columns = 6; // The number of tiles in the texture horizontally
     const int32_t rows = 7;    // and vertically
     const int32_t spriteWidth = previewsTexture.width / columns;
-    const int32_t spriteHeight = previewsTexture.height / rows;
+    const int32_t spriteHeight= previewsTexture.height / rows;
     const vec2s ratio = { 1.f / previewsTexture.width, 1.f / previewsTexture.height };
 
     m_textureGrid.reserve((PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS) << 2);
@@ -410,6 +463,8 @@ void ConstructionMenu::createPreviews() noexcept
     vertices.push_back({ 590.f, 280.f,  texCoords[3].x, texCoords[3].y });
 
     m_previewCells.cellCount = static_cast<uint32_t>(vertices.size() >> 2);
+    m_previewCells.cellWidth = spriteWidth;
+    m_previewCells.cellHeight = spriteHeight;
 
 //  Side bar entity preview
     vertices.push_back({ 950.f,  -100.f,  texCoords[0].x, texCoords[0].y });
