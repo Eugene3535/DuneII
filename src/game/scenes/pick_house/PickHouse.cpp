@@ -3,7 +3,6 @@
 #include "cglm/struct/affine-mat.h"
 
 #include "resources/files/FileProvider.hpp"
-#include "resources/files/Shader.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "resources/gl_interfaces/texture/Texture.hpp"
 #include "graphics/geometry/GeometryGenerator.hpp"
@@ -80,7 +79,7 @@ bool PickHouse::load(std::string_view info) noexcept
         const float outlineColor[] = { 1.f, 0.f, 0.f, 1.f };
         glUseProgram(m_outline.program);
         glUniform4fv(uniformColor, 1, outlineColor);
-        glUseProgram(0); 
+        glUseProgram(0);
     }
 
     std::vector<float> vertices;
@@ -214,7 +213,7 @@ void PickHouse::update(float dt) noexcept
             case HouseType::Harkonnen:
                 outlinePositionX = HARKONNEN_OUTLINE_POSITION_X * dx;
             break;
-            
+
             default:
                 break;
         }
@@ -231,7 +230,7 @@ void PickHouse::draw() noexcept
         return;
 
     auto& camera = m_engine->camera;
-        
+
     alignas(16) mat4s MVP = camera.getModelViewProjectionMatrix();
     alignas(16) mat4s modelView;
     alignas(16) mat4s result;
@@ -281,7 +280,7 @@ void PickHouse::resize(int width, int height) noexcept
         case HouseType::Harkonnen:
             outlinePositionX = HARKONNEN_OUTLINE_POSITION_X * dx;
         break;
-        
+
         default:
             break;
     }

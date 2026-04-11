@@ -2,7 +2,6 @@
 #define GEOMETRY_GENERATOR_HPP
 
 #include <vector>
-#include <span>
 #include <functional>
 
 #include <cglm/struct/vec2.h>

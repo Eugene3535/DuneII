@@ -1,4 +1,5 @@
 #include <cstring>
+#include <span>
 
 #include <cglm/call/vec2.h>
 
@@ -17,7 +18,7 @@ std::vector<float> GeometryGenerator::createOutline(size_t pointCount, const std
 
     if (pointCount < 3)
         return {};
-    
+
     if(thickness < 1.f)
         return {};
 

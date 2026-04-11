@@ -1,5 +1,3 @@
-#include <algorithm>
-
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include "cglm/struct/affine-mat.h"
@@ -44,7 +42,7 @@ bool HeadUpDisplay::init() noexcept
 {
     m_cursorProgram = m_engine->getShaderProgram("selection");
     m_tilemapProgram = m_engine->getShaderProgram("tilemap");
-    
+
     if(!(m_cursorProgram && m_tilemapProgram))
         return false;
 
@@ -139,11 +137,11 @@ void HeadUpDisplay::draw() const noexcept
 
             glUseProgram(m_tilemapProgram); // return to default tilemap shader
         }
-        
+
         modelView = m_cursorTransform.getMatrix();
         result = glms_mul(uniformMatrix, modelView);
         camera.updateUniformBuffer(result.raw);
-        
+
         m_sprites.bind(true);
         glBindTextureUnit(0, m_cursorTexture);
         glDrawArrays(GL_TRIANGLE_FAN, m_currentCursor.frame, 4);
@@ -210,7 +208,7 @@ void HeadUpDisplay::runSelection() noexcept
             case StructureInfo::ROCKET_TURRET:     return PreviewType::Rocket_Turret;
             case StructureInfo::SILO:              return PreviewType::Spice_Silo;
             case StructureInfo::OUTPOST:           return PreviewType::Outpost;
-        
+
             default: return PreviewType::Empty_Cell;
         }
     };
@@ -220,7 +218,7 @@ void HeadUpDisplay::runSelection() noexcept
     if(m_selectionFrame.lastSelectedEntity != entity)
     {
         m_selectionFrame.lastSelectedEntity = entity;
-    }           
+    }
     else
     {
         if(m_clickTimer > BLINK_LOOP_TIME)
@@ -232,8 +230,8 @@ void HeadUpDisplay::runSelection() noexcept
                 if(mainPreview != PreviewType::Empty_Cell)
                 {
                     const bool hasConstructionPreviews = ((info->type == StructureInfo::Type::VEHICLE)           ||
-                                                          (info->type == StructureInfo::Type::HIGH_TECH)         || 
-                                                          (info->type == StructureInfo::Type::CONSTRUCTION_YARD) || 
+                                                          (info->type == StructureInfo::Type::HIGH_TECH)         ||
+                                                          (info->type == StructureInfo::Type::CONSTRUCTION_YARD) ||
                                                           (info->type == StructureInfo::Type::BARRACKS)          ||
                                                           (info->type == StructureInfo::Type::STARPORT));
 
@@ -248,10 +246,10 @@ void HeadUpDisplay::runSelection() noexcept
                     }
 
                     m_menu.showEntityMenu(mainPreview, previews);
-                }        
-            }     
+                }
+            }
         }
-            
+
         return;
     }
 
@@ -260,8 +258,8 @@ void HeadUpDisplay::runSelection() noexcept
     if(StructureInfo* info = registry.try_get<StructureInfo>(entity))
     {
         bool isSelectable = ((info->type != StructureInfo::Type::SLAB_1x1) &&
-                             (info->type != StructureInfo::Type::SLAB_2x2) && 
-                             (info->type != StructureInfo::Type::WALL)     && 
+                             (info->type != StructureInfo::Type::SLAB_2x2) &&
+                             (info->type != StructureInfo::Type::WALL)     &&
                               info->type <  StructureInfo::Type::MAX);
 
         if(isSelectable)
@@ -327,7 +325,7 @@ void HeadUpDisplay::resize(int width, int height) noexcept
 }
 
 
-bool HeadUpDisplay::isMenuShown() const noexcept
+const ConstructionMenu& HeadUpDisplay::getMenu() const noexcept
 {
-    return m_menu.isShown();
+    return m_menu;
 }

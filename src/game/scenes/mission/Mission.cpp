@@ -1,12 +1,7 @@
-#include <cstring>
-
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
-#include "cglm/struct/affine-mat.h"
 
 #include "resources/files/FileProvider.hpp"
-#include "resources/gl_interfaces/texture/Texture.hpp"
-#include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "game/Engine.hpp"
 #include "game/scenes/mission/Mission.hpp"
 
@@ -75,7 +70,7 @@ void Mission::createSystems() noexcept
 //  Viewport Controller
     m_systems.emplace_back([](Mission* mission, float dt)
     {
-        if(mission->m_hud.isMenuShown())
+        if(mission->m_hud.getMenu().isShown())
             return;
 
         const auto game     = mission->m_engine;
@@ -93,13 +88,13 @@ void Mission::createSystems() noexcept
 
         if(is_near_the_left_edge)
             scenePosition.x += velocity;
-        
+
         if(is_near_the_top_edge)
             scenePosition.y += velocity;
-        
+
         if(is_near_the_right_edge)
             scenePosition.x -= velocity;
-        
+
         if(is_near_the_bottom_edge)
             scenePosition.y -= velocity;
 
@@ -118,19 +113,24 @@ void Mission::createSystems() noexcept
 
         const bool isMouseButtonLeftPressed  = engine->isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
         const bool isMouseButtonRightPressed = engine->isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
+        const bool isSpaceKeyPressed = engine->isKeyPressed(GLFW_KEY_SPACE);
 
-        if(isMouseButtonLeftPressed)
+        if (isMouseButtonLeftPressed)
             mission->m_hud.runSelection();
 
-        if(isMouseButtonRightPressed)
+        if (isMouseButtonRightPressed)
             mission->m_hud.cancelSelection();
- 
+
         mission->m_hud.update(dt);
 
-        if(mission->m_hud.isMenuShown())
+        const auto& menu = mission->m_hud.getMenu();
+
+        if (menu.isShown())
         {
-            if(engine->isKeyPressed(GLFW_KEY_SPACE))
+            if (menu.getSelectedButton() == ConstructionMenu::ButtonType::Exit && isSpaceKeyPressed)
+            {
                 mission->m_hud.hideMenu();
+            }
         }
     });
 

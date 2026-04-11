@@ -2,7 +2,6 @@
 #include <cassert>
 
 #include <glad/glad.h>
-#include "cglm/struct/affine-mat.h"
 
 #include "resources/files/FileProvider.hpp"
 #include "resources/gl_interfaces/texture/Texture.hpp"
@@ -47,7 +46,7 @@ ConstructionMenu::~ConstructionMenu()
     glDeleteVertexArrays(1, &m_userElements.vertexArrayObject);
 	glDeleteBuffers(1, &m_userElements.vertexBufferObject);
     glDeleteBuffers(1, &m_userElements.selectionFrame.vertexArrayObject);
-    
+
     glDeleteVertexArrays(1, &m_previewCells.vertexArrayObject);
 	glDeleteBuffers(1, &m_previewCells.vertexBufferObject);
 
@@ -155,10 +154,12 @@ void ConstructionMenu::showEntityMenu(PreviewType mainPreview, std::span<Preview
                 if(i < menu.size())
                 {
                     setup_tex_coords(data, menu[i], (i << 2));
+                    m_previews[i] = menu[i];
                 }
                 else
                 {
                     setup_tex_coords(data, PreviewType::Empty_Cell, (i << 2));
+                    m_previews[i] = PreviewType::Empty_Cell;
                 }
             }
         }
@@ -167,6 +168,7 @@ void ConstructionMenu::showEntityMenu(PreviewType mainPreview, std::span<Preview
             for (size_t i = 0; i < previewCount; ++i)
             {
                setup_tex_coords(data, PreviewType::Empty_Cell, (i << 2));
+               m_previews[i] = PreviewType::Empty_Cell;
             }
         }
 
@@ -186,25 +188,25 @@ void ConstructionMenu::updateSelection(char keyCode, bool isForced) noexcept
 {
     const int32_t oldRow = m_userElements.selectionFrame.row;
     const int32_t oldColumn = m_userElements.selectionFrame.column;
-    
+
     switch (keyCode)
     {
         case 'W': m_userElements.selectionFrame.row--;    break;
         case 'A': m_userElements.selectionFrame.column--; break;
         case 'S': m_userElements.selectionFrame.row++;    break;
         case 'D': m_userElements.selectionFrame.column++; break;
-    
+
         default:
             break;
     }
 
     bool needUpdateOutline = // We check that the position of the frame has not changed, and that the frame is located within the grid.
         ((oldRow + oldColumn) != (m_userElements.selectionFrame.row + m_userElements.selectionFrame.column)) &&
-        ((m_userElements.selectionFrame.row > -1) && (m_userElements.selectionFrame.row < PREVIEW_ICON_ROWS)) &&
+        ((m_userElements.selectionFrame.row > -1) && (m_userElements.selectionFrame.row <= PREVIEW_ICON_ROWS)) &&
         ((m_userElements.selectionFrame.column > -1) && (m_userElements.selectionFrame.column < PREVIEW_ICON_COLUMNS));
 
 //  Returning to the grid limits
-    m_userElements.selectionFrame.row    = std::clamp(m_userElements.selectionFrame.row,    0, PREVIEW_ICON_ROWS - 1);
+    m_userElements.selectionFrame.row    = std::clamp(m_userElements.selectionFrame.row,    0, PREVIEW_ICON_ROWS);
     m_userElements.selectionFrame.column = std::clamp(m_userElements.selectionFrame.column, 0, PREVIEW_ICON_COLUMNS - 1);
 
     if ( (!needUpdateOutline) && (!isForced) )
@@ -252,7 +254,7 @@ void ConstructionMenu::updateSelection(char keyCode, bool isForced) noexcept
         const float right  = left + cellSize.x;
         const float bottom = top + cellSize.y;
 
-        const std::array<vec2s, 4> newFrameVertices = 
+        const std::array<vec2s, 4> newFrameVertices =
         {
             left,  top,
             right, top,
@@ -312,7 +314,7 @@ void ConstructionMenu::draw(bool onlyEntityView) const noexcept
     if(onlyEntityView)
     {
         drawEntityView();
-    }    
+    }
     else
     {
         drawFrames();
@@ -332,6 +334,27 @@ void ConstructionMenu::resize(int width, int height) noexcept
 }
 
 
+PreviewType ConstructionMenu::getSelectedPreview() const noexcept
+{
+    const int32_t row = m_userElements.selectionFrame.row;
+    const int32_t column = m_userElements.selectionFrame.column;
+
+    return (row > 0) ? m_previews[row * column] : PreviewType::INVALID;
+}
+
+
+ConstructionMenu::ButtonType ConstructionMenu::getSelectedButton() const noexcept
+{
+    const int32_t row = m_userElements.selectionFrame.row;
+    const int32_t column = m_userElements.selectionFrame.column;
+    
+    if(row == 0) // first line
+        return static_cast<ButtonType>(column);
+
+    return ButtonType::NotSelected;
+}
+
+
 bool ConstructionMenu::isShown() const noexcept
 {
     return m_isShown;
@@ -345,7 +368,7 @@ const Transform2D& ConstructionMenu::getTransform() const noexcept
 
 
 void ConstructionMenu::createFrames() noexcept
-{ 
+{
     if(const GLint uniformColor = glGetUniformLocation(m_frames.program, "outlineColor"); uniformColor != -1)
         m_frames.uniformColor = uniformColor;
 
@@ -411,6 +434,7 @@ void ConstructionMenu::createPreviews() noexcept
     const vec2s ratio = { 1.f / previewsTexture.width, 1.f / previewsTexture.height };
 
     m_textureGrid.reserve((PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS) << 2);
+    m_previews.resize(PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS, PreviewType::Empty_Cell);
 
     for (int32_t y = 0; y < rows; ++y)
     {
@@ -455,7 +479,7 @@ void ConstructionMenu::createPreviews() noexcept
             vertices.push_back({ left,  bottom, texCoords[3].x, texCoords[3].y });
         }
     }
-    
+
 //  Main preview
     vertices.push_back({ 590.f, 120.f,  texCoords[0].x, texCoords[0].y });
     vertices.push_back({ 870.f, 120.f,  texCoords[1].x, texCoords[1].y });
@@ -640,7 +664,7 @@ void ConstructionMenu::drawPreviews() const noexcept
 
     for (uint32_t i = 0; i < m_previewCells.cellCount; ++i)
         glDrawArrays(GL_TRIANGLE_FAN, i << 2, 4);
-    
+
     glBindTextureUnit(0, 0);
 }
 

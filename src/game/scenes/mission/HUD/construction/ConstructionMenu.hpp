@@ -11,11 +11,15 @@
 class ConstructionMenu
 {
 public:
+    enum class ButtonType : uint32_t
+    {
+        Exit   = 0,
+        Repair = 1,
+        Stop   = 2,
+        NotSelected = 3
+    };
+
     ConstructionMenu(class Engine* engine, class Tilemap& tilemap) noexcept;
-    ConstructionMenu(const ConstructionMenu&)              noexcept = delete;
-	ConstructionMenu(ConstructionMenu&&)                   noexcept = delete;
-	ConstructionMenu& operator = (const ConstructionMenu&) noexcept = delete;
-	ConstructionMenu& operator = (ConstructionMenu&&)      noexcept = delete;
     ~ConstructionMenu();
 
     void init()                                                               noexcept;
@@ -25,6 +29,9 @@ public:
     void hide()                                                               noexcept;
     void draw(bool onlyEntityView)                                      const noexcept;
     void resize(int width, int height)                                        noexcept;
+
+    PreviewType getSelectedPreview() const noexcept;
+    ButtonType  getSelectedButton() const noexcept;
 
     bool isShown()                    const noexcept;
     const Transform2D& getTransform() const noexcept;
@@ -95,6 +102,7 @@ private:
     } m_userElements;
     
     std::vector<vec2s> m_textureGrid;
+    std::vector<PreviewType> m_previews;
     bool m_isShown;
 };
 

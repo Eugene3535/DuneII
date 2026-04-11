@@ -28,7 +28,7 @@ public:
     void cancelSelection()             noexcept;
     void resize(int width, int height) noexcept;
 
-    bool isMenuShown() const noexcept;
+    const ConstructionMenu& getMenu() const noexcept;
 
 private:
     class Engine*        m_engine;
