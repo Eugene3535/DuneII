@@ -78,24 +78,24 @@ void Mission::createSystems() noexcept
         const auto viewSize = game->getWindowsSize();
         const auto mapSize  = glms_ivec2_mul(mission->m_mapLoader.getMapSize(), mission->m_mapLoader.getTileSize());
 
-        const bool is_near_the_left_edge   = (cursor.x > 0 && cursor.x < SCREEN_MARGIN);
-        const bool is_near_the_top_edge    = (cursor.y > 0 && cursor.y < SCREEN_MARGIN);
-        const bool is_near_the_right_edge  = (cursor.x > (viewSize.x - SCREEN_MARGIN) && cursor.x < viewSize.x);
-        const bool is_near_the_bottom_edge = (cursor.y > (viewSize.y - SCREEN_MARGIN) && cursor.y < viewSize.y);
+        const bool isNearTheLeftEdge   = (cursor.x > 0 && cursor.x < SCREEN_MARGIN);
+        const bool isNearTheTopEdge    = (cursor.y > 0 && cursor.y < SCREEN_MARGIN);
+        const bool isNearTheRightEdge  = (cursor.x > (viewSize.x - SCREEN_MARGIN) && cursor.x < viewSize.x);
+        const bool isNearTheBottomEdge = (cursor.y > (viewSize.y - SCREEN_MARGIN) && cursor.y < viewSize.y);
 
         const float velocity = dt * CAMERA_VELOCITY;
         vec2s scenePosition = mission->m_tilemap.getPosition();
 
-        if(is_near_the_left_edge)
+        if(isNearTheLeftEdge)
             scenePosition.x += velocity;
 
-        if(is_near_the_top_edge)
+        if(isNearTheTopEdge)
             scenePosition.y += velocity;
 
-        if(is_near_the_right_edge)
+        if(isNearTheRightEdge)
             scenePosition.x -= velocity;
 
-        if(is_near_the_bottom_edge)
+        if(isNearTheBottomEdge)
             scenePosition.y -= velocity;
 
         if(scenePosition.x > 0)                        scenePosition.x = 0;

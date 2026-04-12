@@ -145,6 +145,7 @@ void ConstructionMenu::showEntityMenu(PreviewType mainPreview, std::span<Preview
     {
         // Main preview
         setup_tex_coords(data, mainPreview, (previewCount << 2));
+        m_userElements.lastSelectedPreview = mainPreview;
 
         // Others previews (if exists)
         if(!menu.empty())
@@ -283,6 +284,27 @@ void ConstructionMenu::updateSelection(char keyCode, bool isForced) noexcept
         memcpy(vertices, outlineVertices.data(), sizeof(float) * outlineVertices.size());
     };
 
+    auto setup_main_icon = [this](void* data, PreviewType preview) -> void
+    {
+        constexpr size_t offset = (PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS) << 2;
+        const size_t index = static_cast<size_t>(preview) << 2;
+        const vec2s* texCoords = &m_textureGrid[index];
+        vec4s* vertices = static_cast<vec4s*>(data) + offset;
+
+        vertices[0].z = texCoords[0].x;
+        vertices[0].w = texCoords[0].y;
+
+        vertices[1].z = texCoords[1].x;
+        vertices[1].w = texCoords[1].y;
+
+        vertices[2].z = texCoords[2].x;
+        vertices[2].w = texCoords[2].y;
+
+        vertices[3].z = texCoords[3].x;
+        vertices[3].w = texCoords[3].y;
+    };
+
+//  Update outline
     glBindBuffer(GL_ARRAY_BUFFER, m_userElements.vertexBufferObject);
 
     if(void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
@@ -294,6 +316,32 @@ void ConstructionMenu::updateSelection(char keyCode, bool isForced) noexcept
         else
         {
             switch_button_outline(data, m_userElements.selectionFrame.column);
+        }
+
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+    }
+
+//  Update main preview
+    glBindBuffer(GL_ARRAY_BUFFER, m_previewCells.vertexBufferObject);
+
+    if(void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
+    {
+        if (m_userElements.selectionFrame.row)
+        {    
+            const auto selectedPreview = getSelectedPreview();
+
+            if (selectedPreview == PreviewType::Empty_Cell)
+            {
+                setup_main_icon(data, m_userElements.lastSelectedPreview);
+            }
+            else if (selectedPreview != PreviewType::INVALID)
+            {
+                setup_main_icon(data, selectedPreview);
+            }
+        }
+        else
+        {
+            setup_main_icon(data, m_userElements.lastSelectedPreview);
         }
 
         glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -339,7 +387,15 @@ PreviewType ConstructionMenu::getSelectedPreview() const noexcept
     const int32_t row = m_userElements.selectionFrame.row;
     const int32_t column = m_userElements.selectionFrame.column;
 
-    return (row > 0) ? m_previews[row * column] : PreviewType::INVALID;
+    if (row)
+    {
+        if (row == 1)
+            return m_previews[column];
+
+        return m_previews[(row - 1) * PREVIEW_ICON_COLUMNS + column];
+    }
+
+    return PreviewType::INVALID;
 }
 
 

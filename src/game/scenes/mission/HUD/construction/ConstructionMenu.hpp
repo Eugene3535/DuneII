@@ -89,6 +89,7 @@ private:
         mesh::Sprite buttonExit;
         mesh::Sprite buttonRepair;
         mesh::Sprite buttonStop;
+        PreviewType lastSelectedPreview;
         
         struct
         {
