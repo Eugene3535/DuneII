@@ -6,6 +6,7 @@
 #include "game/scenes/mission/loader/TiledMapLoader.hpp"
 #include "game/scenes/mission/tilemap/Tilemap.hpp"
 #include "game/scenes/mission/HUD/HeadUpDisplay.hpp"
+#include "game/scenes/mission/action/ActionDataAllocator.hpp"
 #include "game/scenes/Scene.hpp"
 
 
@@ -29,7 +30,11 @@ private:
     entt::registry m_registry;
     HeadUpDisplay  m_hud;
 
+    ActionDataAllocator m_actionAllocator;
+
     std::vector<void(*)(Mission*, float)> m_systems;
+    std::vector<size_t(*)(void*, float)> m_actions;
+    std::vector<void*> m_actionData;
 };
 
 #endif // !MISSION_HPP

@@ -3,17 +3,30 @@
 
 #include "resources/files/FileProvider.hpp"
 #include "game/Engine.hpp"
+#include "game/scenes/mission/action/ActionData.hpp"
+#include "game/scenes/mission/action/Action.hpp"
 #include "game/scenes/mission/Mission.hpp"
 
 
 #define CAMERA_VELOCITY 600
 #define SCREEN_MARGIN 150
+#define ACTION_MEMORY_POOL_SIZE (1024 << 2)
+
+template <class T>
+static void quick_remove_at(std::vector<T>& v, size_t idx) noexcept
+{    
+    if (idx < v.size()) 
+        v[idx] = v.back();
+
+    v.pop_back();
+}
 
 
 Mission::Mission(Engine* engine) noexcept:
     Scene(engine, Scene::MISSION),
     m_tilemap(engine, m_registry),
-    m_hud(engine, m_tilemap)
+    m_hud(engine, m_tilemap),
+    m_actionAllocator(ACTION_MEMORY_POOL_SIZE)
 {
 
 }
@@ -46,9 +59,22 @@ bool Mission::load(std::string_view info) noexcept
 
 void Mission::update(float dt) noexcept
 {
-    if (m_isLoaded)
-        for(auto system : m_systems)
-            system(this, dt);
+    for(auto system : m_systems)
+        system(this, dt);
+    
+    for (size_t i = 0; i < m_actions.size(); ++i)
+    {
+        auto action = m_actions[i];
+        auto data = m_actionData[i];
+        size_t result = action(data, dt);
+
+        if(result)
+        {
+            m_actionAllocator.release(data, result);
+            quick_remove_at(m_actions, i);
+            quick_remove_at(m_actionData, i);
+        }
+    }
 }
 
 
@@ -127,16 +153,28 @@ void Mission::createSystems() noexcept
 
         if (menu.isShown())
         {
-            if (menu.getSelectedButton() == ConstructionMenu::ButtonType::Exit && isSpaceKeyPressed)
+            if (isSpaceKeyPressed)
             {
-                mission->m_hud.hideMenu();
+                if (menu.getSelectedButton() == ConstructionMenu::ButtonType::Exit)
+                {
+                    mission->m_hud.hideMenu();
 
-                return;
-            }
+                    return;
+                }
 
-            if (const auto selectedPreview = menu.getSelectedPreview(); selectedPreview != PreviewType::INVALID)
-            {
-  
+                if (const auto selectedPreview = menu.getSelectedPreview(); selectedPreview != PreviewType::INVALID)
+                {
+                    if (void* actionData = mission->m_actionAllocator.allocate(sizeof(Action::Construction)))
+                    {
+                        auto* data = static_cast<Action::Construction*>(actionData);
+
+                        data->duration = 10.f; // for example
+                        
+                        mission->m_actions.push_back(Action::construct);
+                        mission->m_actionData.push_back(actionData);
+                    }
+                }
+
             }
         }
     });

@@ -1,11 +1,15 @@
+#include "game/scenes/mission/action/ActionData.hpp"
 #include "game/scenes/mission/action/Action.hpp"
 
 
-BEGIN_NAMESPACE_ACTION
+namespace Action
+{
 
-size_t construct(void* actionData) noexcept
+size_t construct(void* actionData, float deltaTime) noexcept
 {
     auto* data = static_cast<Construction*>(actionData);
+
+    data->duration -= deltaTime;
 
     if (data->duration < 0.f)
         return sizeof(Construction);
@@ -13,6 +17,4 @@ size_t construct(void* actionData) noexcept
     return 0;
 }
 
-END_NAMESPACE_ACTION
-
-
+}
