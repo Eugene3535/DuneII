@@ -33,8 +33,8 @@ struct StructureInfo
 
     HouseType owner;
 
-    uint32_t id;
-    uint32_t frame;
+    uint32_t stride; // in vertex array
+    uint32_t frame;  // start index for draw call
     ivec2s texOffset;
 
     int32_t cost;

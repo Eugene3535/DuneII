@@ -130,6 +130,13 @@ void Mission::createSystems() noexcept
             if (menu.getSelectedButton() == ConstructionMenu::ButtonType::Exit && isSpaceKeyPressed)
             {
                 mission->m_hud.hideMenu();
+
+                return;
+            }
+
+            if (const auto selectedPreview = menu.getSelectedPreview(); selectedPreview != PreviewType::INVALID)
+            {
+  
             }
         }
     });

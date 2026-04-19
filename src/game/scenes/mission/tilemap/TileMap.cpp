@@ -444,11 +444,11 @@ void Tilemap::createGraphicsForEntity(const entt::entity entity) noexcept
 {
 	if(m_buildings.mappedStorage)
 	{
-		const uint32_t id = m_registry.storage<StructureInfo>().size() - 1;
+		const uint32_t index = m_registry.storage<StructureInfo>().size() - 1;
 
 		auto& building = m_registry.get<StructureInfo>(entity);
-		building.id = id;
-		building.frame = (id << 2);
+		building.stride = index;
+		building.frame = (index << 2);
 
 		const auto bounds = m_registry.get<ivec4s>(entity);
 		const vec4s texCoords = get_texcoords_of_structure(building.type, m_textureSize.x, m_textureSize.y);
@@ -462,7 +462,7 @@ void Tilemap::createGraphicsForEntity(const entt::entity entity) noexcept
 		};
 
 		float* bytes = static_cast<float*>(m_buildings.mappedStorage);
-		bytes += id * std::size(vertices);
+		bytes += index * std::size(vertices);
 		memcpy(bytes, vertices, sizeof(vertices));
 	}
 }
@@ -493,7 +493,7 @@ void Tilemap::updateWall(int32_t origin, int32_t level) noexcept
 			const auto& building = m_registry.get<StructureInfo>(entity);
 
 			float* bytes = static_cast<float*>(m_buildings.mappedStorage);
-			bytes += building.id * 16; // TODO: fix magic num
+			bytes += building.stride * 16; // TODO: fix magic num
 
 			bytes[2] = texCoords.x;
 			bytes[3] = texCoords.y;

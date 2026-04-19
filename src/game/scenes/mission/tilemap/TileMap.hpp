@@ -1,6 +1,10 @@
 #ifndef TILEMAP_HPP
 #define TILEMAP_HPP
 
+#include <cstdint>
+#include <span>
+#include <string>
+
 #include <entt/entity/registry.hpp>
 
 #include "graphics/transform/Transform2D.hpp"
@@ -15,7 +19,7 @@ public:
     ~Tilemap();
 
     bool createFromLoader(const class TiledMapLoader& loader) noexcept;
-    bool putStructure(const HouseType owner, const StructureInfo::Type type, const ivec2s cell)  noexcept; // cell must be in tiles
+    bool putStructure(const HouseType owner, const StructureInfo::Type type, const ivec2s cell) noexcept; // cell must be presented it tiles
 
     void draw() const noexcept;
 

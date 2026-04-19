@@ -1,6 +1,8 @@
 #ifndef MISSION_HPP
 #define MISSION_HPP
 
+#include <functional>
+
 #include "game/scenes/mission/loader/TiledMapLoader.hpp"
 #include "game/scenes/mission/tilemap/Tilemap.hpp"
 #include "game/scenes/mission/HUD/HeadUpDisplay.hpp"
@@ -23,8 +25,8 @@ private:
     void createSystems() noexcept;
 
     TiledMapLoader m_mapLoader;
-    entt::registry m_registry;
     Tilemap        m_tilemap;
+    entt::registry m_registry;
     HeadUpDisplay  m_hud;
 
     std::vector<void(*)(Mission*, float)> m_systems;
