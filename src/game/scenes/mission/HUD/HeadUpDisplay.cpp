@@ -123,7 +123,7 @@ void HeadUpDisplay::draw() const noexcept
 {
     auto& camera = m_engine->camera;
 
-    alignas(16) mat4s currentWorldMatrix = camera.getModelViewProjectionMatrix();
+    alignas(16) mat4s currentWorldMatrix = camera.getProjectionMatrix();
 
     if(!m_menu.isShown()) // Move viewport and draw cursor
     {

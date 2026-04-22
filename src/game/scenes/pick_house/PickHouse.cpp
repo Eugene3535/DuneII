@@ -231,7 +231,7 @@ void PickHouse::draw() noexcept
 
     auto& camera = m_engine->camera;
 
-    alignas(16) mat4s MVP = camera.getModelViewProjectionMatrix();
+    alignas(16) mat4s MVP = camera.getProjectionMatrix();
     alignas(16) mat4s modelView;
     alignas(16) mat4s result;
 

@@ -307,7 +307,7 @@ void Tilemap::draw() const noexcept
 {
     auto& camera = m_engine->camera;
 
-    alignas(16) mat4s uniformMatrix = camera.getModelViewProjectionMatrix();
+    alignas(16) mat4s uniformMatrix = camera.getProjectionMatrix();
     alignas(16) mat4s modelView     = getMatrix();
     alignas(16) mat4s result        = glms_mul(uniformMatrix, modelView);
     camera.updateUniformBuffer(result.raw);
