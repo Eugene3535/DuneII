@@ -5,7 +5,7 @@ __declspec(dllexport) unsigned long AmdPowerXpressRequestHighPerformance = 0x000
 #endif
 
 #include "game/Engine.hpp"
-#include "app/Game.hpp"
+#include "application/MainWindow.hpp"
 
 
 int main()
@@ -14,12 +14,12 @@ int main()
     int width = 1200;
     int height = 900;
 
-    Game game;
+    MainWindow app;
     Engine engine;
     int retCode = -1;
     
-    if(game.init(title, width, height))
-        retCode = game.run(engine);
+    if(app.create(title, width, height))
+        retCode = app.run(engine);
 
     return retCode;
 }

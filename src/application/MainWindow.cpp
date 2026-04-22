@@ -7,26 +7,26 @@
 
 #include "game/scenes/mission/Mission.hpp"
 #include "game/Engine.hpp"
-#include "app/Game.hpp"
+#include "application/MainWindow.hpp"
 
 
-Game::Game() noexcept:
+MainWindow::MainWindow() noexcept:
 	m_window(nullptr)
 {
 
 }
 
 
-Game::~Game()
+MainWindow::~MainWindow()
 {
 	glfwDestroyWindow(m_window);
 	glfwTerminate();
 }
 
 
-bool Game::init(const char* title, int width, int height) noexcept
+bool MainWindow::create(const char* title, int width, int height) noexcept
 {
-	if (!initWindow(title, width, height))
+	if (!createGLFWWindow(title, width, height))
 		return false;
 
 	checkOpenglTypes();
@@ -36,7 +36,7 @@ bool Game::init(const char* title, int width, int height) noexcept
 }
 
 
-int Game::run(Engine& engine) noexcept
+int MainWindow::run(Engine& engine) noexcept
 {
 	if (!m_window)
 		return -1;
@@ -71,7 +71,7 @@ int Game::run(Engine& engine) noexcept
 }
 
 
-bool Game::initWindow(const char* title, int width, int height) noexcept
+bool MainWindow::createGLFWWindow(const char* title, int width, int height) noexcept
 {
 	if (glfwInit() == GLFW_TRUE)
 	{
@@ -93,7 +93,7 @@ bool Game::initWindow(const char* title, int width, int height) noexcept
 }
 
 
-void Game::checkOpenglTypes() noexcept
+void MainWindow::checkOpenglTypes() noexcept
 {
     static_assert(std::is_same_v<GLbyte, int8_t>, "GLbyte mismatch");
     static_assert(std::is_same_v<GLubyte, uint8_t>, "GLubyte mismatch");
@@ -110,7 +110,7 @@ void Game::checkOpenglTypes() noexcept
 }
 
 
-void Game::initCallbacks() noexcept
+void MainWindow::initCallbacks() noexcept
 {
 #ifdef DEBUG
 	printf("OpenGL Version: %s\n", glGetString(GL_VERSION));

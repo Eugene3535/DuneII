@@ -15,7 +15,7 @@
 
 class Engine final
 {
-    friend class Game;
+    friend class MainWindow;
 
 public:
     Engine() noexcept;
