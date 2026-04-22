@@ -123,9 +123,7 @@ void HeadUpDisplay::draw() const noexcept
 {
     auto& camera = m_engine->camera;
 
-    alignas(16) mat4s uniformMatrix = camera.getModelViewProjectionMatrix();
-    alignas(16) mat4s modelView     = m_tilemap.getMatrix();
-    alignas(16) mat4s result        = glms_mul(uniformMatrix, modelView);
+    alignas(16) mat4s currentWorldMatrix = camera.getModelViewProjectionMatrix();
 
     if(!m_menu.isShown()) // Move viewport and draw cursor
     {
@@ -138,8 +136,8 @@ void HeadUpDisplay::draw() const noexcept
             glUseProgram(m_tilemapProgram); // return to default tilemap shader
         }
 
-        modelView = m_cursorTransform.getMatrix();
-        result = glms_mul(uniformMatrix, modelView);
+        alignas(16) mat4s modelView = m_cursorTransform.getMatrix();
+        alignas(16) mat4s result = glms_mul(currentWorldMatrix, modelView);
         camera.updateUniformBuffer(result.raw);
 
         m_sprites.bind(true);
@@ -150,15 +148,15 @@ void HeadUpDisplay::draw() const noexcept
         if(m_selectionFrame.enabled && (m_selectionFrame.lastSelectedEntity != entt::null))
         {
             modelView = m_menu.getTransform().getMatrix();
-            result = glms_mul(uniformMatrix, modelView);
+            result = glms_mul(currentWorldMatrix, modelView);
             camera.updateUniformBuffer(result.raw);
             m_menu.draw(true);
         }
     }
     else
     {
-        modelView = m_menu.getTransform().getMatrix();
-        result = glms_mul(uniformMatrix, modelView);
+        alignas(16) mat4s modelView = m_menu.getTransform().getMatrix();
+        alignas(16) mat4s result = glms_mul(currentWorldMatrix, modelView);
         camera.updateUniformBuffer(result.raw);
         m_menu.draw(false);
     }
