@@ -39,6 +39,10 @@ void OrthogonalCamera::setupProjectionMatrix(int32_t width, int32_t height) noex
     m_projection = m_flipVertically ? 
         glms_ortho(0.f, static_cast<float>(width), static_cast<float>(height), 0.f, -1.f, 1.f) :
         glms_ortho(0.f, static_cast<float>(width), 0.f, static_cast<float>(height), -1.f, 1.f);
+
+    alignas(16) mat4s modelView = getMatrix();
+
+    m_modelViewProjection = glms_mul(m_projection, modelView);
 }
 
 
@@ -56,11 +60,9 @@ void OrthogonalCamera::flipVertically(bool flip) noexcept
 }
 
 
-mat4s OrthogonalCamera::getModelViewProjectionMatrix() noexcept
+const mat4s& OrthogonalCamera::getModelViewProjectionMatrix() const noexcept
 {
-    mat4s modelView = getMatrix();
-
-    return glms_mul(m_projection, modelView);
+    return m_modelViewProjection;
 }
 
 
