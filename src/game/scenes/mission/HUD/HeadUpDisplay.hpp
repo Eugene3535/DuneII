@@ -19,9 +19,9 @@ public:
 	HeadUpDisplay& operator = (HeadUpDisplay&&)      noexcept = delete;
     ~HeadUpDisplay();
 
-    bool init()            noexcept;
-    void update(float dt)  noexcept;
-    void draw()      const noexcept;
+    bool init()                              noexcept;
+    void update(float dt)                    noexcept;
+    void draw(const mat4s& projection) const noexcept;
 
     void hideMenu()                    noexcept;
     void runSelection()                noexcept;

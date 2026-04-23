@@ -78,10 +78,10 @@ void Mission::update(float dt) noexcept
 }
 
 
-void Mission::draw() noexcept
+void Mission::draw(const mat4s& projection) noexcept
 {
-    m_tilemap.draw();
-    m_hud.draw();
+    m_tilemap.draw(projection);
+    m_hud.draw(projection);
 }
 
 

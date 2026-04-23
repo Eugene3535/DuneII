@@ -30,7 +30,7 @@ void Scene::update(float dt) noexcept
 }
 
 
-void Scene::draw() noexcept
+void Scene::draw(const mat4s& projection) noexcept
 {
 
 }

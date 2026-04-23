@@ -165,23 +165,21 @@ void TitleScreen::update(float dt) noexcept
 }
 
 
-void TitleScreen::draw() noexcept
+void TitleScreen::draw(const mat4s& projection) noexcept
 {
     if(!m_isLoaded)
         return;
-
-    auto& camera = m_engine->camera;
         
-    alignas(16) mat4s MVP = camera.getProjectionMatrix();
-    alignas(16) mat4s modelView;
-    alignas(16) mat4s model;
+    mat4s MVP = projection;
+    mat4s modelView;
+    mat4s model;
 
     glUseProgram(m_spriteProgram);
     m_sprites.bind(true);
 
     model = m_spaceTransform.getMatrix();
     modelView = glms_mul(MVP, model);
-    camera.updateUniformBuffer(modelView.raw);
+    m_engine->updateUniformBuffer(modelView);
 
     glBindTexture(GL_TEXTURE_2D, m_space.texture);
     glDrawArrays(GL_TRIANGLE_FAN, m_space.frame, 4);
@@ -189,7 +187,7 @@ void TitleScreen::draw() noexcept
 
     model = m_planetTransform.getMatrix();
     modelView = glms_mul(MVP, model);
-    camera.updateUniformBuffer(modelView.raw);
+    m_engine->updateUniformBuffer(modelView);
 
     glBindTexture(GL_TEXTURE_2D, m_planet.texture);
     glDrawArrays(GL_TRIANGLE_FAN, m_planet.frame, 4);
@@ -202,17 +200,17 @@ void TitleScreen::draw() noexcept
 
         model = m_playButton->getMatrix();
         modelView = glms_mul(MVP, model);
-        camera.updateUniformBuffer(modelView.raw);
+        m_engine->updateUniformBuffer(modelView);
         m_playButton->draw();
 
         model = m_exitButton->getMatrix();
         modelView = glms_mul(MVP, model);
-        camera.updateUniformBuffer(modelView.raw);
+        m_engine->updateUniformBuffer(modelView);
         m_exitButton->draw();
 
         model = m_settingsButton->getMatrix();
         modelView = glms_mul(MVP, model);
-        camera.updateUniformBuffer(modelView.raw);
+        m_engine->updateUniformBuffer(modelView);
         m_settingsButton->draw();
     }
 

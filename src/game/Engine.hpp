@@ -8,7 +8,7 @@
 #include <cglm/struct/vec2.h>
 
 #include "resources/gl_interfaces/shaders/ShaderProgram.hpp"
-#include "graphics/camera/OrthogonalCamera.hpp"
+#include "graphics/camera/OrthoMatrix.hpp"
 #include "game/scenes/Scene.hpp"
 #include "common/info/GameInfo.hpp"
 
@@ -21,6 +21,7 @@ public:
     Engine() noexcept;
 
     void switchScene(const Scene* requester, Scene::Type nextScene) noexcept;
+    void updateUniformBuffer(const mat4s& modelViewProjection) const noexcept;
 
     bool isKeyPressed(int key) const noexcept;
     bool isMouseButtonPressed(int button) const noexcept;
@@ -30,8 +31,6 @@ public:
     const vec2s&  getCursorPosition()                       const noexcept;
 
     const GameInfo* getInfo() const noexcept;
-
-    OrthogonalCamera camera;
     
 private:
     bool init(struct GLFWwindow* window) noexcept;
@@ -52,6 +51,8 @@ private:
     bool                                                    m_isSceneNeedToBeChanged;
 
     mutable std::unordered_map<std::string, ShaderProgram> m_shaderPrograms;
+
+    OrthoMatrix m_orthoMatrix;
 
     GameInfo m_gameInfo;
 };

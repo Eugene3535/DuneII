@@ -59,6 +59,12 @@ void Engine::switchScene(const Scene* requester, Scene::Type nextScene) noexcept
 }
 
 
+void Engine::updateUniformBuffer(const mat4s& modelViewProjection) const noexcept
+{
+    m_orthoMatrix.updateUniformBuffer(modelViewProjection);
+}
+
+
 bool Engine::isKeyPressed(int key) const noexcept
 {
     if(m_window)
@@ -151,7 +157,7 @@ bool Engine::init(GLFWwindow* window) noexcept
     if (!m_currentScene)
     {
         m_window = window;
-        camera.init();
+        m_orthoMatrix.create();
 
         glClearColor(0.f, 0.f, 0.f, 1.f);
 
@@ -218,15 +224,17 @@ void Engine::draw() noexcept
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
+    auto projection = m_orthoMatrix.getProjectionMatrix();
+
     if (m_currentScene)
-        m_currentScene->draw();
+        m_currentScene->draw(projection);
 }
 
 
 void Engine::resize(int width, int height) noexcept
 {
     m_windowSize = { width, height };
-    camera.setupProjectionMatrix(width, height);
+    m_orthoMatrix.resize(width, height);
 
     if (m_currentScene)
         m_currentScene->resize(width, height);

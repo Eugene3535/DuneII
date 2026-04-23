@@ -13,10 +13,10 @@ public:
     explicit TitleScreen(class Engine* engine) noexcept;
     ~TitleScreen();
 
-    bool load(std::string_view info)         noexcept override;
-    void update(float dt)                    noexcept override;
-    void draw()                              noexcept override;
-    void resize(int width, int height)       noexcept override;
+    bool load(std::string_view info)   noexcept override;
+    void update(float dt)              noexcept override;
+    void draw(const mat4s& projection) noexcept override;
+    void resize(int width, int height) noexcept override;
 
 private:
     GLuint m_textures[5];

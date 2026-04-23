@@ -224,21 +224,19 @@ void PickHouse::update(float dt) noexcept
 }
 
 
-void PickHouse::draw() noexcept
+void PickHouse::draw(const mat4s& projection) noexcept
 {
     if(!m_isLoaded)
         return;
 
-    auto& camera = m_engine->camera;
-
-    alignas(16) mat4s MVP = camera.getProjectionMatrix();
-    alignas(16) mat4s modelView;
-    alignas(16) mat4s result;
+    mat4s MVP = projection;
+    mat4s modelView;
+    mat4s result;
 
 //  Draw background
     modelView = m_background.transform.getMatrix();
     result = glms_mul(MVP, modelView);
-    camera.updateUniformBuffer(result.raw);
+    m_engine->updateUniformBuffer(result);
 
     glUseProgram(m_background.program);
     glBindVertexArray(m_background.vertexArrayObject);
@@ -249,7 +247,7 @@ void PickHouse::draw() noexcept
 //  Draw outline
     modelView = m_outline.transform.getMatrix();
     result = glms_mul(MVP, modelView);
-    camera.updateUniformBuffer(result.raw);
+    m_engine->updateUniformBuffer(result);
 
     glUseProgram(m_outline.program);
     glBindVertexArray(m_outline.vertexArrayObject);

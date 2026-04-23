@@ -26,7 +26,7 @@ public:
     
     virtual bool load(std::string_view info)   noexcept;
     virtual void update(float dt)              noexcept;
-    virtual void draw()                        noexcept;
+    virtual void draw(const mat4s& projection) noexcept;
     virtual void resize(int width, int height) noexcept;
 
     bool isLoaded() const noexcept;

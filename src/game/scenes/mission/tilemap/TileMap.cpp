@@ -303,14 +303,12 @@ bool Tilemap::putStructure(const HouseType owner, const StructureInfo::Type type
 }
 
 
-void Tilemap::draw() const noexcept
+void Tilemap::draw(const mat4s& projection) const noexcept
 {
-    auto& camera = m_engine->camera;
-
-    alignas(16) mat4s uniformMatrix = camera.getProjectionMatrix();
-    alignas(16) mat4s modelView     = getMatrix();
-    alignas(16) mat4s result        = glms_mul(uniformMatrix, modelView);
-    camera.updateUniformBuffer(result.raw);
+    mat4s uniformMatrix = projection;
+    mat4s modelView     = getMatrix();
+    mat4s result        = glms_mul(uniformMatrix, modelView);
+    m_engine->updateUniformBuffer(result);
 
 //  Landscape
 	glUseProgram(m_landscape.program);

@@ -119,11 +119,9 @@ void HeadUpDisplay::update(float dt) noexcept
 }
 
 
-void HeadUpDisplay::draw() const noexcept
+void HeadUpDisplay::draw(const mat4s& projection) const noexcept
 {
-    auto& camera = m_engine->camera;
-
-    alignas(16) mat4s currentWorldMatrix = camera.getProjectionMatrix();
+    mat4s currentWorldMatrix = projection;
 
     if(!m_menu.isShown()) // Move viewport and draw cursor
     {
@@ -136,9 +134,9 @@ void HeadUpDisplay::draw() const noexcept
             glUseProgram(m_tilemapProgram); // return to default tilemap shader
         }
 
-        alignas(16) mat4s modelView = m_cursorTransform.getMatrix();
-        alignas(16) mat4s result = glms_mul(currentWorldMatrix, modelView);
-        camera.updateUniformBuffer(result.raw);
+        mat4s modelView = m_cursorTransform.getMatrix();
+        mat4s result = glms_mul(currentWorldMatrix, modelView);
+        m_engine->updateUniformBuffer(result);
 
         m_sprites.bind(true);
         glBindTextureUnit(0, m_cursorTexture);
@@ -149,15 +147,15 @@ void HeadUpDisplay::draw() const noexcept
         {
             modelView = m_menu.getTransform().getMatrix();
             result = glms_mul(currentWorldMatrix, modelView);
-            camera.updateUniformBuffer(result.raw);
+            m_engine->updateUniformBuffer(result);
             m_menu.draw(true);
         }
     }
     else
     {
-        alignas(16) mat4s modelView = m_menu.getTransform().getMatrix();
-        alignas(16) mat4s result = glms_mul(currentWorldMatrix, modelView);
-        camera.updateUniformBuffer(result.raw);
+        mat4s modelView = m_menu.getTransform().getMatrix();
+        mat4s result = glms_mul(currentWorldMatrix, modelView);
+        m_engine->updateUniformBuffer(result);
         m_menu.draw(false);
     }
 }

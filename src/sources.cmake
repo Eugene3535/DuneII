@@ -64,7 +64,7 @@ set(DUNEII_SRC_FILES
 	src/common/ExternalMath.cpp
 	src/common/info/GameInfo.cpp
 	src/graphics/transform/Transform2D.cpp
-	src/graphics/camera/OrthogonalCamera.cpp
+	src/graphics/camera/OrthoMatrix.cpp
 	src/graphics/sprites/SpriteManager.cpp
 	src/graphics/geometry/GeometryGenerator.cpp
 	${RESOURCE_SRC_FILES}
@@ -82,7 +82,7 @@ set(DUNEII_HDR_FILES
 	src/common/info/GameInfo.hpp
 	src/graphics/Meshes.hpp
 	src/graphics/transform/Transform2D.hpp
-	src/graphics/camera/OrthogonalCamera.hpp
+	src/graphics/camera/OrthoMatrix.hpp
 	src/graphics/sprites/SpriteManager.hpp
 	src/graphics/geometry/GeometryGenerator.hpp
 	${RESOURCE_HDR_FILES}

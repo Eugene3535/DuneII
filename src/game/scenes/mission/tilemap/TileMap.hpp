@@ -21,7 +21,7 @@ public:
     bool createFromLoader(const class TiledMapLoader& loader) noexcept;
     bool putStructure(const HouseType owner, const StructureInfo::Type type, const ivec2s cell) noexcept; // cell must be presented it tiles
 
-    void draw() const noexcept;
+    void draw(const mat4s& projection) const noexcept;
 
     entt::entity    getEntityUnderCursor(const vec2s point) const noexcept;
     entt::registry& getRegistry()                           const noexcept;
