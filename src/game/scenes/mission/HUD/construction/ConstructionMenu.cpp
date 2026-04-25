@@ -92,7 +92,7 @@ void ConstructionMenu::init() noexcept
 }
 
 
-void ConstructionMenu::showEntityView(PreviewType preview) noexcept
+void ConstructionMenu::showEntityView(PreviewType preview, bool enableConstruction) noexcept
 {
     if(preview >= PreviewType::MAX)
         return;
@@ -129,9 +129,11 @@ void ConstructionMenu::showEntityView(PreviewType preview) noexcept
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    {// Setting the height for the gradient fill (construction mode)
+    if (enableConstruction)
+    {// Setting the heights for the gradient fill (construction mode)
         const size_t index = static_cast<size_t>(preview) << 2;
         const vec2s* texCoords = &m_textureGrid[index];
+        glUseProgram(m_previewCells.entityPreview.program);
         glUniform1f(m_previewCells.entityPreview.uniform.top, texCoords[0].y);
         glUniform1f(m_previewCells.entityPreview.uniform.bottom, texCoords[3].y);
     }

@@ -23,7 +23,7 @@ public:
     ~ConstructionMenu();
 
     void init()                                                               noexcept;
-    void showEntityView(PreviewType preview)                                  noexcept;
+    void showEntityView(PreviewType preview, bool enableConstruction)         noexcept;
     void showEntityMenu(PreviewType mainPreview, std::span<PreviewType> menu) noexcept;
     void updateSelection(char keyCode, bool isForced = false)                 noexcept;
     void hide()                                                               noexcept;

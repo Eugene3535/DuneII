@@ -178,7 +178,7 @@ void Mission::createSystems() noexcept
                         mission->m_actionData.push_back(actionData);
 
                         menu.hide();
-                        menu.showEntityView(selectedPreview);
+                        menu.showEntityView(selectedPreview, true);
                     }
                 }
             }

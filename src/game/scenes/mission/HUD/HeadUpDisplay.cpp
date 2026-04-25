@@ -256,7 +256,7 @@ void HeadUpDisplay::runSelection() noexcept
             const auto entityView = convert_building_type_to_preview(info->type);
 
             if(entityView != PreviewType::Empty_Cell)
-                m_menu.showEntityView(entityView);
+                m_menu.showEntityView(entityView, false);
 
             const auto bounds = registry.get<ivec4s>(entity);
             glBindBuffer(GL_ARRAY_BUFFER, m_selectionFrame.vertexBufferObject);
