@@ -2,4 +2,4 @@
 2) Mentat intro scene
 3) Collect the remaining TMX maps
 4) Construction
-5) class Renderer
+5) shader optimization (remove dublicates)

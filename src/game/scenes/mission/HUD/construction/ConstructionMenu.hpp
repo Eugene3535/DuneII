@@ -32,6 +32,7 @@ public:
 
     PreviewType getSelectedPreview() const noexcept;
     ButtonType  getSelectedButton() const noexcept;
+    float* getProgress() noexcept;
 
     bool isShown()                    const noexcept;
     const Transform2D& getTransform() const noexcept;
@@ -78,6 +79,21 @@ private:
         uint32_t cellCount;
         uint32_t cellWidth;
         uint32_t cellHeight;
+
+        struct // side bar preview
+        {
+            uint32_t program;
+            float progress;
+
+            struct
+            {
+                int32_t top;
+                int32_t bottom;
+                int32_t progress;
+            } uniform;
+
+        } entityPreview;
+
     } m_previewCells;
 
     struct 

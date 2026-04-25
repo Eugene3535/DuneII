@@ -23,12 +23,11 @@ public:
     void update(float dt)                    noexcept;
     void draw(const mat4s& projection) const noexcept;
 
-    void hideMenu()                    noexcept;
     void runSelection()                noexcept;
     void cancelSelection()             noexcept;
     void resize(int width, int height) noexcept;
 
-    const ConstructionMenu& getMenu() const noexcept;
+    ConstructionMenu& getMenu() noexcept;
 
 private:
     class Engine*        m_engine;

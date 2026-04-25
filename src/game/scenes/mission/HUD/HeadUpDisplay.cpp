@@ -123,14 +123,20 @@ void HeadUpDisplay::draw(const mat4s& projection) const noexcept
 {
     mat4s currentWorldMatrix = projection;
 
-    if(!m_menu.isShown()) // Move viewport and draw cursor
+    if(m_menu.isShown())
+    {
+        mat4s modelView = m_menu.getTransform().getMatrix();
+        mat4s result = glms_mul(currentWorldMatrix, modelView);
+        m_engine->updateUniformBuffer(result);
+        m_menu.draw(false);
+    }
+    else // Move viewport and draw cursor
     {
         if(m_selectionFrame.enabled && m_selectionFrame.blinkTimer < BLINK_PERIOD)
         {
             glUseProgram(m_cursorProgram);
             glBindVertexArray(m_selectionFrame.vertexArrayObject);
             glDrawArrays(GL_LINES, 0, 16);
-
             glUseProgram(m_tilemapProgram); // return to default tilemap shader
         }
 
@@ -151,19 +157,6 @@ void HeadUpDisplay::draw(const mat4s& projection) const noexcept
             m_menu.draw(true);
         }
     }
-    else
-    {
-        mat4s modelView = m_menu.getTransform().getMatrix();
-        mat4s result = glms_mul(currentWorldMatrix, modelView);
-        m_engine->updateUniformBuffer(result);
-        m_menu.draw(false);
-    }
-}
-
-
-void HeadUpDisplay::hideMenu() noexcept
-{
-    m_menu.hide();
 }
 
 
@@ -321,7 +314,7 @@ void HeadUpDisplay::resize(int width, int height) noexcept
 }
 
 
-const ConstructionMenu& HeadUpDisplay::getMenu() const noexcept
+ConstructionMenu& HeadUpDisplay::getMenu() noexcept
 {
     return m_menu;
 }

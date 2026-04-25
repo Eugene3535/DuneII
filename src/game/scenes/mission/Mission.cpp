@@ -12,14 +12,6 @@
 #define SCREEN_MARGIN 150
 #define ACTION_MEMORY_POOL_SIZE (1024 << 2)
 
-template <class T>
-static void quick_remove_at(std::vector<T>& v, size_t idx) noexcept
-{    
-    if (idx < v.size()) 
-        v[idx] = v.back();
-
-    v.pop_back();
-}
 
 
 Mission::Mission(Engine* engine) noexcept:
@@ -61,6 +53,14 @@ void Mission::update(float dt) noexcept
 {
     for(auto system : m_systems)
         system(this, dt);
+
+    auto quick_remove_at = [](auto& v, size_t idx)
+    {    
+        if (idx < v.size()) 
+            v[idx] = v.back();
+        
+        v.pop_back();
+    };
     
     for (size_t i = 0; i < m_actions.size(); ++i)
     {
@@ -149,7 +149,7 @@ void Mission::createSystems() noexcept
 
         mission->m_hud.update(dt);
 
-        const auto& menu = mission->m_hud.getMenu();
+        auto& menu = mission->m_hud.getMenu();
 
         if (menu.isShown())
         {
@@ -157,24 +157,30 @@ void Mission::createSystems() noexcept
             {
                 if (menu.getSelectedButton() == ConstructionMenu::ButtonType::Exit)
                 {
-                    mission->m_hud.hideMenu();
+                    menu.hide();
 
                     return;
                 }
 
-                if (const auto selectedPreview = menu.getSelectedPreview(); selectedPreview != PreviewType::INVALID)
+                const auto selectedPreview = menu.getSelectedPreview();
+
+                if ((selectedPreview != PreviewType::INVALID) && (selectedPreview != PreviewType::Empty_Cell))
                 {
                     if (void* actionData = mission->m_actionAllocator.allocate(sizeof(Action::Construction)))
                     {
                         auto* data = static_cast<Action::Construction*>(actionData);
 
-                        data->duration = 10.f; // for example
+                        data->duration = 10; // 10 seconds for example
+                        data->countdown = 100;
+                        data->progress = menu.getProgress();
                         
                         mission->m_actions.push_back(Action::construct);
                         mission->m_actionData.push_back(actionData);
+
+                        menu.hide();
+                        menu.showEntityView(selectedPreview);
                     }
                 }
-
             }
         }
     });

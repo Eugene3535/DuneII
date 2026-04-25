@@ -1,5 +1,6 @@
 #include <cstring>
 #include <cassert>
+#include <algorithm>
 
 #include <glad/glad.h>
 
@@ -63,8 +64,25 @@ void ConstructionMenu::init() noexcept
 
     m_frames.program = m_engine->getShaderProgram("color_outline");
     m_previewCells.program = m_engine->getShaderProgram("sprite");
-    assert(m_frames.program != 0);
-    assert(m_previewCells.program != 0);
+    m_previewCells.entityPreview.program = m_engine->getShaderProgram("entity_view");
+
+    assert(m_frames.program);
+    assert(m_previewCells.program);
+    assert(m_previewCells.entityPreview.program);
+
+    {// construction mode progress animation
+        int32_t uniform = glGetUniformLocation(m_previewCells.entityPreview.program, "top");
+        assert(uniform != -1);
+        m_previewCells.entityPreview.uniform.top = uniform;
+
+        uniform = glGetUniformLocation(m_previewCells.entityPreview.program, "bottom");
+        assert(uniform != -1);
+        m_previewCells.entityPreview.uniform.bottom = uniform;
+
+        uniform = glGetUniformLocation(m_previewCells.entityPreview.program, "progress");
+        assert(uniform != -1);
+        m_previewCells.entityPreview.uniform.progress = uniform;
+    }
 
     m_transform.setOrigin(DEFAULT_MENU_WIDTH * 0.5f, DEFAULT_MENU_HEIGHT * 0.5f);
 
@@ -110,6 +128,13 @@ void ConstructionMenu::showEntityView(PreviewType preview) noexcept
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    {// Setting the height for the gradient fill (construction mode)
+        const size_t index = static_cast<size_t>(preview) << 2;
+        const vec2s* texCoords = &m_textureGrid[index];
+        glUniform1f(m_previewCells.entityPreview.uniform.top, texCoords[0].y);
+        glUniform1f(m_previewCells.entityPreview.uniform.bottom, texCoords[3].y);
+    }
 }
 
 
@@ -384,15 +409,18 @@ void ConstructionMenu::resize(int width, int height) noexcept
 
 PreviewType ConstructionMenu::getSelectedPreview() const noexcept
 {
-    const int32_t row = m_userElements.selectionFrame.row;
-    const int32_t column = m_userElements.selectionFrame.column;
-
-    if (row)
+    if (m_isShown)
     {
-        if (row == 1)
-            return m_previews[column];
+        const int32_t row = m_userElements.selectionFrame.row;
+        const int32_t column = m_userElements.selectionFrame.column;
 
-        return m_previews[(row - 1) * PREVIEW_ICON_COLUMNS + column];
+        if (row)
+        {
+            if (row == 1)
+                return m_previews[column];
+
+            return m_previews[(row - 1) * PREVIEW_ICON_COLUMNS + column];
+        }
     }
 
     return PreviewType::INVALID;
@@ -408,6 +436,12 @@ ConstructionMenu::ButtonType ConstructionMenu::getSelectedButton() const noexcep
         return static_cast<ButtonType>(column);
 
     return ButtonType::NotSelected;
+}
+
+
+float* ConstructionMenu::getProgress() noexcept
+{
+    return &m_previewCells.entityPreview.progress;
 }
 
 
@@ -547,10 +581,10 @@ void ConstructionMenu::createPreviews() noexcept
     m_previewCells.cellHeight = spriteHeight;
 
 //  Side bar entity preview
-    vertices.push_back({ 950.f,  -100.f,  texCoords[0].x, texCoords[0].y });
-    vertices.push_back({ 1100.f, -100.f,  texCoords[1].x, texCoords[1].y });
-    vertices.push_back({ 1100.f,  0.f,    texCoords[2].x, texCoords[2].y });
-    vertices.push_back({ 950.f,   0.f,    texCoords[3].x, texCoords[3].y });
+    vertices.push_back({ 950.f,  0.f,   texCoords[0].x, texCoords[0].y });
+    vertices.push_back({ 1100.f, 0.f,   texCoords[1].x, texCoords[1].y });
+    vertices.push_back({ 1100.f, 100.f, texCoords[2].x, texCoords[2].y });
+    vertices.push_back({ 950.f,  100.f, texCoords[3].x, texCoords[3].y });
 
     glCreateBuffers(1, &m_previewCells.vertexBufferObject);
     glNamedBufferData(m_previewCells.vertexBufferObject, vertices.size() * sizeof(vec4s), vertices.data(), GL_DYNAMIC_DRAW);
@@ -727,7 +761,17 @@ void ConstructionMenu::drawPreviews() const noexcept
 
 void ConstructionMenu::drawEntityView() const noexcept
 {
-    glUseProgram(m_previewCells.program);
+    if(m_previewCells.entityPreview.progress > 0.f)
+    {
+        const float progress = std::clamp(m_previewCells.entityPreview.progress, 0.f, 100.f);
+        glUseProgram(m_previewCells.entityPreview.program);
+        glUniform1f(m_previewCells.entityPreview.uniform.progress, progress);
+    }
+    else
+    {
+        glUseProgram(m_previewCells.program);
+    }
+
     glBindTextureUnit(0, m_previewCells.texture);
     glBindVertexArray(m_previewCells.vertexArrayObject);
     glDrawArrays(GL_TRIANGLE_FAN, m_previewCells.cellCount << 2, 4);
