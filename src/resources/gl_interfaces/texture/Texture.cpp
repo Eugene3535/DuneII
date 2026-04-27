@@ -58,7 +58,6 @@ void Texture::setSmooth(bool smooth) noexcept
         if(isSmooth != smooth)
         {
             isSmooth = smooth;
-
             glTextureParameteri(handle, GL_TEXTURE_MIN_FILTER, isSmooth ? GL_LINEAR : GL_NEAREST);
             glTextureParameteri(handle, GL_TEXTURE_MAG_FILTER, isSmooth ? GL_LINEAR : GL_NEAREST);
         }
@@ -76,9 +75,6 @@ void Texture::setRepeated(bool repeate) noexcept
 
             if (isRepeated)
             {
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
                 glTextureParameteri(handle, GL_TEXTURE_WRAP_S, GL_REPEAT);
                 glTextureParameteri(handle, GL_TEXTURE_WRAP_T, GL_REPEAT);
             }
