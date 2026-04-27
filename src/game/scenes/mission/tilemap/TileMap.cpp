@@ -359,7 +359,7 @@ bool Tilemap::createGraphicsResources(std::span<const vec4s> vertices, std::span
 	glCreateBuffers(1, &m_landscape.vertexBufferObject);
     glNamedBufferData(m_landscape.vertexBufferObject, static_cast<GLsizeiptr>(vertices.size_bytes()), vertices.data(), GL_DYNAMIC_DRAW);
 	glGenBuffers(1, &m_landscape.indexBufferObject);
-	glGenTextures(1, &m_landscape.texture);
+	glCreateTextures(GL_TEXTURE_2D, 1, &m_landscape.texture);
     glGenVertexArrays(1, &m_landscape.vertexArrayObject);
 
     Texture landscapeTexture = {.handle = m_landscape.texture };
@@ -410,7 +410,7 @@ bool Tilemap::createGraphicsResources(std::span<const vec4s> vertices, std::span
 	glGenVertexArrays(1, &m_buildings.vertexArrayObject);
 	VertexArrayObject::createVertexInputState(m_buildings.vertexArrayObject, m_buildings.vertexBufferObject, attributes);
 
-	glGenTextures(1, &m_buildings.texture);
+	glCreateTextures(GL_TEXTURE_2D, 1, &m_buildings.texture);
 	Texture buildingTexture = {.handle = m_buildings.texture };
 
 	if(!buildingTexture.loadFromFile(FileProvider::findPathToFile(STRUCTURES_PNG)))

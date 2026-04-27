@@ -512,7 +512,7 @@ void ConstructionMenu::createFrames() noexcept
 
 void ConstructionMenu::createPreviews() noexcept
 {
-    glGenTextures(1, &m_previewCells.texture);
+    glCreateTextures(GL_TEXTURE_2D, 1, &m_previewCells.texture);
 
     Texture previewsTexture = {.handle = m_previewCells.texture };
 
@@ -599,7 +599,7 @@ void ConstructionMenu::createPreviews() noexcept
 
 void ConstructionMenu::createUserElements() noexcept
 {
-    glGenTextures(3, m_userElements.textures);
+    glCreateTextures(GL_TEXTURE_2D, 3, m_userElements.textures);
 
     uint32_t currentTexture = 0;
 

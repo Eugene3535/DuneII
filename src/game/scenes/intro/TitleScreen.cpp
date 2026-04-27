@@ -70,7 +70,7 @@ bool TitleScreen::load(std::string_view info) noexcept
     if(m_isLoaded)
         return true;
     
-    glGenTextures(5, m_textures);
+    glCreateTextures(GL_TEXTURE_2D, 5, m_textures);
 
 //  Textures
     Texture spaceTexture    = {.handle = m_textures[0] };

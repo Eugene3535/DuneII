@@ -46,7 +46,7 @@ bool HeadUpDisplay::init() noexcept
     if(!(m_cursorProgram && m_tilemapProgram))
         return false;
 
-    glGenTextures(1, &m_cursorTexture);
+    glCreateTextures(GL_TEXTURE_2D, 1, &m_cursorTexture);
     Texture crosshairTexture = {.handle = m_cursorTexture };
 
     if(!crosshairTexture.loadFromFile(FileProvider::findPathToFile(CROSSHAIRS_TILESHEET_PNG)))

@@ -49,7 +49,7 @@ bool PickHouse::load(std::string_view info) noexcept
     if(m_isLoaded)
         return true;
 
-    glGenTextures(1, &m_background.sprite.texture);
+    glCreateTextures(GL_TEXTURE_2D, 1, &m_background.sprite.texture);
     glGenVertexArrays(2, m_vertexArrayObjects);
     glCreateBuffers(1, &m_vertexBufferObject);
 

@@ -26,7 +26,6 @@ struct Texture
 {
 	bool loadFromImage(const struct StbImage& image) noexcept;
 	bool loadFromFile(const std::filesystem::path& filePath) noexcept;
-	bool loadCubeMap(const std::array<std::filesystem::path, 6>& facePaths) noexcept;
 
 	void setSmooth(bool smooth)    noexcept;
 	void setRepeated(bool repeate) noexcept;
