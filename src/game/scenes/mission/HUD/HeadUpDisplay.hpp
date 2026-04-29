@@ -32,24 +32,32 @@ public:
 private:
     class Engine*        m_engine;
     const class Tilemap& m_tilemap;
-
-    enum class ClickState: uint32_t
-    {
-        Released,
-        FirstClick,
-        SecondClick
-    } m_clickState;
+    uint32_t             m_tilemapProgram;
 
     SpriteManager m_sprites;
     Sprite2D      m_releasedCursor;
     Sprite2D      m_capturedCursor;
     Sprite2D      m_currentCursor;
-    Transform2D   m_cursorTransform;
-    uint32_t      m_cursorTexture;
-    uint32_t      m_cursorProgram;
-    uint32_t      m_tilemapProgram;
 
-    float m_clickTimer;
+    struct
+    {
+        Transform2D transform;
+        uint32_t    texture;
+        uint32_t    program;
+    } m_cursor;
+    
+    enum class ClickStage: uint32_t
+    {
+        Released,
+        FirstClick,
+        SecondClick
+    };
+
+    struct
+    {
+        ClickStage stage;
+        float timer;
+    } m_clickState;
 
     struct
     {

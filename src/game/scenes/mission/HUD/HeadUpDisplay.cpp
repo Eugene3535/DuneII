@@ -16,13 +16,15 @@
 HeadUpDisplay::HeadUpDisplay(Engine* engine,  Tilemap& tilemap) noexcept:
     m_engine(engine),
     m_tilemap(tilemap),
-    m_clickState(ClickState::Released),
-    menu(engine, tilemap),
-    m_cursorTexture(0),
-    m_cursorProgram(0),
     m_tilemapProgram(0),
-    m_clickTimer(0.f)
+    menu(engine, tilemap)
 {
+    m_clickState.stage = ClickStage::Released;
+    m_clickState.timer = 0;
+
+    m_cursor.texture = 0;
+    m_cursor.program = 0;
+
     m_selectionFrame.vertexBufferObject = 0;
     m_selectionFrame.vertexArrayObject = 0;
     m_selectionFrame.blinkTimer = 0.f;
@@ -33,7 +35,7 @@ HeadUpDisplay::HeadUpDisplay(Engine* engine,  Tilemap& tilemap) noexcept:
 
 HeadUpDisplay::~HeadUpDisplay()
 {
-    glDeleteTextures(1, &m_cursorTexture);
+    glDeleteTextures(1, &m_cursor.texture);
     glDeleteVertexArrays(1, &m_selectionFrame.vertexArrayObject);
     glDeleteBuffers(1, &m_selectionFrame.vertexBufferObject);
 }
@@ -41,14 +43,14 @@ HeadUpDisplay::~HeadUpDisplay()
 
 bool HeadUpDisplay::init() noexcept
 {
-    m_cursorProgram = m_engine->getShaderProgram("selection");
+    m_cursor.program = m_engine->getShaderProgram("selection");
     m_tilemapProgram = m_engine->getShaderProgram("tilemap");
 
-    if(!(m_cursorProgram && m_tilemapProgram))
+    if(!(m_cursor.program && m_tilemapProgram))
         return false;
 
-    glCreateTextures(GL_TEXTURE_2D, 1, &m_cursorTexture);
-    Texture crosshairTexture = {.handle = m_cursorTexture };
+    glCreateTextures(GL_TEXTURE_2D, 1, &m_cursor.texture);
+    Texture crosshairTexture = {.handle = m_cursor.texture };
 
     if(!crosshairTexture.loadFromFile(FileProvider::findPathToFile(CROSSHAIRS_TILESHEET_PNG)))
         return false;
@@ -63,8 +65,8 @@ bool HeadUpDisplay::init() noexcept
 //  Cursors
     m_releasedCursor = crosshairReleased.value();
     m_capturedCursor = crosshairCaptured.value();
-    m_cursorTransform.setOrigin(m_releasedCursor.width * 0.5f, m_releasedCursor.height * 0.5f);
-    m_cursorTransform.setScale(0.5f, 0.5f);
+    m_cursor.transform.setOrigin(m_releasedCursor.width * 0.5f, m_releasedCursor.height * 0.5f);
+    m_cursor.transform.setScale(0.5f, 0.5f);
     m_currentCursor = m_releasedCursor;
 
 //  Selection frame
@@ -83,37 +85,37 @@ bool HeadUpDisplay::init() noexcept
 
 void HeadUpDisplay::update(float dt) noexcept
 {
-    m_clickTimer += dt;
+    m_clickState.timer += dt;
     m_selectionFrame.blinkTimer += dt;
 
     if(m_selectionFrame.blinkTimer > BLINK_LOOP_TIME)
         m_selectionFrame.blinkTimer = 0.f;
 
-    m_cursorTransform.setPosition(m_engine->getCursorPosition());
+    m_cursor.transform.setPosition(m_engine->getCursorPosition());
 
     if(menu.isShown())
     {
-        if(m_clickTimer > BLINK_LOOP_TIME)
+        if(m_clickState.timer > BLINK_LOOP_TIME)
         {
             if(m_engine->isKeyPressed(GLFW_KEY_W))
             {
                 menu.updateSelection('W');
-                m_clickTimer = 0;
+                m_clickState.timer = 0;
             }
             else if(m_engine->isKeyPressed(GLFW_KEY_A))
             {
                 menu.updateSelection('A');
-                m_clickTimer = 0;
+                m_clickState.timer = 0;
             }
             else if(m_engine->isKeyPressed(GLFW_KEY_S))
             {
                 menu.updateSelection('S');
-                m_clickTimer = 0;
+                m_clickState.timer = 0;
             }
             else if(m_engine->isKeyPressed(GLFW_KEY_D))
             {
                 menu.updateSelection('D');
-                m_clickTimer = 0;
+                m_clickState.timer = 0;
             }
         }
     }
@@ -135,18 +137,18 @@ void HeadUpDisplay::draw(const mat4s& projection) const noexcept
     {
         if(m_selectionFrame.enabled && m_selectionFrame.blinkTimer < BLINK_PERIOD)
         {
-            glUseProgram(m_cursorProgram);
+            glUseProgram(m_cursor.program);
             glBindVertexArray(m_selectionFrame.vertexArrayObject);
             glDrawArrays(GL_LINES, 0, 16);
             glUseProgram(m_tilemapProgram); // return to default tilemap shader
         }
 
-        mat4s modelView = m_cursorTransform.getMatrix();
+        mat4s modelView = m_cursor.transform.getMatrix();
         mat4s result = glms_mul(currentWorldMatrix, modelView);
         m_engine->updateUniformBuffer(result);
 
         m_sprites.bind(true);
-        glBindTextureUnit(0, m_cursorTexture);
+        glBindTextureUnit(0, m_cursor.texture);
         glDrawArrays(GL_TRIANGLE_FAN, m_currentCursor.frame, 4);
         glBindTextureUnit(0, 0);
 
@@ -211,7 +213,7 @@ void HeadUpDisplay::runSelection() noexcept
     }
     else
     {
-        if(m_clickTimer > BLINK_LOOP_TIME)
+        if(m_clickState.timer > BLINK_LOOP_TIME)
         {
             if(StructureInfo* info = registry.try_get<StructureInfo>(entity))
             {
@@ -243,7 +245,7 @@ void HeadUpDisplay::runSelection() noexcept
         return;
     }
 
-    m_clickTimer = 0;
+    m_clickState.timer = 0;
 
     if(StructureInfo* info = registry.try_get<StructureInfo>(entity))
     {
