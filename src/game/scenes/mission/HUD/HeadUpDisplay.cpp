@@ -16,7 +16,7 @@
 HeadUpDisplay::HeadUpDisplay(Engine* engine,  Tilemap& tilemap) noexcept:
     m_engine(engine),
     m_tilemap(tilemap),
-    m_menu(engine, tilemap),
+    menu(engine, tilemap),
     m_cursorTexture(0),
     m_cursorProgram(0),
     m_tilemapProgram(0),
@@ -74,7 +74,7 @@ bool HeadUpDisplay::init() noexcept
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float2 };
 	VertexArrayObject::createVertexInputState(m_selectionFrame.vertexArrayObject, m_selectionFrame.vertexBufferObject, attributes);
 
-    m_menu.init();
+    menu.init();
 
     return true;
 }
@@ -90,28 +90,28 @@ void HeadUpDisplay::update(float dt) noexcept
 
     m_cursorTransform.setPosition(m_engine->getCursorPosition());
 
-    if(m_menu.isShown())
+    if(menu.isShown())
     {
         if(m_clickTimer > BLINK_LOOP_TIME)
         {
             if(m_engine->isKeyPressed(GLFW_KEY_W))
             {
-                m_menu.updateSelection('W');
+                menu.updateSelection('W');
                 m_clickTimer = 0;
             }
             else if(m_engine->isKeyPressed(GLFW_KEY_A))
             {
-                m_menu.updateSelection('A');
+                menu.updateSelection('A');
                 m_clickTimer = 0;
             }
             else if(m_engine->isKeyPressed(GLFW_KEY_S))
             {
-                m_menu.updateSelection('S');
+                menu.updateSelection('S');
                 m_clickTimer = 0;
             }
             else if(m_engine->isKeyPressed(GLFW_KEY_D))
             {
-                m_menu.updateSelection('D');
+                menu.updateSelection('D');
                 m_clickTimer = 0;
             }
         }
@@ -123,12 +123,12 @@ void HeadUpDisplay::draw(const mat4s& projection) const noexcept
 {
     mat4s currentWorldMatrix = projection;
 
-    if(m_menu.isShown())
+    if(menu.isShown())
     {
-        mat4s modelView = m_menu.getTransform().getMatrix();
+        mat4s modelView = menu.getTransform().getMatrix();
         mat4s result = glms_mul(currentWorldMatrix, modelView);
         m_engine->updateUniformBuffer(result);
-        m_menu.draw(false);
+        menu.draw(false);
     }
     else // Move viewport and draw cursor
     {
@@ -151,10 +151,10 @@ void HeadUpDisplay::draw(const mat4s& projection) const noexcept
 
         if(m_selectionFrame.enabled && (m_selectionFrame.lastSelectedEntity != entt::null))
         {
-            modelView = m_menu.getTransform().getMatrix();
+            modelView = menu.getTransform().getMatrix();
             result = glms_mul(currentWorldMatrix, modelView);
             m_engine->updateUniformBuffer(result);
-            m_menu.draw(true);
+            menu.draw(true);
         }
     }
 }
@@ -162,7 +162,7 @@ void HeadUpDisplay::draw(const mat4s& projection) const noexcept
 
 void HeadUpDisplay::runSelection() noexcept
 {
-    if(m_menu.isShown())
+    if(menu.isShown())
         return;
 
     vec2s cursorPosition = m_engine->getCursorPosition();
@@ -234,7 +234,7 @@ void HeadUpDisplay::runSelection() noexcept
                             previews = std::span(*previewArray);
                     }
 
-                    m_menu.showEntityMenu(mainPreview, previews);
+                    menu.showEntityMenu(mainPreview, previews);
                 }
             }
         }
@@ -256,7 +256,7 @@ void HeadUpDisplay::runSelection() noexcept
             const auto entityView = convert_building_type_to_preview(info->type);
 
             if(entityView != PreviewType::Empty_Cell)
-                m_menu.showEntityView(entityView, false);
+                menu.showEntityView(entityView, false);
 
             const auto bounds = registry.get<ivec4s>(entity);
             glBindBuffer(GL_ARRAY_BUFFER, m_selectionFrame.vertexBufferObject);
@@ -310,11 +310,5 @@ void HeadUpDisplay::cancelSelection() noexcept
 
 void HeadUpDisplay::resize(int width, int height) noexcept
 {
-    m_menu.resize(width, height);
-}
-
-
-ConstructionMenu& HeadUpDisplay::getMenu() noexcept
-{
-    return m_menu;
+    menu.resize(width, height);
 }

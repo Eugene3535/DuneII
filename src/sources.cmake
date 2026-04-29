@@ -76,6 +76,8 @@ set(DUNEII_SRC_FILES
 )
 
 set(DUNEII_HDR_FILES
+	src/common/NonCopyable.hpp
+	src/common/NonMovable.hpp
 	src/common/Assets.hpp
 	src/common/Enums.hpp
 	src/common/ExternalMath.hpp

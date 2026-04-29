@@ -96,7 +96,7 @@ void Mission::createSystems() noexcept
 //  Viewport Controller
     m_systems.emplace_back([](Mission* mission, float dt)
     {
-        if(mission->m_hud.getMenu().isShown())
+        if(mission->m_hud.menu.isShown())
             return;
 
         const auto game     = mission->m_engine;
@@ -149,7 +149,7 @@ void Mission::createSystems() noexcept
 
         mission->m_hud.update(dt);
 
-        auto& menu = mission->m_hud.getMenu();
+        auto& menu = mission->m_hud.menu;
 
         if (menu.isShown())
         {

@@ -3,20 +3,27 @@
 
 #include <entt/entity/fwd.hpp>
 
+#include "common/NonCopyable.hpp"
+#include "common/NonMovable.hpp"
 #include "graphics/Meshes.hpp"
 #include "graphics/transform/Transform2D.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
 #include "game/scenes/mission/HUD/construction/ConstructionMenu.hpp"
 
 
-class HeadUpDisplay
+class HeadUpDisplay: 
+    private NonCopyable,
+    private NonMovable
 {
 public:
+    enum ClickState: uint32_t
+    {
+        Released,
+        FirstClick,
+        SecondClick
+    };
+
     HeadUpDisplay(class Engine* engine, class Tilemap& tilemap) noexcept;
-    HeadUpDisplay(const HeadUpDisplay&)              noexcept = delete;
-	HeadUpDisplay(HeadUpDisplay&&)                   noexcept = delete;
-	HeadUpDisplay& operator = (const HeadUpDisplay&) noexcept = delete;
-	HeadUpDisplay& operator = (HeadUpDisplay&&)      noexcept = delete;
     ~HeadUpDisplay();
 
     bool init()                              noexcept;
@@ -27,13 +34,11 @@ public:
     void cancelSelection()             noexcept;
     void resize(int width, int height) noexcept;
 
-    ConstructionMenu& getMenu() noexcept;
+        ConstructionMenu menu;
 
 private:
     class Engine*        m_engine;
     const class Tilemap& m_tilemap;
-
-    ConstructionMenu m_menu;
 
     SpriteManager m_sprites;
     mesh::Sprite  m_releasedCursor;
