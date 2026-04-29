@@ -24,10 +24,10 @@ private:
     GLuint m_spriteProgram;
     GLuint m_buttonSpriteProgram;
 
-    mesh::Sprite m_space;
-    Transform2D  m_spaceTransform;
-    mesh::Sprite m_planet;
-    Transform2D  m_planetTransform;
+    Sprite2D    m_space;
+    Transform2D m_spaceTransform;
+    Sprite2D    m_planet;
+    Transform2D m_planetTransform;
 
     SpriteManager m_sprites;
     Button*       m_playButton;

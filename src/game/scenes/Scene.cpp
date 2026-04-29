@@ -54,7 +54,7 @@ Scene::Type Scene::getType() const noexcept
 }
 
 
-void Scene::setSpriteSizeInPixels(const mesh::Sprite& sprite, const vec2s newSize, Transform2D& transform) noexcept
+void Scene::setSpriteSizeInPixels(const Sprite2D& sprite, const vec2s newSize, Transform2D& transform) noexcept
 {
     assert(sprite.width > 0);
     assert(sprite.height > 0);

@@ -5,7 +5,7 @@
 
 #include "common/NonCopyable.hpp"
 #include "common/NonMovable.hpp"
-#include "graphics/Meshes.hpp"
+#include "graphics/Sprite2D.hpp"
 #include "graphics/transform/Transform2D.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
 #include "game/scenes/mission/HUD/construction/ConstructionMenu.hpp"
@@ -16,13 +16,6 @@ class HeadUpDisplay:
     private NonMovable
 {
 public:
-    enum ClickState: uint32_t
-    {
-        Released,
-        FirstClick,
-        SecondClick
-    };
-
     HeadUpDisplay(class Engine* engine, class Tilemap& tilemap) noexcept;
     ~HeadUpDisplay();
 
@@ -34,16 +27,23 @@ public:
     void cancelSelection()             noexcept;
     void resize(int width, int height) noexcept;
 
-        ConstructionMenu menu;
+    ConstructionMenu menu;
 
 private:
     class Engine*        m_engine;
     const class Tilemap& m_tilemap;
 
+    enum class ClickState: uint32_t
+    {
+        Released,
+        FirstClick,
+        SecondClick
+    } m_clickState;
+
     SpriteManager m_sprites;
-    mesh::Sprite  m_releasedCursor;
-    mesh::Sprite  m_capturedCursor;
-    mesh::Sprite  m_currentCursor;
+    Sprite2D      m_releasedCursor;
+    Sprite2D      m_capturedCursor;
+    Sprite2D      m_currentCursor;
     Transform2D   m_cursorTransform;
     uint32_t      m_cursorTexture;
     uint32_t      m_cursorProgram;

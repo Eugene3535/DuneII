@@ -2,7 +2,7 @@
 #define PICK_HOUSE_HPP
 
 #include "common/Enums.hpp"
-#include "graphics/Meshes.hpp"
+#include "graphics/Sprite2D.hpp"
 #include "game/scenes/Scene.hpp"
 
 
@@ -24,10 +24,10 @@ private:
 
     struct
     {
-        uint32_t     vertexArrayObject;
-        mesh::Sprite sprite;
-        uint32_t     program;
-        Transform2D  transform;
+        uint32_t    vertexArrayObject;
+        Sprite2D    sprite;
+        uint32_t    program;
+        Transform2D transform;
     } m_background;
     
     struct

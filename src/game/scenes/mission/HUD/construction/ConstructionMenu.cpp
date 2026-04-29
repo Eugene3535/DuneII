@@ -658,7 +658,7 @@ void ConstructionMenu::createUserElements() noexcept
         quad[15] = bottom;
 
 //  Assign sprite
-        mesh::Sprite* button = &m_userElements.buttonExit;
+        Sprite2D* button = &m_userElements.buttonExit;
         if(i == 1) button = &m_userElements.buttonRepair;
         if(i == 2) button = &m_userElements.buttonStop;
 

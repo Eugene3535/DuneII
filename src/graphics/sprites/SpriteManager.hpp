@@ -10,7 +10,7 @@
 
 #include <cglm/struct/ivec4.h>
 
-#include "graphics/Meshes.hpp"
+#include "graphics/Sprite2D.hpp"
 
 
 class SpriteManager final
@@ -34,8 +34,8 @@ public:
 	
 	void loadSpriteSheet(const std::filesystem::path& filePath, const struct Texture& texture) noexcept;
 
-	std::optional<mesh::Sprite> getSprite(const std::string& name) const noexcept;
-	std::vector<mesh::Sprite> getAnimation(const std::string& name) const noexcept;
+	std::optional<Sprite2D> getSprite(const std::string& name) const noexcept;
+	std::vector<Sprite2D> getAnimation(const std::string& name) const noexcept;
 
 	void bind(bool toBind) const noexcept;
 
@@ -47,7 +47,7 @@ private:
 	uint32_t m_vbo;
 
 	std::unordered_map<std::string, sprite_range> m_animations;
-	std::vector<mesh::Sprite> m_sprites;
+	std::vector<Sprite2D> m_sprites;
 	std::vector<float> m_vertices;
 };
 

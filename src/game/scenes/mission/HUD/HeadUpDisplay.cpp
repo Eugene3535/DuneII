@@ -16,6 +16,7 @@
 HeadUpDisplay::HeadUpDisplay(Engine* engine,  Tilemap& tilemap) noexcept:
     m_engine(engine),
     m_tilemap(tilemap),
+    m_clickState(ClickState::Released),
     menu(engine, tilemap),
     m_cursorTexture(0),
     m_cursorProgram(0),

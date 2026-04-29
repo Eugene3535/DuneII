@@ -102,9 +102,9 @@ private:
         uint32_t textures[3];
         uint32_t vertexBufferObject;
         uint32_t vertexArrayObject;
-        mesh::Sprite buttonExit;
-        mesh::Sprite buttonRepair;
-        mesh::Sprite buttonStop;
+        Sprite2D buttonExit;
+        Sprite2D buttonRepair;
+        Sprite2D buttonStop;
         PreviewType lastSelectedPreview;
         
         struct

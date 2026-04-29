@@ -82,7 +82,7 @@ set(DUNEII_HDR_FILES
 	src/common/Enums.hpp
 	src/common/ExternalMath.hpp
 	src/common/info/GameInfo.hpp
-	src/graphics/Meshes.hpp
+	src/graphics/Sprite2D.hpp
 	src/graphics/transform/Transform2D.hpp
 	src/graphics/camera/OrthoMatrix.hpp
 	src/graphics/sprites/SpriteManager.hpp
