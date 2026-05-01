@@ -10,15 +10,13 @@
 
 #define CAMERA_VELOCITY 600
 #define SCREEN_MARGIN 150
-#define ACTION_MEMORY_POOL_SIZE (1024 << 2)
 
 
 
 Mission::Mission(Engine* engine) noexcept:
     Scene(engine, Scene::MISSION),
     m_tilemap(engine, m_registry),
-    m_hud(engine, m_tilemap),
-    m_actionAllocator(ACTION_MEMORY_POOL_SIZE)
+    m_hud(engine, m_tilemap)
 {
 
 }
@@ -70,7 +68,7 @@ void Mission::update(float dt) noexcept
 
         if(result)
         {
-            m_actionAllocator.release(data, result);
+            m_allocator.release(data, result);
             quick_remove_at(m_actions, i);
             quick_remove_at(m_actionData, i);
         }
@@ -93,7 +91,7 @@ void Mission::resize(int width, int height) noexcept
 
 void Mission::createSystems() noexcept
 {
-//  Viewport Controller
+//  Viewport
     m_systems.emplace_back([](Mission* mission, float dt)
     {
         if(mission->m_hud.menu.isShown())
@@ -132,14 +130,14 @@ void Mission::createSystems() noexcept
         mission->m_tilemap.setPosition(scenePosition);
     });
 
-//  HUD Controller
+
+//  HUD
     m_systems.emplace_back([](Mission* mission, float dt)
     {
         const Engine* engine = mission->m_engine;
 
         const bool isMouseButtonLeftPressed  = engine->isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
         const bool isMouseButtonRightPressed = engine->isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
-        const bool isSpaceKeyPressed = engine->isKeyPressed(GLFW_KEY_SPACE);
 
         if (isMouseButtonLeftPressed)
             mission->m_hud.runSelection();
@@ -148,38 +146,63 @@ void Mission::createSystems() noexcept
             mission->m_hud.cancelSelection();
 
         mission->m_hud.update(dt);
+    });
 
+
+//  Construction menu
+    m_systems.emplace_back([](Mission* mission, float dt)
+    {   
         auto& menu = mission->m_hud.menu;
+        auto& engine = mission->m_engine;
 
-        if (menu.isShown())
+        if (!menu.isShown())
+            return;
+
+        menu.update(dt);
+
+        if(engine->isKeyPressed(GLFW_KEY_W))
         {
-            if (isSpaceKeyPressed)
+            menu.updateSelection('W');
+        }
+        else if(engine->isKeyPressed(GLFW_KEY_A))
+        {
+            menu.updateSelection('A');
+        }
+        else if(engine->isKeyPressed(GLFW_KEY_S))
+        {
+            menu.updateSelection('S');
+        }
+        else if(engine->isKeyPressed(GLFW_KEY_D))
+        {
+            menu.updateSelection('D');
+        }
+         
+        if (engine->isKeyPressed(GLFW_KEY_SPACE))
+        {
+            if (menu.getSelectedButton() == ConstructionMenu::ButtonType::Exit)
             {
-                if (menu.getSelectedButton() == ConstructionMenu::ButtonType::Exit)
+                menu.hide();
+
+                return;
+            }
+
+            const auto selectedPreview = menu.getSelectedPreview();
+
+            if ((selectedPreview != PreviewType::INVALID) && (selectedPreview != PreviewType::Empty_Cell))
+            {
+                if (void* actionData = mission->m_allocator.allocate<Action::Construction>())
                 {
+                    auto* data = static_cast<Action::Construction*>(actionData);
+
+                    data->duration = 10; // 10 seconds for example
+                    data->countdown = 100;
+                    data->progress = menu.getProgress();
+                    
+                    mission->m_actions.push_back(Action::construct);
+                    mission->m_actionData.push_back(actionData);
+
                     menu.hide();
-
-                    return;
-                }
-
-                const auto selectedPreview = menu.getSelectedPreview();
-
-                if ((selectedPreview != PreviewType::INVALID) && (selectedPreview != PreviewType::Empty_Cell))
-                {
-                    if (void* actionData = mission->m_actionAllocator.allocate(sizeof(Action::Construction)))
-                    {
-                        auto* data = static_cast<Action::Construction*>(actionData);
-
-                        data->duration = 10; // 10 seconds for example
-                        data->countdown = 100;
-                        data->progress = menu.getProgress();
-                        
-                        mission->m_actions.push_back(Action::construct);
-                        mission->m_actionData.push_back(actionData);
-
-                        menu.hide();
-                        menu.showEntityView(selectedPreview, true);
-                    }
+                    menu.showEntityView(selectedPreview, true);
                 }
             }
         }

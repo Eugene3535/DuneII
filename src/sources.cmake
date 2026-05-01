@@ -36,7 +36,6 @@ set(SCENE_SRC_FILES
 	src/game/scenes/mission/HUD/HeadUpDisplay.cpp
 	src/game/scenes/mission/base/Base.cpp
 	src/game/scenes/mission/action/Action.cpp
-	src/game/scenes/mission/action/ActionDataAllocator.cpp
 	src/game/scenes/mission/Mission.cpp
 )
 
@@ -54,7 +53,6 @@ set(SCENE_HDR_FILES
 	src/game/scenes/mission/base/Base.hpp
 	src/game/scenes/mission/action/ActionData.hpp
 	src/game/scenes/mission/action/Action.hpp
-	src/game/scenes/mission/action/ActionDataAllocator.hpp
 	src/game/scenes/mission/Mission.hpp
 )
 
@@ -78,6 +76,8 @@ set(DUNEII_SRC_FILES
 set(DUNEII_HDR_FILES
 	src/common/NonCopyable.hpp
 	src/common/NonMovable.hpp
+	src/common/MemoryAllocator.hpp
+	src/common/MemoryAllocator.inl
 	src/common/Assets.hpp
 	src/common/Enums.hpp
 	src/common/ExternalMath.hpp

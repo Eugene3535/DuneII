@@ -3,12 +3,14 @@
 
 #include <functional>
 
+#include "common/MemoryAllocator.hpp"
 #include "game/scenes/mission/loader/TiledMapLoader.hpp"
 #include "game/scenes/mission/tilemap/Tilemap.hpp"
 #include "game/scenes/mission/HUD/HeadUpDisplay.hpp"
-#include "game/scenes/mission/action/ActionDataAllocator.hpp"
 #include "game/scenes/Scene.hpp"
 
+
+#define ACTION_MEMORY_POOL_SIZE (1024 << 2)
 
 class Mission:
     public Scene
@@ -30,7 +32,7 @@ private:
     entt::registry m_registry;
     HeadUpDisplay  m_hud;
 
-    ActionDataAllocator m_actionAllocator;
+    MemoryAllocator<ACTION_MEMORY_POOL_SIZE> m_allocator;
 
     std::vector<void(*)(Mission*, float)> m_systems;
     std::vector<size_t(*)(void*, float)> m_actions;

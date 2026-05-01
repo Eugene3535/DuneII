@@ -20,6 +20,8 @@
 #define DEFAULT_MENU_HEIGHT 800.f
 #define MENU_SCALE_FACTOR 0.7f
 
+#define MOVE_FRAME_DELAY_TIME 0.25f
+
 namespace
 {
     constexpr float background_color[]      = { 155.f / 255.f, 160.f / 255.f, 163.f / 255.f, 1.f };
@@ -89,6 +91,12 @@ void ConstructionMenu::init() noexcept
     createFrames();
     createPreviews();
     createUserElements();
+}
+
+
+void ConstructionMenu::update(float dt) noexcept
+{
+    m_userElements.selectionFrame.moveFrameDelayTimer += dt;
 }
 
 
@@ -214,6 +222,11 @@ void ConstructionMenu::showEntityMenu(PreviewType mainPreview, std::span<Preview
 
 void ConstructionMenu::updateSelection(char keyCode, bool isForced) noexcept
 {
+    if (m_userElements.selectionFrame.moveFrameDelayTimer < MOVE_FRAME_DELAY_TIME)
+        return;
+
+    m_userElements.selectionFrame.moveFrameDelayTimer = 0;
+
     const int32_t oldRow = m_userElements.selectionFrame.row;
     const int32_t oldColumn = m_userElements.selectionFrame.column;
 

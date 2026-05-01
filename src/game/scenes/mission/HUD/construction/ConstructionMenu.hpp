@@ -23,6 +23,7 @@ public:
     ~ConstructionMenu();
 
     void init()                                                               noexcept;
+    void update(float dt)                                                     noexcept;
     void showEntityView(PreviewType preview, bool enableConstruction)         noexcept;
     void showEntityMenu(PreviewType mainPreview, std::span<PreviewType> menu) noexcept;
     void updateSelection(char keyCode, bool isForced = false)                 noexcept;
@@ -114,6 +115,7 @@ private:
             uint32_t count;
             int32_t row;
             int32_t column;
+            float moveFrameDelayTimer;
         } selectionFrame;
 
     } m_userElements;

@@ -9,6 +9,7 @@
 #include "game/Engine.hpp"
 #include "game/scenes/mission/HUD/HeadUpDisplay.hpp"
 
+// The flicker period of the selection frame
 #define BLINK_PERIOD 0.125f
 #define BLINK_LOOP_TIME 0.25f
 
@@ -92,33 +93,6 @@ void HeadUpDisplay::update(float dt) noexcept
         m_selectionFrame.blinkTimer = 0.f;
 
     m_cursor.transform.setPosition(m_engine->getCursorPosition());
-
-    if(menu.isShown())
-    {
-        if(m_clickState.timer > BLINK_LOOP_TIME)
-        {
-            if(m_engine->isKeyPressed(GLFW_KEY_W))
-            {
-                menu.updateSelection('W');
-                m_clickState.timer = 0;
-            }
-            else if(m_engine->isKeyPressed(GLFW_KEY_A))
-            {
-                menu.updateSelection('A');
-                m_clickState.timer = 0;
-            }
-            else if(m_engine->isKeyPressed(GLFW_KEY_S))
-            {
-                menu.updateSelection('S');
-                m_clickState.timer = 0;
-            }
-            else if(m_engine->isKeyPressed(GLFW_KEY_D))
-            {
-                menu.updateSelection('D');
-                m_clickState.timer = 0;
-            }
-        }
-    }
 }
 
 

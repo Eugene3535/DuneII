@@ -1,0 +1,33 @@
+#ifndef MEMORY_ALLOCATOR_HPP
+#define MEMORY_ALLOCATOR_HPP
+
+#include <cstdint>
+#include <array>
+#include <unordered_map>
+
+
+template<size_t N>
+class MemoryAllocator
+{
+public:
+    MemoryAllocator() noexcept;
+    ~MemoryAllocator();
+
+    template<class T>
+    T* allocate() noexcept;
+
+    template<class T>
+    void release(T* data) noexcept;
+
+    void release(void* data, size_t size) noexcept;
+
+private:
+    std::array<uint8_t, N> m_memoryPool;
+    size_t m_stride;
+
+    std::unordered_map<size_t, std::vector<void*>> m_freeBlocks;
+};
+
+#include "common/MemoryAllocator.inl"
+
+#endif // !MEMORY_ALLOCATOR_HPP
