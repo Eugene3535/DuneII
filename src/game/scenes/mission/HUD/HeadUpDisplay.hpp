@@ -8,7 +8,6 @@
 #include "graphics/Sprite2D.hpp"
 #include "graphics/transform/Transform2D.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
-#include "game/scenes/mission/HUD/construction/ConstructionMenu.hpp"
 
 
 class HeadUpDisplay: 
@@ -16,7 +15,7 @@ class HeadUpDisplay:
     private NonMovable
 {
 public:
-    HeadUpDisplay(class Engine* engine, class Tilemap& tilemap) noexcept;
+    HeadUpDisplay(class Engine* engine, class Tilemap& tilemap, class ConstructionMenu& menu) noexcept;
     ~HeadUpDisplay();
 
     bool init()                              noexcept;
@@ -27,12 +26,13 @@ public:
     void cancelSelection()             noexcept;
     void resize(int width, int height) noexcept;
 
-    ConstructionMenu menu;
+    bool isEntitySelected() const noexcept;
 
 private:
-    class Engine*        m_engine;
-    const class Tilemap& m_tilemap;
-    uint32_t             m_tilemapProgram;
+    class Engine*           m_engine;
+    const class Tilemap&    m_tilemap;
+    class ConstructionMenu& m_menu;
+    uint32_t                m_tilemapProgram;
 
     SpriteManager m_sprites;
     Sprite2D      m_releasedCursor;

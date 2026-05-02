@@ -7,6 +7,7 @@
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "game/scenes/mission/tilemap/Tilemap.hpp"
 #include "game/Engine.hpp"
+#include "game/scenes/mission/HUD/construction/ConstructionMenu.hpp"
 #include "game/scenes/mission/HUD/HeadUpDisplay.hpp"
 
 // The flicker period of the selection frame
@@ -14,11 +15,11 @@
 #define BLINK_LOOP_TIME 0.25f
 
 
-HeadUpDisplay::HeadUpDisplay(Engine* engine,  Tilemap& tilemap) noexcept:
+HeadUpDisplay::HeadUpDisplay(Engine* engine,  Tilemap& tilemap, ConstructionMenu& menu) noexcept:
     m_engine(engine),
     m_tilemap(tilemap),
-    m_tilemapProgram(0),
-    menu(engine, tilemap)
+    m_menu(menu),
+    m_tilemapProgram(0)
 {
     m_clickState.stage = ClickStage::Released;
     m_clickState.timer = 0;
@@ -78,8 +79,6 @@ bool HeadUpDisplay::init() noexcept
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float2 };
 	VertexArrayObject::createVertexInputState(m_selectionFrame.vertexArrayObject, m_selectionFrame.vertexBufferObject, attributes);
 
-    menu.init();
-
     return true;
 }
 
@@ -98,48 +97,29 @@ void HeadUpDisplay::update(float dt) noexcept
 
 void HeadUpDisplay::draw(const mat4s& projection) const noexcept
 {
+    if(m_selectionFrame.enabled && m_selectionFrame.blinkTimer < BLINK_PERIOD)
+    {
+        glUseProgram(m_cursor.program);
+        glBindVertexArray(m_selectionFrame.vertexArrayObject);
+        glDrawArrays(GL_LINES, 0, 16);
+        glUseProgram(m_tilemapProgram); // return to default tilemap shader
+    }
+
     mat4s currentWorldMatrix = projection;
+    mat4s modelView = m_cursor.transform.getMatrix();
+    mat4s result = glms_mul(currentWorldMatrix, modelView);
+    m_engine->updateUniformBuffer(result);
 
-    if(menu.isShown())
-    {
-        mat4s modelView = menu.getTransform().getMatrix();
-        mat4s result = glms_mul(currentWorldMatrix, modelView);
-        m_engine->updateUniformBuffer(result);
-        menu.draw(false);
-    }
-    else // Move viewport and draw cursor
-    {
-        if(m_selectionFrame.enabled && m_selectionFrame.blinkTimer < BLINK_PERIOD)
-        {
-            glUseProgram(m_cursor.program);
-            glBindVertexArray(m_selectionFrame.vertexArrayObject);
-            glDrawArrays(GL_LINES, 0, 16);
-            glUseProgram(m_tilemapProgram); // return to default tilemap shader
-        }
-
-        mat4s modelView = m_cursor.transform.getMatrix();
-        mat4s result = glms_mul(currentWorldMatrix, modelView);
-        m_engine->updateUniformBuffer(result);
-
-        m_sprites.bind(true);
-        glBindTextureUnit(0, m_cursor.texture);
-        glDrawArrays(GL_TRIANGLE_FAN, m_currentCursor.frame, 4);
-        glBindTextureUnit(0, 0);
-
-        if(m_selectionFrame.enabled && (m_selectionFrame.lastSelectedEntity != entt::null))
-        {
-            modelView = menu.getTransform().getMatrix();
-            result = glms_mul(currentWorldMatrix, modelView);
-            m_engine->updateUniformBuffer(result);
-            menu.draw(true);
-        }
-    }
+    m_sprites.bind(true);
+    glBindTextureUnit(0, m_cursor.texture);
+    glDrawArrays(GL_TRIANGLE_FAN, m_currentCursor.frame, 4);
+    glBindTextureUnit(0, 0);
 }
 
 
 void HeadUpDisplay::runSelection() noexcept
 {
-    if(menu.isShown())
+    if(m_menu.isShown())
         return;
 
     vec2s cursorPosition = m_engine->getCursorPosition();
@@ -211,7 +191,7 @@ void HeadUpDisplay::runSelection() noexcept
                             previews = std::span(*previewArray);
                     }
 
-                    menu.showEntityMenu(mainPreview, previews);
+                    m_menu.showEntityMenu(mainPreview, previews);
                 }
             }
         }
@@ -233,7 +213,7 @@ void HeadUpDisplay::runSelection() noexcept
             const auto entityView = convert_building_type_to_preview(info->type);
 
             if(entityView != PreviewType::Empty_Cell)
-                menu.showEntityView(entityView, false);
+                m_menu.showEntityView(entityView, false);
 
             const auto bounds = registry.get<ivec4s>(entity);
             glBindBuffer(GL_ARRAY_BUFFER, m_selectionFrame.vertexBufferObject);
@@ -287,5 +267,11 @@ void HeadUpDisplay::cancelSelection() noexcept
 
 void HeadUpDisplay::resize(int width, int height) noexcept
 {
-    menu.resize(width, height);
+    m_menu.resize(width, height);
+}
+
+
+bool HeadUpDisplay::isEntitySelected() const noexcept
+{
+    return (m_selectionFrame.enabled && (m_selectionFrame.lastSelectedEntity != entt::null));
 }

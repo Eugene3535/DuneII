@@ -16,7 +16,8 @@
 Mission::Mission(Engine* engine) noexcept:
     Scene(engine, Scene::MISSION),
     m_tilemap(engine, m_registry),
-    m_hud(engine, m_tilemap)
+    m_menu(engine, m_tilemap),
+    m_hud(engine, m_tilemap, m_menu)
 {
 
 }
@@ -34,6 +35,8 @@ bool Mission::load(std::string_view info) noexcept
 
     if(!m_hud.init())
         return false;
+
+    m_menu.init();
 
     if(m_mapLoader.loadFromFile(FileProvider::findPathToFile(std::string(info))))
     {
@@ -79,7 +82,12 @@ void Mission::update(float dt) noexcept
 void Mission::draw(const mat4s& projection) noexcept
 {
     m_tilemap.draw(projection);
-    m_hud.draw(projection);
+
+    if (!m_menu.isShown())
+        m_hud.draw(projection);
+
+    if (m_hud.isEntitySelected() || m_menu.isShown())
+        m_menu.draw(projection);
 }
 
 
@@ -94,7 +102,7 @@ void Mission::createSystems() noexcept
 //  Viewport
     m_systems.emplace_back([](Mission* mission, float dt)
     {
-        if(mission->m_hud.menu.isShown())
+        if(mission->m_menu.isShown())
             return;
 
         const auto game     = mission->m_engine;
@@ -152,7 +160,7 @@ void Mission::createSystems() noexcept
 //  Construction menu
     m_systems.emplace_back([](Mission* mission, float dt)
     {   
-        auto& menu = mission->m_hud.menu;
+        auto& menu = mission->m_menu;
         auto& engine = mission->m_engine;
 
         if (!menu.isShown())

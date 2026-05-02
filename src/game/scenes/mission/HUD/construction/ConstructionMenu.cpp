@@ -128,7 +128,7 @@ void ConstructionMenu::showEntityView(PreviewType preview, bool enableConstructi
 
     glBindBuffer(GL_ARRAY_BUFFER, m_previewCells.vertexBufferObject);
 
-    if(void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
+    if (void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
     {
         setup_tex_coords(data, preview, ((previewCount + 1) << 2));
 
@@ -397,9 +397,15 @@ void ConstructionMenu::hide() noexcept
 }
 
 
-void ConstructionMenu::draw(bool onlyEntityView) const noexcept
+void ConstructionMenu::draw(const mat4s& projection) const noexcept
 {
-    if(onlyEntityView)
+    mat4s currentWorldMatrix = projection;
+    mat4s modelView = getTransform().getMatrix();
+    mat4s result;
+    glm_mul(currentWorldMatrix.raw, modelView.raw, result.raw);
+    m_engine->updateUniformBuffer(result);
+
+    if(!m_isShown)
     {
         drawEntityView();
     }

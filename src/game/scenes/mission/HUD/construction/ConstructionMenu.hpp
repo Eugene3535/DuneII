@@ -28,7 +28,7 @@ public:
     void showEntityMenu(PreviewType mainPreview, std::span<PreviewType> menu) noexcept;
     void updateSelection(char keyCode, bool isForced = false)                 noexcept;
     void hide()                                                               noexcept;
-    void draw(bool onlyEntityView)                                      const noexcept;
+    void draw(const mat4s& projection)                                        const noexcept;
     void resize(int width, int height)                                        noexcept;
 
     PreviewType getSelectedPreview() const noexcept;

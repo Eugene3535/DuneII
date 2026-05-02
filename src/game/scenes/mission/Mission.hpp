@@ -7,6 +7,7 @@
 #include "game/scenes/mission/loader/TiledMapLoader.hpp"
 #include "game/scenes/mission/tilemap/Tilemap.hpp"
 #include "game/scenes/mission/HUD/HeadUpDisplay.hpp"
+#include "game/scenes/mission/HUD/construction/ConstructionMenu.hpp"
 #include "game/scenes/Scene.hpp"
 
 
@@ -27,10 +28,12 @@ public:
 private:
     void createSystems() noexcept;
 
-    TiledMapLoader m_mapLoader;
-    Tilemap        m_tilemap;
-    entt::registry m_registry;
-    HeadUpDisplay  m_hud;
+    TiledMapLoader   m_mapLoader;
+    Tilemap          m_tilemap;
+    entt::registry   m_registry;
+
+    ConstructionMenu m_menu;
+    HeadUpDisplay    m_hud;
 
     MemoryAllocator<ACTION_MEMORY_POOL_SIZE> m_allocator;
 
