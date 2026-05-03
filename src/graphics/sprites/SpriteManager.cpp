@@ -2,7 +2,7 @@
 
 #include "RapidXML/rapidxml_utils.hpp"
 
-#include "resources/gl_interfaces/texture/Texture.hpp"
+#include "resources/gl_interfaces/texture/Texture2D.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
 
@@ -27,7 +27,7 @@ SpriteManager::~SpriteManager()
 }
 
 
-void SpriteManager::createSprite(const std::string& name, const Texture& texture) noexcept
+void SpriteManager::createSprite(const std::string& name, const Texture2D& texture) noexcept
 {
 	if(auto it = m_animations.find(name); it == m_animations.end())
 	{
@@ -37,7 +37,7 @@ void SpriteManager::createSprite(const std::string& name, const Texture& texture
 }
 
 
-void SpriteManager::createSprite(const std::string& name, const Texture& texture, const ivec4s& frame) noexcept
+void SpriteManager::createSprite(const std::string& name, const Texture2D& texture, const ivec4s& frame) noexcept
 {
 	if(auto it = m_animations.find(name); it == m_animations.end())
 	{
@@ -52,7 +52,7 @@ void SpriteManager::createSprite(const std::string& name, const Texture& texture
 }
 
 
-void SpriteManager::createLinearAnimaton(const std::string& name, const Texture& texture, int duration) noexcept
+void SpriteManager::createLinearAnimaton(const std::string& name, const Texture2D& texture, int duration) noexcept
 {
 	if(auto it = m_animations.find(name); it == m_animations.end())
 	{
@@ -75,7 +75,7 @@ void SpriteManager::createLinearAnimaton(const std::string& name, const Texture&
 }
 
 
-void SpriteManager::createGridAnimaton(const std::string& name, const Texture& texture, int columns, int rows) noexcept
+void SpriteManager::createGridAnimaton(const std::string& name, const Texture2D& texture, int columns, int rows) noexcept
 {
 	if(auto it = m_animations.find(name); it == m_animations.end())
 	{
@@ -102,7 +102,7 @@ void SpriteManager::createGridAnimaton(const std::string& name, const Texture& t
 }
 
 
-void SpriteManager::createCustomAnimaton(const std::string& name, const class Texture& texture, std::span<const ivec4s> frames) noexcept
+void SpriteManager::createCustomAnimaton(const std::string& name, const Texture2D& texture, std::span<const ivec4s> frames) noexcept
 {
 	if(auto it = m_animations.find(name); it == m_animations.end())
 	{
@@ -120,7 +120,7 @@ void SpriteManager::createCustomAnimaton(const std::string& name, const class Te
 }
 
 
-void SpriteManager::loadSpriteSheet(const std::filesystem::path& filePath, const Texture& texture) noexcept
+void SpriteManager::loadSpriteSheet(const std::filesystem::path& filePath, const Texture2D& texture) noexcept
 {
 	auto document = std::make_unique<rapidxml::xml_document<char>>();
 	rapidxml::file<char> xmlFile(filePath.string().c_str());

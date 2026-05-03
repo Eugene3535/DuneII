@@ -3,7 +3,7 @@
 #include "cglm/struct/affine-mat.h"
 
 #include "resources/files/FileProvider.hpp"
-#include "resources/gl_interfaces/texture/Texture.hpp"
+#include "resources/gl_interfaces/texture/Texture2D.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "game/scenes/mission/tilemap/Tilemap.hpp"
 #include "game/Engine.hpp"
@@ -52,7 +52,7 @@ bool HeadUpDisplay::init() noexcept
         return false;
 
     glCreateTextures(GL_TEXTURE_2D, 1, &m_cursor.texture);
-    Texture crosshairTexture = {.handle = m_cursor.texture };
+    Texture2D crosshairTexture = {.handle = m_cursor.texture };
 
     if(!crosshairTexture.loadFromFile(FileProvider::findPathToFile(CROSSHAIRS_TILESHEET_PNG)))
         return false;

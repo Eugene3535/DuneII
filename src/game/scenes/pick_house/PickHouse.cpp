@@ -4,7 +4,7 @@
 
 #include "resources/files/FileProvider.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
-#include "resources/gl_interfaces/texture/Texture.hpp"
+#include "resources/gl_interfaces/texture/Texture2D.hpp"
 #include "graphics/geometry/GeometryGenerator.hpp"
 #include "game/Engine.hpp"
 #include "game/scenes/pick_house/PickHouse.hpp"
@@ -57,7 +57,7 @@ bool PickHouse::load(std::string_view info) noexcept
     m_outline.vertexArrayObject = m_vertexArrayObjects[1];
 
 //  Textures
-    Texture housesTexture = {.handle = m_background.sprite.texture };
+    Texture2D housesTexture = {.handle = m_background.sprite.texture };
 
     if(!housesTexture.loadFromFile(FileProvider::findPathToFile(HOUSES_PNG)))
         return false;

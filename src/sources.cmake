@@ -6,7 +6,7 @@ set(RESOURCE_SRC_FILES
 	src/resources/files/StbImage.cpp
 	src/resources/gl_interfaces/buffers/GlBuffer.cpp
 	src/resources/gl_interfaces/shaders/ShaderProgram.cpp
-	src/resources/gl_interfaces/texture/Texture.cpp
+	src/resources/gl_interfaces/texture/Texture2D.cpp
 	src/resources/gl_interfaces/vao/attributes/VertexBufferLayout.cpp
 	src/resources/gl_interfaces/vao/VertexArrayObject.cpp
 )
@@ -18,7 +18,7 @@ set(RESOURCE_HDR_FILES
 	src/resources/files/StbImage.hpp
 	src/resources/gl_interfaces/buffers/GlBuffer.hpp
 	src/resources/gl_interfaces/shaders/ShaderProgram.hpp
-	src/resources/gl_interfaces/texture/Texture.hpp
+	src/resources/gl_interfaces/texture/Texture2D.hpp
 	src/resources/gl_interfaces/vao/attributes/VertexBufferLayout.hpp
 	src/resources/gl_interfaces/vao/VertexArrayObject.hpp
 )
@@ -33,6 +33,7 @@ set(SCENE_SRC_FILES
 	src/game/scenes/mission/tilemap/Tilemap.cpp
 	src/game/scenes/mission/loader/TiledMapLoader.cpp
 	src/game/scenes/mission/HUD/construction/ConstructionMenu.cpp
+	src/game/scenes/mission/HUD/previews/EntityPreview.cpp
 	src/game/scenes/mission/HUD/HeadUpDisplay.cpp
 	src/game/scenes/mission/base/Base.cpp
 	src/game/scenes/mission/action/Action.cpp
@@ -49,6 +50,7 @@ set(SCENE_HDR_FILES
 	src/game/scenes/mission/tilemap/Tilemap.hpp
 	src/game/scenes/mission/loader/TiledMapLoader.hpp
 	src/game/scenes/mission/HUD/construction/ConstructionMenu.hpp
+	src/game/scenes/mission/HUD/previews/EntityPreview.cpp
 	src/game/scenes/mission/HUD/HeadUpDisplay.hpp
 	src/game/scenes/mission/base/Base.hpp
 	src/game/scenes/mission/action/ActionData.hpp

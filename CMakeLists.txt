@@ -58,7 +58,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /GR-)
 else()
-    target_compile_options(${PROJECT_NAME} PRIVATE -fno-rtti -fno-exceptions)  
+    target_compile_options(${PROJECT_NAME} PRIVATE -fno-rtti)# -fno-exceptions (rapidxml throw errors fix)
 endif()
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG> CGLM_USE_ANONYMOUS_STRUCT)

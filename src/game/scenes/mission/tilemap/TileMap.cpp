@@ -6,7 +6,7 @@
 #include "cglm/struct/affine-mat.h"
 
 #include "resources/files/FileProvider.hpp"
-#include "resources/gl_interfaces/texture/Texture.hpp"
+#include "resources/gl_interfaces/texture/Texture2D.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "game/Engine.hpp"
 #include "game/scenes/mission/loader/TiledMapLoader.hpp"
@@ -362,12 +362,12 @@ bool Tilemap::createGraphicsResources(std::span<const vec4s> vertices, std::span
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_landscape.texture);
     glGenVertexArrays(1, &m_landscape.vertexArrayObject);
 
-    Texture landscapeTexture = {.handle = m_landscape.texture };
+    Texture2D landscapeTexture = {.handle = m_landscape.texture };
 
-    if(!landscapeTexture.loadFromFile(FileProvider::findPathToFile(LANDSCAPE_PNG)))
+    if (!landscapeTexture.loadFromFile(FileProvider::findPathToFile(LANDSCAPE_PNG)))
         return false;
 
-    if(m_landscape.program = m_engine->getShaderProgram("tilemap"); m_landscape.program == 0)
+    if (m_landscape.program = m_engine->getShaderProgram("tilemap"); m_landscape.program == 0)
         return false;
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_landscape.indexBufferObject);
@@ -411,7 +411,7 @@ bool Tilemap::createGraphicsResources(std::span<const vec4s> vertices, std::span
 	VertexArrayObject::createVertexInputState(m_buildings.vertexArrayObject, m_buildings.vertexBufferObject, attributes);
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_buildings.texture);
-	Texture buildingTexture = {.handle = m_buildings.texture };
+	Texture2D buildingTexture = {.handle = m_buildings.texture };
 
 	if(!buildingTexture.loadFromFile(FileProvider::findPathToFile(STRUCTURES_PNG)))
 		return false;

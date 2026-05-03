@@ -1,16 +1,15 @@
-#include <cstring>
+#include <glad/glad.h>
 
 #include "resources/files/StbImage.hpp"
-#include "resources/gl_interfaces/texture/Texture.hpp"
+#include "resources/gl_interfaces/texture/Texture2D.hpp"
 
 
-bool Texture::loadFromImage(const StbImage& image) noexcept
+bool Texture2D::loadFromImage(const StbImage& image) noexcept
 {
     if(handle)
     {
         width  = image.width;
         height = image.height;
-        type   = GL_TEXTURE_2D; // TODO -> type move to arguments
 
         GLenum internalFormat = GL_RGBA8; 
         GLenum dataFormat = GL_RGBA;
@@ -40,7 +39,7 @@ bool Texture::loadFromImage(const StbImage& image) noexcept
 }
 
 
-bool Texture::loadFromFile(const std::filesystem::path& filePath) noexcept
+bool Texture2D::loadFromFile(const std::filesystem::path& filePath) noexcept
 {
     StbImage image;
 
@@ -51,7 +50,7 @@ bool Texture::loadFromFile(const std::filesystem::path& filePath) noexcept
 }
 
 
-void Texture::setSmooth(bool smooth) noexcept
+void Texture2D::setSmooth(bool smooth) noexcept
 {
     if(handle)
     {
@@ -65,7 +64,7 @@ void Texture::setSmooth(bool smooth) noexcept
 }
 
 
-void Texture::setRepeated(bool repeate) noexcept
+void Texture2D::setRepeated(bool repeate) noexcept
 {
     if(handle)
     {

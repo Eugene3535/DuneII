@@ -5,7 +5,7 @@
 #include <glad/glad.h>
 
 #include "resources/files/FileProvider.hpp"
-#include "resources/gl_interfaces/texture/Texture.hpp"
+#include "resources/gl_interfaces/texture/Texture2D.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "graphics/geometry/GeometryGenerator.hpp"
 #include "game/scenes/mission/tilemap/Tilemap.hpp"
@@ -102,7 +102,7 @@ void ConstructionMenu::update(float dt) noexcept
 
 void ConstructionMenu::showEntityView(PreviewType preview, bool enableConstruction) noexcept
 {
-    if(preview >= PreviewType::MAX)
+    if(preview >= PreviewType::Empty_Cell)
         return;
 
     auto setup_tex_coords = [this](void* data, PreviewType preview, uint32_t offset) -> void
@@ -533,18 +533,18 @@ void ConstructionMenu::createPreviews() noexcept
 {
     glCreateTextures(GL_TEXTURE_2D, 1, &m_previewCells.texture);
 
-    Texture previewsTexture = {.handle = m_previewCells.texture };
+    Texture2D previewsTexture = {.handle = m_previewCells.texture };
 
     if(!previewsTexture.loadFromFile(FileProvider::findPathToFile(PREVIEWS_PNG)))
         return;
 
-    const int32_t columns = 6; // The number of tiles in the texture horizontally
-    const int32_t rows = 7;    // and vertically
-    const int32_t spriteWidth = previewsTexture.width / columns;
-    const int32_t spriteHeight= previewsTexture.height / rows;
-    const vec2s ratio = { 1.f / previewsTexture.width, 1.f / previewsTexture.height };
+    const int32_t columns      = 6; // The number of tiles in the texture horizontally
+    const int32_t rows         = 7;    // and vertically
+    const int32_t spriteWidth  = previewsTexture.width / columns;
+    const int32_t spriteHeight = previewsTexture.height / rows;
+    const vec2s   ratio        = { 1.f / previewsTexture.width, 1.f / previewsTexture.height };
 
-    m_textureGrid.reserve((PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS) << 2);
+    m_textureGrid.reserve((rows * columns) << 2);
     m_previews.resize(PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS, PreviewType::Empty_Cell);
 
     for (int32_t y = 0; y < rows; ++y)
@@ -624,7 +624,7 @@ void ConstructionMenu::createUserElements() noexcept
 
     for (const auto textureName : { BUTTON_EXIT_RU_PNG, BUTTON_REPAIR_RU_PNG, BUTTON_STOP_RU_PNG })
     {
-        Texture texture = {.handle = m_userElements.textures[currentTexture++] };
+        Texture2D texture = {.handle = m_userElements.textures[currentTexture++] };
 
         if(!texture.loadFromFile(FileProvider::findPathToFile(textureName)))
             return;

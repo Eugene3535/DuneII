@@ -5,7 +5,7 @@
 #include "cglm/struct/affine-mat.h"
 
 #include "resources/files/FileProvider.hpp"
-#include "resources/gl_interfaces/texture/Texture.hpp"
+#include "resources/gl_interfaces/texture/Texture2D.hpp"
 #include "game/Engine.hpp"
 #include "game/scenes/intro/TitleScreen.hpp"
 
@@ -73,11 +73,11 @@ bool TitleScreen::load(std::string_view info) noexcept
     glCreateTextures(GL_TEXTURE_2D, 5, m_textures);
 
 //  Textures
-    Texture spaceTexture    = {.handle = m_textures[0] };
-    Texture planetTexture   = {.handle = m_textures[1] };  
-    Texture playTexture     = {.handle = m_textures[2] }; 
-    Texture exitTexture     = {.handle = m_textures[3] };
-    Texture settingsTexture = {.handle = m_textures[4] };
+    Texture2D spaceTexture    = {.handle = m_textures[0] };
+    Texture2D planetTexture   = {.handle = m_textures[1] };  
+    Texture2D playTexture     = {.handle = m_textures[2] }; 
+    Texture2D exitTexture     = {.handle = m_textures[3] };
+    Texture2D settingsTexture = {.handle = m_textures[4] };
 
     if(!spaceTexture.loadFromFile(FileProvider::findPathToFile(SPACE_JPG)))
         return false;
