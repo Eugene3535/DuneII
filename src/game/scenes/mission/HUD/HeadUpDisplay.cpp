@@ -19,7 +19,8 @@ HeadUpDisplay::HeadUpDisplay(Engine* engine,  Tilemap& tilemap, ConstructionMenu
     m_engine(engine),
     m_tilemap(tilemap),
     m_menu(menu),
-    m_tilemapProgram(0)
+    m_tilemapProgram(0),
+    m_previewIcon(engine)
 {
     m_clickState.stage = ClickStage::Released;
     m_clickState.timer = 0;
@@ -48,20 +49,20 @@ bool HeadUpDisplay::init() noexcept
     m_cursor.program = m_engine->getShaderProgram("selection");
     m_tilemapProgram = m_engine->getShaderProgram("tilemap");
 
-    if(!(m_cursor.program && m_tilemapProgram))
+    if (!(m_cursor.program && m_tilemapProgram))
         return false;
 
     glCreateTextures(GL_TEXTURE_2D, 1, &m_cursor.texture);
     Texture2D crosshairTexture = {.handle = m_cursor.texture };
 
-    if(!crosshairTexture.loadFromFile(FileProvider::findPathToFile(CROSSHAIRS_TILESHEET_PNG)))
+    if (!crosshairTexture.loadFromFile(FileProvider::findPathToFile(CROSSHAIRS_TILESHEET_PNG)))
         return false;
 
     m_sprites.loadSpriteSheet(FileProvider::findPathToFile(CURSOR_FRAME_XML), crosshairTexture);
     auto crosshairReleased = m_sprites.getSprite("Released");
     auto crosshairCaptured = m_sprites.getSprite("Captured");
 
-    if(! (crosshairReleased && crosshairCaptured) )
+    if (!(crosshairReleased && crosshairCaptured) )
         return false;
 
 //  Cursors
@@ -79,7 +80,17 @@ bool HeadUpDisplay::init() noexcept
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float2 };
 	VertexArrayObject::createVertexInputState(m_selectionFrame.vertexArrayObject, m_selectionFrame.vertexBufferObject, attributes);
 
-    return true;
+//  Entity preview
+    if (m_previewIcon.loadFromFile(FileProvider::findPathToFile(PREVIEWS_PNG)))
+    {
+        const ivec2s position = { 950, 0 };
+        const ivec2s size = { 150, 100 };
+        m_previewIcon.createIcon(position, size);
+
+        return true;
+    }
+
+    return false;
 }
 
 
@@ -97,23 +108,37 @@ void HeadUpDisplay::update(float dt) noexcept
 
 void HeadUpDisplay::draw(const mat4s& projection) const noexcept
 {
-    if(m_selectionFrame.enabled && m_selectionFrame.blinkTimer < BLINK_PERIOD)
+    if (m_selectionFrame.enabled)
     {
         glUseProgram(m_cursor.program);
-        glBindVertexArray(m_selectionFrame.vertexArrayObject);
-        glDrawArrays(GL_LINES, 0, 16);
-        glUseProgram(m_tilemapProgram); // return to default tilemap shader
+
+        if (m_selectionFrame.blinkTimer < BLINK_PERIOD)
+        {
+            glBindVertexArray(m_selectionFrame.vertexArrayObject);
+            glDrawArrays(GL_LINES, 0, 16);
+        }
+
+        mat4s currentWorldMatrix = projection;
+        mat4s modelView = m_menu.getTransform().getMatrix();
+        mat4s result = glms_mul(currentWorldMatrix, modelView);
+        m_engine->updateUniformBuffer(result);
+        m_previewIcon.draw();
     }
 
-    mat4s currentWorldMatrix = projection;
-    mat4s modelView = m_cursor.transform.getMatrix();
-    mat4s result = glms_mul(currentWorldMatrix, modelView);
-    m_engine->updateUniformBuffer(result);
+    if (!m_menu.isShown())
+    {
+        glUseProgram(m_tilemapProgram);
 
-    m_sprites.bind(true);
-    glBindTextureUnit(0, m_cursor.texture);
-    glDrawArrays(GL_TRIANGLE_FAN, m_currentCursor.frame, 4);
-    glBindTextureUnit(0, 0);
+        mat4s currentWorldMatrix = projection;
+        mat4s modelView = m_cursor.transform.getMatrix();
+        mat4s result = glms_mul(currentWorldMatrix, modelView);
+        m_engine->updateUniformBuffer(result);
+
+        m_sprites.bind(true);
+        glBindTextureUnit(0, m_cursor.texture);
+        glDrawArrays(GL_TRIANGLE_FAN, m_currentCursor.frame, 4);
+        glBindTextureUnit(0, 0);
+    }
 }
 
 
@@ -130,32 +155,31 @@ void HeadUpDisplay::runSelection() noexcept
 
     if(entity == entt::null)
     {
-        m_selectionFrame.enabled = false;
-        m_selectionFrame.lastSelectedEntity = entt::null;
+        cancelSelection();
 
         return;
     }
 
-    auto convert_building_type_to_preview = [](StructureInfo::Type type) -> PreviewType
+    auto convert_building_type_to_preview_icon = [](StructureInfo::Type type) -> EntityPreview::Icon
     {
         switch (type)
         {
-            case StructureInfo::SLAB_2x2:          return PreviewType::Slab_2x2;
-            case StructureInfo::PALACE:            return PreviewType::Palace;
-            case StructureInfo::VEHICLE:           return PreviewType::Light_Vehicle_Factory;
-            case StructureInfo::HIGH_TECH:         return PreviewType::High_Tech;
-            case StructureInfo::CONSTRUCTION_YARD: return PreviewType::Construction_Yard;
-            case StructureInfo::WIND_TRAP:         return PreviewType::Wind_Trap;
-            case StructureInfo::BARRACKS:          return PreviewType::Barracks;
-            case StructureInfo::STARPORT:          return PreviewType::Starport;
-            case StructureInfo::REFINERY:          return PreviewType::Refinery;
-            case StructureInfo::REPAIR:            return PreviewType::Repair;
-            case StructureInfo::TURRET:            return PreviewType::Turret;
-            case StructureInfo::ROCKET_TURRET:     return PreviewType::Rocket_Turret;
-            case StructureInfo::SILO:              return PreviewType::Spice_Silo;
-            case StructureInfo::OUTPOST:           return PreviewType::Outpost;
+            case StructureInfo::SLAB_2x2:          return EntityPreview::Icon::Slab_2x2;
+            case StructureInfo::PALACE:            return EntityPreview::Icon::Palace;
+            case StructureInfo::VEHICLE:           return EntityPreview::Icon::Light_Vehicle_Factory;
+            case StructureInfo::HIGH_TECH:         return EntityPreview::Icon::High_Tech;
+            case StructureInfo::CONSTRUCTION_YARD: return EntityPreview::Icon::Construction_Yard;
+            case StructureInfo::WIND_TRAP:         return EntityPreview::Icon::Wind_Trap;
+            case StructureInfo::BARRACKS:          return EntityPreview::Icon::Barracks;
+            case StructureInfo::STARPORT:          return EntityPreview::Icon::Starport;
+            case StructureInfo::REFINERY:          return EntityPreview::Icon::Refinery;
+            case StructureInfo::REPAIR:            return EntityPreview::Icon::Repair;
+            case StructureInfo::TURRET:            return EntityPreview::Icon::Turret;
+            case StructureInfo::ROCKET_TURRET:     return EntityPreview::Icon::Rocket_Turret;
+            case StructureInfo::SILO:              return EntityPreview::Icon::Spice_Silo;
+            case StructureInfo::OUTPOST:           return EntityPreview::Icon::Outpost;
 
-            default: return PreviewType::Empty_Cell;
+            default: return EntityPreview::Icon::Empty_Cell;
         }
     };
 
@@ -171,9 +195,9 @@ void HeadUpDisplay::runSelection() noexcept
         {
             if(StructureInfo* info = registry.try_get<StructureInfo>(entity))
             {
-                const auto mainPreview = convert_building_type_to_preview(info->type);
+                const auto mainPreviewIcon = convert_building_type_to_preview_icon(info->type);
 
-                if(mainPreview != PreviewType::Empty_Cell)
+                if(mainPreviewIcon != EntityPreview::Icon::Empty_Cell)
                 {
                     const bool hasConstructionPreviews = ((info->type == StructureInfo::Type::VEHICLE)           ||
                                                           (info->type == StructureInfo::Type::HIGH_TECH)         ||
@@ -181,17 +205,17 @@ void HeadUpDisplay::runSelection() noexcept
                                                           (info->type == StructureInfo::Type::BARRACKS)          ||
                                                           (info->type == StructureInfo::Type::STARPORT));
 
-                    std::span<PreviewType> previews;
+                    std::span<EntityPreview::Icon> previews;
 
                     if(hasConstructionPreviews)
                     {
-                        std::vector<PreviewType>* previewArray = registry.try_get<std::vector<PreviewType>>(entity);
+                        std::vector<EntityPreview::Icon>* previewArray = registry.try_get<std::vector<EntityPreview::Icon>>(entity);
 
                         if(previewArray)
                             previews = std::span(*previewArray);
                     }
 
-                    m_menu.showEntityMenu(mainPreview, previews);
+                    m_menu.showEntityMenu(mainPreviewIcon, previews);
                 }
             }
         }
@@ -210,11 +234,11 @@ void HeadUpDisplay::runSelection() noexcept
 
         if(isSelectable)
         {
-            const auto entityView = convert_building_type_to_preview(info->type);
+            const auto entityIcon = convert_building_type_to_preview_icon(info->type);
 
-            if(entityView != PreviewType::Empty_Cell)
-                m_menu.showEntityView(entityView, false);
-
+            if(entityIcon != EntityPreview::Icon::Empty_Cell)
+                m_previewIcon.setIcon(entityIcon);
+            
             const auto bounds = registry.get<ivec4s>(entity);
             glBindBuffer(GL_ARRAY_BUFFER, m_selectionFrame.vertexBufferObject);
 

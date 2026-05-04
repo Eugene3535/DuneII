@@ -1,5 +1,6 @@
-1) Class MusicBox with automatic control of soundtrack parameters
-2) Mentat intro scene
-3) Collect the remaining TMX maps
-4) Construction
-5) shader optimization (remove dublicates)
+- [x] Construction (50%)
+- [ ] Class MusicBox with automatic control of soundtrack parameters
+- [ ] Mentat intro scene
+- [ ] shader optimization (remove dublicates)
+- [ ] texture optimization (remove dublicates)
+- [ ] Collect the remaining TMX maps

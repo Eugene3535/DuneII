@@ -66,25 +66,7 @@ void ConstructionMenu::init() noexcept
 
     m_frames.program = m_engine->getShaderProgram("color_outline");
     m_previewCells.program = m_engine->getShaderProgram("sprite");
-    m_previewCells.entityPreview.program = m_engine->getShaderProgram("entity_view");
-
-    assert(m_frames.program);
-    assert(m_previewCells.program);
-    assert(m_previewCells.entityPreview.program);
-
-    {// construction mode progress animation
-        int32_t uniform = glGetUniformLocation(m_previewCells.entityPreview.program, "top");
-        assert(uniform != -1);
-        m_previewCells.entityPreview.uniform.top = uniform;
-
-        uniform = glGetUniformLocation(m_previewCells.entityPreview.program, "bottom");
-        assert(uniform != -1);
-        m_previewCells.entityPreview.uniform.bottom = uniform;
-
-        uniform = glGetUniformLocation(m_previewCells.entityPreview.program, "progress");
-        assert(uniform != -1);
-        m_previewCells.entityPreview.uniform.progress = uniform;
-    }
+    assert(m_frames.program && m_previewCells.program);
 
     m_transform.setOrigin(DEFAULT_MENU_WIDTH * 0.5f, DEFAULT_MENU_HEIGHT * 0.5f);
 
@@ -100,60 +82,12 @@ void ConstructionMenu::update(float dt) noexcept
 }
 
 
-void ConstructionMenu::showEntityView(PreviewType preview, bool enableConstruction) noexcept
+void ConstructionMenu::showEntityMenu(EntityPreview::Icon mainIcon, std::span<EntityPreview::Icon> menuIcons) noexcept
 {
-    if(preview >= PreviewType::Empty_Cell)
+    if(mainIcon >= EntityPreview::Icon::MAX)
         return;
 
-    auto setup_tex_coords = [this](void* data, PreviewType preview, uint32_t offset) -> void
-    {
-        const size_t index = static_cast<size_t>(preview) << 2;
-        const vec2s* texCoords = &m_textureGrid[index];
-        vec4s* vertices = static_cast<vec4s*>(data) + offset;
-
-        vertices[0].z = texCoords[0].x;
-        vertices[0].w = texCoords[0].y;
-
-        vertices[1].z = texCoords[1].x;
-        vertices[1].w = texCoords[1].y;
-
-        vertices[2].z = texCoords[2].x;
-        vertices[2].w = texCoords[2].y;
-
-        vertices[3].z = texCoords[3].x;
-        vertices[3].w = texCoords[3].y;
-    };
-
-    constexpr size_t previewCount = PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS;
-
-    glBindBuffer(GL_ARRAY_BUFFER, m_previewCells.vertexBufferObject);
-
-    if (void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
-    {
-        setup_tex_coords(data, preview, ((previewCount + 1) << 2));
-
-        glUnmapBuffer(GL_ARRAY_BUFFER);
-    }
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    if (enableConstruction)
-    {// Setting the heights for the gradient fill (construction mode)
-        const size_t index = static_cast<size_t>(preview) << 2;
-        const vec2s* texCoords = &m_textureGrid[index];
-        glUseProgram(m_previewCells.entityPreview.program);
-        glUniform1f(m_previewCells.entityPreview.uniform.top, texCoords[0].y);
-        glUniform1f(m_previewCells.entityPreview.uniform.bottom, texCoords[3].y);
-    }
-}
-
-
-void ConstructionMenu::showEntityMenu(PreviewType mainPreview, std::span<PreviewType> menu) noexcept
-{
-    if(mainPreview >= PreviewType::MAX)
-        return;
-
-    auto setup_tex_coords = [this](void* data, PreviewType preview, uint32_t offset) -> void
+    auto setup_tex_coords = [this](void* data, EntityPreview::Icon preview, uint32_t offset) -> void
     {
         const size_t index = static_cast<size_t>(preview) << 2;
         const vec2s* texCoords = &m_textureGrid[index];
@@ -179,23 +113,23 @@ void ConstructionMenu::showEntityMenu(PreviewType mainPreview, std::span<Preview
     if(void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
     {
         // Main preview
-        setup_tex_coords(data, mainPreview, (previewCount << 2));
-        m_userElements.lastSelectedPreview = mainPreview;
+        setup_tex_coords(data, mainIcon, (previewCount << 2));
+        m_userElements.lastSelectedPreview = mainIcon;
 
         // Others previews (if exists)
-        if(!menu.empty())
+        if(!menuIcons.empty())
         {
             for (size_t i = 0; i < previewCount; ++i)
             {
-                if(i < menu.size())
+                if(i < menuIcons.size())
                 {
-                    setup_tex_coords(data, menu[i], (i << 2));
-                    m_previews[i] = menu[i];
+                    setup_tex_coords(data, menuIcons[i], (i << 2));
+                    m_previews[i] = menuIcons[i];
                 }
                 else
                 {
-                    setup_tex_coords(data, PreviewType::Empty_Cell, (i << 2));
-                    m_previews[i] = PreviewType::Empty_Cell;
+                    setup_tex_coords(data, EntityPreview::Icon::Empty_Cell, (i << 2));
+                    m_previews[i] = EntityPreview::Icon::Empty_Cell;
                 }
             }
         }
@@ -203,8 +137,8 @@ void ConstructionMenu::showEntityMenu(PreviewType mainPreview, std::span<Preview
         {
             for (size_t i = 0; i < previewCount; ++i)
             {
-               setup_tex_coords(data, PreviewType::Empty_Cell, (i << 2));
-               m_previews[i] = PreviewType::Empty_Cell;
+               setup_tex_coords(data, EntityPreview::Icon::Empty_Cell, (i << 2));
+               m_previews[i] = EntityPreview::Icon::Empty_Cell;
             }
         }
 
@@ -324,7 +258,7 @@ void ConstructionMenu::updateSelection(char keyCode, bool isForced) noexcept
         memcpy(vertices, outlineVertices.data(), sizeof(float) * outlineVertices.size());
     };
 
-    auto setup_main_icon = [this](void* data, PreviewType preview) -> void
+    auto setup_main_icon = [this](void* data, EntityPreview::Icon preview) -> void
     {
         constexpr size_t offset = (PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS) << 2;
         const size_t index = static_cast<size_t>(preview) << 2;
@@ -370,11 +304,11 @@ void ConstructionMenu::updateSelection(char keyCode, bool isForced) noexcept
         {    
             const auto selectedPreview = getSelectedPreview();
 
-            if (selectedPreview == PreviewType::Empty_Cell)
+            if (selectedPreview == EntityPreview::Icon::Empty_Cell)
             {
                 setup_main_icon(data, m_userElements.lastSelectedPreview);
             }
-            else if (selectedPreview != PreviewType::INVALID)
+            else if (selectedPreview != EntityPreview::Icon::INVALID)
             {
                 setup_main_icon(data, selectedPreview);
             }
@@ -399,22 +333,18 @@ void ConstructionMenu::hide() noexcept
 
 void ConstructionMenu::draw(const mat4s& projection) const noexcept
 {
+    if (!m_isShown)
+        return;
+        
     mat4s currentWorldMatrix = projection;
     mat4s modelView = getTransform().getMatrix();
     mat4s result;
     glm_mul(currentWorldMatrix.raw, modelView.raw, result.raw);
     m_engine->updateUniformBuffer(result);
 
-    if(!m_isShown)
-    {
-        drawEntityView();
-    }
-    else
-    {
-        drawFrames();
-        drawPreviews();
-        drawUserElements();
-    }
+    drawFrames();
+    drawPreviews();
+    drawUserElements();
 }
 
 
@@ -428,7 +358,7 @@ void ConstructionMenu::resize(int width, int height) noexcept
 }
 
 
-PreviewType ConstructionMenu::getSelectedPreview() const noexcept
+EntityPreview::Icon ConstructionMenu::getSelectedPreview() const noexcept
 {
     if (m_isShown)
     {
@@ -444,7 +374,7 @@ PreviewType ConstructionMenu::getSelectedPreview() const noexcept
         }
     }
 
-    return PreviewType::INVALID;
+    return EntityPreview::Icon::INVALID;
 }
 
 
@@ -457,12 +387,6 @@ ConstructionMenu::ButtonType ConstructionMenu::getSelectedButton() const noexcep
         return static_cast<ButtonType>(column);
 
     return ButtonType::NotSelected;
-}
-
-
-float* ConstructionMenu::getProgress() noexcept
-{
-    return &m_previewCells.entityPreview.progress;
 }
 
 
@@ -535,7 +459,7 @@ void ConstructionMenu::createPreviews() noexcept
 
     Texture2D previewsTexture = {.handle = m_previewCells.texture };
 
-    if(!previewsTexture.loadFromFile(FileProvider::findPathToFile(PREVIEWS_PNG)))
+    if (!previewsTexture.loadFromFile(FileProvider::findPathToFile(PREVIEWS_PNG)))
         return;
 
     const int32_t columns      = 6; // The number of tiles in the texture horizontally
@@ -545,7 +469,7 @@ void ConstructionMenu::createPreviews() noexcept
     const vec2s   ratio        = { 1.f / previewsTexture.width, 1.f / previewsTexture.height };
 
     m_textureGrid.reserve((rows * columns) << 2);
-    m_previews.resize(PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS, PreviewType::Empty_Cell);
+    m_previews.resize(PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS, EntityPreview::Icon::Empty_Cell);
 
     for (int32_t y = 0; y < rows; ++y)
     {
@@ -572,7 +496,7 @@ void ConstructionMenu::createPreviews() noexcept
     const vec2s startPos = { 50.f, 100.f  };
     const float indent = 10.f;
 
-    const size_t index = static_cast<size_t>(PreviewType::Empty_Cell) << 2;
+    const size_t index = static_cast<size_t>(EntityPreview::Icon::Empty_Cell) << 2;
     const vec2s* texCoords = &m_textureGrid[index]; // offset to gray color cell (empty preview)
 
     for (int32_t y = 0; y < PREVIEW_ICON_ROWS; ++y)
@@ -776,26 +700,6 @@ void ConstructionMenu::drawPreviews() const noexcept
     for (uint32_t i = 0; i < m_previewCells.cellCount; ++i)
         glDrawArrays(GL_TRIANGLE_FAN, i << 2, 4);
 
-    glBindTextureUnit(0, 0);
-}
-
-
-void ConstructionMenu::drawEntityView() const noexcept
-{
-    if(m_previewCells.entityPreview.progress > 0.f)
-    {
-        const float progress = std::clamp(m_previewCells.entityPreview.progress, 0.f, 100.f);
-        glUseProgram(m_previewCells.entityPreview.program);
-        glUniform1f(m_previewCells.entityPreview.uniform.progress, progress);
-    }
-    else
-    {
-        glUseProgram(m_previewCells.program);
-    }
-
-    glBindTextureUnit(0, m_previewCells.texture);
-    glBindVertexArray(m_previewCells.vertexArrayObject);
-    glDrawArrays(GL_TRIANGLE_FAN, m_previewCells.cellCount << 2, 4);
     glBindTextureUnit(0, 0);
 }
 

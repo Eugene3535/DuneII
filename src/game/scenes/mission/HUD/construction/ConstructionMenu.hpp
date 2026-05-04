@@ -6,6 +6,7 @@
 
 #include "common/Enums.hpp"
 #include "graphics/transform/Transform2D.hpp"
+#include "game/scenes/mission/HUD/previews/EntityPreview.hpp"
 
 
 class ConstructionMenu
@@ -22,18 +23,16 @@ public:
     ConstructionMenu(class Engine* engine, class Tilemap& tilemap) noexcept;
     ~ConstructionMenu();
 
-    void init()                                                               noexcept;
-    void update(float dt)                                                     noexcept;
-    void showEntityView(PreviewType preview, bool enableConstruction)         noexcept;
-    void showEntityMenu(PreviewType mainPreview, std::span<PreviewType> menu) noexcept;
-    void updateSelection(char keyCode, bool isForced = false)                 noexcept;
-    void hide()                                                               noexcept;
-    void draw(const mat4s& projection)                                        const noexcept;
-    void resize(int width, int height)                                        noexcept;
+    void init()                                                                                 noexcept;
+    void update(float dt)                                                                       noexcept;
+    void showEntityMenu(EntityPreview::Icon mainIcon, std::span<EntityPreview::Icon> menuIcons) noexcept;
+    void updateSelection(char keyCode, bool isForced = false)                                   noexcept;
+    void hide()                                                                                 noexcept;
+    void draw(const mat4s& projection)                                                    const noexcept;
+    void resize(int width, int height)                                                          noexcept;
 
-    PreviewType getSelectedPreview() const noexcept;
+    EntityPreview::Icon getSelectedPreview() const noexcept;
     ButtonType  getSelectedButton() const noexcept;
-    float* getProgress() noexcept;
 
     bool isShown()                    const noexcept;
     const Transform2D& getTransform() const noexcept;
@@ -45,7 +44,6 @@ private:
 
     void drawFrames()       const noexcept;
     void drawPreviews()     const noexcept;
-    void drawEntityView()   const noexcept;
     void drawUserElements() const noexcept;
 
     class Engine*  m_engine;
@@ -80,21 +78,6 @@ private:
         uint32_t cellCount;
         uint32_t cellWidth;
         uint32_t cellHeight;
-
-        struct // side bar preview
-        {
-            uint32_t program;
-            float progress;
-
-            struct
-            {
-                int32_t top;
-                int32_t bottom;
-                int32_t progress;
-            } uniform;
-
-        } entityPreview;
-
     } m_previewCells;
 
     struct 
@@ -106,7 +89,7 @@ private:
         Sprite2D buttonExit;
         Sprite2D buttonRepair;
         Sprite2D buttonStop;
-        PreviewType lastSelectedPreview;
+        EntityPreview::Icon lastSelectedPreview;
         
         struct
         {
@@ -121,7 +104,7 @@ private:
     } m_userElements;
     
     std::vector<vec2s> m_textureGrid;
-    std::vector<PreviewType> m_previews;
+    std::vector<EntityPreview::Icon> m_previews;
     bool m_isShown;
 };
 

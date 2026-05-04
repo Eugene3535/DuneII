@@ -12,7 +12,7 @@
 class EntityPreview
 {
 public:
-    enum Icon : uint32_t
+    enum class Icon : uint32_t
     {
         WOR = 0,
         Wind_Trap,
@@ -68,7 +68,8 @@ public:
     void draw() const noexcept;
     void draw(EntityPreview::Icon icon, float progress) const noexcept;
 
-    std::span<const vec2s> getTexCoords(Icon icon) const noexcept;
+    uint32_t getTexture() const noexcept;
+    const vec2s* getTexCoords(Icon icon) const noexcept;
 
 private:
     class Engine* m_engine;

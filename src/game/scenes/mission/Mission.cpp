@@ -196,21 +196,20 @@ void Mission::createSystems() noexcept
 
             const auto selectedPreview = menu.getSelectedPreview();
 
-            if ((selectedPreview != PreviewType::INVALID) && (selectedPreview != PreviewType::Empty_Cell))
+            if ((selectedPreview != EntityPreview::Icon::INVALID) && (selectedPreview != EntityPreview::Icon::Empty_Cell))
             {
                 if (void* actionData = mission->m_allocator.allocate<Action::Construction>())
                 {
                     auto* data = static_cast<Action::Construction*>(actionData);
 
-                    data->duration = 10; // 10 seconds for example
-                    data->countdown = 100;
-                    data->progress = menu.getProgress();
+                    // data->duration = 10; // 10 seconds for example
+                    // data->countdown = 100;
+                    // data->progress = menu.getProgress();
                     
-                    mission->m_actions.push_back(Action::construct);
-                    mission->m_actionData.push_back(actionData);
+                    // mission->m_actions.push_back(Action::construct);
+                    // mission->m_actionData.push_back(actionData);
 
                     menu.hide();
-                    menu.showEntityView(selectedPreview, true);
                 }
             }
         }

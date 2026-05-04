@@ -8,6 +8,7 @@
 #include "graphics/Sprite2D.hpp"
 #include "graphics/transform/Transform2D.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
+#include "game/scenes/mission/HUD/previews/EntityPreview.hpp"
 
 
 class HeadUpDisplay: 
@@ -32,6 +33,7 @@ private:
     class Engine*           m_engine;
     const class Tilemap&    m_tilemap;
     class ConstructionMenu& m_menu;
+    EntityPreview           m_previewIcon;
     uint32_t                m_tilemapProgram;
 
     SpriteManager m_sprites;

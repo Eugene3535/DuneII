@@ -2,7 +2,6 @@
 
 #include <cglm/struct/ivec4.h>
 
-#include "resources/files/FileProvider.hpp"
 #include "resources/gl_interfaces/texture/Texture2D.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "game/Engine.hpp"
@@ -58,7 +57,7 @@ bool EntityPreview::loadFromFile(const std::filesystem::path& filepath) noexcept
     glCreateTextures(GL_TEXTURE_2D, 1, &m_texture);
     Texture2D previewsTexture = {.handle = m_texture };
 
-    if (!previewsTexture.loadFromFile(FileProvider::findPathToFile(PREVIEWS_PNG)))
+    if (!previewsTexture.loadFromFile(filepath))
         return false;
 
     const int32_t columns       = 6; // The number of tiles in the texture horizontally
@@ -93,10 +92,7 @@ bool EntityPreview::loadFromFile(const std::filesystem::path& filepath) noexcept
 
 void EntityPreview::createIcon(const ivec2s position, const ivec2s size) noexcept
 {
-    auto texCoords = getTexCoords(EntityPreview::Empty_Cell);
-
-    // pos:  950, 0
-    // size: 150, 100
+    auto texCoords = getTexCoords(EntityPreview::Icon::Empty_Cell);
 
     const float x = static_cast<float>(position.x);
     const float y = static_cast<float>(position.y);
@@ -177,9 +173,15 @@ void EntityPreview::draw(EntityPreview::Icon icon, float progress) const noexcep
 }
 
 
-std::span<const vec2s> EntityPreview::getTexCoords(EntityPreview::Icon icon) const noexcept
+uint32_t EntityPreview::getTexture() const noexcept
+{
+    return m_texture;
+}
+
+
+const vec2s* EntityPreview::getTexCoords(EntityPreview::Icon icon) const noexcept
 {
     const size_t index = static_cast<size_t>(icon) << 2;
 
-    return { m_textureGrid.data() + index, 4 };
+    return m_textureGrid.data() + index;
 }
