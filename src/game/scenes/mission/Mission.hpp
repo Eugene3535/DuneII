@@ -11,7 +11,7 @@
 #include "game/scenes/Scene.hpp"
 
 
-#define ACTION_MEMORY_POOL_SIZE (1024 << 2)
+#define MEMORY_POOL_SIZE (1024 << 2)
 
 class Mission:
     public Scene
@@ -35,7 +35,7 @@ private:
     ConstructionMenu m_menu;
     HeadUpDisplay    m_hud;
 
-    MemoryAllocator<ACTION_MEMORY_POOL_SIZE> m_allocator;
+    MemoryAllocator<MEMORY_POOL_SIZE> m_allocator;
 
     std::vector<void(*)(Mission*, float)> m_systems;
     std::vector<size_t(*)(void*, float)> m_actions;

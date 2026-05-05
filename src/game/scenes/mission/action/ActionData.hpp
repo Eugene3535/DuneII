@@ -7,8 +7,7 @@ namespace Action
 struct Construction
 {
     float duration; // in seconds
-    float countdown;
-    float* progress;
+    float progress;
 };
 
 }

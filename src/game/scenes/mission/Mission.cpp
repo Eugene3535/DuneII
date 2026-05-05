@@ -1,3 +1,5 @@
+#include <cassert>
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
@@ -198,19 +200,17 @@ void Mission::createSystems() noexcept
 
             if ((selectedPreview != EntityPreview::Icon::INVALID) && (selectedPreview != EntityPreview::Icon::Empty_Cell))
             {
-                if (void* actionData = mission->m_allocator.allocate<Action::Construction>())
-                {
-                    auto* data = static_cast<Action::Construction*>(actionData);
+                auto entity = mission->m_hud.getLastSelectedEntity();
+                assert(entity != entt::null);
 
-                    // data->duration = 10; // 10 seconds for example
-                    // data->countdown = 100;
-                    // data->progress = menu.getProgress();
-                    
-                    // mission->m_actions.push_back(Action::construct);
-                    // mission->m_actionData.push_back(actionData);
+                auto actionData = mission->m_registry.try_get<Action::Construction>(entity);
+                assert(actionData);
 
-                    menu.hide();
-                }
+                mission->m_actions.push_back(Action::construct);
+                mission->m_actionData.push_back(actionData);
+                menu.hide();
+
+                // TODO: progress for selected building
             }
         }
     });

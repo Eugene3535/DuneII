@@ -22,7 +22,6 @@ HeadUpDisplay::HeadUpDisplay(Engine* engine,  Tilemap& tilemap, ConstructionMenu
     m_tilemapProgram(0),
     m_previewIcon(engine)
 {
-    m_clickState.stage = ClickStage::Released;
     m_clickState.timer = 0;
 
     m_cursor.texture = 0;
@@ -298,4 +297,10 @@ void HeadUpDisplay::resize(int width, int height) noexcept
 bool HeadUpDisplay::isEntitySelected() const noexcept
 {
     return (m_selectionFrame.enabled && (m_selectionFrame.lastSelectedEntity != entt::null));
+}
+
+
+entt::entity HeadUpDisplay::getLastSelectedEntity() const noexcept
+{
+    return m_selectionFrame.lastSelectedEntity;
 }

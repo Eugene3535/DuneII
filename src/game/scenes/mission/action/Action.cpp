@@ -8,17 +8,11 @@ namespace Action
 size_t construct(void* actionData, float deltaTime) noexcept
 {
     auto* data = static_cast<Construction*>(actionData);
+    data->progress += data->duration * deltaTime;
 
-    data->countdown -= data->duration * deltaTime;
-    (*data->progress) = data->countdown;
-
-    if (data->countdown < 1.f)
-    {
-        (*data->progress) = 0;
-
+    if (data->progress > 99.f)
         return sizeof(Construction);
-    }
-
+    
     return 0;
 }
 

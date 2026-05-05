@@ -9,6 +9,7 @@
 #include "resources/gl_interfaces/texture/Texture2D.hpp"
 #include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
 #include "game/Engine.hpp"
+#include "game/scenes/mission/action/ActionData.hpp"
 #include "game/scenes/mission/loader/TiledMapLoader.hpp"
 #include "game/scenes/mission/tilemap/Tilemap.hpp"
 
@@ -255,8 +256,12 @@ bool Tilemap::putStructure(const HouseType owner, const StructureInfo::Type type
 		const GameInfo* info = m_engine->getInfo();
 		auto previews = info->getPreviewIconList(owner, type, 8);
 
-		if(!previews.empty())
+		if (!previews.empty())
 			m_registry.emplace<std::vector<EntityPreview::Icon>>(entity, previews);
+
+		auto& actionData = m_registry.emplace<Action::Construction>(entity);
+		actionData.duration = 10; // 10 seconds for example
+		actionData.progress = 0;  // TODO: request different times
 	}
 
 	auto setup_tiles_on_mask = [this, origin, entity](int32_t width, int32_t height, char symbol = 'B') -> void

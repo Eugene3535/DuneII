@@ -28,6 +28,7 @@ public:
     void resize(int width, int height) noexcept;
 
     bool isEntitySelected() const noexcept;
+    entt::entity getLastSelectedEntity() const noexcept;
 
 private:
     class Engine*           m_engine;
@@ -47,17 +48,9 @@ private:
         uint32_t    texture;
         uint32_t    program;
     } m_cursor;
-    
-    enum class ClickStage: uint32_t
-    {
-        Released,
-        FirstClick,
-        SecondClick
-    };
 
     struct
     {
-        ClickStage stage;
         float timer;
     } m_clickState;
 
