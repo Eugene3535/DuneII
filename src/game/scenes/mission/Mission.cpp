@@ -4,9 +4,8 @@
 #include <GLFW/glfw3.h>
 
 #include "resources/files/FileProvider.hpp"
+#include "game/scenes/mission/ECS/Components.hpp"
 #include "game/Engine.hpp"
-#include "game/scenes/mission/action/ActionData.hpp"
-#include "game/scenes/mission/action/Action.hpp"
 #include "game/scenes/mission/Mission.hpp"
 
 
@@ -56,28 +55,6 @@ void Mission::update(float dt) noexcept
 {
     for(auto system : m_systems)
         system(this, dt);
-
-    auto quick_remove_at = [](auto& v, size_t idx)
-    {    
-        if (idx < v.size()) 
-            v[idx] = v.back();
-        
-        v.pop_back();
-    };
-    
-    for (size_t i = 0; i < m_actions.size(); ++i)
-    {
-        auto action = m_actions[i];
-        auto data = m_actionData[i];
-        size_t result = action(data, dt);
-
-        if(result)
-        {
-            m_allocator.release(data, result);
-            quick_remove_at(m_actions, i);
-            quick_remove_at(m_actionData, i);
-        }
-    }
 }
 
 
@@ -104,7 +81,7 @@ void Mission::createSystems() noexcept
 //  Viewport
     m_systems.emplace_back([](Mission* mission, float dt)
     {
-        if(mission->m_menu.isShown())
+        if (mission->m_menu.isShown())
             return;
 
         const auto game     = mission->m_engine;
@@ -120,22 +97,22 @@ void Mission::createSystems() noexcept
         const float velocity = dt * CAMERA_VELOCITY;
         vec2s scenePosition = mission->m_tilemap.getPosition();
 
-        if(isNearTheLeftEdge)
+        if (isNearTheLeftEdge)
             scenePosition.x += velocity;
 
-        if(isNearTheTopEdge)
+        if (isNearTheTopEdge)
             scenePosition.y += velocity;
 
-        if(isNearTheRightEdge)
+        if (isNearTheRightEdge)
             scenePosition.x -= velocity;
 
-        if(isNearTheBottomEdge)
+        if (isNearTheBottomEdge)
             scenePosition.y -= velocity;
 
-        if(scenePosition.x > 0)                        scenePosition.x = 0;
-        if(scenePosition.y > 0)                        scenePosition.y = 0;
-        if(scenePosition.x < (viewSize.x - mapSize.x)) scenePosition.x = viewSize.x - mapSize.x;
-        if(scenePosition.y < (viewSize.y - mapSize.y)) scenePosition.y = viewSize.y - mapSize.y;
+        if (scenePosition.x > 0)                        scenePosition.x = 0;
+        if (scenePosition.y > 0)                        scenePosition.y = 0;
+        if (scenePosition.x < (viewSize.x - mapSize.x)) scenePosition.x = viewSize.x - mapSize.x;
+        if (scenePosition.y < (viewSize.y - mapSize.y)) scenePosition.y = viewSize.y - mapSize.y;
 
         mission->m_tilemap.setPosition(scenePosition);
     });
@@ -170,19 +147,19 @@ void Mission::createSystems() noexcept
 
         menu.update(dt);
 
-        if(engine->isKeyPressed(GLFW_KEY_W))
+        if (engine->isKeyPressed(GLFW_KEY_W))
         {
             menu.updateSelection('W');
         }
-        else if(engine->isKeyPressed(GLFW_KEY_A))
+        else if (engine->isKeyPressed(GLFW_KEY_A))
         {
             menu.updateSelection('A');
         }
-        else if(engine->isKeyPressed(GLFW_KEY_S))
+        else if (engine->isKeyPressed(GLFW_KEY_S))
         {
             menu.updateSelection('S');
         }
-        else if(engine->isKeyPressed(GLFW_KEY_D))
+        else if (engine->isKeyPressed(GLFW_KEY_D))
         {
             menu.updateSelection('D');
         }
@@ -203,16 +180,35 @@ void Mission::createSystems() noexcept
                 auto entity = mission->m_hud.getLastSelectedEntity();
                 assert(entity != entt::null);
 
-                auto actionData = mission->m_registry.try_get<Action::Construction>(entity);
-                assert(actionData);
+                auto component = mission->m_registry.try_get<Component::Construction>(entity);
+                assert(component);
 
-                mission->m_actions.push_back(Action::construct);
-                mission->m_actionData.push_back(actionData);
+                component->duration = 10; // 10 seconds for example
+                component->progress = 0;
+                component->underConstruction = true;
+
+                // TODO: setup progress for selected building
+
                 menu.hide();
-
-                // TODO: progress for selected building
             }
         }
+    });
+
+    //  Under construction
+    m_systems.emplace_back([](Mission* mission, float dt)
+    {
+        auto view = mission->m_registry.view<Component::Construction>();
+
+        view.each([dt](Component::Construction& component) 
+        {
+            if (component.underConstruction)
+            {
+                component.progress += component.duration * dt;
+
+                if (component.progress > 99.f)
+                    component.underConstruction = false;
+            }
+        });
     });
 
     m_isLoaded = true;

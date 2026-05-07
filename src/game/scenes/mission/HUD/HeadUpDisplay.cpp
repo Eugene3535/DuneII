@@ -30,7 +30,6 @@ HeadUpDisplay::HeadUpDisplay(Engine* engine,  Tilemap& tilemap, ConstructionMenu
     m_selectionFrame.vertexBufferObject = 0;
     m_selectionFrame.vertexArrayObject = 0;
     m_selectionFrame.blinkTimer = 0.f;
-    m_selectionFrame.enabled = false;
     m_selectionFrame.lastSelectedEntity = entt::null;
 }
 
@@ -107,7 +106,11 @@ void HeadUpDisplay::update(float dt) noexcept
 
 void HeadUpDisplay::draw(const mat4s& projection) const noexcept
 {
-    if (m_selectionFrame.enabled)
+    mat4s currentWorldMatrix = projection;
+    mat4s modelView;
+    mat4s result;
+
+    if (m_selectionFrame.lastSelectedEntity != entt::null)
     {
         glUseProgram(m_cursor.program);
 
@@ -117,10 +120,15 @@ void HeadUpDisplay::draw(const mat4s& projection) const noexcept
             glDrawArrays(GL_LINES, 0, 16);
         }
 
-        mat4s currentWorldMatrix = projection;
-        mat4s modelView = m_menu.getTransform().getMatrix();
-        mat4s result = glms_mul(currentWorldMatrix, modelView);
+        modelView = m_menu.getTransform().getMatrix();
+        result = glms_mul(currentWorldMatrix, modelView);
         m_engine->updateUniformBuffer(result);
+
+
+
+
+
+        // вот тут надо чёт придумать
         m_previewIcon.draw();
     }
 
@@ -128,9 +136,8 @@ void HeadUpDisplay::draw(const mat4s& projection) const noexcept
     {
         glUseProgram(m_tilemapProgram);
 
-        mat4s currentWorldMatrix = projection;
-        mat4s modelView = m_cursor.transform.getMatrix();
-        mat4s result = glms_mul(currentWorldMatrix, modelView);
+        modelView = m_cursor.transform.getMatrix();
+        result = glms_mul(currentWorldMatrix, modelView);
         m_engine->updateUniformBuffer(result);
 
         m_sprites.bind(true);
@@ -271,8 +278,7 @@ void HeadUpDisplay::runSelection() noexcept
                 vertices[14] = rightBottom;
                 vertices[15] = { rightBottom.x - offset, rightBottom.y };
 
-                if(glUnmapBuffer(GL_ARRAY_BUFFER) == GL_TRUE)
-                    m_selectionFrame.enabled = true;
+                glUnmapBuffer(GL_ARRAY_BUFFER);
             }
 
             glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -283,7 +289,6 @@ void HeadUpDisplay::runSelection() noexcept
 
 void HeadUpDisplay::cancelSelection() noexcept
 {
-    m_selectionFrame.enabled = false;
     m_selectionFrame.lastSelectedEntity = entt::null;
 }
 
@@ -296,7 +301,7 @@ void HeadUpDisplay::resize(int width, int height) noexcept
 
 bool HeadUpDisplay::isEntitySelected() const noexcept
 {
-    return (m_selectionFrame.enabled && (m_selectionFrame.lastSelectedEntity != entt::null));
+    return (m_selectionFrame.lastSelectedEntity != entt::null);
 }
 
 

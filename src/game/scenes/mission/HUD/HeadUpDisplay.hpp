@@ -59,7 +59,6 @@ private:
         uint32_t     vertexBufferObject;
         uint32_t     vertexArrayObject;
         float        blinkTimer;
-        bool         enabled;
         entt::entity lastSelectedEntity;
     } m_selectionFrame;
 };
