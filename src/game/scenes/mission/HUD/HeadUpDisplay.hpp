@@ -30,12 +30,16 @@ public:
     bool isEntitySelected() const noexcept;
     entt::entity getLastSelectedEntity() const noexcept;
 
+    uint32_t getTexture() const noexcept;
+
 private:
     class Engine*           m_engine;
     const class Tilemap&    m_tilemap;
     class ConstructionMenu& m_menu;
     EntityPreview           m_previewIcon;
-    uint32_t                m_tilemapProgram;
+
+    uint32_t m_tilemapProgram;
+    uint32_t m_previewTexture;
 
     SpriteManager m_sprites;
     Sprite2D      m_releasedCursor;
@@ -47,12 +51,8 @@ private:
         Transform2D transform;
         uint32_t    texture;
         uint32_t    program;
+        float       timer;
     } m_cursor;
-
-    struct
-    {
-        float timer;
-    } m_clickState;
 
     struct
     {

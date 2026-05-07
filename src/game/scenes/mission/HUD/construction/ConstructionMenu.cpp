@@ -44,7 +44,6 @@ ConstructionMenu::ConstructionMenu(Engine* engine, Tilemap& tilemap) noexcept:
 ConstructionMenu::~ConstructionMenu()
 {
     glDeleteTextures(3, m_userElements.textures);
-    glDeleteTextures(1, &m_previewCells.texture);
 
     glDeleteVertexArrays(1, &m_userElements.vertexArrayObject);
 	glDeleteBuffers(1, &m_userElements.vertexBufferObject);
@@ -58,7 +57,7 @@ ConstructionMenu::~ConstructionMenu()
 }
 
 
-void ConstructionMenu::init() noexcept
+void ConstructionMenu::init(uint32_t texture) noexcept
 {
     memset(&m_frames, 0, sizeof(m_frames));
     memset(&m_previewCells, 0, sizeof(m_previewCells));
@@ -67,6 +66,8 @@ void ConstructionMenu::init() noexcept
     m_frames.program = m_engine->getShaderProgram("color_outline");
     m_previewCells.program = m_engine->getShaderProgram("sprite");
     assert(m_frames.program && m_previewCells.program);
+
+    m_previewCells.texture = texture;
 
     m_transform.setOrigin(DEFAULT_MENU_WIDTH * 0.5f, DEFAULT_MENU_HEIGHT * 0.5f);
 
@@ -455,18 +456,15 @@ void ConstructionMenu::createFrames() noexcept
 
 void ConstructionMenu::createPreviews() noexcept
 {
-    glCreateTextures(GL_TEXTURE_2D, 1, &m_previewCells.texture);
-
-    Texture2D previewsTexture = {.handle = m_previewCells.texture };
-
-    if (!previewsTexture.loadFromFile(FileProvider::findPathToFile(PREVIEWS_PNG)))
-        return;
+    int32_t texWidth, texHeight;
+    glGetTextureLevelParameteriv(m_previewCells.texture, 0, GL_TEXTURE_WIDTH, &texWidth);
+	glGetTextureLevelParameteriv(m_previewCells.texture, 0, GL_TEXTURE_HEIGHT, &texHeight);
 
     const int32_t columns      = 6; // The number of tiles in the texture horizontally
     const int32_t rows         = 7;    // and vertically
-    const int32_t spriteWidth  = previewsTexture.width / columns;
-    const int32_t spriteHeight = previewsTexture.height / rows;
-    const vec2s   ratio        = { 1.f / previewsTexture.width, 1.f / previewsTexture.height };
+    const int32_t spriteWidth  = texWidth / columns;
+    const int32_t spriteHeight = texHeight / rows;
+    const vec2s   ratio        = { 1.f / texWidth, 1.f / texHeight };
 
     m_textureGrid.reserve((rows * columns) << 2);
     m_previews.resize(PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS, EntityPreview::Icon::Empty_Cell);

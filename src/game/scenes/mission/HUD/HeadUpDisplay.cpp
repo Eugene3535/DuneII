@@ -20,12 +20,12 @@ HeadUpDisplay::HeadUpDisplay(Engine* engine,  Tilemap& tilemap, ConstructionMenu
     m_tilemap(tilemap),
     m_menu(menu),
     m_tilemapProgram(0),
+    m_previewTexture(0),
     m_previewIcon(engine)
 {
-    m_clickState.timer = 0;
-
     m_cursor.texture = 0;
     m_cursor.program = 0;
+    m_cursor.timer = 0;
 
     m_selectionFrame.vertexBufferObject = 0;
     m_selectionFrame.vertexArrayObject = 0;
@@ -37,6 +37,7 @@ HeadUpDisplay::HeadUpDisplay(Engine* engine,  Tilemap& tilemap, ConstructionMenu
 HeadUpDisplay::~HeadUpDisplay()
 {
     glDeleteTextures(1, &m_cursor.texture);
+    glDeleteTextures(1, &m_previewTexture);
     glDeleteVertexArrays(1, &m_selectionFrame.vertexArrayObject);
     glDeleteBuffers(1, &m_selectionFrame.vertexBufferObject);
 }
@@ -79,7 +80,13 @@ bool HeadUpDisplay::init() noexcept
 	VertexArrayObject::createVertexInputState(m_selectionFrame.vertexArrayObject, m_selectionFrame.vertexBufferObject, attributes);
 
 //  Entity preview
-    if (m_previewIcon.loadFromFile(FileProvider::findPathToFile(PREVIEWS_PNG)))
+    glCreateTextures(GL_TEXTURE_2D, 1, &m_previewTexture);
+    Texture2D previewTexture = {.handle = m_previewTexture };
+
+    if (!previewTexture.loadFromFile(FileProvider::findPathToFile(PREVIEWS_PNG)))
+        return false;
+
+    if (m_previewIcon.loadFromTexture(previewTexture))
     {
         const ivec2s position = { 950, 0 };
         const ivec2s size = { 150, 100 };
@@ -94,7 +101,7 @@ bool HeadUpDisplay::init() noexcept
 
 void HeadUpDisplay::update(float dt) noexcept
 {
-    m_clickState.timer += dt;
+    m_cursor.timer += dt;
     m_selectionFrame.blinkTimer += dt;
 
     if(m_selectionFrame.blinkTimer > BLINK_LOOP_TIME)
@@ -123,12 +130,6 @@ void HeadUpDisplay::draw(const mat4s& projection) const noexcept
         modelView = m_menu.getTransform().getMatrix();
         result = glms_mul(currentWorldMatrix, modelView);
         m_engine->updateUniformBuffer(result);
-
-
-
-
-
-        // вот тут надо чёт придумать
         m_previewIcon.draw();
     }
 
@@ -197,7 +198,7 @@ void HeadUpDisplay::runSelection() noexcept
     }
     else
     {
-        if(m_clickState.timer > BLINK_LOOP_TIME)
+        if(m_cursor.timer > BLINK_LOOP_TIME)
         {
             if(StructureInfo* info = registry.try_get<StructureInfo>(entity))
             {
@@ -229,7 +230,7 @@ void HeadUpDisplay::runSelection() noexcept
         return;
     }
 
-    m_clickState.timer = 0;
+    m_cursor.timer = 0;
 
     if(StructureInfo* info = registry.try_get<StructureInfo>(entity))
     {
@@ -308,4 +309,10 @@ bool HeadUpDisplay::isEntitySelected() const noexcept
 entt::entity HeadUpDisplay::getLastSelectedEntity() const noexcept
 {
     return m_selectionFrame.lastSelectedEntity;
+}
+
+
+uint32_t HeadUpDisplay::getTexture() const noexcept
+{
+    return m_previewTexture;
 }

@@ -23,7 +23,7 @@ public:
     ConstructionMenu(class Engine* engine, class Tilemap& tilemap) noexcept;
     ~ConstructionMenu();
 
-    void init()                                                                                 noexcept;
+    void init(uint32_t texture)                                                                 noexcept;
     void update(float dt)                                                                       noexcept;
     void showEntityMenu(EntityPreview::Icon mainIcon, std::span<EntityPreview::Icon> menuIcons) noexcept;
     void updateSelection(char keyCode, bool isForced = false)                                   noexcept;

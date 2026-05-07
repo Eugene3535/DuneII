@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <span>
-#include <filesystem>
 
 #include <cglm/struct/ivec2.h>
 
@@ -61,14 +60,13 @@ public:
     EntityPreview(class Engine* engine) noexcept;
     ~EntityPreview();
 
-    bool loadFromFile(const std::filesystem::path& filepath) noexcept;
+    bool loadFromTexture(const struct Texture2D& texture) noexcept;
     void createIcon(const ivec2s position, const ivec2s size) noexcept;
     void setIcon(Icon icon) noexcept;
 
     void draw() const noexcept;
     void draw(EntityPreview::Icon icon, float progress) const noexcept;
 
-    uint32_t getTexture() const noexcept;
     const vec2s* getTexCoords(Icon icon) const noexcept;
 
 private:

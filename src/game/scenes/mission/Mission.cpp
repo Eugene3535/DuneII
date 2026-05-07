@@ -37,7 +37,7 @@ bool Mission::load(std::string_view info) noexcept
     if(!m_hud.init())
         return false;
 
-    m_menu.init();
+    m_menu.init(m_hud.getTexture());
 
     if(m_mapLoader.loadFromFile(FileProvider::findPathToFile(std::string(info))))
     {

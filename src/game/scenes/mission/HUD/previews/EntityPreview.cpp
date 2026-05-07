@@ -1,5 +1,3 @@
-#include <cassert>
-
 #include <cglm/struct/ivec4.h>
 
 #include "resources/gl_interfaces/texture/Texture2D.hpp"
@@ -30,41 +28,36 @@ EntityPreview::~EntityPreview()
 }
 
 
-bool EntityPreview::loadFromFile(const std::filesystem::path& filepath) noexcept
+bool EntityPreview::loadFromTexture(const Texture2D& texture) noexcept
 {
 //  Shader program
     m_defaultProgram = m_engine->getShaderProgram("sprite");
     m_progressProgram = m_engine->getShaderProgram("entity_view");
 
-    assert(m_defaultProgram);
-    assert(m_progressProgram);
+    if ( ! (m_defaultProgram && m_progressProgram) )
+        return false;
 
     {// construction mode progress animation
         int32_t uniform = glGetUniformLocation(m_progressProgram, "top");
-        assert(uniform != -1);
+        if (uniform == -1) return false;
         m_uniforms.top = uniform;
 
         uniform = glGetUniformLocation(m_progressProgram, "bottom");
-        assert(uniform != -1);
+        if (uniform == -1) return false;
         m_uniforms.bottom = uniform;
 
         uniform = glGetUniformLocation(m_progressProgram, "progress");
-        assert(uniform != -1);
+        if (uniform == -1) return false;
         m_uniforms.progress = uniform;
     }
 
 //  Texture
-    glCreateTextures(GL_TEXTURE_2D, 1, &m_texture);
-    Texture2D previewsTexture = {.handle = m_texture };
-
-    if (!previewsTexture.loadFromFile(filepath))
-        return false;
-
+    m_texture = texture.handle;
     const int32_t columns       = 6; // The number of tiles in the texture horizontally
     const int32_t rows          = 7;    // and vertically
-    const int32_t previewWidth  = previewsTexture.width / columns;
-    const int32_t previewHeight = previewsTexture.height / rows;
-    const vec2s   ratio         = { 1.f / previewsTexture.width, 1.f / previewsTexture.height };
+    const int32_t previewWidth  = texture.width / columns;
+    const int32_t previewHeight = texture.height / rows;
+    const vec2s   ratio         = { 1.f / texture.width, 1.f / texture.height };
 
     m_textureGrid.reserve((rows * columns) << 2);
 
@@ -170,12 +163,6 @@ void EntityPreview::draw(EntityPreview::Icon icon, float progress) const noexcep
     glBindVertexArray(m_vertexArrayObject);
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     glBindTextureUnit(0, 0);
-}
-
-
-uint32_t EntityPreview::getTexture() const noexcept
-{
-    return m_texture;
 }
 
 
