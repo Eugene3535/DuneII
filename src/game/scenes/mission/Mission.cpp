@@ -4,7 +4,6 @@
 #include <GLFW/glfw3.h>
 
 #include "resources/files/FileProvider.hpp"
-#include "game/scenes/mission/ECS/Components.hpp"
 #include "game/Engine.hpp"
 #include "game/scenes/mission/Mission.hpp"
 
@@ -175,38 +174,39 @@ void Mission::createSystems() noexcept
 
             const auto selectedPreview = menu.getSelectedPreview();
 
-            if ((selectedPreview != EntityPreview::Icon::INVALID) && (selectedPreview != EntityPreview::Icon::Empty_Cell))
+            if ((selectedPreview != EntityIcon::INVALID) && (selectedPreview != EntityIcon::Empty_Cell))
             {
                 auto entity = mission->m_hud.getLastSelectedEntity();
                 assert(entity != entt::null);
 
-                auto component = mission->m_registry.try_get<Component::Construction>(entity);
+                auto component = mission->m_registry.try_get<StructureInfo>(entity);
                 assert(component);
 
+                component->icon = selectedPreview;
                 component->duration = 10; // 10 seconds for example
-                component->progress = 0;
-                component->underConstruction = true;
+                component->progress = 100;
+                component->isUnderConstruction = true;
 
-                // TODO: setup progress for selected building
+                mission->m_hud.forceUpdateConstructionIcon(selectedPreview);
 
                 menu.hide();
             }
         }
     });
 
-    //  Under construction
+//  Under construction
     m_systems.emplace_back([](Mission* mission, float dt)
     {
-        auto view = mission->m_registry.view<Component::Construction>();
+        auto view = mission->m_registry.view<StructureInfo>();
 
-        view.each([dt](Component::Construction& component) 
+        view.each([mission, dt](StructureInfo& component) 
         {
-            if (component.underConstruction)
+            if (component.isUnderConstruction)
             {
-                component.progress += component.duration * dt;
+                component.progress -= component.duration * dt;
 
-                if (component.progress > 99.f)
-                    component.underConstruction = false;
+                if (component.progress < 1.f)
+                    component.isUnderConstruction = false;
             }
         });
     });

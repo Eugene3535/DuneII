@@ -9,7 +9,7 @@
 GameInfo::GameInfo() noexcept = default;
 
 
-std::vector<EntityPreview::Icon> GameInfo::getPreviewIconList(HouseType house, StructureInfo::Type building, uint32_t mission) const noexcept
+std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureInfo::Type building, uint32_t mission) const noexcept
 {
 	assert(mission > 0);
 	assert(mission < 10);
@@ -17,7 +17,7 @@ std::vector<EntityPreview::Icon> GameInfo::getPreviewIconList(HouseType house, S
 	// Filtering available entities by mission, excluding 8 and 9 (all entities are available)
 	// No research is conducted in missions 8 and 9.
 
-	std::vector<EntityPreview::Icon> previews;
+	std::vector<EntityIcon> previews;
 
 	switch (mission)
 	{
@@ -32,9 +32,9 @@ std::vector<EntityPreview::Icon> GameInfo::getPreviewIconList(HouseType house, S
 
 				case StructureInfo::CONSTRUCTION_YARD: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Slab_2x2,
-					EntityPreview::Icon::Wind_Trap,
-					EntityPreview::Icon::Refinery
+					EntityIcon::Slab_2x2,
+					EntityIcon::Wind_Trap,
+					EntityIcon::Refinery
 				});
 				break;
 
@@ -54,8 +54,8 @@ std::vector<EntityPreview::Icon> GameInfo::getPreviewIconList(HouseType house, S
 			{
 				case StructureInfo::VEHICLE: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Raider_Trike,
-					EntityPreview::Icon::Trike
+					EntityIcon::Raider_Trike,
+					EntityIcon::Trike
 				});
 				break;
 
@@ -64,19 +64,19 @@ std::vector<EntityPreview::Icon> GameInfo::getPreviewIconList(HouseType house, S
 
 				case StructureInfo::CONSTRUCTION_YARD: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Slab_2x2,
-					EntityPreview::Icon::Wind_Trap,
-					EntityPreview::Icon::Refinery,
-					EntityPreview::Icon::Outpost,
-					EntityPreview::Icon::Spice_Silo,
-					EntityPreview::Icon::Barracks,
-					EntityPreview::Icon::Light_Vehicle_Factory
+					EntityIcon::Slab_2x2,
+					EntityIcon::Wind_Trap,
+					EntityIcon::Refinery,
+					EntityIcon::Outpost,
+					EntityIcon::Spice_Silo,
+					EntityIcon::Barracks,
+					EntityIcon::Light_Vehicle_Factory
 				});
 				break;
 
 				case StructureInfo::BARRACKS: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Infantry
+					EntityIcon::Infantry
 				});
 				break;
 
@@ -93,9 +93,9 @@ std::vector<EntityPreview::Icon> GameInfo::getPreviewIconList(HouseType house, S
 			{
 				case StructureInfo::VEHICLE: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Raider_Trike,
-					EntityPreview::Icon::Trike,
-					EntityPreview::Icon::Quad
+					EntityIcon::Raider_Trike,
+					EntityIcon::Trike,
+					EntityIcon::Quad
 				});
 				break;
 
@@ -104,20 +104,20 @@ std::vector<EntityPreview::Icon> GameInfo::getPreviewIconList(HouseType house, S
 
 				case StructureInfo::CONSTRUCTION_YARD: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Slab_2x2,
-					EntityPreview::Icon::Wind_Trap,
-					EntityPreview::Icon::Refinery,
-					EntityPreview::Icon::Outpost,
-					EntityPreview::Icon::Spice_Silo,
-					EntityPreview::Icon::Barracks,
-					EntityPreview::Icon::Light_Vehicle_Factory
+					EntityIcon::Slab_2x2,
+					EntityIcon::Wind_Trap,
+					EntityIcon::Refinery,
+					EntityIcon::Outpost,
+					EntityIcon::Spice_Silo,
+					EntityIcon::Barracks,
+					EntityIcon::Light_Vehicle_Factory
 				});
 				break;
 
 				case StructureInfo::BARRACKS: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Trooper,
-					EntityPreview::Icon::Infantry
+					EntityIcon::Trooper,
+					EntityIcon::Infantry
 				});
 				break;
 
@@ -134,12 +134,12 @@ std::vector<EntityPreview::Icon> GameInfo::getPreviewIconList(HouseType house, S
 			{
 				case StructureInfo::VEHICLE: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Raider_Trike,
-					EntityPreview::Icon::Trike,
-					EntityPreview::Icon::Quad,
-					EntityPreview::Icon::Harvester,
-					EntityPreview::Icon::Tank,
-					EntityPreview::Icon::MCV
+					EntityIcon::Raider_Trike,
+					EntityIcon::Trike,
+					EntityIcon::Quad,
+					EntityIcon::Harvester,
+					EntityIcon::Tank,
+					EntityIcon::MCV
 				});
 				break;
 
@@ -148,22 +148,22 @@ std::vector<EntityPreview::Icon> GameInfo::getPreviewIconList(HouseType house, S
 
 				case StructureInfo::CONSTRUCTION_YARD: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Slab_2x2,
-					EntityPreview::Icon::Wind_Trap,
-					EntityPreview::Icon::Refinery,
-					EntityPreview::Icon::Outpost,
-					EntityPreview::Icon::Spice_Silo,
-					EntityPreview::Icon::Barracks,
-					EntityPreview::Icon::Light_Vehicle_Factory,
-					EntityPreview::Icon::Wall
+					EntityIcon::Slab_2x2,
+					EntityIcon::Wind_Trap,
+					EntityIcon::Refinery,
+					EntityIcon::Outpost,
+					EntityIcon::Spice_Silo,
+					EntityIcon::Barracks,
+					EntityIcon::Light_Vehicle_Factory,
+					EntityIcon::Wall
 				});
 				break;
 
 				case StructureInfo::BARRACKS: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Infantry,
-					EntityPreview::Icon::Trooper,
-					EntityPreview::Icon::Troopers
+					EntityIcon::Infantry,
+					EntityIcon::Trooper,
+					EntityIcon::Troopers
 				});
 				break;
 
@@ -180,42 +180,42 @@ std::vector<EntityPreview::Icon> GameInfo::getPreviewIconList(HouseType house, S
 			{
 				case StructureInfo::VEHICLE: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Raider_Trike,
-					EntityPreview::Icon::Trike,
-					EntityPreview::Icon::Quad,
-					EntityPreview::Icon::Harvester,
-					EntityPreview::Icon::Tank,
-					EntityPreview::Icon::MCV,
-					EntityPreview::Icon::Launcher
+					EntityIcon::Raider_Trike,
+					EntityIcon::Trike,
+					EntityIcon::Quad,
+					EntityIcon::Harvester,
+					EntityIcon::Tank,
+					EntityIcon::MCV,
+					EntityIcon::Launcher
 				});
 				break;
 
 				case StructureInfo::HIGH_TECH: previews.insert(previews.end(), {
-				                                                       EntityPreview::Icon::Carryall
+				                                                       EntityIcon::Carryall
 				                                                    });
 				break;
 
 				case StructureInfo::CONSTRUCTION_YARD: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Slab_2x2,
-					EntityPreview::Icon::Wind_Trap,
-					EntityPreview::Icon::Refinery,
-					EntityPreview::Icon::Outpost,
-					EntityPreview::Icon::Spice_Silo,
-					EntityPreview::Icon::Barracks,
-					EntityPreview::Icon::Light_Vehicle_Factory,
-					EntityPreview::Icon::Turret,
-					EntityPreview::Icon::Wall,
-					EntityPreview::Icon::Repair,
-					EntityPreview::Icon::High_Tech
+					EntityIcon::Slab_2x2,
+					EntityIcon::Wind_Trap,
+					EntityIcon::Refinery,
+					EntityIcon::Outpost,
+					EntityIcon::Spice_Silo,
+					EntityIcon::Barracks,
+					EntityIcon::Light_Vehicle_Factory,
+					EntityIcon::Turret,
+					EntityIcon::Wall,
+					EntityIcon::Repair,
+					EntityIcon::High_Tech
 				});
 				break;
 
 				case StructureInfo::BARRACKS: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Infantry,
-					EntityPreview::Icon::Trooper,
-					EntityPreview::Icon::Troopers
+					EntityIcon::Infantry,
+					EntityIcon::Trooper,
+					EntityIcon::Troopers
 				});
 				break;
 
@@ -232,58 +232,58 @@ std::vector<EntityPreview::Icon> GameInfo::getPreviewIconList(HouseType house, S
 			{
 				case StructureInfo::VEHICLE: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Trike,
-					EntityPreview::Icon::Raider_Trike,
-					EntityPreview::Icon::Quad,
-					EntityPreview::Icon::Harvester,
-					EntityPreview::Icon::Tank,
-					EntityPreview::Icon::MCV,
-					EntityPreview::Icon::Launcher,
-					EntityPreview::Icon::Siege_Tank
+					EntityIcon::Trike,
+					EntityIcon::Raider_Trike,
+					EntityIcon::Quad,
+					EntityIcon::Harvester,
+					EntityIcon::Tank,
+					EntityIcon::MCV,
+					EntityIcon::Launcher,
+					EntityIcon::Siege_Tank
 				});
 				break;
 
 				case StructureInfo::HIGH_TECH: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Carryall
+					EntityIcon::Carryall
 				});
 				break;
 
 				case StructureInfo::CONSTRUCTION_YARD: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Slab_2x2,
-					EntityPreview::Icon::Wind_Trap,
-					EntityPreview::Icon::Refinery,
-					EntityPreview::Icon::Outpost,
-					EntityPreview::Icon::Spice_Silo,
-					EntityPreview::Icon::Barracks,
-					EntityPreview::Icon::Light_Vehicle_Factory,
-					EntityPreview::Icon::Turret,
-					EntityPreview::Icon::Wall,
-					EntityPreview::Icon::Repair,
-					EntityPreview::Icon::Rocket_Turret,
-					EntityPreview::Icon::High_Tech,
-					EntityPreview::Icon::Starport
+					EntityIcon::Slab_2x2,
+					EntityIcon::Wind_Trap,
+					EntityIcon::Refinery,
+					EntityIcon::Outpost,
+					EntityIcon::Spice_Silo,
+					EntityIcon::Barracks,
+					EntityIcon::Light_Vehicle_Factory,
+					EntityIcon::Turret,
+					EntityIcon::Wall,
+					EntityIcon::Repair,
+					EntityIcon::Rocket_Turret,
+					EntityIcon::High_Tech,
+					EntityIcon::Starport
 				});
 				break;
 
 				case StructureInfo::BARRACKS: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Infantry,
-					EntityPreview::Icon::Trooper,
-					EntityPreview::Icon::Troopers
+					EntityIcon::Infantry,
+					EntityIcon::Trooper,
+					EntityIcon::Troopers
 				});
 				break;
 
 				case StructureInfo::STARPORT: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Trike,
-					EntityPreview::Icon::Quad,
-					EntityPreview::Icon::Harvester,
-					EntityPreview::Icon::Tank,
-					EntityPreview::Icon::MCV,
-					EntityPreview::Icon::Launcher,
-					EntityPreview::Icon::Siege_Tank
+					EntityIcon::Trike,
+					EntityIcon::Quad,
+					EntityIcon::Harvester,
+					EntityIcon::Tank,
+					EntityIcon::MCV,
+					EntityIcon::Launcher,
+					EntityIcon::Siege_Tank
 				});
 				break;
 
@@ -297,63 +297,63 @@ std::vector<EntityPreview::Icon> GameInfo::getPreviewIconList(HouseType house, S
 			{
 				case StructureInfo::VEHICLE: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Trike,
-					EntityPreview::Icon::Raider_Trike,
-					EntityPreview::Icon::Quad,
-					EntityPreview::Icon::Harvester,
-					EntityPreview::Icon::Tank,
-					EntityPreview::Icon::MCV,
-					EntityPreview::Icon::Launcher,
-					EntityPreview::Icon::Siege_Tank,
-					EntityPreview::Icon::Sonic_Tank,
-					EntityPreview::Icon::Devastator,
-					EntityPreview::Icon::Deviator
+					EntityIcon::Trike,
+					EntityIcon::Raider_Trike,
+					EntityIcon::Quad,
+					EntityIcon::Harvester,
+					EntityIcon::Tank,
+					EntityIcon::MCV,
+					EntityIcon::Launcher,
+					EntityIcon::Siege_Tank,
+					EntityIcon::Sonic_Tank,
+					EntityIcon::Devastator,
+					EntityIcon::Deviator
 				});
 				break;
 
 				case StructureInfo::HIGH_TECH: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Carryall,
-					EntityPreview::Icon::Ornithopter
+					EntityIcon::Carryall,
+					EntityIcon::Ornithopter
 				});
 				break;
 
 				case StructureInfo::CONSTRUCTION_YARD: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Slab_2x2,
-					EntityPreview::Icon::Wind_Trap,
-					EntityPreview::Icon::Refinery,
-					EntityPreview::Icon::Outpost,
-					EntityPreview::Icon::Spice_Silo,
-					EntityPreview::Icon::Barracks,
-					EntityPreview::Icon::Light_Vehicle_Factory,
-					EntityPreview::Icon::Turret,
-					EntityPreview::Icon::Wall,
-					EntityPreview::Icon::Repair,
-					EntityPreview::Icon::Rocket_Turret,
-					EntityPreview::Icon::High_Tech,
-					EntityPreview::Icon::Starport
+					EntityIcon::Slab_2x2,
+					EntityIcon::Wind_Trap,
+					EntityIcon::Refinery,
+					EntityIcon::Outpost,
+					EntityIcon::Spice_Silo,
+					EntityIcon::Barracks,
+					EntityIcon::Light_Vehicle_Factory,
+					EntityIcon::Turret,
+					EntityIcon::Wall,
+					EntityIcon::Repair,
+					EntityIcon::Rocket_Turret,
+					EntityIcon::High_Tech,
+					EntityIcon::Starport
 				});
 				break;
 
 				case StructureInfo::BARRACKS: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Infantry,
-					EntityPreview::Icon::Trooper,
-					EntityPreview::Icon::Troopers
+					EntityIcon::Infantry,
+					EntityIcon::Trooper,
+					EntityIcon::Troopers
 				});
 				break;
 
 				case StructureInfo::STARPORT: previews.insert(previews.end(), 
 				{
-					EntityPreview::Icon::Trike,
-					EntityPreview::Icon::Quad,
-					EntityPreview::Icon::Harvester,
-					EntityPreview::Icon::Tank,
-					EntityPreview::Icon::MCV,
-					EntityPreview::Icon::Launcher,
-					EntityPreview::Icon::Siege_Tank,
-					EntityPreview::Icon::Ornithopter
+					EntityIcon::Trike,
+					EntityIcon::Quad,
+					EntityIcon::Harvester,
+					EntityIcon::Tank,
+					EntityIcon::MCV,
+					EntityIcon::Launcher,
+					EntityIcon::Siege_Tank,
+					EntityIcon::Ornithopter
 				});
 				break;
 
@@ -372,64 +372,64 @@ std::vector<EntityPreview::Icon> GameInfo::getPreviewIconList(HouseType house, S
 		{
 			case StructureInfo::VEHICLE: previews.insert(previews.end(), 
 			{
-				EntityPreview::Icon::Trike,
-				EntityPreview::Icon::Raider_Trike,
-				EntityPreview::Icon::Quad,
-				EntityPreview::Icon::Harvester,
-				EntityPreview::Icon::Tank,
-				EntityPreview::Icon::MCV,
-				EntityPreview::Icon::Launcher,
-				EntityPreview::Icon::Siege_Tank,
-				EntityPreview::Icon::Sonic_Tank,
-				EntityPreview::Icon::Deviator,
-				EntityPreview::Icon::Devastator
+				EntityIcon::Trike,
+				EntityIcon::Raider_Trike,
+				EntityIcon::Quad,
+				EntityIcon::Harvester,
+				EntityIcon::Tank,
+				EntityIcon::MCV,
+				EntityIcon::Launcher,
+				EntityIcon::Siege_Tank,
+				EntityIcon::Sonic_Tank,
+				EntityIcon::Deviator,
+				EntityIcon::Devastator
 			});
 			break;
 
 			case StructureInfo::HIGH_TECH: previews.insert(previews.end(), 
 			{
-				EntityPreview::Icon::Carryall,
-				EntityPreview::Icon::Ornithopter
+				EntityIcon::Carryall,
+				EntityIcon::Ornithopter
 			});
 			break;
 
 			case StructureInfo::CONSTRUCTION_YARD: previews.insert(previews.end(), 
 			{
-				EntityPreview::Icon::Slab_2x2,
-				EntityPreview::Icon::Wind_Trap,
-				EntityPreview::Icon::Refinery,
-				EntityPreview::Icon::Outpost,
-				EntityPreview::Icon::Spice_Silo,
-				EntityPreview::Icon::Barracks,
-				EntityPreview::Icon::Light_Vehicle_Factory,
-				EntityPreview::Icon::Turret,
-				EntityPreview::Icon::Wall,
-				EntityPreview::Icon::Repair,
-				EntityPreview::Icon::Rocket_Turret,
-				EntityPreview::Icon::High_Tech,
-				EntityPreview::Icon::Starport,
-				EntityPreview::Icon::Palace
+				EntityIcon::Slab_2x2,
+				EntityIcon::Wind_Trap,
+				EntityIcon::Refinery,
+				EntityIcon::Outpost,
+				EntityIcon::Spice_Silo,
+				EntityIcon::Barracks,
+				EntityIcon::Light_Vehicle_Factory,
+				EntityIcon::Turret,
+				EntityIcon::Wall,
+				EntityIcon::Repair,
+				EntityIcon::Rocket_Turret,
+				EntityIcon::High_Tech,
+				EntityIcon::Starport,
+				EntityIcon::Palace
 			});
 			break;
 
 			case StructureInfo::BARRACKS: previews.insert(previews.end(), 
 			{
-				EntityPreview::Icon::Infantry,
-				EntityPreview::Icon::Trooper,
-				EntityPreview::Icon::Troopers
+				EntityIcon::Infantry,
+				EntityIcon::Trooper,
+				EntityIcon::Troopers
 			});
 			break;
 
 			case StructureInfo::STARPORT: previews.insert(previews.end(), 
 			{
-				EntityPreview::Icon::Trike,
-				EntityPreview::Icon::Quad,
-				EntityPreview::Icon::Harvester,
-				EntityPreview::Icon::Tank,
-				EntityPreview::Icon::MCV,
-				EntityPreview::Icon::Launcher,
-				EntityPreview::Icon::Siege_Tank,
-				EntityPreview::Icon::Ornithopter
+				EntityIcon::Trike,
+				EntityIcon::Quad,
+				EntityIcon::Harvester,
+				EntityIcon::Tank,
+				EntityIcon::MCV,
+				EntityIcon::Launcher,
+				EntityIcon::Siege_Tank,
+				EntityIcon::Ornithopter
 			});
 			break;
 
@@ -439,12 +439,12 @@ std::vector<EntityPreview::Icon> GameInfo::getPreviewIconList(HouseType house, S
 	}
 
 //  Filtering by house
-	auto remove_previews = [](std::vector<EntityPreview::Icon>& vec, std::initializer_list<EntityPreview::Icon> values) -> void
+	auto remove_previews = [](std::vector<EntityIcon>& vec, std::initializer_list<EntityIcon> values) -> void
 	{
-		std::unordered_set<EntityPreview::Icon> to_remove(values);
+		std::unordered_set<EntityIcon> to_remove(values);
 
 		vec.erase(std::remove_if(vec.begin(), vec.end(),
-			[&to_remove](EntityPreview::Icon icon) { return to_remove.contains(icon); }), vec.end());
+			[&to_remove](EntityIcon icon) { return to_remove.contains(icon); }), vec.end());
 	};
 
 	switch (house)
@@ -455,9 +455,9 @@ std::vector<EntityPreview::Icon> GameInfo::getPreviewIconList(HouseType house, S
 				case StructureInfo::VEHICLE:
 					remove_previews(previews, 
 					{
-						EntityPreview::Icon::Raider_Trike,
-						EntityPreview::Icon::Deviator,
-						EntityPreview::Icon::Devastator
+						EntityIcon::Raider_Trike,
+						EntityIcon::Deviator,
+						EntityIcon::Devastator
 					});
 				break;
 
@@ -470,8 +470,8 @@ std::vector<EntityPreview::Icon> GameInfo::getPreviewIconList(HouseType house, S
 				case StructureInfo::BARRACKS:
 					remove_previews(previews, 
 					{
-						EntityPreview::Icon::Trooper,
-						EntityPreview::Icon::Troopers
+						EntityIcon::Trooper,
+						EntityIcon::Troopers
 					});
 				break;
 
@@ -489,10 +489,10 @@ std::vector<EntityPreview::Icon> GameInfo::getPreviewIconList(HouseType house, S
 				case StructureInfo::VEHICLE:
 					remove_previews(previews, 
 					{
-						EntityPreview::Icon::Trike,
-						EntityPreview::Icon::Launcher,
-						EntityPreview::Icon::Sonic_Tank,
-						EntityPreview::Icon::Devastator
+						EntityIcon::Trike,
+						EntityIcon::Launcher,
+						EntityIcon::Sonic_Tank,
+						EntityIcon::Devastator
 					});
 				break;
 
@@ -519,17 +519,17 @@ std::vector<EntityPreview::Icon> GameInfo::getPreviewIconList(HouseType house, S
 				case StructureInfo::VEHICLE:
 					remove_previews(previews, 
 					{
-						EntityPreview::Icon::Raider_Trike,
-						EntityPreview::Icon::Trike,
-						EntityPreview::Icon::Sonic_Tank,
-						EntityPreview::Icon::Deviator
+						EntityIcon::Raider_Trike,
+						EntityIcon::Trike,
+						EntityIcon::Sonic_Tank,
+						EntityIcon::Deviator
 					});
 				break;
 
 				case StructureInfo::HIGH_TECH:
 					remove_previews(previews, 
 					{
-						EntityPreview::Icon::Ornithopter
+						EntityIcon::Ornithopter
 					});
 				break;
 
@@ -539,7 +539,7 @@ std::vector<EntityPreview::Icon> GameInfo::getPreviewIconList(HouseType house, S
 				case StructureInfo::BARRACKS:
 					remove_previews(previews, 
 					{
-						EntityPreview::Icon::Infantry
+						EntityIcon::Infantry
 					});
 				break;
 

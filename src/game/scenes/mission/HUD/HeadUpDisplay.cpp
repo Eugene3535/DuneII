@@ -21,7 +21,7 @@ HeadUpDisplay::HeadUpDisplay(Engine* engine,  Tilemap& tilemap, ConstructionMenu
     m_menu(menu),
     m_tilemapProgram(0),
     m_previewTexture(0),
-    m_previewIcon(engine)
+    m_previewIcons(engine)
 {
     m_cursor.texture = 0;
     m_cursor.program = 0;
@@ -86,11 +86,11 @@ bool HeadUpDisplay::init() noexcept
     if (!previewTexture.loadFromFile(FileProvider::findPathToFile(PREVIEWS_PNG)))
         return false;
 
-    if (m_previewIcon.loadFromTexture(previewTexture))
+    if (m_previewIcons.loadFromTexture(previewTexture))
     {
         const ivec2s position = { 950, 0 };
         const ivec2s size = { 150, 100 };
-        m_previewIcon.createIcon(position, size);
+        m_previewIcons.createIcons(position, size);
 
         return true;
     }
@@ -130,7 +130,17 @@ void HeadUpDisplay::draw(const mat4s& projection) const noexcept
         modelView = m_menu.getTransform().getMatrix();
         result = glms_mul(currentWorldMatrix, modelView);
         m_engine->updateUniformBuffer(result);
-        m_previewIcon.draw();
+        m_previewIcons.draw();
+
+        auto& registry = m_tilemap.getRegistry();
+
+        if (StructureInfo* component = registry.try_get<StructureInfo>(m_selectionFrame.lastSelectedEntity))
+        {
+            if (component->isUnderConstruction)
+            {
+                m_previewIcons.draw(component->icon, component->progress);
+            }
+        }
     }
 
     if (!m_menu.isShown())
@@ -167,26 +177,26 @@ void HeadUpDisplay::runSelection() noexcept
         return;
     }
 
-    auto convert_building_type_to_preview_icon = [](StructureInfo::Type type) -> EntityPreview::Icon
+    auto convert_building_type_to_preview_icon = [](StructureInfo::Type type) -> EntityIcon
     {
         switch (type)
         {
-            case StructureInfo::SLAB_2x2:          return EntityPreview::Icon::Slab_2x2;
-            case StructureInfo::PALACE:            return EntityPreview::Icon::Palace;
-            case StructureInfo::VEHICLE:           return EntityPreview::Icon::Light_Vehicle_Factory;
-            case StructureInfo::HIGH_TECH:         return EntityPreview::Icon::High_Tech;
-            case StructureInfo::CONSTRUCTION_YARD: return EntityPreview::Icon::Construction_Yard;
-            case StructureInfo::WIND_TRAP:         return EntityPreview::Icon::Wind_Trap;
-            case StructureInfo::BARRACKS:          return EntityPreview::Icon::Barracks;
-            case StructureInfo::STARPORT:          return EntityPreview::Icon::Starport;
-            case StructureInfo::REFINERY:          return EntityPreview::Icon::Refinery;
-            case StructureInfo::REPAIR:            return EntityPreview::Icon::Repair;
-            case StructureInfo::TURRET:            return EntityPreview::Icon::Turret;
-            case StructureInfo::ROCKET_TURRET:     return EntityPreview::Icon::Rocket_Turret;
-            case StructureInfo::SILO:              return EntityPreview::Icon::Spice_Silo;
-            case StructureInfo::OUTPOST:           return EntityPreview::Icon::Outpost;
+            case StructureInfo::SLAB_2x2:          return EntityIcon::Slab_2x2;
+            case StructureInfo::PALACE:            return EntityIcon::Palace;
+            case StructureInfo::VEHICLE:           return EntityIcon::Light_Vehicle_Factory;
+            case StructureInfo::HIGH_TECH:         return EntityIcon::High_Tech;
+            case StructureInfo::CONSTRUCTION_YARD: return EntityIcon::Construction_Yard;
+            case StructureInfo::WIND_TRAP:         return EntityIcon::Wind_Trap;
+            case StructureInfo::BARRACKS:          return EntityIcon::Barracks;
+            case StructureInfo::STARPORT:          return EntityIcon::Starport;
+            case StructureInfo::REFINERY:          return EntityIcon::Refinery;
+            case StructureInfo::REPAIR:            return EntityIcon::Repair;
+            case StructureInfo::TURRET:            return EntityIcon::Turret;
+            case StructureInfo::ROCKET_TURRET:     return EntityIcon::Rocket_Turret;
+            case StructureInfo::SILO:              return EntityIcon::Spice_Silo;
+            case StructureInfo::OUTPOST:           return EntityIcon::Outpost;
 
-            default: return EntityPreview::Icon::Empty_Cell;
+            default: return EntityIcon::Empty_Cell;
         }
     };
 
@@ -204,7 +214,7 @@ void HeadUpDisplay::runSelection() noexcept
             {
                 const auto mainPreviewIcon = convert_building_type_to_preview_icon(info->type);
 
-                if(mainPreviewIcon != EntityPreview::Icon::Empty_Cell)
+                if(mainPreviewIcon != EntityIcon::Empty_Cell)
                 {
                     const bool hasConstructionPreviews = ((info->type == StructureInfo::Type::VEHICLE)           ||
                                                           (info->type == StructureInfo::Type::HIGH_TECH)         ||
@@ -212,11 +222,11 @@ void HeadUpDisplay::runSelection() noexcept
                                                           (info->type == StructureInfo::Type::BARRACKS)          ||
                                                           (info->type == StructureInfo::Type::STARPORT));
 
-                    std::span<EntityPreview::Icon> previews;
+                    std::span<EntityIcon> previews;
 
                     if(hasConstructionPreviews)
                     {
-                        std::vector<EntityPreview::Icon>* previewArray = registry.try_get<std::vector<EntityPreview::Icon>>(entity);
+                        std::vector<EntityIcon>* previewArray = registry.try_get<std::vector<EntityIcon>>(entity);
 
                         if(previewArray)
                             previews = std::span(*previewArray);
@@ -232,24 +242,27 @@ void HeadUpDisplay::runSelection() noexcept
 
     m_cursor.timer = 0;
 
-    if(StructureInfo* info = registry.try_get<StructureInfo>(entity))
+    if (StructureInfo* component = registry.try_get<StructureInfo>(entity))
     {
-        bool isSelectable = ((info->type != StructureInfo::Type::SLAB_1x1) &&
-                             (info->type != StructureInfo::Type::SLAB_2x2) &&
-                             (info->type != StructureInfo::Type::WALL)     &&
-                              info->type <  StructureInfo::Type::MAX);
+        bool isSelectable = ((component->type != StructureInfo::Type::SLAB_1x1) &&
+                             (component->type != StructureInfo::Type::SLAB_2x2) &&
+                             (component->type != StructureInfo::Type::WALL)     &&
+                              component->type <  StructureInfo::Type::MAX);
 
-        if(isSelectable)
+        if (isSelectable)
         {
-            const auto entityIcon = convert_building_type_to_preview_icon(info->type);
+            const auto entityIcon = convert_building_type_to_preview_icon(component->type);
 
-            if(entityIcon != EntityPreview::Icon::Empty_Cell)
-                m_previewIcon.setIcon(entityIcon);
+            if (entityIcon != EntityIcon::Empty_Cell)
+                m_previewIcons.setPreviewIcon(entityIcon);
+
+            if (component->isUnderConstruction)
+                m_previewIcons.setConstructionIcon(component->icon);
             
             const auto bounds = registry.get<ivec4s>(entity);
             glBindBuffer(GL_ARRAY_BUFFER, m_selectionFrame.vertexBufferObject);
 
-            if(void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
+            if (void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
             {
                 vec2s* vertices = static_cast<vec2s*>(data);
                 const float offset = 12.f;
@@ -297,6 +310,12 @@ void HeadUpDisplay::cancelSelection() noexcept
 void HeadUpDisplay::resize(int width, int height) noexcept
 {
     m_menu.resize(width, height);
+}
+
+
+void HeadUpDisplay::forceUpdateConstructionIcon(EntityIcon icon) noexcept
+{
+    m_previewIcons.setConstructionIcon(icon);
 }
 
 

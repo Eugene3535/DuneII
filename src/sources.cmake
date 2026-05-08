@@ -45,7 +45,6 @@ set(SCENE_HDR_FILES
 	src/game/scenes/pick_house/PickHouse.hpp
 	src/game/scenes/mission/common/Structures.hpp
 	src/game/scenes/mission/common/Units.hpp
-	src/game/scenes/mission/ECS/Components.hpp
 	src/game/scenes/mission/tilemap/Tilemap.hpp
 	src/game/scenes/mission/loader/TiledMapLoader.hpp
 	src/game/scenes/mission/HUD/construction/ConstructionMenu.hpp

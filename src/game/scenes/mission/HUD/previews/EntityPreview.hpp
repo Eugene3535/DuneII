@@ -6,70 +6,27 @@
 
 #include <cglm/struct/ivec2.h>
 
+#include "common/Enums.hpp"
 
 
 class EntityPreview
 {
 public:
-    enum class Icon : uint32_t
-    {
-        WOR = 0,
-        Wind_Trap,
-        Wall,
-        Death_Hand,
-        Quad,
-        Harvester,
-        Light_Vehicle_Factory,
-        Starport,
-        Turret,
-        Slab_2x2,
-        Raider_Trike,
-        MCV,
-        House_of_IX,
-        Spice_Silo,
-        Rocket_Turret,
-        Construction_Yard,
-        Launcher,
-        Carryall,
-        High_Tech,
-        Repair,
-        Refinery,
-        Barracks,
-        Siege_Tank,
-        Starport_Intro,
-        Heavy_Vehicle_Factory,
-        Palace,
-        Outpost,
-        Fremen,
-        Sonic_Tank,
-        Devastator,
-        Saboteur,
-        Sandworm,
-        Trooper,
-        Troopers,
-        Trike,
-        Deviator,
-        Ornithopter,
-        Infantry,
-        Tank,
-        Empty_Cell,
-        MAX,
-        INVALID = 0xFF
-    };
-
     EntityPreview(class Engine* engine) noexcept;
     ~EntityPreview();
 
     bool loadFromTexture(const struct Texture2D& texture) noexcept;
-    void createIcon(const ivec2s position, const ivec2s size) noexcept;
-    void setIcon(Icon icon) noexcept;
+    void createIcons(const ivec2s position, const ivec2s size) noexcept;
+
+    void setPreviewIcon(EntityIcon icon) noexcept;
+    void setConstructionIcon(EntityIcon icon) noexcept;
 
     void draw() const noexcept;
-    void draw(EntityPreview::Icon icon, float progress) const noexcept;
-
-    const vec2s* getTexCoords(Icon icon) const noexcept;
+    void draw(EntityIcon icon, float progress) const noexcept;
 
 private:
+    const vec2s* getTexCoords(EntityIcon icon) const noexcept;
+
     class Engine* m_engine;
 
     uint32_t m_texture;

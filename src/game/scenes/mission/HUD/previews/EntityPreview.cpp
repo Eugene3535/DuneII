@@ -83,21 +83,28 @@ bool EntityPreview::loadFromTexture(const Texture2D& texture) noexcept
 }
 
 
-void EntityPreview::createIcon(const ivec2s position, const ivec2s size) noexcept
+void EntityPreview::createIcons(const ivec2s position, const ivec2s size) noexcept
 {
-    auto texCoords = getTexCoords(EntityPreview::Icon::Empty_Cell);
+    auto texCoords = getTexCoords(EntityIcon::Empty_Cell);
 
     const float x = static_cast<float>(position.x);
     const float y = static_cast<float>(position.y);
     const float w = static_cast<float>(size.x);
     const float h = static_cast<float>(size.y);
 
-    const std::array<float, 16> vertices = 
+    const float offset = h + 20;
+
+    const std::array<float, 32> vertices = 
     {
         x,     y,     texCoords[0].x, texCoords[0].y,
         x + w, y,     texCoords[1].x, texCoords[1].y,
         x + w, y + h, texCoords[2].x, texCoords[2].y,
-        x,     y + h, texCoords[3].x, texCoords[3].y
+        x,     y + h, texCoords[3].x, texCoords[3].y,
+
+        x,     y + offset,     texCoords[0].x, texCoords[0].y,
+        x + w, y + offset,     texCoords[1].x, texCoords[1].y,
+        x + w, y + offset + h, texCoords[2].x, texCoords[2].y,
+        x,     y + offset + h, texCoords[3].x, texCoords[3].y
     };
 
     glCreateBuffers(1, &m_vertexBufferObject);
@@ -109,9 +116,9 @@ void EntityPreview::createIcon(const ivec2s position, const ivec2s size) noexcep
 }
 
 
-void EntityPreview::setIcon(EntityPreview::Icon icon) noexcept
+void EntityPreview::setPreviewIcon(EntityIcon icon) noexcept
 {
-    if(icon > Icon::Empty_Cell)
+    if(icon > EntityIcon::Empty_Cell)
         return;
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferObject);
@@ -119,6 +126,37 @@ void EntityPreview::setIcon(EntityPreview::Icon icon) noexcept
     if (void* buffer = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
     {
         auto vertices = static_cast<float*>(buffer);
+        auto texCoords = getTexCoords(icon);
+        
+        vertices[2] = texCoords[0].x;
+        vertices[3] = texCoords[0].y;
+
+        vertices[6] = texCoords[1].x;
+        vertices[7] = texCoords[1].y;
+
+        vertices[10] = texCoords[2].x;
+        vertices[11] = texCoords[2].y;
+
+        vertices[14] = texCoords[3].x;
+        vertices[15] = texCoords[3].y;
+
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+
+void EntityPreview::setConstructionIcon(EntityIcon icon) noexcept
+{
+    if(icon > EntityIcon::Empty_Cell)
+        return;
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferObject);
+
+    if (void* buffer = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
+    {
+        auto vertices = static_cast<float*>(buffer) + 16;
         auto texCoords = getTexCoords(icon);
         
         vertices[2] = texCoords[0].x;
@@ -150,7 +188,7 @@ void EntityPreview::draw() const noexcept
 }
 
 
-void EntityPreview::draw(EntityPreview::Icon icon, float progress) const noexcept
+void EntityPreview::draw(EntityIcon icon, float progress) const noexcept
 {
     auto texCoords = getTexCoords(icon);
 
@@ -161,12 +199,12 @@ void EntityPreview::draw(EntityPreview::Icon icon, float progress) const noexcep
 
     glBindTextureUnit(0, m_texture);
     glBindVertexArray(m_vertexArrayObject);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    glDrawArrays(GL_TRIANGLE_FAN, 4, 4);
     glBindTextureUnit(0, 0);
 }
 
 
-const vec2s* EntityPreview::getTexCoords(EntityPreview::Icon icon) const noexcept
+const vec2s* EntityPreview::getTexCoords(EntityIcon icon) const noexcept
 {
     const size_t index = static_cast<size_t>(icon) << 2;
 

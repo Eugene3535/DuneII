@@ -33,14 +33,18 @@ struct StructureInfo
 
     HouseType owner;
 
-    uint32_t stride;  // in vertex array
-    uint32_t frame;   // start index for draw call
-    ivec2s texOffset; // landing pad
+    uint32_t stride; // in vertex array
+    uint32_t frame;  // start index for draw call
 
     int32_t cost;
     int32_t armor;
     int32_t maxArmor;
-    float progress; // construction mode
+
+ // construction mode
+    EntityIcon icon;
+    float duration;
+    float progress;
+    bool isUnderConstruction;
 };
 
 #endif // !STRUCTURE_HPP

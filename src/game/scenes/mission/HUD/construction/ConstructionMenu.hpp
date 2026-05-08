@@ -6,7 +6,6 @@
 
 #include "common/Enums.hpp"
 #include "graphics/transform/Transform2D.hpp"
-#include "game/scenes/mission/HUD/previews/EntityPreview.hpp"
 
 
 class ConstructionMenu
@@ -23,16 +22,16 @@ public:
     ConstructionMenu(class Engine* engine, class Tilemap& tilemap) noexcept;
     ~ConstructionMenu();
 
-    void init(uint32_t texture)                                                                 noexcept;
-    void update(float dt)                                                                       noexcept;
-    void showEntityMenu(EntityPreview::Icon mainIcon, std::span<EntityPreview::Icon> menuIcons) noexcept;
-    void updateSelection(char keyCode, bool isForced = false)                                   noexcept;
-    void hide()                                                                                 noexcept;
-    void draw(const mat4s& projection)                                                    const noexcept;
-    void resize(int width, int height)                                                          noexcept;
+    void init(uint32_t texture)                                               noexcept;
+    void update(float dt)                                                     noexcept;
+    void showEntityMenu(EntityIcon mainIcon, std::span<EntityIcon> menuIcons) noexcept;
+    void updateSelection(char keyCode, bool isForced = false)                 noexcept;
+    void hide()                                                               noexcept;
+    void draw(const mat4s& projection)                                  const noexcept;
+    void resize(int width, int height)                                        noexcept;
 
-    EntityPreview::Icon getSelectedPreview() const noexcept;
-    ButtonType  getSelectedButton() const noexcept;
+    EntityIcon getSelectedPreview() const noexcept;
+    ButtonType getSelectedButton()  const noexcept;
 
     bool isShown()                    const noexcept;
     const Transform2D& getTransform() const noexcept;
@@ -89,7 +88,7 @@ private:
         Sprite2D buttonExit;
         Sprite2D buttonRepair;
         Sprite2D buttonStop;
-        EntityPreview::Icon lastSelectedPreview;
+        EntityIcon lastSelectedPreview;
         
         struct
         {
@@ -104,7 +103,7 @@ private:
     } m_userElements;
     
     std::vector<vec2s> m_textureGrid;
-    std::vector<EntityPreview::Icon> m_previews;
+    std::vector<EntityIcon> m_previews;
     bool m_isShown;
 };
 

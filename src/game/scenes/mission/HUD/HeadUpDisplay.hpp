@@ -27,6 +27,8 @@ public:
     void cancelSelection()             noexcept;
     void resize(int width, int height) noexcept;
 
+    void forceUpdateConstructionIcon(EntityIcon icon) noexcept;
+
     bool isEntitySelected() const noexcept;
     entt::entity getLastSelectedEntity() const noexcept;
 
@@ -36,7 +38,7 @@ private:
     class Engine*           m_engine;
     const class Tilemap&    m_tilemap;
     class ConstructionMenu& m_menu;
-    EntityPreview           m_previewIcon;
+    EntityPreview           m_previewIcons;
 
     uint32_t m_tilemapProgram;
     uint32_t m_previewTexture;

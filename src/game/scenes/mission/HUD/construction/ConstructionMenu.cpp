@@ -83,12 +83,12 @@ void ConstructionMenu::update(float dt) noexcept
 }
 
 
-void ConstructionMenu::showEntityMenu(EntityPreview::Icon mainIcon, std::span<EntityPreview::Icon> menuIcons) noexcept
+void ConstructionMenu::showEntityMenu(EntityIcon mainIcon, std::span<EntityIcon> menuIcons) noexcept
 {
-    if(mainIcon >= EntityPreview::Icon::MAX)
+    if(mainIcon >= EntityIcon::MAX)
         return;
 
-    auto setup_tex_coords = [this](void* data, EntityPreview::Icon preview, uint32_t offset) -> void
+    auto setup_tex_coords = [this](void* data, EntityIcon preview, uint32_t offset) -> void
     {
         const size_t index = static_cast<size_t>(preview) << 2;
         const vec2s* texCoords = &m_textureGrid[index];
@@ -129,8 +129,8 @@ void ConstructionMenu::showEntityMenu(EntityPreview::Icon mainIcon, std::span<En
                 }
                 else
                 {
-                    setup_tex_coords(data, EntityPreview::Icon::Empty_Cell, (i << 2));
-                    m_previews[i] = EntityPreview::Icon::Empty_Cell;
+                    setup_tex_coords(data, EntityIcon::Empty_Cell, (i << 2));
+                    m_previews[i] = EntityIcon::Empty_Cell;
                 }
             }
         }
@@ -138,8 +138,8 @@ void ConstructionMenu::showEntityMenu(EntityPreview::Icon mainIcon, std::span<En
         {
             for (size_t i = 0; i < previewCount; ++i)
             {
-               setup_tex_coords(data, EntityPreview::Icon::Empty_Cell, (i << 2));
-               m_previews[i] = EntityPreview::Icon::Empty_Cell;
+               setup_tex_coords(data, EntityIcon::Empty_Cell, (i << 2));
+               m_previews[i] = EntityIcon::Empty_Cell;
             }
         }
 
@@ -259,7 +259,7 @@ void ConstructionMenu::updateSelection(char keyCode, bool isForced) noexcept
         memcpy(vertices, outlineVertices.data(), sizeof(float) * outlineVertices.size());
     };
 
-    auto setup_main_icon = [this](void* data, EntityPreview::Icon preview) -> void
+    auto setup_main_icon = [this](void* data, EntityIcon preview) -> void
     {
         constexpr size_t offset = (PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS) << 2;
         const size_t index = static_cast<size_t>(preview) << 2;
@@ -305,11 +305,11 @@ void ConstructionMenu::updateSelection(char keyCode, bool isForced) noexcept
         {    
             const auto selectedPreview = getSelectedPreview();
 
-            if (selectedPreview == EntityPreview::Icon::Empty_Cell)
+            if (selectedPreview == EntityIcon::Empty_Cell)
             {
                 setup_main_icon(data, m_userElements.lastSelectedPreview);
             }
-            else if (selectedPreview != EntityPreview::Icon::INVALID)
+            else if (selectedPreview != EntityIcon::INVALID)
             {
                 setup_main_icon(data, selectedPreview);
             }
@@ -359,7 +359,7 @@ void ConstructionMenu::resize(int width, int height) noexcept
 }
 
 
-EntityPreview::Icon ConstructionMenu::getSelectedPreview() const noexcept
+EntityIcon ConstructionMenu::getSelectedPreview() const noexcept
 {
     if (m_isShown)
     {
@@ -375,7 +375,7 @@ EntityPreview::Icon ConstructionMenu::getSelectedPreview() const noexcept
         }
     }
 
-    return EntityPreview::Icon::INVALID;
+    return EntityIcon::INVALID;
 }
 
 
@@ -467,7 +467,7 @@ void ConstructionMenu::createPreviews() noexcept
     const vec2s   ratio        = { 1.f / texWidth, 1.f / texHeight };
 
     m_textureGrid.reserve((rows * columns) << 2);
-    m_previews.resize(PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS, EntityPreview::Icon::Empty_Cell);
+    m_previews.resize(PREVIEW_ICON_COLUMNS * PREVIEW_ICON_ROWS, EntityIcon::Empty_Cell);
 
     for (int32_t y = 0; y < rows; ++y)
     {
@@ -494,7 +494,7 @@ void ConstructionMenu::createPreviews() noexcept
     const vec2s startPos = { 50.f, 100.f  };
     const float indent = 10.f;
 
-    const size_t index = static_cast<size_t>(EntityPreview::Icon::Empty_Cell) << 2;
+    const size_t index = static_cast<size_t>(EntityIcon::Empty_Cell) << 2;
     const vec2s* texCoords = &m_textureGrid[index]; // offset to gray color cell (empty preview)
 
     for (int32_t y = 0; y < PREVIEW_ICON_ROWS; ++y)
