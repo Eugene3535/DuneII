@@ -39,6 +39,7 @@ add_subdirectory(${EXTERNAL_SOURCE_DIR}/glfw glfw)
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/glad/core glad)
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/cglm cglm)
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/entt entt)
+add_subdirectory(${EXTERNAL_SOURCE_DIR}/magic_enum magic_enum)
 
 target_sources(${PROJECT_NAME} PRIVATE ${SHADER_FILES})
 
@@ -53,6 +54,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	glad
 	cglm
 	EnTT::EnTT
+	magic_enum::magic_enum
 )
 
 if(MSVC)

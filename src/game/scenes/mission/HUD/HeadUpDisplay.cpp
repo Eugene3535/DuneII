@@ -181,7 +181,7 @@ void HeadUpDisplay::runSelection() noexcept
     {
         switch (type)
         {
-            case StructureInfo::SLAB_2x2:          return EntityIcon::Slab_2x2;
+            case StructureInfo::SLAB_2X2:          return EntityIcon::Slab_2x2;
             case StructureInfo::PALACE:            return EntityIcon::Palace;
             case StructureInfo::VEHICLE:           return EntityIcon::Light_Vehicle_Factory;
             case StructureInfo::HIGH_TECH:         return EntityIcon::High_Tech;
@@ -244,8 +244,8 @@ void HeadUpDisplay::runSelection() noexcept
 
     if (StructureInfo* component = registry.try_get<StructureInfo>(entity))
     {
-        bool isSelectable = ((component->type != StructureInfo::Type::SLAB_1x1) &&
-                             (component->type != StructureInfo::Type::SLAB_2x2) &&
+        bool isSelectable = ((component->type != StructureInfo::Type::SLAB_1X1) &&
+                             (component->type != StructureInfo::Type::SLAB_2X2) &&
                              (component->type != StructureInfo::Type::WALL)     &&
                               component->type <  StructureInfo::Type::MAX);
 

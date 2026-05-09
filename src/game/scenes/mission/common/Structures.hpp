@@ -11,8 +11,8 @@ struct StructureInfo
 {
     enum Type : int32_t
     {
-        SLAB_1x1 = 0,
-        SLAB_2x2,
+        SLAB_1X1 = 0,
+        SLAB_2X2,
         PALACE,
         VEHICLE,
         HIGH_TECH,

@@ -351,7 +351,7 @@ void TiledMapLoader::loadStructures(const Tileset& tileset, std::span<const int>
 			case 161: return StructureInfo::Type::PALACE;
 			case 164: return StructureInfo::Type::HIGH_TECH;
 			case 166: return StructureInfo::Type::REPAIR;
-			case 191: return StructureInfo::Type::SLAB_1x1;
+			case 191: return StructureInfo::Type::SLAB_1X1;
 			case 207: return StructureInfo::Type::STARPORT;
 			case 261: return StructureInfo::Type::TURRET;
 			case 269: return StructureInfo::Type::ROCKET_TURRET;
@@ -367,19 +367,19 @@ void TiledMapLoader::loadStructures(const Tileset& tileset, std::span<const int>
 		{
 			case StructureInfo::Type::WALL:              return "Wall";
 			case StructureInfo::Type::REFINERY:          return "Refinery";
-			case StructureInfo::Type::CONSTRUCTION_YARD: return "ConstructYard";
-			case StructureInfo::Type::WIND_TRAP:         return "WindTrap";
+			case StructureInfo::Type::CONSTRUCTION_YARD: return "Construction_Yard";
+			case StructureInfo::Type::WIND_TRAP:         return "Wind_Trap";
 			case StructureInfo::Type::OUTPOST:           return "Outpost";
 			case StructureInfo::Type::SILO:              return "Silo";
 			case StructureInfo::Type::VEHICLE:           return "Vehicle";
 			case StructureInfo::Type::BARRACKS:          return "Barracks";
 			case StructureInfo::Type::PALACE:            return "Palace";
-			case StructureInfo::Type::HIGH_TECH:         return "HighTech";
+			case StructureInfo::Type::HIGH_TECH:         return "High_Tech";
 			case StructureInfo::Type::REPAIR:            return "Repair";
-			case StructureInfo::Type::SLAB_1x1:          return "Slab_1x1";
+			case StructureInfo::Type::SLAB_1X1:          return "Slab_1x1";
 			case StructureInfo::Type::STARPORT:          return "Starport";
 			case StructureInfo::Type::TURRET:            return "Turret";
-			case StructureInfo::Type::ROCKET_TURRET:     return "RocketTurret";
+			case StructureInfo::Type::ROCKET_TURRET:     return "Rocket_Turret";
 		
 			default:
 				return {};
@@ -391,7 +391,7 @@ void TiledMapLoader::loadStructures(const Tileset& tileset, std::span<const int>
 	{
 		switch (type)
 		{
-            case StructureInfo::Type::SLAB_1x1:          return { 1, 1 };
+            case StructureInfo::Type::SLAB_1X1:          return { 1, 1 };
 			case StructureInfo::Type::PALACE:            return { 3, 3 };
 			case StructureInfo::Type::VEHICLE:           return { 3, 2 };
 			case StructureInfo::Type::HIGH_TECH:         return { 2, 2 };

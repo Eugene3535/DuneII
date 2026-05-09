@@ -1,9 +1,11 @@
 #include <cstring>
+#include <algorithm>
 
 #include <glad/glad.h>
 #include <cglm/struct/ivec2.h>
 #include <cglm/call/aabb2d.h>
 #include "cglm/struct/affine-mat.h"
+#include <magic_enum/magic_enum.hpp>
 
 #include "resources/files/FileProvider.hpp"
 #include "resources/gl_interfaces/texture/Texture2D.hpp"
@@ -74,23 +76,14 @@ bool Tilemap::createFromLoader(const TiledMapLoader& loader) noexcept
 
 	auto get_structure_enum = [](const std::string& name) -> StructureInfo::Type
 	{
-		if(name == "Wall")          return StructureInfo::Type::WALL;
-		if(name == "Refinery")      return StructureInfo::Type::REFINERY;
-		if(name == "ConstructYard") return StructureInfo::Type::CONSTRUCTION_YARD ;
-		if(name == "WindTrap")      return StructureInfo::Type::WIND_TRAP;
-		if(name == "Outpost")       return StructureInfo::Type::OUTPOST;
-		if(name == "Silo")          return StructureInfo::Type::SILO;
-		if(name == "Vehicle")       return StructureInfo::Type::VEHICLE;
-		if(name == "Barracks")      return StructureInfo::Type::BARRACKS;
-		if(name == "Palace")        return StructureInfo::Type::PALACE;
-		if(name == "HighTech")      return StructureInfo::Type::HIGH_TECH;
-		if(name == "Repair")        return StructureInfo::Type::REPAIR;
-		if(name == "Slab_1x1")      return StructureInfo::Type::SLAB_1x1;
-		if(name == "Starport")      return StructureInfo::Type::STARPORT;
-		if(name == "Turret")        return StructureInfo::Type::TURRET;
-		if(name == "RocketTurret")  return StructureInfo::Type::ROCKET_TURRET;
-
-		return StructureInfo::Type::INVALID;
+		std::string upper_name = name;
+		std::transform(upper_name.begin(), upper_name.end(), upper_name.begin(), ::toupper);
+		std::replace(upper_name.begin(), upper_name.end(), ' ', '_');
+		std::replace(upper_name.begin(), upper_name.end(), '-', '_');
+		
+		auto result = magic_enum::enum_cast<StructureInfo::Type>(upper_name);
+		
+		return result.value_or(StructureInfo::Type::INVALID);
 	};
 
 	auto objects = loader.getObjects();
@@ -204,7 +197,7 @@ bool Tilemap::putStructure(const HouseType owner, const StructureInfo::Type type
 
         switch (type)
         {
-            case StructureInfo::Type::SLAB_1x1:          size = { 1, 1 }; break;
+            case StructureInfo::Type::SLAB_1X1:          size = { 1, 1 }; break;
 			case StructureInfo::Type::PALACE:            size = { 3, 3 }; break;
 			case StructureInfo::Type::VEHICLE:           size = { 3, 2 }; break;
 			case StructureInfo::Type::HIGH_TECH:         size = { 2, 2 }; break;
@@ -279,7 +272,7 @@ bool Tilemap::putStructure(const HouseType owner, const StructureInfo::Type type
 
 	switch(type)
 	{
-		case StructureInfo::Type::SLAB_1x1:          setup_tiles_on_mask(1, 1, 'C'); break;
+		case StructureInfo::Type::SLAB_1X1:          setup_tiles_on_mask(1, 1, 'C'); break;
 		case StructureInfo::Type::PALACE:            setup_tiles_on_mask(3, 3);      break;
 		case StructureInfo::Type::VEHICLE:           setup_tiles_on_mask(3, 2);      break;
 		case StructureInfo::Type::HIGH_TECH:         setup_tiles_on_mask(2, 2);      break;
@@ -567,7 +560,7 @@ vec4s get_texcoords_of_structure(const StructureInfo::Type type, float width, fl
 
 	switch (type)
 	{
-		case StructureInfo::Type::SLAB_1x1:          { tc = { 0.f,   160.f, 32.f, 32.f }; break; }
+		case StructureInfo::Type::SLAB_1X1:          { tc = { 0.f,   160.f, 32.f, 32.f }; break; }
 		case StructureInfo::Type::PALACE:            { tc = { 64.f,  96.f , 96.f, 96.f }; break; }
 		case StructureInfo::Type::VEHICLE:           { tc = { 256.f, 32.f , 96.f, 64.f }; break; }
 		case StructureInfo::Type::HIGH_TECH:         { tc = { 160.f, 96.f , 64.f, 64.f }; break; }
@@ -596,7 +589,7 @@ ivec4s get_bounds_of(const StructureInfo::Type type, const ivec2s cell, const iv
 
 	switch (type)
 	{
-		case StructureInfo::Type::SLAB_1x1:          return { offset.x, offset.y, offset.x + 32, offset.y + 32 };
+		case StructureInfo::Type::SLAB_1X1:          return { offset.x, offset.y, offset.x + 32, offset.y + 32 };
 		case StructureInfo::Type::PALACE:            return { offset.x, offset.y, offset.x + 96, offset.y + 96 };
 		case StructureInfo::Type::VEHICLE:           return { offset.x, offset.y, offset.x + 96, offset.y + 64 };
 		case StructureInfo::Type::HIGH_TECH:         return { offset.x, offset.y, offset.x + 64, offset.y + 64 };
@@ -621,7 +614,7 @@ int32_t get_armor_of(const StructureInfo::Type type) noexcept
 {
 	switch (type)
 	{
-		case StructureInfo::Type::SLAB_1x1:          return 40;
+		case StructureInfo::Type::SLAB_1X1:          return 40;
 		case StructureInfo::Type::PALACE:            return 2000;
 		case StructureInfo::Type::VEHICLE:           return 800;
 		case StructureInfo::Type::HIGH_TECH:         return 1000;
