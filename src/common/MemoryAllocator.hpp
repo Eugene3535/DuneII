@@ -13,8 +13,8 @@ public:
     MemoryAllocator() noexcept;
     ~MemoryAllocator();
 
-    template<class T>
-    T* allocate() noexcept;
+    template<class T, class... Args>
+    T* allocate(Args&&... args) noexcept;
 
     template<class T>
     void release(T* data) noexcept;
@@ -27,6 +27,7 @@ private:
 
     std::unordered_map<size_t, std::vector<void*>> m_freeBlocks;
 };
+
 
 #include "common/MemoryAllocator.inl"
 

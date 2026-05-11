@@ -11,8 +11,8 @@ MemoryAllocator<N>::~MemoryAllocator() = default;
 
 
 template<size_t N>
-template<class T>
-T* MemoryAllocator<N>::allocate() noexcept
+template<class T, class... Args>
+T* MemoryAllocator<N>::allocate(Args&&... args) noexcept
 {
     auto& freeBlocks = m_freeBlocks[sizeof(T)];
 
@@ -21,7 +21,7 @@ T* MemoryAllocator<N>::allocate() noexcept
         void* block = freeBlocks.back();
         freeBlocks.pop_back();
 
-        return static_cast<T*>(block);
+        return new (block) T(std::forward<Args>(args)...);
     }
 
     if (m_stride + sizeof(T) < m_memoryPool.size())
@@ -29,7 +29,7 @@ T* MemoryAllocator<N>::allocate() noexcept
         const size_t offset = m_stride;
         m_stride += sizeof(T);
 
-        return reinterpret_cast<T*>(m_memoryPool.data() + offset);
+        return new (m_memoryPool.data() + offset) T(std::forward<Args>(args)...);
     }
 
     return nullptr;
