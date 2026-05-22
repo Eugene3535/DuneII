@@ -2,8 +2,9 @@
 #include <cstring>
 #include <algorithm>
 
-#include "RapidXML/rapidxml.hpp"
-#include "RapidXML/rapidxml_utils.hpp"
+#include <RapidXML/rapidxml.hpp>
+#include <RapidXML/rapidxml_utils.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 #include "game/scenes/mission/common/Structures.hpp"
 #include "game/scenes/mission/loader/TiledMapLoader.hpp"
@@ -340,72 +341,46 @@ void TiledMapLoader::loadStructures(const Tileset& tileset, std::span<const int>
 			case 119:
 			case 120:
 			case 121:
-			case 122: return StructureInfo::Type::WALL;
-			case 124: return StructureInfo::Type::REFINERY;
-			case 127: return StructureInfo::Type::CONSTRUCTION_YARD;
-			case 129: return StructureInfo::Type::WIND_TRAP;
-			case 131: return StructureInfo::Type::OUTPOST;
-			case 133: return StructureInfo::Type::SILO;
-			case 135: return StructureInfo::Type::VEHICLE;
-			case 159: return StructureInfo::Type::BARRACKS;
-			case 161: return StructureInfo::Type::PALACE;
-			case 164: return StructureInfo::Type::HIGH_TECH;
-			case 166: return StructureInfo::Type::REPAIR;
-			case 191: return StructureInfo::Type::SLAB_1X1;
-			case 207: return StructureInfo::Type::STARPORT;
-			case 261: return StructureInfo::Type::TURRET;
-			case 269: return StructureInfo::Type::ROCKET_TURRET;
+			case 122: return StructureInfo::Type::Wall;
+			case 124: return StructureInfo::Type::Refinery;
+			case 127: return StructureInfo::Type::ConstructionYard;
+			case 129: return StructureInfo::Type::WindTrap;
+			case 131: return StructureInfo::Type::Outpost;
+			case 133: return StructureInfo::Type::Silo;
+			case 135: return StructureInfo::Type::Vehicle;
+			case 159: return StructureInfo::Type::Barracks;
+			case 161: return StructureInfo::Type::Palace;
+			case 164: return StructureInfo::Type::HighTech;
+			case 166: return StructureInfo::Type::Repair;
+			case 191: return StructureInfo::Type::Slab_1x1;
+			case 207: return StructureInfo::Type::Starport;
+			case 261: return StructureInfo::Type::Turret;
+			case 269: return StructureInfo::Type::RocketTurret;
 		
-			default: return StructureInfo::Type::INVALID;
+			default: return StructureInfo::Type::Undefined;
 		}
 	};
 
 
-	auto get_structure_name = [](StructureInfo::Type type) -> std::string_view
+	auto get_structure_size_in_tiles = [](StructureInfo::Type type) -> ivec2s
 	{
 		switch (type)
 		{
-			case StructureInfo::Type::WALL:              return "Wall";
-			case StructureInfo::Type::REFINERY:          return "Refinery";
-			case StructureInfo::Type::CONSTRUCTION_YARD: return "Construction_Yard";
-			case StructureInfo::Type::WIND_TRAP:         return "Wind_Trap";
-			case StructureInfo::Type::OUTPOST:           return "Outpost";
-			case StructureInfo::Type::SILO:              return "Silo";
-			case StructureInfo::Type::VEHICLE:           return "Vehicle";
-			case StructureInfo::Type::BARRACKS:          return "Barracks";
-			case StructureInfo::Type::PALACE:            return "Palace";
-			case StructureInfo::Type::HIGH_TECH:         return "High_Tech";
-			case StructureInfo::Type::REPAIR:            return "Repair";
-			case StructureInfo::Type::SLAB_1X1:          return "Slab_1x1";
-			case StructureInfo::Type::STARPORT:          return "Starport";
-			case StructureInfo::Type::TURRET:            return "Turret";
-			case StructureInfo::Type::ROCKET_TURRET:     return "Rocket_Turret";
-		
-			default:
-				return {};
-		}
-	};
-
-
-	auto get_structure_tile_bounds = [](StructureInfo::Type type) -> ivec2s
-	{
-		switch (type)
-		{
-            case StructureInfo::Type::SLAB_1X1:          return { 1, 1 };
-			case StructureInfo::Type::PALACE:            return { 3, 3 };
-			case StructureInfo::Type::VEHICLE:           return { 3, 2 };
-			case StructureInfo::Type::HIGH_TECH:         return { 2, 2 };
-            case StructureInfo::Type::CONSTRUCTION_YARD: return { 2, 2 };
-			case StructureInfo::Type::WIND_TRAP:         return { 2, 2 };
-            case StructureInfo::Type::BARRACKS:          return { 2, 2 };
-			case StructureInfo::Type::STARPORT:          return { 3, 3 };
-			case StructureInfo::Type::REFINERY:          return { 3, 2 };
-			case StructureInfo::Type::REPAIR:            return { 3, 2 };
-            case StructureInfo::Type::WALL:              return { 1, 1 };
-            case StructureInfo::Type::TURRET:            return { 1, 1 };
-            case StructureInfo::Type::ROCKET_TURRET:     return { 1, 1 };
-            case StructureInfo::Type::SILO:              return { 2, 2 };
-            case StructureInfo::Type::OUTPOST:           return { 2, 2 };
+            case StructureInfo::Type::Slab_1x1:         return { 1, 1 };
+			case StructureInfo::Type::Palace:           return { 3, 3 };
+			case StructureInfo::Type::Vehicle:          return { 3, 2 };
+			case StructureInfo::Type::HighTech:         return { 2, 2 };
+            case StructureInfo::Type::ConstructionYard: return { 2, 2 };
+			case StructureInfo::Type::WindTrap:         return { 2, 2 };
+            case StructureInfo::Type::Barracks:         return { 2, 2 };
+			case StructureInfo::Type::Starport:         return { 3, 3 };
+			case StructureInfo::Type::Refinery:         return { 3, 2 };
+			case StructureInfo::Type::Repair:           return { 3, 2 };
+            case StructureInfo::Type::Wall:             return { 1, 1 };
+            case StructureInfo::Type::Turret:           return { 1, 1 };
+            case StructureInfo::Type::RocketTurret:     return { 1, 1 };
+            case StructureInfo::Type::Silo:             return { 2, 2 };
+            case StructureInfo::Type::Outpost:          return { 2, 2 };
 
             default: return { 0, 0 };
 		}
@@ -424,14 +399,14 @@ void TiledMapLoader::loadStructures(const Tileset& tileset, std::span<const int>
 			if (!tileID)
 				continue;
 			
-			if(const auto type = get_structure_type(tileID); type != StructureInfo::Type::INVALID)
+			if(const auto type = get_structure_type(tileID); type != StructureInfo::Type::Undefined)
 			{
 				auto& object = m_objects.emplace_back();
 
-				object.name = get_structure_name(type); 
+				object.name = magic_enum::enum_name(type);
 				object.type = "Structure";
 				object.coords = { x, y };
-				object.size = get_structure_tile_bounds(type);
+				object.size = get_structure_size_in_tiles(type);
 			}
 		}
 	}

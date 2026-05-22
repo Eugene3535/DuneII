@@ -24,13 +24,13 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 		case 1:                                                           // MISSION 1
 			switch (building)
 			{
-				case StructureInfo::VEHICLE:
+				case StructureInfo::Type::Vehicle:
 				break;
 
-				case StructureInfo::HIGH_TECH:
+				case StructureInfo::Type::HighTech:
 				break;
 
-				case StructureInfo::CONSTRUCTION_YARD: previews.insert(previews.end(), 
+				case StructureInfo::Type::ConstructionYard: previews.insert(previews.end(), 
 				{
 					EntityIcon::Slab_2x2,
 					EntityIcon::Wind_Trap,
@@ -38,10 +38,10 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 				});
 				break;
 
-				case StructureInfo::BARRACKS:
+				case StructureInfo::Type::Barracks:
 				break;
 
-				case StructureInfo::STARPORT:
+				case StructureInfo::Type::Starport:
 				break;
 
 				default:
@@ -52,17 +52,17 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 		case 2:                                                           // MISSION 2
 			switch (building)
 			{
-				case StructureInfo::VEHICLE: previews.insert(previews.end(), 
+				case StructureInfo::Type::Vehicle: previews.insert(previews.end(), 
 				{
 					EntityIcon::Raider_Trike,
 					EntityIcon::Trike
 				});
 				break;
 
-				case StructureInfo::HIGH_TECH:
+				case StructureInfo::Type::HighTech:
 				break;
 
-				case StructureInfo::CONSTRUCTION_YARD: previews.insert(previews.end(), 
+				case StructureInfo::Type::ConstructionYard: previews.insert(previews.end(), 
 				{
 					EntityIcon::Slab_2x2,
 					EntityIcon::Wind_Trap,
@@ -74,13 +74,13 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 				});
 				break;
 
-				case StructureInfo::BARRACKS: previews.insert(previews.end(), 
+				case StructureInfo::Type::Barracks: previews.insert(previews.end(), 
 				{
 					EntityIcon::Infantry
 				});
 				break;
 
-				case StructureInfo::STARPORT:
+				case StructureInfo::Type::Starport:
 				break;
 
 				default:
@@ -91,7 +91,7 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 		case 3:                                                           // MISSION 3
 			switch (building)
 			{
-				case StructureInfo::VEHICLE: previews.insert(previews.end(), 
+				case StructureInfo::Type::Vehicle: previews.insert(previews.end(), 
 				{
 					EntityIcon::Raider_Trike,
 					EntityIcon::Trike,
@@ -99,10 +99,10 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 				});
 				break;
 
-				case StructureInfo::HIGH_TECH:
+				case StructureInfo::Type::HighTech:
 				break;
 
-				case StructureInfo::CONSTRUCTION_YARD: previews.insert(previews.end(), 
+				case StructureInfo::Type::ConstructionYard: previews.insert(previews.end(), 
 				{
 					EntityIcon::Slab_2x2,
 					EntityIcon::Wind_Trap,
@@ -114,14 +114,14 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 				});
 				break;
 
-				case StructureInfo::BARRACKS: previews.insert(previews.end(), 
+				case StructureInfo::Type::Barracks: previews.insert(previews.end(), 
 				{
 					EntityIcon::Trooper,
 					EntityIcon::Infantry
 				});
 				break;
 
-				case StructureInfo::STARPORT:
+				case StructureInfo::Type::Starport:
 				break;
 
 				default:
@@ -132,7 +132,7 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 		case 4:                                                           // MISSION 4
 			switch (building)
 			{
-				case StructureInfo::VEHICLE: previews.insert(previews.end(), 
+				case StructureInfo::Type::Vehicle: previews.insert(previews.end(), 
 				{
 					EntityIcon::Raider_Trike,
 					EntityIcon::Trike,
@@ -143,10 +143,10 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 				});
 				break;
 
-				case StructureInfo::HIGH_TECH:
+				case StructureInfo::Type::HighTech:
 				break;
 
-				case StructureInfo::CONSTRUCTION_YARD: previews.insert(previews.end(), 
+				case StructureInfo::Type::ConstructionYard: previews.insert(previews.end(), 
 				{
 					EntityIcon::Slab_2x2,
 					EntityIcon::Wind_Trap,
@@ -159,7 +159,7 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 				});
 				break;
 
-				case StructureInfo::BARRACKS: previews.insert(previews.end(), 
+				case StructureInfo::Type::Barracks: previews.insert(previews.end(), 
 				{
 					EntityIcon::Infantry,
 					EntityIcon::Trooper,
@@ -167,7 +167,7 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 				});
 				break;
 
-				case StructureInfo::STARPORT:
+				case StructureInfo::Type::Starport:
 				break;
 
 				default:
@@ -178,7 +178,7 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 		case 5:                                                           // MISSION 5
 			switch (building)
 			{
-				case StructureInfo::VEHICLE: previews.insert(previews.end(), 
+				case StructureInfo::Type::Vehicle: previews.insert(previews.end(), 
 				{
 					EntityIcon::Raider_Trike,
 					EntityIcon::Trike,
@@ -190,12 +190,12 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 				});
 				break;
 
-				case StructureInfo::HIGH_TECH: previews.insert(previews.end(), {
+				case StructureInfo::Type::HighTech: previews.insert(previews.end(), {
 				                                                       EntityIcon::Carryall
 				                                                    });
 				break;
 
-				case StructureInfo::CONSTRUCTION_YARD: previews.insert(previews.end(), 
+				case StructureInfo::Type::ConstructionYard: previews.insert(previews.end(), 
 				{
 					EntityIcon::Slab_2x2,
 					EntityIcon::Wind_Trap,
@@ -211,7 +211,7 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 				});
 				break;
 
-				case StructureInfo::BARRACKS: previews.insert(previews.end(), 
+				case StructureInfo::Type::Barracks: previews.insert(previews.end(), 
 				{
 					EntityIcon::Infantry,
 					EntityIcon::Trooper,
@@ -219,7 +219,7 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 				});
 				break;
 
-				case StructureInfo::STARPORT:
+				case StructureInfo::Type::Starport:
 				break;
 
 				default:
@@ -230,7 +230,7 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 		case 6:                                                           // MISSION 6
 			switch (building)
 			{
-				case StructureInfo::VEHICLE: previews.insert(previews.end(), 
+				case StructureInfo::Type::Vehicle: previews.insert(previews.end(), 
 				{
 					EntityIcon::Trike,
 					EntityIcon::Raider_Trike,
@@ -243,13 +243,13 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 				});
 				break;
 
-				case StructureInfo::HIGH_TECH: previews.insert(previews.end(), 
+				case StructureInfo::Type::HighTech: previews.insert(previews.end(), 
 				{
 					EntityIcon::Carryall
 				});
 				break;
 
-				case StructureInfo::CONSTRUCTION_YARD: previews.insert(previews.end(), 
+				case StructureInfo::Type::ConstructionYard: previews.insert(previews.end(), 
 				{
 					EntityIcon::Slab_2x2,
 					EntityIcon::Wind_Trap,
@@ -267,7 +267,7 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 				});
 				break;
 
-				case StructureInfo::BARRACKS: previews.insert(previews.end(), 
+				case StructureInfo::Type::Barracks: previews.insert(previews.end(), 
 				{
 					EntityIcon::Infantry,
 					EntityIcon::Trooper,
@@ -275,7 +275,7 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 				});
 				break;
 
-				case StructureInfo::STARPORT: previews.insert(previews.end(), 
+				case StructureInfo::Type::Starport: previews.insert(previews.end(), 
 				{
 					EntityIcon::Trike,
 					EntityIcon::Quad,
@@ -295,7 +295,7 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 		case 7:                                                           // MISSION 7
 			switch (building)
 			{
-				case StructureInfo::VEHICLE: previews.insert(previews.end(), 
+				case StructureInfo::Type::Vehicle: previews.insert(previews.end(), 
 				{
 					EntityIcon::Trike,
 					EntityIcon::Raider_Trike,
@@ -311,14 +311,14 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 				});
 				break;
 
-				case StructureInfo::HIGH_TECH: previews.insert(previews.end(), 
+				case StructureInfo::Type::HighTech: previews.insert(previews.end(), 
 				{
 					EntityIcon::Carryall,
 					EntityIcon::Ornithopter
 				});
 				break;
 
-				case StructureInfo::CONSTRUCTION_YARD: previews.insert(previews.end(), 
+				case StructureInfo::Type::ConstructionYard: previews.insert(previews.end(), 
 				{
 					EntityIcon::Slab_2x2,
 					EntityIcon::Wind_Trap,
@@ -336,7 +336,7 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 				});
 				break;
 
-				case StructureInfo::BARRACKS: previews.insert(previews.end(), 
+				case StructureInfo::Type::Barracks: previews.insert(previews.end(), 
 				{
 					EntityIcon::Infantry,
 					EntityIcon::Trooper,
@@ -344,7 +344,7 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 				});
 				break;
 
-				case StructureInfo::STARPORT: previews.insert(previews.end(), 
+				case StructureInfo::Type::Starport: previews.insert(previews.end(), 
 				{
 					EntityIcon::Trike,
 					EntityIcon::Quad,
@@ -370,7 +370,7 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 	{
 		switch (building)
 		{
-			case StructureInfo::VEHICLE: previews.insert(previews.end(), 
+			case StructureInfo::Type::Vehicle: previews.insert(previews.end(), 
 			{
 				EntityIcon::Trike,
 				EntityIcon::Raider_Trike,
@@ -386,14 +386,14 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 			});
 			break;
 
-			case StructureInfo::HIGH_TECH: previews.insert(previews.end(), 
+			case StructureInfo::Type::HighTech: previews.insert(previews.end(), 
 			{
 				EntityIcon::Carryall,
 				EntityIcon::Ornithopter
 			});
 			break;
 
-			case StructureInfo::CONSTRUCTION_YARD: previews.insert(previews.end(), 
+			case StructureInfo::Type::ConstructionYard: previews.insert(previews.end(), 
 			{
 				EntityIcon::Slab_2x2,
 				EntityIcon::Wind_Trap,
@@ -412,7 +412,7 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 			});
 			break;
 
-			case StructureInfo::BARRACKS: previews.insert(previews.end(), 
+			case StructureInfo::Type::Barracks: previews.insert(previews.end(), 
 			{
 				EntityIcon::Infantry,
 				EntityIcon::Trooper,
@@ -420,7 +420,7 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 			});
 			break;
 
-			case StructureInfo::STARPORT: previews.insert(previews.end(), 
+			case StructureInfo::Type::Starport: previews.insert(previews.end(), 
 			{
 				EntityIcon::Trike,
 				EntityIcon::Quad,
@@ -452,7 +452,7 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 		case HouseType::Atreides:
 			switch (building)
 			{
-				case StructureInfo::VEHICLE:
+				case StructureInfo::Type::Vehicle:
 					remove_previews(previews, 
 					{
 						EntityIcon::Raider_Trike,
@@ -461,13 +461,13 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 					});
 				break;
 
-				case StructureInfo::HIGH_TECH:
+				case StructureInfo::Type::HighTech:
 				break;
 
-				case StructureInfo::CONSTRUCTION_YARD:
+				case StructureInfo::Type::ConstructionYard:
 				break;
 
-				case StructureInfo::BARRACKS:
+				case StructureInfo::Type::Barracks:
 					remove_previews(previews, 
 					{
 						EntityIcon::Trooper,
@@ -475,7 +475,7 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 					});
 				break;
 
-				case StructureInfo::STARPORT:
+				case StructureInfo::Type::Starport:
 				break;
 
 				default:
@@ -486,7 +486,7 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 		case HouseType::Ordos:
 			switch (building)
 			{
-				case StructureInfo::VEHICLE:
+				case StructureInfo::Type::Vehicle:
 					remove_previews(previews, 
 					{
 						EntityIcon::Trike,
@@ -496,16 +496,16 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 					});
 				break;
 
-				case StructureInfo::HIGH_TECH:
+				case StructureInfo::Type::HighTech:
 				break;
 
-				case StructureInfo::CONSTRUCTION_YARD:
+				case StructureInfo::Type::ConstructionYard:
 				break;
 
-				case StructureInfo::BARRACKS:
+				case StructureInfo::Type::Barracks:
 				break;
 
-				case StructureInfo::STARPORT:
+				case StructureInfo::Type::Starport:
 				break;
 
 				default:
@@ -516,7 +516,7 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 		case HouseType::Harkonnen:
 			switch (building)
 			{
-				case StructureInfo::VEHICLE:
+				case StructureInfo::Type::Vehicle:
 					remove_previews(previews, 
 					{
 						EntityIcon::Raider_Trike,
@@ -526,24 +526,24 @@ std::vector<EntityIcon> GameInfo::getPreviewIconList(HouseType house, StructureI
 					});
 				break;
 
-				case StructureInfo::HIGH_TECH:
+				case StructureInfo::Type::HighTech:
 					remove_previews(previews, 
 					{
 						EntityIcon::Ornithopter
 					});
 				break;
 
-				case StructureInfo::CONSTRUCTION_YARD:
+				case StructureInfo::Type::ConstructionYard:
 				break;
 
-				case StructureInfo::BARRACKS:
+				case StructureInfo::Type::Barracks:
 					remove_previews(previews, 
 					{
 						EntityIcon::Infantry
 					});
 				break;
 
-				case StructureInfo::STARPORT:
+				case StructureInfo::Type::Starport:
 				break;
 
 				default:

@@ -9,26 +9,26 @@
 // https://gamicus.fandom.com/wiki/List_of_structures_in_Dune_II
 struct StructureInfo
 {
-    enum Type : int32_t
+    enum class Type : int32_t
     {
-        SLAB_1X1 = 0,
-        SLAB_2X2,
-        PALACE,
-        VEHICLE,
-        HIGH_TECH,
-        CONSTRUCTION_YARD,
-        WIND_TRAP,
-        BARRACKS,
-        STARPORT,
-        REFINERY,
-        REPAIR,
-        WALL,
-        TURRET,
-        ROCKET_TURRET,
-        SILO,
-        OUTPOST,
-        MAX,
-        INVALID = 0xFF
+        Slab_1x1 = 0,
+        Slab_2x2,
+        Palace,
+        Vehicle,
+        HighTech,
+        ConstructionYard,
+        WindTrap,
+        Barracks,
+        Starport,
+        Refinery,
+        Repair,
+        Wall,
+        Turret,
+        RocketTurret,
+        Silo,
+        Outpost,
+        Max,
+        Undefined = 0xFF
     } type;
 
     HouseType owner;

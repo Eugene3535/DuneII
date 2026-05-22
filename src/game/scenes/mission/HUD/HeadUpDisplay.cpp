@@ -181,20 +181,20 @@ void HeadUpDisplay::runSelection() noexcept
     {
         switch (type)
         {
-            case StructureInfo::SLAB_2X2:          return EntityIcon::Slab_2x2;
-            case StructureInfo::PALACE:            return EntityIcon::Palace;
-            case StructureInfo::VEHICLE:           return EntityIcon::Light_Vehicle_Factory;
-            case StructureInfo::HIGH_TECH:         return EntityIcon::High_Tech;
-            case StructureInfo::CONSTRUCTION_YARD: return EntityIcon::Construction_Yard;
-            case StructureInfo::WIND_TRAP:         return EntityIcon::Wind_Trap;
-            case StructureInfo::BARRACKS:          return EntityIcon::Barracks;
-            case StructureInfo::STARPORT:          return EntityIcon::Starport;
-            case StructureInfo::REFINERY:          return EntityIcon::Refinery;
-            case StructureInfo::REPAIR:            return EntityIcon::Repair;
-            case StructureInfo::TURRET:            return EntityIcon::Turret;
-            case StructureInfo::ROCKET_TURRET:     return EntityIcon::Rocket_Turret;
-            case StructureInfo::SILO:              return EntityIcon::Spice_Silo;
-            case StructureInfo::OUTPOST:           return EntityIcon::Outpost;
+            case StructureInfo::Type::Slab_2x2:         return EntityIcon::Slab_2x2;
+            case StructureInfo::Type::Palace:           return EntityIcon::Palace;
+            case StructureInfo::Type::Vehicle:          return EntityIcon::Light_Vehicle_Factory;
+            case StructureInfo::Type::HighTech:         return EntityIcon::High_Tech;
+            case StructureInfo::Type::ConstructionYard: return EntityIcon::Construction_Yard;
+            case StructureInfo::Type::WindTrap:         return EntityIcon::Wind_Trap;
+            case StructureInfo::Type::Barracks:         return EntityIcon::Barracks;
+            case StructureInfo::Type::Starport:         return EntityIcon::Starport;
+            case StructureInfo::Type::Refinery:         return EntityIcon::Refinery;
+            case StructureInfo::Type::Repair:           return EntityIcon::Repair;
+            case StructureInfo::Type::Turret:           return EntityIcon::Turret;
+            case StructureInfo::Type::RocketTurret:     return EntityIcon::Rocket_Turret;
+            case StructureInfo::Type::Silo:             return EntityIcon::Spice_Silo;
+            case StructureInfo::Type::Outpost:          return EntityIcon::Outpost;
 
             default: return EntityIcon::Empty_Cell;
         }
@@ -216,11 +216,11 @@ void HeadUpDisplay::runSelection() noexcept
 
                 if(mainPreviewIcon != EntityIcon::Empty_Cell)
                 {
-                    const bool hasConstructionPreviews = ((info->type == StructureInfo::Type::VEHICLE)           ||
-                                                          (info->type == StructureInfo::Type::HIGH_TECH)         ||
-                                                          (info->type == StructureInfo::Type::CONSTRUCTION_YARD) ||
-                                                          (info->type == StructureInfo::Type::BARRACKS)          ||
-                                                          (info->type == StructureInfo::Type::STARPORT));
+                    const bool hasConstructionPreviews = ((info->type == StructureInfo::Type::Vehicle)          ||
+                                                          (info->type == StructureInfo::Type::HighTech)         ||
+                                                          (info->type == StructureInfo::Type::ConstructionYard) ||
+                                                          (info->type == StructureInfo::Type::Barracks)         ||
+                                                          (info->type == StructureInfo::Type::Starport));
 
                     std::span<EntityIcon> previews;
 
@@ -244,10 +244,10 @@ void HeadUpDisplay::runSelection() noexcept
 
     if (StructureInfo* component = registry.try_get<StructureInfo>(entity))
     {
-        bool isSelectable = ((component->type != StructureInfo::Type::SLAB_1X1) &&
-                             (component->type != StructureInfo::Type::SLAB_2X2) &&
-                             (component->type != StructureInfo::Type::WALL)     &&
-                              component->type <  StructureInfo::Type::MAX);
+        bool isSelectable = ((component->type != StructureInfo::Type::Slab_1x1) &&
+                             (component->type != StructureInfo::Type::Slab_2x2) &&
+                             (component->type != StructureInfo::Type::Wall)     &&
+                              component->type <  StructureInfo::Type::Max);
 
         if (isSelectable)
         {
