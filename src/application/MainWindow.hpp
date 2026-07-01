@@ -1,5 +1,4 @@
-#ifndef MAIN_WINDOW_HPP
-#define MAIN_WINDOW_HPP
+#pragma once
 
 
 class MainWindow final
@@ -18,5 +17,3 @@ private:
 
 	struct GLFWwindow* m_window;
 };
-
-#endif // !MAIN_WINDOW_HPP

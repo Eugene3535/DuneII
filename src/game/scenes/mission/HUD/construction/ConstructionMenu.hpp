@@ -1,10 +1,10 @@
-#ifndef CONSTRUCTION_MENU_HPP
-#define CONSTRUCTION_MENU_HPP
+#pragma once
 
 #include <vector>
 #include <span>
 
 #include "common/Enums.hpp"
+#include "graphics/sprites/SpriteManager.hpp"
 #include "graphics/transform/Transform2D.hpp"
 
 
@@ -106,5 +106,3 @@ private:
     std::vector<EntityIcon> m_previews;
     bool m_isShown;
 };
-
-#endif // !CONSTRUCTION_MENU_HPP

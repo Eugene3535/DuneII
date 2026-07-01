@@ -1,6 +1,4 @@
-#ifndef UNITS_HPP
-#define UNITS_HPP
-
+#pragma once
 
 enum class UnitType : int
 {
@@ -33,5 +31,3 @@ enum class UnitType : int
     MAX,
     INVALID = 0xFF
 };
-
-#endif // !UNITS_HPP

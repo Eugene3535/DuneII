@@ -2,8 +2,8 @@
 #include <cstdio>
 #endif
 
-#include "resources/files/Shader.hpp"
-#include "resources/gl_interfaces/shaders/ShaderProgram.hpp"
+#include "files/Shader.hpp"
+#include "graphics/shaders/ShaderProgram.hpp"
 
 
 ShaderProgram::ShaderProgram() noexcept:

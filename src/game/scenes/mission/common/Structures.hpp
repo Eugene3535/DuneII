@@ -1,5 +1,4 @@
-#ifndef STRUCTURE_HPP
-#define STRUCTURE_HPP
+#pragma once
 
 #include <cglm/struct/ivec2.h>
 
@@ -46,5 +45,3 @@ struct StructureInfo
     float progress;
     bool isUnderConstruction;
 };
-
-#endif // !STRUCTURE_HPP

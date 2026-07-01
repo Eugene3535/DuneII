@@ -1,7 +1,6 @@
-#ifndef BUTTON_HPP
-#define BUTTON_HPP
+#pragma once
 
-#include "graphics/Sprite2D.hpp"
+#include "graphics/sprites/SpriteManager.hpp"
 #include "graphics/transform/Transform2D.hpp"
 
 class Button:
@@ -25,5 +24,3 @@ private:
     bool m_boundsNeedUpdate;
     bool m_isSelected;
 };
-
-#endif // !BUTTON_HPP

@@ -1,6 +1,4 @@
-#ifndef IMAGE_HPP
-#define IMAGE_HPP
-
+#pragma once
 #include <filesystem>
 #include <memory>
 
@@ -18,5 +16,3 @@ struct StbImage
     int32_t height = 0;
     int32_t bytePerPixel = 0;
 };
-
-#endif // !IMAGE_HPP

@@ -7,9 +7,9 @@
 #include "cglm/struct/affine-mat.h"
 #include <magic_enum/magic_enum.hpp>
 
-#include "resources/files/FileProvider.hpp"
-#include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
-#include "resources/gl_interfaces/texture/Texture2D.hpp"
+#include "files/FileProvider.hpp"
+#include "graphics/vao/VertexBufferLayout.hpp"
+#include "graphics/texture/Texture2D.hpp"
 #include "game/Engine.hpp"
 #include "game/scenes/mission/loader/TiledMapLoader.hpp"
 #include "game/scenes/mission/tilemap/Tilemap.hpp"
@@ -367,7 +367,8 @@ bool Tilemap::createGraphicsResources(std::span<const vec4s> vertices, std::span
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
-	VertexArrayObject::createVertexInputState(m_landscape.vertexArrayObject, m_landscape.vertexBufferObject, attributes);
+	VertexBufferLayout layout(attributes);
+	layout.createVertexInputState(m_landscape.vertexArrayObject, m_landscape.vertexBufferObject);
 
 	glBindVertexArray(m_landscape.vertexArrayObject);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_landscape.indexBufferObject);
@@ -400,7 +401,7 @@ bool Tilemap::createGraphicsResources(std::span<const vec4s> vertices, std::span
 	);
 
 	glGenVertexArrays(1, &m_buildings.vertexArrayObject);
-	VertexArrayObject::createVertexInputState(m_buildings.vertexArrayObject, m_buildings.vertexBufferObject, attributes);
+	layout.createVertexInputState(m_buildings.vertexArrayObject, m_buildings.vertexBufferObject);
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_buildings.texture);
 	Texture2D buildingTexture = {.handle = m_buildings.texture };

@@ -1,8 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "resources/files/FileProvider.hpp"
-#include "resources/files/Shader.hpp"
+#include "files/FileProvider.hpp"
+#include "files/Shader.hpp"
 #include "game/scenes/intro/TitleScreen.hpp"
 #include "game/scenes/pick_house/PickHouse.hpp"
 #include "game/scenes/mission/Mission.hpp"

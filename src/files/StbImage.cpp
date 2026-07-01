@@ -1,7 +1,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#include "resources/files/StbImage.hpp"
+#include "files/StbImage.hpp"
 
 void StbImage::StbImageDeleter::operator()(uint8_t* src) noexcept
 {

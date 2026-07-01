@@ -1,5 +1,4 @@
-#ifndef ORTHO_MATRIX_HPP
-#define ORTHO_MATRIX_HPP
+#pragma once
 
 
 #include <cglm/struct/mat4.h>
@@ -25,5 +24,3 @@ private:
 
     bool m_flipVertically;
 };
-
-#endif // !ORTHO_MATRIX_HPP

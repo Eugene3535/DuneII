@@ -2,6 +2,7 @@
 
 #include <cglm/call/cam.h>
 
+#include "graphics/sprites/SpriteManager.hpp"
 #include "game/scenes/Scene.hpp"
 #include "game/Engine.hpp"
 

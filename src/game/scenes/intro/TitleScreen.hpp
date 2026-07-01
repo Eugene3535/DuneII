@@ -1,5 +1,4 @@
-#ifndef TITLE_SCREEN_HPP
-#define TITLE_SCREEN_HPP
+#pragma once
 
 #include "graphics/sprites/SpriteManager.hpp"
 #include "game/scenes/intro/interactive_elements/Button.hpp"
@@ -37,5 +36,3 @@ private:
 
     bool m_isPresented;
 };
-
-#endif // !TITLE_SCREEN_HPP

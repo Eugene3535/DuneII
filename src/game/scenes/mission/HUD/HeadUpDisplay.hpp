@@ -1,11 +1,9 @@
-#ifndef HEAD_UP_DISPLAY_HPP
-#define HEAD_UP_DISPLAY_HPP
+#pragma once
 
 #include <entt/entity/fwd.hpp>
 
 #include "common/NonCopyable.hpp"
 #include "common/NonMovable.hpp"
-#include "graphics/Sprite2D.hpp"
 #include "graphics/transform/Transform2D.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
 #include "game/scenes/mission/HUD/previews/EntityPreview.hpp"
@@ -64,5 +62,3 @@ private:
         entt::entity lastSelectedEntity;
     } m_selectionFrame;
 };
-
-#endif // !HEAD_UP_DISPLAY_HPP

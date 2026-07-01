@@ -2,9 +2,9 @@
 #include <GLFW/glfw3.h>
 #include "cglm/struct/affine-mat.h"
 
-#include "resources/files/FileProvider.hpp"
-#include "resources/gl_interfaces/texture/Texture2D.hpp"
-#include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
+#include "files/FileProvider.hpp"
+#include "graphics/texture/Texture2D.hpp"
+#include "graphics/vao/VertexBufferLayout.hpp"
 #include "game/scenes/mission/tilemap/Tilemap.hpp"
 #include "game/Engine.hpp"
 #include "game/scenes/mission/HUD/construction/ConstructionMenu.hpp"
@@ -77,7 +77,8 @@ bool HeadUpDisplay::init() noexcept
 
 	glGenVertexArrays(1, &m_selectionFrame.vertexArrayObject);
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float2 };
-	VertexArrayObject::createVertexInputState(m_selectionFrame.vertexArrayObject, m_selectionFrame.vertexBufferObject, attributes);
+    VertexBufferLayout layout(attributes);
+	layout.createVertexInputState(m_selectionFrame.vertexArrayObject, m_selectionFrame.vertexBufferObject);
 
 //  Entity preview
     glCreateTextures(GL_TEXTURE_2D, 1, &m_previewTexture);

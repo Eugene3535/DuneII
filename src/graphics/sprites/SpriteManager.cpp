@@ -2,8 +2,8 @@
 
 #include "RapidXML/rapidxml_utils.hpp"
 
-#include "resources/gl_interfaces/texture/Texture2D.hpp"
-#include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
+#include "graphics/texture/Texture2D.hpp"
+#include "graphics/vao/VertexBufferLayout.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
 
 
@@ -16,7 +16,8 @@ SpriteManager::SpriteManager() noexcept:
 
 	glGenVertexArrays(1, &m_vao);
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
-	VertexArrayObject::createVertexInputState(m_vao, m_vbo, attributes);
+	VertexBufferLayout layout(attributes);
+	layout.createVertexInputState(m_vao, m_vbo);
 }
 
 

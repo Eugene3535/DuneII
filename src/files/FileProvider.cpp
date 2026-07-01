@@ -1,4 +1,4 @@
-#include "resources/files/FileProvider.hpp"
+#include "files/FileProvider.hpp"
 
 
 std::filesystem::path FileProvider::findPathToFile(const std::string& filename) noexcept

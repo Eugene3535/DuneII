@@ -1,12 +1,10 @@
-#ifndef SCENE_HPP
-#define SCENE_HPP
+#pragma once
 
 #include <cstdint>
 #include <string_view>
 
 #include <cglm/struct/vec2.h>
 
-#include "graphics/Sprite2D.hpp"
 #include "graphics/transform/Transform2D.hpp"
 
 
@@ -33,7 +31,7 @@ public:
     Type getType()  const noexcept;
 
 protected:
-    void setSpriteSizeInPixels(const Sprite2D& sprite, const vec2s newSize, Transform2D& transform) noexcept;
+    void setSpriteSizeInPixels(const struct Sprite2D& sprite, const vec2s newSize, Transform2D& transform) noexcept;
 
     class Engine* m_engine;
     bool          m_isLoaded;
@@ -41,5 +39,3 @@ protected:
 private:
     const Type m_type;
 };
-
-#endif // !SCENE_HPP

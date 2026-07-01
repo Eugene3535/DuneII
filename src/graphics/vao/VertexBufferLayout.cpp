@@ -1,4 +1,4 @@
-#include "resources/gl_interfaces/vao/attributes/VertexBufferLayout.hpp"
+#include "graphics/vao/VertexBufferLayout.hpp"
 
 
 static constexpr GLuint shaderAttributeTypeToComponentCount(const VertexBufferLayout::Attribute::Type type) noexcept
@@ -90,7 +90,7 @@ VertexBufferLayout::VertexBufferLayout(std::span<const Attribute> attributes) no
     m_attributes(attributes.begin(), attributes.end()),
     m_stride(0)
 {
-    size_t offset = 0;
+    GLuint offset = 0;
 
     for (auto& attribute : m_attributes)
     {
@@ -101,13 +101,36 @@ VertexBufferLayout::VertexBufferLayout(std::span<const Attribute> attributes) no
 }
 
 
+void VertexBufferLayout::createVertexInputState(GLuint vao, GLuint vbo) const noexcept
+{
+    if (m_attributes.empty())
+        return;
+
+	GLuint attributeCount = 0;
+
+	glBindVertexArray(vao);
+
+	for (const auto& attribute : m_attributes)
+	{
+		glEnableVertexAttribArray(attributeCount);
+		glBindVertexBuffer(attributeCount, vbo, attribute.offset, m_stride);
+		glVertexAttribFormat(attributeCount, static_cast<GLint>(attribute.componentsCount), attribute.componentType, attribute.isNormalized, 0);
+		glVertexAttribBinding(attributeCount, attributeCount);
+
+		++attributeCount;
+	}
+
+	glBindVertexArray(0);	
+}
+
+
 std::span<const VertexBufferLayout::Attribute> VertexBufferLayout::getAttributes() const noexcept
 {
     return m_attributes;
 }
 
 
-size_t VertexBufferLayout::getStride() const noexcept
+GLuint VertexBufferLayout::getStride() const noexcept
 {
     return m_stride;
 }

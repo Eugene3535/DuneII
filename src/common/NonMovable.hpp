@@ -1,5 +1,4 @@
-#ifndef NON_MOVABLE_HPP
-#define NON_MOVABLE_HPP
+#pragma once
 
 class NonMovable 
 {
@@ -10,5 +9,3 @@ protected:
     NonMovable(NonMovable&&) = delete;
     NonMovable& operator=(NonMovable&&) = delete;
 };
-
-#endif

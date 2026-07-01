@@ -1,5 +1,4 @@
-#ifndef ENTITY_PREVIEW_HPP
-#define ENTITY_PREVIEW_HPP
+#pragma once
 
 #include <vector>
 #include <span>
@@ -44,5 +43,3 @@ private:
 
     std::vector<vec2s> m_textureGrid;
 };
-
-#endif // !ENTITY_PREVIEW_HPP

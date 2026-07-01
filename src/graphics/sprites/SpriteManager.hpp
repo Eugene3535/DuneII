@@ -1,5 +1,4 @@
-#ifndef SPRITE_MANAGER_HPP
-#define SPRITE_MANAGER_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -10,7 +9,14 @@
 
 #include <cglm/struct/ivec4.h>
 
-#include "graphics/Sprite2D.hpp"
+
+struct Sprite2D
+{
+	uint32_t texture;
+	uint32_t frame;
+	uint32_t width;
+	uint32_t height;
+};
 
 
 class SpriteManager final
@@ -50,5 +56,3 @@ private:
 	std::vector<Sprite2D> m_sprites;
 	std::vector<float> m_vertices;
 };
-
-#endif // !SPRITE_MANAGER_HPP

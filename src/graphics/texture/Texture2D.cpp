@@ -1,7 +1,7 @@
 #include <glad/glad.h>
 
-#include "resources/files/StbImage.hpp"
-#include "resources/gl_interfaces/texture/Texture2D.hpp"
+#include "files/StbImage.hpp"
+#include "graphics/texture/Texture2D.hpp"
 
 
 bool Texture2D::loadFromImage(const StbImage& image) noexcept

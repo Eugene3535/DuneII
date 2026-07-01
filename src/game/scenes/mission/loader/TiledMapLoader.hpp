@@ -1,5 +1,4 @@
-#ifndef TILED_MAP_LOADER_HPP
-#define TILED_MAP_LOADER_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -61,5 +60,3 @@ private:
 	ivec2s m_mapSize;
 	ivec2s m_tileSize;
 };
-
-#endif // !TILED_MAP_LOADER_HPP

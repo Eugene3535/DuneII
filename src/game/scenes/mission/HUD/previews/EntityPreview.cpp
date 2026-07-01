@@ -1,7 +1,7 @@
 #include <cglm/struct/ivec4.h>
 
-#include "resources/gl_interfaces/texture/Texture2D.hpp"
-#include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
+#include "graphics/texture/Texture2D.hpp"
+#include "graphics/vao/VertexBufferLayout.hpp"
 #include "game/Engine.hpp"
 #include "game/scenes/mission/HUD/previews/EntityPreview.hpp"
 
@@ -112,7 +112,8 @@ void EntityPreview::createIcons(const ivec2s position, const ivec2s size) noexce
 
     glGenVertexArrays(1, &m_vertexArrayObject);
     const std::array<VertexBufferLayout::Attribute, 1> attributes { VertexBufferLayout::Attribute::Float4 };
-    VertexArrayObject::createVertexInputState(m_vertexArrayObject, m_vertexBufferObject, attributes);
+    VertexBufferLayout layout(attributes);
+    layout.createVertexInputState(m_vertexArrayObject, m_vertexBufferObject);
 }
 
 

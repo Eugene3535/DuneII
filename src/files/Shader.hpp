@@ -1,5 +1,4 @@
-#ifndef SHADER_HPP
-#define SHADER_HPP
+#pragma once
 
 #include <filesystem>
 
@@ -23,5 +22,3 @@ private:
     GLuint m_handle;
     GLenum m_type;
 };
-
-#endif // !SHADER_HPP

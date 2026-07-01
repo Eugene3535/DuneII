@@ -2,9 +2,9 @@
 #include <GLFW/glfw3.h>
 #include "cglm/struct/affine-mat.h"
 
-#include "resources/files/FileProvider.hpp"
-#include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
-#include "resources/gl_interfaces/texture/Texture2D.hpp"
+#include "files/FileProvider.hpp"
+#include "graphics/texture/Texture2D.hpp"
+#include "graphics/vao/VertexBufferLayout.hpp"
 #include "graphics/geometry/GeometryGenerator.hpp"
 #include "game/Engine.hpp"
 #include "game/scenes/pick_house/PickHouse.hpp"
@@ -140,10 +140,12 @@ bool PickHouse::load(std::string_view info) noexcept
     glNamedBufferData(m_vertexBufferObject, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 
     const std::array<VertexBufferLayout::Attribute, 1> spriteAttributes{ VertexBufferLayout::Attribute::Float4 };
-    VertexArrayObject::createVertexInputState(m_background.vertexArrayObject, m_vertexBufferObject, spriteAttributes);
+    VertexBufferLayout spriteLayout(spriteAttributes);
+    spriteLayout.createVertexInputState(m_background.vertexArrayObject, m_vertexBufferObject);
 
     const std::array<VertexBufferLayout::Attribute, 1> outlineAttributes{ VertexBufferLayout::Attribute::Float2 };
-    VertexArrayObject::createVertexInputState(m_outline.vertexArrayObject, m_vertexBufferObject, outlineAttributes);
+    VertexBufferLayout outlineLayout(outlineAttributes);
+    outlineLayout.createVertexInputState(m_outline.vertexArrayObject, m_vertexBufferObject);
 
     m_isLoaded = true;
 

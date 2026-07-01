@@ -1,5 +1,4 @@
-#ifndef VERTEX_BUFFER_LAYOUT_HPP
-#define VERTEX_BUFFER_LAYOUT_HPP
+#pragma once
 
 #include <span>
 #include <vector>
@@ -38,20 +37,20 @@ public:
 
         Type   type;
         GLuint componentType;
-        size_t componentsCount;
-        size_t sizeInBytes;
-        size_t offset;
+        GLuint componentsCount;
+        GLuint sizeInBytes;
+        GLuint offset;
         GLboolean isNormalized;
     };
 
     VertexBufferLayout(std::span<const Attribute> attributes) noexcept;
 
+    void createVertexInputState(GLuint vao, GLuint vbo) const noexcept;
+
     std::span<const Attribute> getAttributes() const noexcept;
-    size_t getStride() const noexcept;
+    GLuint getStride() const noexcept;
 
 private:
     std::vector<Attribute> m_attributes;
-    size_t m_stride;
+    GLuint m_stride;
 };
-
-#endif // !VERTEX_BUFFER_LAYOUT_HPP

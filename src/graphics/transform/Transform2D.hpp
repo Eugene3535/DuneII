@@ -1,5 +1,4 @@
-#ifndef TRANSFORM_2D_HPP
-#define TRANSFORM_2D_HPP
+#pragma once
 
 #include <cglm/struct/vec2.h>
 #include <cglm/call/mat4.h>
@@ -39,5 +38,3 @@ private:
     vec2s m_scale;
     float m_rotation;   
 };
-
-#endif 

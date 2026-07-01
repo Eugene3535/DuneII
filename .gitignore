@@ -1,6 +1,7 @@
 .vscode
 .vs
 .cache
+.qtcreator
 build
 out
 tmp

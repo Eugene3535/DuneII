@@ -1,6 +1,4 @@
-#ifndef TEXTURE_HPP
-#define TEXTURE_HPP
-
+#pragma once
 #include <array>
 #include <filesystem>
 
@@ -35,5 +33,3 @@ struct Texture2D
 	bool isSmooth   = false;
 	bool isRepeated = false;
 };
-
-#endif // !TEXTURE_HPP

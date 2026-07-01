@@ -1,5 +1,4 @@
-#ifndef NON_COPYABLE_HPP
-#define NON_COPYABLE_HPP
+#pragma once
 
 class NonCopyable 
 {
@@ -10,5 +9,3 @@ protected:
     NonCopyable(const NonCopyable&) = delete;
     NonCopyable& operator=(const NonCopyable&) = delete;
 };
-
-#endif

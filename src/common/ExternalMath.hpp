@@ -1,5 +1,4 @@
-#ifndef EXTERNAL_MATH_HPP
-#define EXTERNAL_MATH_HPP
+#pragma once
 
 #include <array>
 
@@ -19,5 +18,3 @@ private:
 };
 
 // int32_t get_distance(const sf::Vector2i& from, const sf::Vector2i& to) noexcept;
-
-#endif // !EXTERNAL_MATH_HPP

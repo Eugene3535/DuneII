@@ -4,9 +4,9 @@
 
 #include <glad/glad.h>
 
-#include "resources/files/FileProvider.hpp"
-#include "resources/gl_interfaces/texture/Texture2D.hpp"
-#include "resources/gl_interfaces/vao/VertexArrayObject.hpp"
+#include "files/FileProvider.hpp"
+#include "graphics/texture/Texture2D.hpp"
+#include "graphics/vao/VertexBufferLayout.hpp"
 #include "graphics/geometry/GeometryGenerator.hpp"
 #include "game/scenes/mission/tilemap/Tilemap.hpp"
 #include "game/Engine.hpp"
@@ -450,7 +450,8 @@ void ConstructionMenu::createFrames() noexcept
 
     glGenVertexArrays(1, &m_frames.vertexArrayObject);
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float2 };
-    VertexArrayObject::createVertexInputState(m_frames.vertexArrayObject, m_frames.vertexBufferObject, attributes);
+    VertexBufferLayout layout(attributes);
+    layout.createVertexInputState(m_frames.vertexArrayObject, m_frames.vertexBufferObject);
 }
 
 
@@ -534,7 +535,8 @@ void ConstructionMenu::createPreviews() noexcept
 
     glGenVertexArrays(1, &m_previewCells.vertexArrayObject);
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
-    VertexArrayObject::createVertexInputState(m_previewCells.vertexArrayObject, m_previewCells.vertexBufferObject, attributes);
+    VertexBufferLayout layout(attributes);
+    layout.createVertexInputState(m_previewCells.vertexArrayObject, m_previewCells.vertexBufferObject);
 }
 
 
@@ -639,13 +641,15 @@ void ConstructionMenu::createUserElements() noexcept
     {// Vertex array object for buttons
         glGenVertexArrays(1, &m_userElements.vertexArrayObject);
         const std::array<VertexBufferLayout::Attribute, 1> attributes = { VertexBufferLayout::Attribute::Float4 };
-        VertexArrayObject::createVertexInputState(m_userElements.vertexArrayObject, m_userElements.vertexBufferObject, attributes);
+        VertexBufferLayout layout(attributes);
+        layout.createVertexInputState(m_userElements.vertexArrayObject, m_userElements.vertexBufferObject);
     }
 
     {// Vertex array object for selection frame
         glGenVertexArrays(1, &m_userElements.selectionFrame.vertexArrayObject);
         const std::array<VertexBufferLayout::Attribute, 1> attributes = { VertexBufferLayout::Attribute::Float2 };
-        VertexArrayObject::createVertexInputState(m_userElements.selectionFrame.vertexArrayObject, m_userElements.vertexBufferObject, attributes);
+        VertexBufferLayout layout(attributes);
+        layout.createVertexInputState(m_userElements.selectionFrame.vertexArrayObject, m_userElements.vertexBufferObject);
     }
 
     m_userElements.program = m_previewCells.program;

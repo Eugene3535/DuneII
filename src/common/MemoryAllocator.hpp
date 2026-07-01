@@ -1,5 +1,4 @@
-#ifndef MEMORY_ALLOCATOR_HPP
-#define MEMORY_ALLOCATOR_HPP
+#pragma once
 
 #include <cstdint>
 #include <array>
@@ -28,7 +27,4 @@ private:
     std::unordered_map<size_t, std::vector<void*>> m_freeBlocks;
 };
 
-
 #include "common/MemoryAllocator.inl"
-
-#endif // !MEMORY_ALLOCATOR_HPP

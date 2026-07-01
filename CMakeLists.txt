@@ -34,7 +34,7 @@ set(CGLM_USE_TESTS OFF CACHE BOOL "Enable tests" FORCE)
 
 include(src/sources.cmake)
 
-add_executable(${PROJECT_NAME} ${DUNEII_ALL_FILES})
+add_executable(${PROJECT_NAME} ${DUNEII_SRC_FILES})
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/glfw glfw)
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/glad/core glad)
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/cglm cglm)

@@ -4,8 +4,8 @@
 #include <GLFW/glfw3.h>
 #include "cglm/struct/affine-mat.h"
 
-#include "resources/files/FileProvider.hpp"
-#include "resources/gl_interfaces/texture/Texture2D.hpp"
+#include "files/FileProvider.hpp"
+#include "graphics/texture/Texture2D.hpp"
 #include "game/Engine.hpp"
 #include "game/scenes/intro/TitleScreen.hpp"
 

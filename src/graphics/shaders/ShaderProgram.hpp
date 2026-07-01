@@ -1,5 +1,4 @@
-#ifndef SHADER_PROGRAM_HPP
-#define SHADER_PROGRAM_HPP
+#pragma once
 
 #include <span>
 
@@ -24,5 +23,3 @@ public:
 private:
     GLuint m_handle;
 };
-
-#endif // !SHADER_PROGRAM_HPP

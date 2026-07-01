@@ -1,5 +1,4 @@
-#ifndef MISSION_HPP
-#define MISSION_HPP
+#pragma once
 
 #include "game/scenes/mission/loader/TiledMapLoader.hpp"
 #include "game/scenes/mission/tilemap/Tilemap.hpp"
@@ -32,5 +31,3 @@ private:
 
     std::vector<void(*)(Mission*, float)> m_systems;
 };
-
-#endif // !MISSION_HPP

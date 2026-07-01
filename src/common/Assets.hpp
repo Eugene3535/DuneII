@@ -1,5 +1,4 @@
-#ifndef DEFINES_HPP
-#define DEFINES_HPP
+#pragma once
 
 
 // Textures
@@ -53,5 +52,3 @@
 #define ORDOS_DIRGE_FLAC     "17-Ordos-Dirge.flac"
 #define FINALE_FLAC          "19-Finale.flac"
 #define CREDIT_ROLL_FLAC     "20-Credit-Roll.flac"
-
-#endif // !DEFINES_HPP

@@ -1,5 +1,4 @@
-#ifndef GAME_ENGINE_HPP
-#define GAME_ENGINE_HPP
+#pragma once
 
 #include <string>
 #include <unordered_map>
@@ -7,7 +6,7 @@
 
 #include <cglm/struct/vec2.h>
 
-#include "resources/gl_interfaces/shaders/ShaderProgram.hpp"
+#include "graphics/shaders/ShaderProgram.hpp"
 #include "graphics/camera/OrthoMatrix.hpp"
 #include "game/scenes/Scene.hpp"
 #include "common/info/GameInfo.hpp"
@@ -58,5 +57,3 @@ private:
 };
 
 #include "game/Engine.inl"
-
-#endif // !GAME_ENGINE_HPP

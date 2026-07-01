@@ -1,8 +1,7 @@
-#ifndef PICK_HOUSE_HPP
-#define PICK_HOUSE_HPP
+#pragma once
 
 #include "common/Enums.hpp"
-#include "graphics/Sprite2D.hpp"
+#include "graphics/sprites/SpriteManager.hpp"
 #include "game/scenes/Scene.hpp"
 
 
@@ -42,5 +41,3 @@ private:
     float m_timer;
     bool m_outlineNeedUpdate;
 };
-
-#endif // !PICK_HOUSE_HPP

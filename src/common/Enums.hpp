@@ -1,5 +1,4 @@
-#ifndef ENUMS_HPP
-#define ENUMS_HPP
+#pragma once
 
 #include <cstdint>
 
@@ -61,5 +60,3 @@ enum class EntityIcon : uint32_t
 	MAX,
 	INVALID = 0xFF
 };
-
-#endif // !ENUMS_HPP

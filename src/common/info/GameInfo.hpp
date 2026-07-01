@@ -1,5 +1,4 @@
-#ifndef GAME_INFO_HPP
-#define GAME_INFO_HPP
+#pragma once
 
 #include <cstdint>
 #include <vector>
@@ -17,5 +16,3 @@ public:
 private:
 
 };
-
-#endif // !GAME_INFO_HPP
