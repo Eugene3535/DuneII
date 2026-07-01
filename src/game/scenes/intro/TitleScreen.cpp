@@ -61,81 +61,83 @@ TitleScreen::~TitleScreen()
     if(m_settingsButton)
         m_settingsButton->~Button();
 
-    glDeleteTextures(5, m_textures);
+    glDeleteTextures(static_cast<GLsizei>(m_textures.size()), m_textures.data());
 }
 
 
 bool TitleScreen::load(std::string_view info) noexcept
 {
-    if(m_isLoaded)
+    if (m_isLoaded)
         return true;
     
-    glCreateTextures(GL_TEXTURE_2D, 5, m_textures);
+    glCreateTextures(GL_TEXTURE_2D, static_cast<GLsizei>(m_textures.size()), m_textures.data());
 
 //  Textures
-    Texture2D spaceTexture    = {.handle = m_textures[0] };
-    Texture2D planetTexture   = {.handle = m_textures[1] };  
-    Texture2D playTexture     = {.handle = m_textures[2] }; 
-    Texture2D exitTexture     = {.handle = m_textures[3] };
-    Texture2D settingsTexture = {.handle = m_textures[4] };
+    Texture2D spaceTexture(m_textures[0]);
+    Texture2D planetTexture(m_textures[1]);  
+    Texture2D playTexture(m_textures[2]); 
+    Texture2D exitTexture(m_textures[3]);
+    Texture2D settingsTexture(m_textures[4]);
 
-    if(!spaceTexture.loadFromFile(FileProvider::findPathToFile(SPACE_JPG)))
+    if (!spaceTexture.loadFromFile(FileProvider::findPathToFile(SPACE_JPG)))
         return false;
 
-    if(!planetTexture.loadFromFile(FileProvider::findPathToFile(DUNE_PNG)))
+    if (!planetTexture.loadFromFile(FileProvider::findPathToFile(DUNE_PNG)))
         return false;
 
-    if(!playTexture.loadFromFile(FileProvider::findPathToFile(BUTTON_PLAY_PNG)))
+    if (!playTexture.loadFromFile(FileProvider::findPathToFile(BUTTON_PLAY_PNG)))
         return false;
 
-    if(!exitTexture.loadFromFile(FileProvider::findPathToFile(BUTTON_EXIT_RU_PNG)))
+    if (!exitTexture.loadFromFile(FileProvider::findPathToFile(BUTTON_EXIT_RU_PNG)))
         return false;
 
-    if(!settingsTexture.loadFromFile(FileProvider::findPathToFile(BUTTON_SETTINGS_RU_PNG)))
+    if (!settingsTexture.loadFromFile(FileProvider::findPathToFile(BUTTON_SETTINGS_RU_PNG)))
         return false;
 
 //  Shaders
     {
-        if(m_spriteProgram = m_engine->getShaderProgram("sprite"); m_spriteProgram == 0)
+        if (m_spriteProgram = m_engine->getShaderProgram("sprite"); m_spriteProgram == 0)
             return false;
 
-        if(m_buttonSpriteProgram = m_engine->getShaderProgram("color_sprite"); m_buttonSpriteProgram == 0)
+        if (m_buttonSpriteProgram = m_engine->getShaderProgram("color_sprite"); m_buttonSpriteProgram == 0)
             return false;
     }
     
 //  Sprites
-    m_sprites.createSprite("space", spaceTexture);
-    m_sprites.createSprite("planet", planetTexture);
-    m_sprites.createSprite("play", playTexture);
-    m_sprites.createSprite("exit", exitTexture);
-    m_sprites.createSprite("settings", settingsTexture);
+    m_sprites.createSprite("space", spaceTexture.getHandle());
+    m_sprites.createSprite("planet", planetTexture.getHandle());
+    m_sprites.createSprite("play", playTexture.getHandle());
+    m_sprites.createSprite("exit", exitTexture.getHandle());
+    m_sprites.createSprite("settings", settingsTexture.getHandle());
+    m_sprites.pushVerticesOnGPU();
 
-    if(auto spaceSprite = m_sprites.getSprite("space"); spaceSprite.has_value())
+    if (auto spaceSprite = m_sprites.getSprite("space"); spaceSprite.has_value())
         m_space = spaceSprite.value();
 
-    if(auto planetSprite = m_sprites.getSprite("planet"); planetSprite.has_value())
+    if (auto planetSprite = m_sprites.getSprite("planet"); planetSprite.has_value())
         m_planet = planetSprite.value();
 
-    m_planetTransform.setOrigin(planetTexture.width * 0.5f, planetTexture.height * 0.5f);
+    auto texSize = planetTexture.getSize();
+    m_planetTransform.setOrigin(texSize.x * 0.5f, texSize.y * 0.5f);
 
 //  Buttons
     int32_t uniform = glGetUniformLocation(m_buttonSpriteProgram, "spriteColor");
 
-    if(uniform == -1)
+    if (uniform == -1)
         return false;
 
     char* offset = m_memoryPool;
 
-    for(const auto btn : { "play", "exit", "settings" })
+    for (const auto btn : { "play", "exit", "settings" })
     {
-        if(auto sprite = m_sprites.getSprite(btn); sprite.has_value())
+        if (auto sprite = m_sprites.getSprite(btn); sprite.has_value())
         {
             Button* button = new(offset) Button(sprite.value(), uniform);
             offset += sizeof(Button);
 
-            if(strcmp(btn, "play") == 0)     m_playButton = button;
-            if(strcmp(btn, "exit") == 0)     m_exitButton = button;
-            if(strcmp(btn, "settings") == 0) m_settingsButton = button;
+            if (strcmp(btn, "play") == 0)     m_playButton = button;
+            if (strcmp(btn, "exit") == 0)     m_exitButton = button;
+            if (strcmp(btn, "settings") == 0) m_settingsButton = button;
         }
     }
     

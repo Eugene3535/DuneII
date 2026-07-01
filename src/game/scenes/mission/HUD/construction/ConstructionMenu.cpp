@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include <glad/glad.h>
+#include <cglm/affine-mat.h>
 
 #include "files/FileProvider.hpp"
 #include "graphics/texture/Texture2D.hpp"
@@ -548,7 +549,7 @@ void ConstructionMenu::createUserElements() noexcept
 
     for (const auto textureName : { BUTTON_EXIT_RU_PNG, BUTTON_REPAIR_RU_PNG, BUTTON_STOP_RU_PNG })
     {
-        Texture2D texture = {.handle = m_userElements.textures[currentTexture++] };
+        Texture2D texture(m_userElements.textures[currentTexture++]);
 
         if(!texture.loadFromFile(FileProvider::findPathToFile(textureName)))
             return;

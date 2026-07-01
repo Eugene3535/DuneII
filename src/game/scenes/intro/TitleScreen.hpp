@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include "graphics/sprites/SpriteManager.hpp"
 #include "game/scenes/intro/interactive_elements/Button.hpp"
 #include "game/scenes/Scene.hpp"
@@ -18,7 +20,7 @@ public:
     void resize(int width, int height) noexcept override;
 
 private:
-    GLuint m_textures[5];
+    std::array<GLuint, 5> m_textures;
 
     GLuint m_spriteProgram;
     GLuint m_buttonSpriteProgram;

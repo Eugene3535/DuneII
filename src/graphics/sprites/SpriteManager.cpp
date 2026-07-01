@@ -2,8 +2,8 @@
 
 #include "RapidXML/rapidxml_utils.hpp"
 
-#include "graphics/texture/Texture2D.hpp"
 #include "graphics/vao/VertexBufferLayout.hpp"
+#include "graphics/texture/Texture2D.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
 
 
@@ -11,13 +11,7 @@ SpriteManager::SpriteManager() noexcept:
 	m_vbo(0),
 	m_vao(0)
 {
-	glCreateBuffers(1, &m_vbo);
-	glNamedBufferData(m_vbo, 0, nullptr, GL_STATIC_DRAW);
 
-	glGenVertexArrays(1, &m_vao);
-    const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
-	VertexBufferLayout layout(attributes);
-	layout.createVertexInputState(m_vao, m_vbo);
 }
 
 
@@ -28,55 +22,65 @@ SpriteManager::~SpriteManager()
 }
 
 
-void SpriteManager::createSprite(const std::string& name, const Texture2D& texture) noexcept
+void SpriteManager::createSprite(const std::string& name, uint32_t texture) noexcept
 {
 	if(auto it = m_animations.find(name); it == m_animations.end())
 	{
-		const ivec4s textureFrame = { 0, 0, texture.width, texture.height };
+		GLint width;
+		GLint height;
+		glGetTextureLevelParameteriv(texture, 0, GL_TEXTURE_WIDTH, &width);
+		glGetTextureLevelParameteriv(texture, 0, GL_TEXTURE_HEIGHT, &height);
+
+		const ivec4s textureFrame = { 0, 0, width, height };
 		createSprite(name, texture, textureFrame);
 	}
 }
 
 
-void SpriteManager::createSprite(const std::string& name, const Texture2D& texture, const ivec4s& frame) noexcept
+void SpriteManager::createSprite(const std::string& name, uint32_t texture, const ivec4s& frame) noexcept
 {
 	if(auto it = m_animations.find(name); it == m_animations.end())
 	{
 		const GLuint id = m_sprites.size();
 		m_animations.emplace(name, sprite_range(id, 1));
 
-		const vec2s ratio = { 1.f / texture.width, 1.f / texture.height };
-		addSprite(texture.handle, frame, ratio);
+		GLint width;
+		GLint height;
+		glGetTextureLevelParameteriv(texture, 0, GL_TEXTURE_WIDTH, &width);
+		glGetTextureLevelParameteriv(texture, 0, GL_TEXTURE_HEIGHT, &height);
+		const vec2s ratio = { 1.f / width, 1.f / height };
 
-		pushVerticesOnGPU();
+		addSprite(texture, frame, ratio);
 	}
 }
 
 
-void SpriteManager::createLinearAnimaton(const std::string& name, const Texture2D& texture, int duration) noexcept
+void SpriteManager::createLinearAnimaton(const std::string& name, uint32_t texture, int duration) noexcept
 {
 	if(auto it = m_animations.find(name); it == m_animations.end())
 	{
 		const GLuint id = m_sprites.size();
 		m_animations.emplace(name, sprite_range(id, duration));
 
-		const ivec2s size  = { texture.width, texture.height };
+			GLint width;
+		GLint height;
+		glGetTextureLevelParameteriv(texture, 0, GL_TEXTURE_WIDTH, &width);
+		glGetTextureLevelParameteriv(texture, 0, GL_TEXTURE_HEIGHT, &height);
+
+		const ivec2s size  = { width, height };
 		const vec2s ratio = { 1.f / size.x, 1.f / size.y };
-		const int frameWidth = texture.width / duration;
-		const GLuint handle = texture.handle;
+		const int frameWidth = width / duration;
 	
 		for (int i = 0; i < duration; ++i)
 		{
 			ivec4s frame = { i * frameWidth, 0, frameWidth, size.y };
-			addSprite(handle, frame, ratio);
+			addSprite(texture, frame, ratio);
 		}
-
-		pushVerticesOnGPU();
 	}
 }
 
 
-void SpriteManager::createGridAnimaton(const std::string& name, const Texture2D& texture, int columns, int rows) noexcept
+void SpriteManager::createGridAnimaton(const std::string& name, uint32_t texture, int columns, int rows) noexcept
 {
 	if(auto it = m_animations.find(name); it == m_animations.end())
 	{
@@ -84,53 +88,61 @@ void SpriteManager::createGridAnimaton(const std::string& name, const Texture2D&
 		const GLuint duration = columns * rows;
 		m_animations.emplace(name, sprite_range(id, duration));
 
-		const ivec2s size  = { texture.width, texture.height };
-		const vec2s ratio = { 1.f / size.x, 1.f / size.y };
+		GLint texWidth;
+		GLint texHeight;
+		glGetTextureLevelParameteriv(texture, 0, GL_TEXTURE_WIDTH, &texWidth);
+		glGetTextureLevelParameteriv(texture, 0, GL_TEXTURE_HEIGHT, &texHeight);
 
+		const ivec2s  size   = { texWidth, texHeight };
+		const vec2s   ratio  = { 1.f / size.x, 1.f / size.y };
 		const int32_t width  = size.x / columns;
 		const int32_t height = size.y / rows;
-		const GLuint handle = texture.handle;
 	
 		for (int y = 0; y < rows; ++y)
+		{
 			for (int x = 0; x < columns; ++x)
 			{
 				ivec4s frame = { x * width, y * height, width, height };
-				addSprite(handle, frame, ratio);
+				addSprite(texture, frame, ratio);
 			}
-
-		pushVerticesOnGPU();
+		}
 	}
 }
 
 
-void SpriteManager::createCustomAnimaton(const std::string& name, const Texture2D& texture, std::span<const ivec4s> frames) noexcept
+void SpriteManager::createCustomAnimaton(const std::string& name, uint32_t texture, std::span<const ivec4s> frames) noexcept
 {
 	if(auto it = m_animations.find(name); it == m_animations.end())
 	{
 		const GLuint id = m_sprites.size();
 		m_animations.emplace(name, sprite_range(id, static_cast<GLuint>(frames.size())));
 
-		const vec2s ratio = { 1.f / texture.width, 1.f / texture.height };
-		const GLuint handle = texture.handle;
+		GLint width;
+		GLint height;
+		glGetTextureLevelParameteriv(texture, 0, GL_TEXTURE_WIDTH, &width);
+		glGetTextureLevelParameteriv(texture, 0, GL_TEXTURE_HEIGHT, &height);
+		const vec2s ratio = { 1.f / width, 1.f / height };
 	
 		for (const auto& frame : frames)	
-			addSprite(handle, frame, ratio);
-
-		pushVerticesOnGPU();
+			addSprite(texture, frame, ratio);
 	}
 }
 
 
-void SpriteManager::loadSpriteSheet(const std::filesystem::path& filePath, const Texture2D& texture) noexcept
+void SpriteManager::loadSpriteSheet(const std::filesystem::path& filePath, uint32_t texture) noexcept
 {
 	auto document = std::make_unique<rapidxml::xml_document<char>>();
 	rapidxml::file<char> xmlFile(filePath.string().c_str());
 	document->parse<0>(xmlFile.data());
 	const auto spriteNode = document->first_node("sprites");
 
-	const ivec2s size = { texture.width, texture.height };
+	GLint width;
+	GLint height;
+	glGetTextureLevelParameteriv(texture, 0, GL_TEXTURE_WIDTH, &width);
+	glGetTextureLevelParameteriv(texture, 0, GL_TEXTURE_HEIGHT, &height);
+
+	const ivec2s size = { width, height };
 	const vec2s ratio = { 1.f / size.x, 1.f / size.y };
-	const GLuint handle = texture.handle;
 
 	for(auto animNode = spriteNode->first_node("animation");
 		     animNode != nullptr;
@@ -168,11 +180,9 @@ void SpriteManager::loadSpriteSheet(const std::filesystem::path& filePath, const
 			m_animations.emplace(title, sprite_range(id, static_cast<GLuint>(frames.size())));
 
 			for(const auto& frame : frames)
-				addSprite(handle, frame, ratio);
+				addSprite(texture, frame, ratio);
 		}
 	}
-
-	pushVerticesOnGPU();
 }
 
 
@@ -190,14 +200,14 @@ std::optional<Sprite2D> SpriteManager::getSprite(const std::string& name) const 
 }
 
 
-std::vector<Sprite2D> SpriteManager::getAnimation(const std::string& name) const noexcept
+std::span<const Sprite2D> SpriteManager::getAnimation(const std::string& name) const noexcept
 {
 	if(auto it = m_animations.find(name); it != m_animations.end())
 	{
 		const size_t startFrame = static_cast<size_t>(it->second.first);
 		const size_t duration = static_cast<size_t>(it->second.second);
 
-		return { m_sprites.begin() + startFrame, m_sprites.begin() + duration };
+		return { m_sprites.data() + startFrame, duration };
 	}
 
 	return {};
@@ -207,6 +217,30 @@ std::vector<Sprite2D> SpriteManager::getAnimation(const std::string& name) const
 void SpriteManager::bind(bool toBind) const noexcept
 {
 	glBindVertexArray(toBind ? m_vao : 0);
+}
+
+
+void SpriteManager::pushVerticesOnGPU() noexcept
+{
+	if (m_vertices.empty())
+		return;
+
+	glDeleteBuffers(1, &m_vbo);
+	glDeleteVertexArrays(1, &m_vao);
+
+	glCreateBuffers(1, &m_vbo);
+	glNamedBufferData(m_vbo, 0, nullptr, GL_STATIC_DRAW);
+
+	glGenVertexArrays(1, &m_vao);
+    const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
+	VertexBufferLayout layout(attributes);
+	layout.createVertexInputState(m_vao, m_vbo);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(float), static_cast<const void*>(m_vertices.data()), GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	std::vector<float>().swap(m_vertices); 
 }
 
 
@@ -243,12 +277,4 @@ void SpriteManager::addSprite(const uint32_t texture, const ivec4s frame, const 
 	quad[15] = bottom;
 
 	m_vertices.insert(m_vertices.end(), quad.begin(), quad.end());
-}
-
-
-void SpriteManager::pushVerticesOnGPU() noexcept
-{
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(float), static_cast<const void*>(m_vertices.data()), GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

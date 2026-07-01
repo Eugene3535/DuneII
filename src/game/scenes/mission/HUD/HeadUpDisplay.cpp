@@ -52,12 +52,13 @@ bool HeadUpDisplay::init() noexcept
         return false;
 
     glCreateTextures(GL_TEXTURE_2D, 1, &m_cursor.texture);
-    Texture2D crosshairTexture = {.handle = m_cursor.texture };
+    Texture2D crosshairTexture(m_cursor.texture);
 
     if (!crosshairTexture.loadFromFile(FileProvider::findPathToFile(CROSSHAIRS_TILESHEET_PNG)))
         return false;
 
-    m_sprites.loadSpriteSheet(FileProvider::findPathToFile(CURSOR_FRAME_XML), crosshairTexture);
+    m_sprites.loadSpriteSheet(FileProvider::findPathToFile(CURSOR_FRAME_XML), m_cursor.texture);
+    m_sprites.pushVerticesOnGPU();
     auto crosshairReleased = m_sprites.getSprite("Released");
     auto crosshairCaptured = m_sprites.getSprite("Captured");
 
@@ -82,7 +83,7 @@ bool HeadUpDisplay::init() noexcept
 
 //  Entity preview
     glCreateTextures(GL_TEXTURE_2D, 1, &m_previewTexture);
-    Texture2D previewTexture = {.handle = m_previewTexture };
+    Texture2D previewTexture(m_previewTexture);
 
     if (!previewTexture.loadFromFile(FileProvider::findPathToFile(PREVIEWS_PNG)))
         return false;

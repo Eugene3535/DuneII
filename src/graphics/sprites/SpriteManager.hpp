@@ -21,7 +21,7 @@ struct Sprite2D
 
 class SpriteManager final
 {
-	using sprite_range = std::pair<uint32_t, uint32_t>; // start sprite number, count
+	using sprite_range = std::pair<uint32_t, uint32_t>; // start sprite number, count ( single = 1, animation = n )
 
 public:
 	SpriteManager() noexcept;
@@ -31,23 +31,24 @@ public:
 	SpriteManager& operator = (SpriteManager&&)      noexcept = delete;
 	~SpriteManager();
 
-	void createSprite(const std::string& name, const struct Texture2D& texture) noexcept;
-	void createSprite(const std::string& name, const struct Texture2D& texture, const ivec4s& frame) noexcept;
+	void createSprite(const std::string& name, uint32_t texture) noexcept;
+	void createSprite(const std::string& name, uint32_t texture, const ivec4s& frame) noexcept;
 
-	void createLinearAnimaton(const std::string& name, const struct Texture2D& texture, int duration) noexcept;
-	void createGridAnimaton(const std::string& name, const struct Texture2D& texture, int columns, int rows) noexcept;
-	void createCustomAnimaton(const std::string& name, const struct Texture2D& texture, std::span<const ivec4s> frames) noexcept;
+	void createLinearAnimaton(const std::string& name, uint32_t texture, int duration) noexcept;
+	void createGridAnimaton(const std::string& name, uint32_t texture, int columns, int rows) noexcept;
+	void createCustomAnimaton(const std::string& name, uint32_t texture, std::span<const ivec4s> frames) noexcept;
 	
-	void loadSpriteSheet(const std::filesystem::path& filePath, const struct Texture2D& texture) noexcept;
+	void loadSpriteSheet(const std::filesystem::path& filePath, uint32_t texture) noexcept;
 
-	std::optional<Sprite2D> getSprite(const std::string& name) const noexcept;
-	std::vector<Sprite2D> getAnimation(const std::string& name) const noexcept;
+	std::optional<Sprite2D>   getSprite(const std::string& name) const noexcept;
+	std::span<const Sprite2D> getAnimation(const std::string& name) const noexcept;
 
 	void bind(bool toBind) const noexcept;
 
+	void pushVerticesOnGPU() noexcept;
+
 private:
 	void addSprite(const uint32_t texture, const ivec4s frame, const vec2s ratio) noexcept;
-	void pushVerticesOnGPU() noexcept;
 
 	uint32_t m_vao;
 	uint32_t m_vbo;

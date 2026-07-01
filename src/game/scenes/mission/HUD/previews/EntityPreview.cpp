@@ -1,3 +1,5 @@
+#include <array>
+
 #include <cglm/struct/ivec4.h>
 
 #include "graphics/texture/Texture2D.hpp"
@@ -52,12 +54,13 @@ bool EntityPreview::loadFromTexture(const Texture2D& texture) noexcept
     }
 
 //  Texture
-    m_texture = texture.handle;
+    m_texture = texture.getHandle();
+    const auto texSize = texture.getSize();
     const int32_t columns       = 6; // The number of tiles in the texture horizontally
     const int32_t rows          = 7;    // and vertically
-    const int32_t previewWidth  = texture.width / columns;
-    const int32_t previewHeight = texture.height / rows;
-    const vec2s   ratio         = { 1.f / texture.width, 1.f / texture.height };
+    const int32_t previewWidth  = texSize.x / columns;
+    const int32_t previewHeight = texSize.y / rows;
+    const vec2s   ratio         = { 1.f / texSize.x, 1.f / texSize.y };
 
     m_textureGrid.reserve((rows * columns) << 2);
 

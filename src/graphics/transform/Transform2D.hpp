@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cglm/struct/vec2.h>
-#include <cglm/call/mat4.h>
+#include <cglm/struct/mat4.h>
 
 
 // Class for optimized use of orthographic matrix
@@ -28,13 +28,15 @@ public:
     float getRotation() const noexcept;
 
     void move(const vec2s offset) noexcept;
-    void rotate(float angle)     noexcept;
+    void rotate(float angle)      noexcept;
 
-    mat4s getMatrix() const noexcept;
+    const mat4s& getMatrix() const noexcept;
 
 private:
-    vec2s m_origin;
-    vec2s m_position;       
-    vec2s m_scale;
-    float m_rotation;   
+    mutable mat4s m_matrix;
+    vec2s         m_origin;
+    vec2s         m_position;       
+    vec2s         m_scale;
+    float         m_rotation;
+    mutable bool  m_transformNeedUpdate;
 };

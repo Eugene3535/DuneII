@@ -1,3 +1,5 @@
+#include <array>
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include "cglm/struct/affine-mat.h"
@@ -57,13 +59,14 @@ bool PickHouse::load(std::string_view info) noexcept
     m_outline.vertexArrayObject = m_vertexArrayObjects[1];
 
 //  Textures
-    Texture2D housesTexture = {.handle = m_background.sprite.texture };
+    Texture2D houseTexture(m_background.sprite.texture);
 
-    if(!housesTexture.loadFromFile(FileProvider::findPathToFile(HOUSES_PNG)))
+    if(!houseTexture.loadFromFile(FileProvider::findPathToFile(HOUSES_PNG)))
         return false;
 
-    m_background.sprite.width  = housesTexture.width;
-    m_background.sprite.height = housesTexture.height;
+    auto houseTexSize = houseTexture.getSize();
+    m_background.sprite.width  = houseTexSize.x;
+    m_background.sprite.height = houseTexSize.y;
 
 //  Shaders
     {
@@ -86,8 +89,8 @@ bool PickHouse::load(std::string_view info) noexcept
 
 //  Background sprite
     {
-        const vec2s ratio = { 1.f / housesTexture.width, 1.f / housesTexture.height };
-        const ivec4s textureRect = { 0, 0, housesTexture.width, housesTexture.height };
+        const vec2s ratio = { 1.f / houseTexSize.x, 1.f / houseTexSize.y };
+        const ivec4s textureRect = { 0, 0, houseTexSize.x, houseTexSize.y };
 
         std::array<float, 16> quad = {};
 

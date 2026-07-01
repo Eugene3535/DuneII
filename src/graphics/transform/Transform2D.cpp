@@ -2,10 +2,12 @@
 
 
 Transform2D::Transform2D() noexcept:
+    m_matrix(glms_mat4_identity()),
     m_origin(glms_vec2_zero()),
     m_position(glms_vec2_zero()),
     m_scale(glms_vec2_one()),
-    m_rotation(0.f)
+    m_rotation(0.f),
+    m_transformNeedUpdate(false)
 {
 
 }
@@ -16,25 +18,29 @@ Transform2D::~Transform2D() = default;
 
 void Transform2D::loadIdentity() noexcept
 {
-    *this = Transform2D();
+    m_matrix = glms_mat4_identity();
+    m_transformNeedUpdate = true;
 }
 
 
 void Transform2D::setPosition(float x, float y) noexcept
 {
     m_position = { x, y };
+    m_transformNeedUpdate = true;
 }
 
 
 void Transform2D::setScale(float x, float y) noexcept
 {
     m_scale = { x, y };
+    m_transformNeedUpdate = true;
 }
 
 
 void Transform2D::setOrigin(float x, float y) noexcept
 {
     m_origin = { x, y };
+    m_transformNeedUpdate = true;
 }
 
 
@@ -44,24 +50,29 @@ void Transform2D::setRotation(float angle) noexcept
 
     if (m_rotation < 0)
         m_rotation += 360.f;
+
+    m_transformNeedUpdate = true;
 }
 
 
 void Transform2D::setPosition(const vec2s position) noexcept
 {
     m_position = position;
+    m_transformNeedUpdate = true;
 }
 
 
 void Transform2D::setScale(const vec2s factors) noexcept
 {
     m_scale = factors;
+    m_transformNeedUpdate = true;
 }
 
 
 void Transform2D::setOrigin(const vec2s origin) noexcept
 {
     m_origin = origin;
+    m_transformNeedUpdate = true;
 }
 
 
@@ -102,25 +113,29 @@ void Transform2D::rotate(float angle) noexcept
 }
 
 
-mat4s Transform2D::getMatrix() const noexcept
+const mat4s& Transform2D::getMatrix() const noexcept
 {
-    const float angle  = glm_rad(-m_rotation);
-    const float cosine = cos(angle);
-    const float sine   = sin(angle);
-    const float sxc    = m_scale.x * cosine;
-    const float syc    = m_scale.y * cosine;
-    const float sxs    = m_scale.x * sine;
-    const float sys    = m_scale.y * sine;
-    const float tx     = -m_origin.x * sxc - m_origin.y * sys + m_position.x;
-    const float ty     =  m_origin.x * sxs - m_origin.y * syc + m_position.y;
+    if (m_transformNeedUpdate)
+    {
+        const float angle  = glm_rad(-m_rotation);
+        const float cosine = cos(angle);
+        const float sine   = sin(angle);
+        const float sxc    = m_scale.x * cosine;
+        const float syc    = m_scale.y * cosine;
+        const float sxs    = m_scale.x * sine;
+        const float sys    = m_scale.y * sine;
+        const float tx     = -m_origin.x * sxc - m_origin.y * sys + m_position.x;
+        const float ty     =  m_origin.x * sxs - m_origin.y * syc + m_position.y;
 
-    mat4s result;
-    auto m = static_cast<float*>(&result.raw[0][0]);
-    
-    m[0] = sxc;  m[4] = sys; m[8] = 0.f;  m[12] = tx;
-    m[1] = -sxs; m[5] = syc; m[9] = 0.f;  m[13] = ty;
-    m[2] = 0.f;  m[6] = 0.f; m[10] = 1.f; m[14] = 0.f;
-    m[3] = 0.f;  m[7] = 0.f; m[11] = 0.f; m[15] = 1.f;
+        auto m = static_cast<float*>(&m_matrix.raw[0][0]);
+        
+        m[0] = sxc;  m[4] = sys; m[8] = 0.f;  m[12] = tx;
+        m[1] = -sxs; m[5] = syc; m[9] = 0.f;  m[13] = ty;
+        m[2] = 0.f;  m[6] = 0.f; m[10] = 1.f; m[14] = 0.f;
+        m[3] = 0.f;  m[7] = 0.f; m[11] = 0.f; m[15] = 1.f;
 
-    return result;
+        m_transformNeedUpdate = false;
+    }
+
+    return m_matrix;
 }
