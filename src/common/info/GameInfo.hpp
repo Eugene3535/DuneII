@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <vector>
 
-#include "game/scenes/mission/common/Structures.hpp"
+#include "scenes/mission/common/Structures.hpp"
 
 
 class GameInfo

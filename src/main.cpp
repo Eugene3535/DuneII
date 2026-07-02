@@ -7,8 +7,8 @@ extern "C"
 }
 #endif
 
-#include "game/Engine.hpp"
-#include "application/MainWindow.hpp"
+#include "application/game/Game.hpp"
+#include "application/window/MainWindow.hpp"
 
 
 int main()
@@ -17,12 +17,12 @@ int main()
     int width = 1200;
     int height = 900;
 
-    MainWindow app;
-    Engine engine;
-    int retCode = -1;
+    MainWindow window;
+    Game game;
+    int retCode = 1;
     
-    if(app.create(title, width, height))
-        retCode = app.run(engine);
+    if (window.open(title, width, height))
+        retCode = window.run(game);
 
     return retCode;
 }

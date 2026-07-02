@@ -1,0 +1,67 @@
+#include <cassert>
+
+#include <cglm/call/cam.h>
+
+#include "graphics/sprites/SpriteManager.hpp"
+#include "application/game/Game.hpp"
+#include "scenes/Scene.hpp"
+
+
+
+Scene::Scene(Game* game, const Scene::Type type) noexcept:
+    m_game(game),
+    m_isLoaded(false),
+    m_type(type)
+{
+
+}
+
+
+Scene::~Scene() = default;
+
+
+bool Scene::load(std::string_view info) noexcept
+{
+    return false;
+}
+
+
+void Scene::update(float dt) noexcept
+{
+
+}
+
+
+void Scene::draw(const mat4s& projection) noexcept
+{
+
+}
+
+
+void Scene::resize(int width, int height) noexcept
+{
+
+}
+
+
+bool Scene::isLoaded() const noexcept
+{
+    return m_isLoaded;
+}
+
+
+Scene::Type Scene::getType() const noexcept
+{
+    return m_type;
+}
+
+
+void Scene::setSpriteSizeInPixels(const Sprite2D& sprite, const vec2s newSize, Transform2D& transform) noexcept
+{
+    assert(sprite.width > 0);
+    assert(sprite.height > 0);
+
+    float dx = newSize.x / sprite.width;
+    float dy = newSize.y / sprite.height;
+    transform.setScale(dx, dy);
+}

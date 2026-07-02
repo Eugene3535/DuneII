@@ -1,3 +1,4 @@
+# Files
 set(FILE_SRC_FILES
 	src/files/FileProvider.hpp
 	src/files/FileProvider.cpp
@@ -10,6 +11,7 @@ set(FILE_SRC_FILES
 )
 
 
+# Graphics
 set(GRAPHICS_SRC_FILES
 	src/graphics/texture/Texture2D.hpp
 	src/graphics/texture/Texture2D.cpp
@@ -28,34 +30,35 @@ set(GRAPHICS_SRC_FILES
 )
 
 
+# Scenes
 set(SCENE_SRC_FILES
-	src/game/scenes/Scene.hpp
-	src/game/scenes/Scene.cpp
-	src/game/scenes/intro/interactive_elements/Button.hpp
-	src/game/scenes/intro/interactive_elements/Button.cpp
-	src/game/scenes/intro/TitleScreen.hpp
-	src/game/scenes/intro/TitleScreen.cpp
-	src/game/scenes/pick_house/PickHouse.hpp
-	src/game/scenes/pick_house/PickHouse.cpp
-	src/game/scenes/mission/common/Structures.hpp
-	src/game/scenes/mission/common/Units.hpp
-	src/game/scenes/mission/loader/TiledMapLoader.hpp # TODO: move to file folder
-	src/game/scenes/mission/loader/TiledMapLoader.cpp
-	src/game/scenes/mission/tilemap/Tilemap.hpp
-	src/game/scenes/mission/tilemap/Tilemap.cpp
-	src/game/scenes/mission/HUD/construction/ConstructionMenu.hpp
-	src/game/scenes/mission/HUD/construction/ConstructionMenu.cpp
-	src/game/scenes/mission/HUD/previews/EntityPreview.hpp
-	src/game/scenes/mission/HUD/previews/EntityPreview.cpp
-	src/game/scenes/mission/HUD/HeadUpDisplay.hpp
-	src/game/scenes/mission/HUD/HeadUpDisplay.cpp
-	src/game/scenes/mission/Mission.hpp
-	src/game/scenes/mission/Mission.cpp
+	src/scenes/Scene.hpp
+	src/scenes/Scene.cpp
+	src/scenes/intro/interactive_elements/Button.hpp
+	src/scenes/intro/interactive_elements/Button.cpp
+	src/scenes/intro/TitleScreen.hpp
+	src/scenes/intro/TitleScreen.cpp
+	src/scenes/pick_house/PickHouse.hpp
+	src/scenes/pick_house/PickHouse.cpp
+	src/scenes/mission/common/Structures.hpp
+	src/scenes/mission/common/Units.hpp
+	src/scenes/mission/loader/TiledMapLoader.hpp # TODO: move to file folder
+	src/scenes/mission/loader/TiledMapLoader.cpp
+	src/scenes/mission/tilemap/Tilemap.hpp
+	src/scenes/mission/tilemap/Tilemap.cpp
+	src/scenes/mission/HUD/construction/ConstructionMenu.hpp
+	src/scenes/mission/HUD/construction/ConstructionMenu.cpp
+	src/scenes/mission/HUD/previews/EntityPreview.hpp
+	src/scenes/mission/HUD/previews/EntityPreview.cpp
+	src/scenes/mission/HUD/HeadUpDisplay.hpp
+	src/scenes/mission/HUD/HeadUpDisplay.cpp
+	src/scenes/mission/Mission.hpp
+	src/scenes/mission/Mission.cpp
 )
 
 
 # Common
-set(DUNEII_SRC_FILES
+set(COMMON_SRC_FILES
 	src/common/NonCopyable.hpp
 	src/common/NonMovable.hpp
 	src/common/MemoryAllocator.hpp
@@ -66,14 +69,21 @@ set(DUNEII_SRC_FILES
 	src/common/ExternalMath.cpp
 	src/common/info/GameInfo.hpp
 	src/common/info/GameInfo.cpp
+)
+
+# Application
+set(DUNEII_SRC_FILES
+	${COMMON_SRC_FILES}
 	${FILE_SRC_FILES}
 	${GRAPHICS_SRC_FILES}
 	${SCENE_SRC_FILES}
-	src/application/MainWindow.hpp
-	src/application/MainWindow.cpp
-	src/game/Engine.hpp
-	src/game/Engine.inl
-	src/game/Engine.cpp
+	src/application/window/MainWindow.hpp
+	src/application/window/MainWindow.cpp
+	src/application/context/Context.hpp
+	src/application/context/Context.cpp
+	src/application/game/Game.hpp
+	src/application/game/Game.inl
+	src/application/game/Game.cpp
 	src/main.cpp
 )
 
