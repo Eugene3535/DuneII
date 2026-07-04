@@ -1,7 +1,8 @@
 #include <cstring>
 
-#include <glad/glad.h>
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include <glad/glad.h>
 #include "cglm/struct/affine-mat.h"
 
 #include "files/FileProvider.hpp"
@@ -23,8 +24,6 @@
 
 #define TEXT_INFO_SCALE_FACTOR_WIDTH  3.f
 #define TEXT_INFO_SCALE_FACTOR_HEIGHT 20.f
-
-#define INTRO_TEXT_PRESENTATION "Какие-то компании представляют"
 
 // Stages in seconds
 #define INTRO_TEXT_PRESENT_START_TIME   5.f;
@@ -149,21 +148,23 @@ bool TitleScreen::load(std::string_view info) noexcept
 
 void TitleScreen::update(float dt) noexcept
 {
-    if(!m_isLoaded)
+    if (!m_isLoaded)
         return;
 
-    if(m_isPresented)
-    {
-        const bool isMouseButtonPressed = m_game->isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
-        const vec2s mousePosition = m_game->getCursorPosition();
 
-        m_settingsButton->update(mousePosition, isMouseButtonPressed);
-        m_playButton->update(mousePosition, isMouseButtonPressed);
-        m_exitButton->update(mousePosition, isMouseButtonPressed);
 
-        if(m_playButton->isSelected())
-            m_game->switchScene(this, Scene::PICK_HOUSE);
-    }
+
+    if (!m_isPresented)
+        return;
+    
+    const bool isMouseButtonPressed = ( (m_mouse.button == GLFW_MOUSE_BUTTON_LEFT) && (m_mouse.action == GLFW_PRESS) );
+
+    m_settingsButton->update(m_cursor, isMouseButtonPressed);
+    m_playButton->update(m_cursor, isMouseButtonPressed);
+    m_exitButton->update(m_cursor, isMouseButtonPressed);
+
+    if(m_playButton->isSelected())
+        m_game->switchScene(this, Scene::PICK_HOUSE);
 }
 
 
@@ -223,37 +224,39 @@ void TitleScreen::draw(const mat4s& projection) noexcept
 
 void TitleScreen::resize(int width, int height) noexcept
 {
-    if(!m_isLoaded)
+    Scene::resize(width, height);
+
+    if (!m_isLoaded)
         return;
-    
+        
     vec2s size = { static_cast<float>(width), static_cast<float>(height) };
     setSpriteSizeInPixels(m_space, size, m_spaceTransform);
 
-    if(m_isPresented)
-    {
-        {// space and planet
-            vec2s planetScale = { size.x / PLANET_SCALE_FACTOR_WIDTH, size.y / PLANET_SCALE_FACTOR_HEIGHT };
-            setSpriteSizeInPixels(m_planet, planetScale, m_planetTransform);
-            m_planetTransform.setPosition(size.x / PLANET_POSITION_FACTOR_X, size.y / PLANET_POSITION_FACTOR_Y);
-        }
+    if (!m_isPresented)
+        return;
+    
+    {// space and planet
+        vec2s planetScale = { size.x / PLANET_SCALE_FACTOR_WIDTH, size.y / PLANET_SCALE_FACTOR_HEIGHT };
+        setSpriteSizeInPixels(m_planet, planetScale, m_planetTransform);
+        m_planetTransform.setPosition(size.x / PLANET_POSITION_FACTOR_X, size.y / PLANET_POSITION_FACTOR_Y);
+    }
 
-        {// buttons (size)
-            const float width = size.x / BUTTON_SCALE_FACTOR_WIDTH;
-            const float height = size.y / BUTTON_SCALE_FACTOR_HEIGHT;
+    {// buttons (size)
+        const float width = size.x / BUTTON_SCALE_FACTOR_WIDTH;
+        const float height = size.y / BUTTON_SCALE_FACTOR_HEIGHT;
 
-            m_settingsButton->resize(width, height);
-            m_playButton->resize(width, width); // <- this is not a typo
-            m_exitButton->resize(width, height);
-        }
+        m_settingsButton->resize(width, height);
+        m_playButton->resize(width, width); // <- this is not a typo
+        m_exitButton->resize(width, height);
+    }
 
-        {// buttons (positions)
-            const float centerX = size.x / BUTTON_POSITION_FACTOR_X;
-            const float centerY = size.y / BUTTON_POSITION_FACTOR_Y;
-            const float offset = size.x / BUTTON_SCALE_FACTOR_WIDTH * PLANET_POSITION_FACTOR_X;
+    {// buttons (positions)
+        const float centerX = size.x / BUTTON_POSITION_FACTOR_X;
+        const float centerY = size.y / BUTTON_POSITION_FACTOR_Y;
+        const float offset = size.x / BUTTON_SCALE_FACTOR_WIDTH * PLANET_POSITION_FACTOR_X;
 
-            m_settingsButton->setPosition(centerX - offset, centerY);
-            m_playButton->setPosition(centerX, centerY);
-            m_exitButton->setPosition(centerX + offset, centerY);
-        }
+        m_settingsButton->setPosition(centerX - offset, centerY);
+        m_playButton->setPosition(centerX, centerY);
+        m_exitButton->setPosition(centerX + offset, centerY);
     }
 }

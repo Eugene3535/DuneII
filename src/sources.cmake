@@ -77,6 +77,7 @@ set(DUNEII_SRC_FILES
 	${FILE_SRC_FILES}
 	${GRAPHICS_SRC_FILES}
 	${SCENE_SRC_FILES}
+	src/application/window/WindowData.hpp
 	src/application/window/MainWindow.hpp
 	src/application/window/MainWindow.cpp
 	src/application/context/Context.hpp

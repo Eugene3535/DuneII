@@ -1,23 +1,94 @@
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 #include "files/FileProvider.hpp"
 #include "files/Shader.hpp"
 #include "scenes/intro/TitleScreen.hpp"
 #include "scenes/pick_house/PickHouse.hpp"
 #include "scenes/mission/Mission.hpp"
+#include "application/window/WindowData.hpp"
 #include "application/game/Game.hpp"
 
 
 
-Game::Game() noexcept:
-    m_window(nullptr),
-    m_currentScene(nullptr),
+Game::Game(WindowData& data) noexcept:
+    m_windowData(data),
     m_nextSceneType(Scene::NONE),
     m_isSceneNeedToBeChanged(false)
 {
-    m_windowSize = { 0, 0 };
-    m_cursorPosition = { 0.f, 0.f };
+
+}
+
+
+bool Game::initialize() noexcept
+{
+    if (m_currentScene)
+        return true;
+
+    glClearColor(0.f, 0.f, 0.f, 1.f);
+
+    if (m_currentScene = load<TitleScreen>({}); !m_currentScene)
+        return false;
+
+    updateData();
+
+    return true;
+}
+
+
+void Game::update(float dt) noexcept
+{
+    if (!m_currentScene)
+        return;
+
+    m_currentScene->update(dt);
+
+    if (m_isSceneNeedToBeChanged) [[unlikely]]
+    {
+        switch (m_nextSceneType)
+        {
+            case Scene::Type::MAIN_MENU:
+            {
+                if (auto titleScene = load<TitleScreen>({}))
+                    m_currentScene = titleScene;
+            }
+            break;
+
+            case Scene::Type::PICK_HOUSE:
+            {
+                if (auto pickHouseScene = load<PickHouse>({}))
+                    m_currentScene = pickHouseScene;
+            }
+            break;
+
+            case Scene::Type::MISSION:
+            {
+                if (auto missionScene = load<Mission>("Atreides-8.tmx"))
+                    m_currentScene = missionScene;
+
+                // glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+            }
+            break;
+
+            default:
+                break;
+        }
+
+        updateData();
+
+        m_isSceneNeedToBeChanged = false;
+        m_nextSceneType = Scene::NONE;
+    }
+}
+
+
+void Game::draw() noexcept
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    auto projection = m_windowData.viewport.getProjectionMatrix();
+
+    if (m_currentScene)
+        m_currentScene->draw(projection);
 }
 
 
@@ -62,25 +133,7 @@ void Game::switchScene(const Scene* requester, Scene::Type nextScene) noexcept
 
 void Game::updateUniformBuffer(const mat4s& modelViewProjection) const noexcept
 {
-    m_orthoMatrix.updateUniformBuffer(modelViewProjection);
-}
-
-
-bool Game::isKeyPressed(int key) const noexcept
-{
-    if(m_window)
-        return (glfwGetKey(m_window, key) == GLFW_PRESS);
-
-    return false;
-}
-
-
-bool Game::isMouseButtonPressed(int button) const noexcept
-{
-    if (m_window)
-        return (glfwGetMouseButton(m_window, button) == GLFW_PRESS);
-
-    return false;
+    m_windowData.viewport.updateUniformBuffer(modelViewProjection);
 }
 
 
@@ -135,104 +188,17 @@ uint32_t Game::getShaderProgram(const std::string& name) const noexcept
 }
 
 
-const vec2s& Game::getCursorPosition() const noexcept
-{
-    return m_cursorPosition;
-}
-
-
 const GameInfo* Game::getInfo() const noexcept
 {
     return &m_gameInfo;
 }
 
 
-const ivec2s& Game::getWindowsSize() const noexcept
+void Game::updateData() noexcept
 {
-    return m_windowSize;
-}
-
-
-bool Game::init(GLFWwindow* window) noexcept
-{
-    if (!m_currentScene)
-    {
-        m_window = window;
-        m_orthoMatrix.create();
-
-        glClearColor(0.f, 0.f, 0.f, 1.f);
-
-        m_currentScene = load<TitleScreen>({});
-    }
-
-    return m_currentScene ? true : false;
-}
-
-
-void Game::update(float dt) noexcept
-{
-    if (!m_currentScene)
-        return;
-
-    m_currentScene->update(dt);
-
-    if (m_isSceneNeedToBeChanged)
-    {
-        switch (m_nextSceneType)
-        {
-            case Scene::Type::MAIN_MENU:
-            {
-                if (auto titleScene = load<TitleScreen>({}))
-                    m_currentScene = titleScene;
-            }
-            break;
-
-            case Scene::Type::PICK_HOUSE:
-            {
-                if (auto pickHouseScene = load<PickHouse>({}))
-                    m_currentScene = pickHouseScene;
-            }
-            break;
-
-            case Scene::Type::MISSION:
-            {
-                if (auto missionScene = load<Mission>("Atreides-8.tmx"))
-                    m_currentScene = missionScene;
-
-                glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-            }
-            break;
-
-            default:
-                break;
-        }
-
-        int width, height;
-        glfwGetWindowSize(m_window, &width, &height);
-        m_currentScene->resize(width, height);
-
-        m_isSceneNeedToBeChanged = false;
-        m_nextSceneType = Scene::NONE;
-    }
-}
-
-
-void Game::draw() noexcept
-{
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    auto projection = m_orthoMatrix.getProjectionMatrix();
-
     if (m_currentScene)
-        m_currentScene->draw(projection);
-}
-
-
-void Game::resize(int width, int height) noexcept
-{
-    m_windowSize = { width, height };
-    m_orthoMatrix.resize(width, height);
-
-    if (m_currentScene)
-        m_currentScene->resize(width, height);
+    {
+        m_windowData.scene = m_currentScene.get();
+        m_currentScene->resize(m_windowData.size.x, m_windowData.size.y);
+    }
 }

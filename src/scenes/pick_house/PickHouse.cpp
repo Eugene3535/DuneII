@@ -163,6 +163,10 @@ void PickHouse::update(float dt) noexcept
 
     m_timer += dt;
 
+    const int key = m_keyboard.key;
+    const int action = m_keyboard.action;
+    const bool isPressed = (action != GLFW_RELEASE);
+
     if (m_timer > SWITCH_HOUSE_OUTLINE_DELAY)
     {
         m_timer = 0;
@@ -171,20 +175,20 @@ void PickHouse::update(float dt) noexcept
         switch (m_selectedHouse)
         {
             case HouseType::Atreides:
-                if (m_game->isKeyPressed(GLFW_KEY_RIGHT))
+                if ((key == GLFW_KEY_RIGHT) && isPressed)
                     m_selectedHouse = HouseType::Ordos;
                 break;
 
             case HouseType::Ordos:
-                if (m_game->isKeyPressed(GLFW_KEY_LEFT))
+                if ((key == GLFW_KEY_LEFT) && isPressed)
                     m_selectedHouse = HouseType::Atreides;
 
-                if (m_game->isKeyPressed(GLFW_KEY_RIGHT))
+                if ((key == GLFW_KEY_RIGHT) && isPressed)
                     m_selectedHouse = HouseType::Harkonnen;
                 break;
 
             case HouseType::Harkonnen:
-                if (m_game->isKeyPressed(GLFW_KEY_LEFT))
+                if ((key == GLFW_KEY_LEFT) && isPressed)
                     m_selectedHouse = HouseType::Ordos;
                 break;
 
@@ -193,39 +197,38 @@ void PickHouse::update(float dt) noexcept
         }
     }
 
-    if (m_game->isKeyPressed(GLFW_KEY_ENTER))
+    if ((key == GLFW_KEY_ENTER) && isPressed)
         m_game->switchScene(this, Scene::MISSION);
 
-    if(m_outlineNeedUpdate)
+    if (!m_outlineNeedUpdate)
+        return;
+    
+    vec2s size = { static_cast<float>(m_size.x), static_cast<float>(m_size.y) };
+
+    float dx = size.x / m_background.sprite.width;
+    float dy = size.y / m_background.sprite.height;
+    float outlinePositionX = 0;
+
+    switch (m_selectedHouse)
     {
-        const auto windowSize = m_game->getWindowsSize();
-        vec2s size = { static_cast<float>(windowSize.x), static_cast<float>(windowSize.y) };
+        case HouseType::Atreides:
+            outlinePositionX = ATREIDES_OUTLINE_POSITION_X * dx;
+        break;
 
-        float dx = size.x / m_background.sprite.width;
-        float dy = size.y / m_background.sprite.height;
-        float outlinePositionX = 0;
+        case HouseType::Ordos:
+            outlinePositionX = ORDOS_OUTLINE_POSITION_X * dx;
+        break;
 
-        switch (m_selectedHouse)
-        {
-            case HouseType::Atreides:
-                outlinePositionX = ATREIDES_OUTLINE_POSITION_X * dx;
+        case HouseType::Harkonnen:
+            outlinePositionX = HARKONNEN_OUTLINE_POSITION_X * dx;
+        break;
+
+        default:
             break;
-
-            case HouseType::Ordos:
-                outlinePositionX = ORDOS_OUTLINE_POSITION_X * dx;
-            break;
-
-            case HouseType::Harkonnen:
-                outlinePositionX = HARKONNEN_OUTLINE_POSITION_X * dx;
-            break;
-
-            default:
-                break;
-        }
-
-        m_outline.transform.setPosition(outlinePositionX, OUTLINE_POSITION_Y * dy);
-        m_outlineNeedUpdate = false;
     }
+
+    m_outline.transform.setPosition(outlinePositionX, OUTLINE_POSITION_Y * dy);
+    m_outlineNeedUpdate = false;
 }
 
 
@@ -263,6 +266,8 @@ void PickHouse::draw(const mat4s& projection) noexcept
 
 void PickHouse::resize(int width, int height) noexcept
 {
+    Scene::resize(width, height);
+
     vec2s size = { static_cast<float>(width), static_cast<float>(height) };
     setSpriteSizeInPixels(m_background.sprite, size, m_background.transform);
 

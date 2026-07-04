@@ -21,7 +21,7 @@ OrthoMatrix::~OrthoMatrix()
 }
 
 
-void OrthoMatrix::create() noexcept
+void OrthoMatrix::create(int32_t width, int32_t height) noexcept
 {
     if (!m_uniformBuffer)
     {
@@ -30,6 +30,8 @@ void OrthoMatrix::create() noexcept
         glBindBufferRange(GL_UNIFORM_BUFFER, 0, m_uniformBuffer, 0, sizeof(mat4s));
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
+
+    resize(width, height);
 }
 
 

@@ -71,6 +71,7 @@ void Mission::draw(const mat4s& projection) noexcept
 
 void Mission::resize(int width, int height) noexcept
 {
+    Scene::resize(width, height);
     m_hud.resize(width, height);
 }
 
@@ -84,8 +85,8 @@ void Mission::createSystems() noexcept
             return;
 
         const auto game     = mission->m_game;
-        const auto cursor   = game->getCursorPosition();
-        const auto viewSize = game->getWindowsSize();
+        const auto cursor   = mission->m_cursor;
+        const auto viewSize = mission->m_size;
         const auto mapSize  = glms_ivec2_mul(mission->m_mapLoader.getMapSize(), mission->m_mapLoader.getTileSize());
 
         const bool isNearTheLeftEdge   = (cursor.x > 0 && cursor.x < SCREEN_MARGIN);
@@ -120,10 +121,12 @@ void Mission::createSystems() noexcept
 //  HUD
     m_systems.emplace_back([](Mission* mission, float dt)
     {
-        const Game* game = mission->m_game;
+        const int button = mission->m_mouse.button;
+        const int action = mission->m_mouse.action;
+        const bool isPressed = (action != GLFW_RELEASE);
 
-        const bool isMouseButtonLeftPressed  = game->isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
-        const bool isMouseButtonRightPressed = game->isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT);
+        const bool isMouseButtonLeftPressed  = ( (button == GLFW_MOUSE_BUTTON_LEFT) && isPressed );
+        const bool isMouseButtonRightPressed = ( (button == GLFW_MOUSE_BUTTON_RIGHT) && isPressed );
 
         if (isMouseButtonLeftPressed)
             mission->m_hud.runSelection();
@@ -131,7 +134,7 @@ void Mission::createSystems() noexcept
         if (isMouseButtonRightPressed)
             mission->m_hud.cancelSelection();
 
-        mission->m_hud.update(dt);
+        mission->m_hud.update(dt, mission->m_cursor);
     });
 
 
@@ -146,24 +149,28 @@ void Mission::createSystems() noexcept
 
         menu.update(dt);
 
-        if (game->isKeyPressed(GLFW_KEY_W))
+        const int key = mission->m_keyboard.key;
+        const int action = mission->m_keyboard.action;
+        const bool isPressed = (action != GLFW_RELEASE);
+
+        if ((key == GLFW_KEY_W) && isPressed)
         {
             menu.updateSelection('W');
         }
-        else if (game->isKeyPressed(GLFW_KEY_A))
+        else if ((key == GLFW_KEY_A) && isPressed)
         {
             menu.updateSelection('A');
         }
-        else if (game->isKeyPressed(GLFW_KEY_S))
+        else if ((key == GLFW_KEY_S) && isPressed)
         {
             menu.updateSelection('S');
         }
-        else if (game->isKeyPressed(GLFW_KEY_D))
+        else if ((key == GLFW_KEY_D) && isPressed)
         {
             menu.updateSelection('D');
         }
          
-        if (game->isKeyPressed(GLFW_KEY_SPACE))
+        if ((key == GLFW_KEY_SPACE) && isPressed)
         {
             if (menu.getSelectedButton() == ConstructionMenu::ButtonType::Exit)
             {

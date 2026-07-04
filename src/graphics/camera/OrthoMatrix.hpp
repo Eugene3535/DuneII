@@ -9,7 +9,7 @@ public:
     OrthoMatrix() noexcept;
     ~OrthoMatrix();
 
-    void create() noexcept;
+    void create(int32_t width, int32_t height) noexcept;
 
     void resize(int32_t width, int32_t height) noexcept;
     void updateUniformBuffer(const mat4s& modelViewProjection) const noexcept;

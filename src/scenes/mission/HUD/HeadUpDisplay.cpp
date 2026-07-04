@@ -101,7 +101,7 @@ bool HeadUpDisplay::init() noexcept
 }
 
 
-void HeadUpDisplay::update(float dt) noexcept
+void HeadUpDisplay::update(float dt, vec2s cursor) noexcept
 {
     m_cursor.timer += dt;
     m_selectionFrame.blinkTimer += dt;
@@ -109,7 +109,8 @@ void HeadUpDisplay::update(float dt) noexcept
     if(m_selectionFrame.blinkTimer > BLINK_LOOP_TIME)
         m_selectionFrame.blinkTimer = 0.f;
 
-    m_cursor.transform.setPosition(m_game->getCursorPosition());
+    m_cursor.position = cursor;
+    m_cursor.transform.setPosition(cursor);
 }
 
 
@@ -166,7 +167,7 @@ void HeadUpDisplay::runSelection() noexcept
     if(m_menu.isShown())
         return;
 
-    vec2s cursorPosition = m_game->getCursorPosition();
+    vec2s cursorPosition = m_cursor.position;
     vec2s scenePosition  = glms_vec2_negate(m_tilemap.getPosition());
     vec2s worldCoords    = glms_vec2_add(scenePosition, cursorPosition);
 

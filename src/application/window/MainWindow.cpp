@@ -6,12 +6,13 @@
 #include <GLFW/glfw3.h>
 
 #include "application/context/Context.hpp"
-#include "application/game/Game.hpp"
+#include "application/window/WindowData.hpp"
 #include "application/window/MainWindow.hpp"
+#include "scenes/Scene.hpp"
 
 
 MainWindow::MainWindow() noexcept:
-	m_window(nullptr)
+	m_glfwWindow(nullptr)
 {
 
 }
@@ -19,14 +20,14 @@ MainWindow::MainWindow() noexcept:
 
 MainWindow::~MainWindow()
 {
-	glfwDestroyWindow(m_window);
+	glfwDestroyWindow(m_glfwWindow);
 	glfwTerminate();
 }
 
 
-bool MainWindow::open(const char* title, int width, int height) noexcept
+bool MainWindow::open(WindowData& data) noexcept
 {
-	if (!createGLFWWindow(title, width, height))
+	if (!createGLFWWindow(data.title.c_str(), data.size.x, data.size.y))
 		return false;
 
 	Context context;
@@ -34,44 +35,49 @@ bool MainWindow::open(const char* title, int width, int height) noexcept
 	if (!context.initialize())
 		return false;
 
-	initCallbacks();
+	data.viewport.create(data.size.x, data.size.y);
+	initCallbacks(data);
 
 	return true;
 }
 
 
-int MainWindow::run(Game& game) noexcept
+void MainWindow::close() const noexcept
 {
-	if (!m_window)
-		return -1;
+    glfwSetWindowShouldClose(m_glfwWindow, GLFW_TRUE);
+}
 
-	glfwSetWindowUserPointer(m_window, static_cast<void*>(&game));
-	
-	if (!game.init(m_window))
-		return 1;
 
-	int width, height;
-	glfwGetWindowSize(m_window, &width, &height);
-	game.resize(width, height);
+void MainWindow::pollEvents() const noexcept
+{
+    glfwPollEvents();
+}
 
-	float deltaTime = 0.f;
-	float lastFrame = 0.f;
-    
-	while (!glfwWindowShouldClose(m_window))
-	{
-		glfwPollEvents();
 
-		float currentFrame = static_cast<float>(glfwGetTime());
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
+void MainWindow::display() const noexcept
+{
+    glfwSwapBuffers(m_glfwWindow);
+}
 
-		game.update(deltaTime);
-		game.draw();
 
-		glfwSwapBuffers(m_window);
-	}
+float MainWindow::getElapsedTime() const noexcept
+{
+    return static_cast<float>(glfwGetTime());
+}
 
-	return 0;
+
+ivec2s MainWindow::getSize() const noexcept
+{
+    int width, height;
+	glfwGetWindowSize(m_glfwWindow, &width, &height);
+
+    return { width, height };
+}
+
+
+bool MainWindow::isOpen() const noexcept
+{
+	return static_cast<bool>(!glfwWindowShouldClose(m_glfwWindow));
 }
 
 
@@ -86,9 +92,9 @@ bool MainWindow::createGLFWWindow(const char* title, int width, int height) noex
     	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #endif
 
-		if (m_window = glfwCreateWindow(width, height, title, nullptr, nullptr); m_window)
+		if (m_glfwWindow = glfwCreateWindow(width, height, title, nullptr, nullptr); m_glfwWindow)
 		{
-			glfwMakeContextCurrent(m_window);
+			glfwMakeContextCurrent(m_glfwWindow);
 			glfwSwapInterval(1);
 
 			return true;
@@ -99,25 +105,51 @@ bool MainWindow::createGLFWWindow(const char* title, int width, int height) noex
 }
 
 
-void MainWindow::initCallbacks() noexcept
+void MainWindow::initCallbacks(WindowData& data) noexcept
 {
-	glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int width, int height)
+	glfwSetWindowUserPointer(m_glfwWindow, static_cast<void*>(&data));
+
+	glfwSetFramebufferSizeCallback(m_glfwWindow, [](GLFWwindow* window, int width, int height)
 	{
 		glViewport(0, 0, width, height);
 
-		if (auto game = static_cast<Game*>(glfwGetWindowUserPointer(window)); game)
-			game->resize(width, height);
+		if (auto data = static_cast<WindowData*>(glfwGetWindowUserPointer(window)); data)
+		{
+			data->size = { width, height };
+			data->viewport.resize(width, height);
+
+			if (data->scene)
+				static_cast<Scene*>(data->scene)->resize(width, height);
+		}
 	});
 
-	glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double xpos, double ypos)
+	glfwSetCursorPosCallback(m_glfwWindow, [](GLFWwindow* window, double xpos, double ypos)
 	{
-		if (auto game = static_cast<Game*>(glfwGetWindowUserPointer(window)); game)
-			game->m_cursorPosition = { static_cast<float>(xpos), static_cast<float>(ypos) };
+		if (auto data = static_cast<WindowData*>(glfwGetWindowUserPointer(window)); data)
+		{
+			if (data->scene)
+				static_cast<Scene*>(data->scene)->setCursor(static_cast<float>(xpos), static_cast<float>(ypos));
+		}
 	});
 
-	glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+	glfwSetMouseButtonCallback(m_glfwWindow, [](GLFWwindow* window, int button, int action, int mods)
+	{
+		if (auto data = static_cast<WindowData*>(glfwGetWindowUserPointer(window)); data)
+		{
+			if (data->scene)
+				static_cast<Scene*>(data->scene)->setMouse(button, action, mods);
+		}
+	});
+
+	glfwSetKeyCallback(m_glfwWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
 		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         	glfwSetWindowShouldClose(window, GLFW_TRUE);
+
+		if (auto data = static_cast<WindowData*>(glfwGetWindowUserPointer(window)); data)
+		{
+			if (data->scene)
+				static_cast<Scene*>(data->scene)->setKeyboard(key, scancode, action, mods);
+		}
 	});
 }

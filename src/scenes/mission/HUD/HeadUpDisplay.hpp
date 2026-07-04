@@ -18,7 +18,7 @@ public:
     ~HeadUpDisplay();
 
     bool init()                              noexcept;
-    void update(float dt)                    noexcept;
+    void update(float dt, vec2s cursor)      noexcept;
     void draw(const mat4s& projection) const noexcept;
 
     void runSelection()                noexcept;
@@ -52,6 +52,7 @@ private:
         uint32_t    texture;
         uint32_t    program;
         float       timer;
+        vec2s       position;
     } m_cursor;
 
     struct
