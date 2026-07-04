@@ -15,7 +15,7 @@
 #define BLINK_LOOP_TIME 0.25f
 
 
-HeadUpDisplay::HeadUpDisplay(Game* game,  Tilemap& tilemap, ConstructionMenu& menu) noexcept:
+HeadUpDisplay::HeadUpDisplay(Game* game,  TileMap& tilemap, ConstructionMenu& menu) noexcept:
     m_game(game),
     m_tilemap(tilemap),
     m_menu(menu),

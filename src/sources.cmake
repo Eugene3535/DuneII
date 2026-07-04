@@ -8,6 +8,8 @@ set(FILE_SRC_FILES
 	src/files/Shader.cpp
 	src/files/StbImage.hpp
 	src/files/StbImage.cpp
+	src/files/TiledMapLoader.hpp
+	src/files/TiledMapLoader.cpp
 )
 
 
@@ -42,8 +44,6 @@ set(SCENE_SRC_FILES
 	src/scenes/pick_house/PickHouse.cpp
 	src/scenes/mission/common/Structures.hpp
 	src/scenes/mission/common/Units.hpp
-	src/scenes/mission/loader/TiledMapLoader.hpp # TODO: move to file folder
-	src/scenes/mission/loader/TiledMapLoader.cpp
 	src/scenes/mission/tilemap/Tilemap.hpp
 	src/scenes/mission/tilemap/Tilemap.cpp
 	src/scenes/mission/HUD/construction/ConstructionMenu.hpp

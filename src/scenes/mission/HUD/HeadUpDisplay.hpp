@@ -14,7 +14,7 @@ class HeadUpDisplay:
     private NonMovable
 {
 public:
-    HeadUpDisplay(class Game* game, class Tilemap& tilemap, class ConstructionMenu& menu) noexcept;
+    HeadUpDisplay(class Game* game, class TileMap& tilemap, class ConstructionMenu& menu) noexcept;
     ~HeadUpDisplay();
 
     bool init()                              noexcept;
@@ -34,7 +34,7 @@ public:
 
 private:
     class Game*             m_game;
-    const class Tilemap&    m_tilemap;
+    const class TileMap&    m_tilemap;
     class ConstructionMenu& m_menu;
     EntityPreview           m_previewIcons;
 

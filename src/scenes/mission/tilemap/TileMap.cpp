@@ -8,10 +8,10 @@
 #include <magic_enum/magic_enum.hpp>
 
 #include "files/FileProvider.hpp"
+#include "files/TiledMapLoader.hpp"
 #include "graphics/vao/VertexBufferLayout.hpp"
 #include "graphics/texture/Texture2D.hpp"
 #include "application/game/Game.hpp"
-#include "scenes/mission/loader/TiledMapLoader.hpp"
 #include "scenes/mission/tilemap/Tilemap.hpp"
 
 
@@ -43,7 +43,7 @@ static ivec4s       get_bounds_of(const StructureInfo::Type type, const ivec2s c
 static int32_t      get_armor_of(const StructureInfo::Type type)                                            noexcept;
 
 
-Tilemap::Tilemap(Game* game, entt::registry& registry) noexcept:
+TileMap::TileMap(Game* game, entt::registry& registry) noexcept:
 	Transform2D(),
 	m_game(game),
     m_registry(registry),
@@ -55,13 +55,13 @@ Tilemap::Tilemap(Game* game, entt::registry& registry) noexcept:
 }
 
 
-Tilemap::~Tilemap()
+TileMap::~TileMap()
 {
 	cleanupGraphicsResources();
 }
 
 
-bool Tilemap::createFromLoader(const TiledMapLoader& loader) noexcept
+bool TileMap::createFromLoader(const TiledMapLoader& loader) noexcept
 {
 	createGraphicsResources(loader.getVertices(), loader.getIndices());
 	m_structureMask.clear();
@@ -162,7 +162,7 @@ bool Tilemap::createFromLoader(const TiledMapLoader& loader) noexcept
 }
 
 
-bool Tilemap::putStructure(const HouseType owner, const StructureInfo::Type type, const ivec2s cell) noexcept
+bool TileMap::putStructure(const HouseType owner, const StructureInfo::Type type, const ivec2s cell) noexcept
 {
 	if(auto size = m_registry.storage<StructureInfo>().size(); size >= STRUCTURE_LIMIT_ON_MAP)
 		return false;
@@ -295,7 +295,7 @@ bool Tilemap::putStructure(const HouseType owner, const StructureInfo::Type type
 }
 
 
-void Tilemap::draw(const mat4s& projection) const noexcept
+void TileMap::draw(const mat4s& projection) const noexcept
 {
     mat4s uniformMatrix = projection;
     mat4s modelView     = getMatrix();
@@ -324,7 +324,7 @@ void Tilemap::draw(const mat4s& projection) const noexcept
 }
 
 
-entt::entity Tilemap::getEntityUnderCursor(const vec2s point) const noexcept
+entt::entity TileMap::getEntityUnderCursor(const vec2s point) const noexcept
 {
 	const ivec2s tile = { static_cast<int>(point.x) / m_tileSize.x, static_cast<int>(point.y) / m_tileSize.y };
 	const int32_t origin = tile.y * m_mapSize.x + tile.x;
@@ -336,13 +336,13 @@ entt::entity Tilemap::getEntityUnderCursor(const vec2s point) const noexcept
 }
 
 
-entt::registry& Tilemap::getRegistry() const noexcept
+entt::registry& TileMap::getRegistry() const noexcept
 {
 	return m_registry;
 }
 
 
-bool Tilemap::createGraphicsResources(std::span<const vec4s> vertices, std::span<const uint32_t> indices) noexcept
+bool TileMap::createGraphicsResources(std::span<const vec4s> vertices, std::span<const uint32_t> indices) noexcept
 {
 	memset(&m_landscape, 0, sizeof(m_landscape));
     memset(&m_buildings, 0, sizeof(m_buildings));
@@ -413,7 +413,7 @@ bool Tilemap::createGraphicsResources(std::span<const vec4s> vertices, std::span
 }
 
 
-void Tilemap::cleanupGraphicsResources() noexcept
+void TileMap::cleanupGraphicsResources() noexcept
 {
 	GLint mapped;
 	glGetNamedBufferParameteriv(m_buildings.vertexBufferObject, GL_BUFFER_MAPPED, &mapped);
@@ -431,7 +431,7 @@ void Tilemap::cleanupGraphicsResources() noexcept
 }
 
 
-void Tilemap::createGraphicsForEntity(const entt::entity entity) noexcept
+void TileMap::createGraphicsForEntity(const entt::entity entity) noexcept
 {
 	if(m_buildings.mappedStorage)
 	{
@@ -459,7 +459,7 @@ void Tilemap::createGraphicsForEntity(const entt::entity entity) noexcept
 }
 
 
-void Tilemap::updateWall(int32_t origin, int32_t level) noexcept
+void TileMap::updateWall(int32_t origin, int32_t level) noexcept
 {
     if(level > 0)
 	{

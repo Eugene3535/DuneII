@@ -10,12 +10,12 @@
 #include "scenes/mission/common/Structures.hpp"
 
 
-class Tilemap final:
+class TileMap final:
     public Transform2D
 {
 public:
-    Tilemap(class Game* game, entt::registry& registry) noexcept;
-    ~Tilemap();
+    TileMap(class Game* game, entt::registry& registry) noexcept;
+    ~TileMap();
 
     bool createFromLoader(const class TiledMapLoader& loader) noexcept;
     bool putStructure(const HouseType owner, const StructureInfo::Type type, const ivec2s cell) noexcept; // cell must be presented it tiles

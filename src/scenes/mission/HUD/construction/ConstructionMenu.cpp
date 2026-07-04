@@ -32,7 +32,7 @@ namespace
 }
 
 
-ConstructionMenu::ConstructionMenu(Game* game, Tilemap& tilemap) noexcept:
+ConstructionMenu::ConstructionMenu(Game* game, TileMap& tilemap) noexcept:
     m_game(game),
     m_tilemap(tilemap),
     m_transform(),

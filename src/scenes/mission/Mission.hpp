@@ -1,7 +1,7 @@
 #pragma once
 
-#include "scenes/mission/loader/TiledMapLoader.hpp"
-#include "scenes/mission/tilemap/Tilemap.hpp"
+#include "files/TiledMapLoader.hpp"
+#include "scenes/mission/tilemap/TileMap.hpp"
 #include "scenes/mission/HUD/HeadUpDisplay.hpp"
 #include "scenes/mission/HUD/construction/ConstructionMenu.hpp"
 #include "scenes/Scene.hpp"
@@ -23,7 +23,7 @@ private:
     void createSystems() noexcept;
 
     TiledMapLoader   m_mapLoader;
-    Tilemap          m_tilemap;
+    TileMap          m_tilemap;
     entt::registry   m_registry;
 
     ConstructionMenu m_menu;

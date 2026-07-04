@@ -7,7 +7,7 @@
 #include <magic_enum/magic_enum.hpp>
 
 #include "scenes/mission/common/Structures.hpp"
-#include "scenes/mission/loader/TiledMapLoader.hpp"
+#include "files/TiledMapLoader.hpp"
 
 
 struct Tileset
