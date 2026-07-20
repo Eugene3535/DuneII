@@ -240,7 +240,7 @@ void SpriteManager::pushVerticesOnGPU() noexcept
 	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(float), static_cast<const void*>(m_vertices.data()), GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	std::vector<float>().swap(m_vertices); 
+	std::vector<float>().swap(m_vertices);
 }
 
 

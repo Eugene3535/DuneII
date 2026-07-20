@@ -62,9 +62,9 @@ void Button::draw() noexcept
     assert(m_uniform != -1);
 
     glUniform4fv(m_uniform, 1, m_currentColor);
-    glBindTexture(GL_TEXTURE_2D, m_sprite.texture);
+    glBindTextureUnit(0, m_sprite.texture);
     glDrawArrays(GL_TRIANGLE_FAN, m_sprite.frame, 4);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTextureUnit(0, 0);
 }
 
 

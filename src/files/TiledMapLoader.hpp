@@ -4,6 +4,7 @@
 #include <vector>
 #include <span>
 #include <filesystem>
+#include <variant>
 
 #include <cglm/struct/ivec2.h>
 #include <cglm/struct/ivec4.h>
@@ -17,8 +18,7 @@ public:
 		struct Property
 		{
 			std::string name;
-			std::string type;
-			std::string value;
+			std::variant<bool, int, float, std::string> value;
 		};
 
 		std::string           name;

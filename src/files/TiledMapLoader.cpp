@@ -198,10 +198,10 @@ bool TiledMapLoader::loadLayers(const void* rootNode) noexcept
 			return minTile <= ts.firstGID && maxTile <= (ts.firstGID + ts.tileCount);
 		});
 
-		if(currentTileset == tilesets.end())
+		if (currentTileset == tilesets.end())
 			continue;
 
-		if(auto attrName = layerNode->first_attribute("name"))
+		if (auto attrName = layerNode->first_attribute("name"))
 		{
 			if(strcmp(attrName->value(), "Landscape") == 0)
 				loadLandscape(*currentTileset, tileIDs);
@@ -247,12 +247,41 @@ bool TiledMapLoader::loadObjects(const void* rootNode) noexcept
 				{
 					auto& property = object.properties.emplace_back();
 
-					for (auto attribute = propertyNode->first_attribute(); attribute != nullptr; attribute = attribute->next_attribute())
+                    std::string_view type;
+                    std::string_view value;
+
+					for (auto attribute = propertyNode->first_attribute(); attribute; attribute = attribute->next_attribute())
 					{
-						if (strcmp(attribute->name(), "name") == 0) { property.name  = { attribute->value(), attribute->value_size() }; continue; }
-						if (strcmp(attribute->name(), "type") == 0) { property.type  = { attribute->value(), attribute->value_size() }; continue; }
-						if (strcmp(attribute->name(), "value") == 0)  property.value = { attribute->value(), attribute->value_size() };
+						if (strcmp(attribute->name(), "name") == 0) 
+                            property.name = { attribute->value(), attribute->value_size() }; 
+                        
+						else if (strcmp(attribute->name(), "type") == 0)  
+                            type  = { attribute->value(), attribute->value_size() };
+
+						else if (strcmp(attribute->name(), "value") == 0) 
+                            value = { attribute->value(), attribute->value_size() };
 					}
+
+                    if (type == "bool")
+                    {
+                        property.value = (value == "true") ? true : false; 
+                    }
+                    else if (type == "int")
+                    {
+                        property.value = atoi(value.data()); 
+                    }
+                    else if (type == "float")
+                    {
+                        float result = 0.f;
+                        auto [ptr, ec] = std::from_chars(value.data(), value.data() + value.size(), result);
+                        
+                        if (ec == std::errc())
+                            property.value = result; 
+                    }
+                    else if (type == "string")
+                    {
+                        property.value = std::string(value); 
+                    }
 				}
 			}
 		}

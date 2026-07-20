@@ -184,17 +184,17 @@ void TitleScreen::draw(const mat4s& projection) noexcept
     modelView = glms_mul(MVP, model);
     m_game->updateUniformBuffer(modelView);
 
-    glBindTexture(GL_TEXTURE_2D, m_space.texture);
+    glBindTextureUnit(0, m_space.texture);
     glDrawArrays(GL_TRIANGLE_FAN, m_space.frame, 4);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTextureUnit(0, 0);
 
     model = m_planetTransform.getMatrix();
     modelView = glms_mul(MVP, model);
     m_game->updateUniformBuffer(modelView);
 
-    glBindTexture(GL_TEXTURE_2D, m_planet.texture);
+    glBindTextureUnit(0, m_planet.texture);
     glDrawArrays(GL_TRIANGLE_FAN, m_planet.frame, 4);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTextureUnit(0, 0);
 
 //  Draw buttons
     if(m_isPresented)
