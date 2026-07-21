@@ -42,8 +42,8 @@ set(SCENE_SRC_FILES
 	src/scenes/intro/TitleScreen.cpp
 	src/scenes/pick_house/PickHouse.hpp
 	src/scenes/pick_house/PickHouse.cpp
-	src/scenes/mission/common/Structures.hpp
-	src/scenes/mission/common/Units.hpp
+	src/scenes/mission/data/Structures.hpp
+	src/scenes/mission/data/Units.hpp
 	src/scenes/mission/tilemap/Tilemap.hpp
 	src/scenes/mission/tilemap/Tilemap.cpp
 	src/scenes/mission/HUD/construction/ConstructionMenu.hpp
@@ -59,16 +59,19 @@ set(SCENE_SRC_FILES
 
 # Common
 set(COMMON_SRC_FILES
-	src/common/NonCopyable.hpp
-	src/common/NonMovable.hpp
-	src/common/MemoryAllocator.hpp
-	src/common/MemoryAllocator.inl
 	src/common/Assets.hpp
 	src/common/Enums.hpp
-	src/common/ExternalMath.hpp
-	src/common/ExternalMath.cpp
+	src/common/math/ExternalMath.hpp
+	src/common/math/ExternalMath.cpp
 	src/common/info/GameInfo.hpp
 	src/common/info/GameInfo.cpp
+	src/common/allocator/MemoryAllocator.hpp
+	src/common/allocator/MemoryAllocator.inl
+	src/common/action/Action.cpp
+	src/common/action/Action.hpp
+	src/common/action/ActionData.hpp
+	src/common/action/ActionManager.cpp
+	src/common/action/ActionManager.hpp
 )
 
 # Application

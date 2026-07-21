@@ -1,6 +1,9 @@
 - [x] Construction (50%)
 - [ ] Class MusicBox with automatic control of soundtrack parameters
 - [ ] Mentat intro scene
-- [ ] shader optimization (remove dublicates)
+- [x] shader optimization (remove dublicates)
 - [ ] texture optimization (remove dublicates)
 - [ ] Collect the remaining TMX maps
+- [ ] Move input data into WindowData
+- [ ] AssetManager
+- [ ] Use class Game just as a struct

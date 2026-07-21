@@ -2,16 +2,12 @@
 
 #include <entt/entity/fwd.hpp>
 
-#include "common/NonCopyable.hpp"
-#include "common/NonMovable.hpp"
 #include "graphics/transform/Transform2D.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
 #include "scenes/mission/HUD/previews/EntityPreview.hpp"
 
 
-class HeadUpDisplay: 
-    private NonCopyable,
-    private NonMovable
+class HeadUpDisplay final
 {
 public:
     HeadUpDisplay(class Game* game, class TileMap& tilemap, class ConstructionMenu& menu) noexcept;

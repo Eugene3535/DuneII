@@ -7,7 +7,7 @@
 #include <RapidXML/rapidxml_utils.hpp>
 #include <magic_enum/magic_enum.hpp>
 
-#include "scenes/mission/common/Structures.hpp"
+#include "scenes/mission/data/Structures.hpp"
 #include "files/TiledMapLoader.hpp"
 
 

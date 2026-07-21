@@ -7,7 +7,7 @@
 #include <entt/entity/registry.hpp>
 
 #include "graphics/transform/Transform2D.hpp"
-#include "scenes/mission/common/Structures.hpp"
+#include "scenes/mission/data/Structures.hpp"
 
 
 class TileMap final:

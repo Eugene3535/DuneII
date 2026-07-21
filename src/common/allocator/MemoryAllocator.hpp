@@ -27,4 +27,5 @@ private:
     std::unordered_map<size_t, std::vector<void*>> m_freeBlocks;
 };
 
+
 #include "common/MemoryAllocator.inl"
