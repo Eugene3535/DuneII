@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <memory>
 
 #include "scenes/intro/interactive_elements/Button.hpp"
 #include "scenes/Scene.hpp"
@@ -30,10 +31,9 @@ private:
     Transform2D m_planetTransform;
 
     SpriteManager m_sprites;
-    Button*       m_playButton;
-    Button*       m_exitButton;
-    Button*       m_settingsButton;
-    char m_memoryPool[sizeof(Button) * 3];
+    std::unique_ptr<Button> m_playButton;
+    std::unique_ptr<Button> m_exitButton;
+    std::unique_ptr<Button> m_settingsButton;
 
     bool m_isPresented;
 };

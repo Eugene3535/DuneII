@@ -125,18 +125,15 @@ bool TitleScreen::load(std::string_view info) noexcept
     if (uniform == -1)
         return false;
 
-    char* offset = m_memoryPool;
-
     for (const auto btn : { "play", "exit", "settings" })
     {
         if (auto sprite = m_sprites.getSprite(btn); sprite.has_value())
         {
-            Button* button = new(offset) Button(sprite.value(), uniform);
-            offset += sizeof(Button);
+            auto button = std::make_unique<Button>(sprite.value(), uniform);
 
-            if (strcmp(btn, "play") == 0)     m_playButton = button;
-            if (strcmp(btn, "exit") == 0)     m_exitButton = button;
-            if (strcmp(btn, "settings") == 0) m_settingsButton = button;
+            if (strcmp(btn, "play") == 0)     m_playButton.swap(button);
+            if (strcmp(btn, "exit") == 0)     m_exitButton.swap(button);
+            if (strcmp(btn, "settings") == 0) m_settingsButton.swap(button);
         }
     }
     

@@ -95,7 +95,7 @@ bool TileMap::createFromLoader(const TiledMapLoader& loader) noexcept
 			{
 				auto found = std::find_if(object.properties.begin(), object.properties.end(), [houseName](const TiledMapLoader::Object::Property& property)
 				{
-					if (auto value = std::get_if<int>(&property.value))
+					if (const auto value = std::get_if<int>(&property.value))
 					{
 						return (houseName == static_cast<HouseType>(*value));
 					}

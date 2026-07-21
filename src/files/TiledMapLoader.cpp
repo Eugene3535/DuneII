@@ -1,6 +1,7 @@
 #include <array>
 #include <cstring>
 #include <algorithm>
+#include <charconv>
 
 #include <RapidXML/rapidxml.hpp>
 #include <RapidXML/rapidxml_utils.hpp>
@@ -19,7 +20,10 @@ struct Tileset
 };
 
 
+static void parse_csv(const void* node, std::vector<int>& result) noexcept;
 static char convert_tile_num_to_char(int32_t index) noexcept;
+
+
 
 TiledMapLoader::TiledMapLoader() noexcept:
 	m_mapSize(glms_ivec2_zero()),
@@ -61,8 +65,6 @@ bool TiledMapLoader::loadFromFile(const std::filesystem::path &filePath) noexcep
 		if( ! (mapWidth && mapHeight && tileWidth && tileHeight) )
 			return false;
 
-		m_vertices.reserve(mapWidth * mapHeight * 4);
-		m_indices.reserve(mapWidth * mapHeight * 6);
 		m_tileMask.resize(mapWidth * mapHeight);
 
 		m_mapSize  = { mapWidth,  mapHeight  };
@@ -168,25 +170,15 @@ bool TiledMapLoader::loadLayers(const void* rootNode) noexcept
 			  layerNode = layerNode->next_sibling("layer"))
 	{
 		auto attrName = layerNode->first_attribute("name");
-		std::string name = attrName ? attrName->value() : std::string();
+		std::string name = attrName ? std::string(attrName->value(), attrName->value_size()) : std::string();
 
 		auto dataNode = layerNode->first_node("data");
 
 		if (!dataNode)
 			continue;
 
-		std::string csv(dataNode->value(), dataNode->value_size());
-		std::string token;
-		std::istringstream iss(csv);
 		std::vector<int> tileIDs;
-
-		const size_t tileCount = std::count_if(csv.begin(), csv.end(),
-			[](const char c) { return c == ','; });
-
-		tileIDs.reserve(tileCount + 1);
-
-		while (std::getline(iss, token, ','))
-			tileIDs.push_back(std::stoi(token));
+		parse_csv(dataNode, tileIDs);
 
 		const auto minMaxElems = std::minmax_element(tileIDs.begin(), tileIDs.end());
 		const int minTile = *minMaxElems.first;
@@ -306,6 +298,8 @@ void TiledMapLoader::loadLandscape(const Tileset& tileset, std::span<const int32
 	const int32_t tileWidth  = m_tileSize.x;
 	const int32_t tileHeight = m_tileSize.x;
 
+	m_vertices.reserve(tileIds.size() * 4);
+	m_indices.reserve(tileIds.size() * 6);
 	size_t tileIndex = 0;
 
 	for (int32_t y = 0; y < mapHeight; ++y)
@@ -315,40 +309,42 @@ void TiledMapLoader::loadLandscape(const Tileset& tileset, std::span<const int32
 			const int32_t tileID = tileIds[y * mapWidth + x];
 			const int32_t tileNum = tileID - tileset.firstGID;
 
-			m_tileMask[tileIndex] = convert_tile_num_to_char(tileID);
-			++tileIndex;
+			if (tileID)
+			{
+				m_tileMask[tileIndex++] = convert_tile_num_to_char(tileID);
 
-			const int32_t tileY = (tileNum >= tileset.columns) ? tileNum / tileset.columns : 0;
-			const int32_t tileX = tileNum % tileset.columns;
+				const int32_t tileY = (tileNum >= tileset.columns) ? tileNum / tileset.columns : 0;
+				const int32_t tileX = tileNum % tileset.columns;
 
-			const int32_t positionX = tileX * tileWidth;
-			const int32_t positionY = tileY * tileHeight;
-//  Texture coords
-			const float left   = positionX * ratio.x;
-			const float top    = positionY * ratio.y;
-			const float right  = (positionX + tileWidth) * ratio.x;
-			const float bottom = (positionY + tileHeight) * ratio.y;
+				const int32_t positionX = tileX * tileWidth;
+				const int32_t positionY = tileY * tileHeight;
+//  UV
+				const float left   = positionX * ratio.x;
+				const float top    = positionY * ratio.y;
+				const float right  = (positionX + tileWidth) * ratio.x;
+				const float bottom = (positionY + tileHeight) * ratio.y;
 //  Vertices
-			const vec2s leftBottom  = { static_cast<float>(x) * tileWidth,              static_cast<float>(y) * tileHeight + tileHeight };
-			const vec2s rightBootom = { static_cast<float>(x) * tileWidth + tileWidth,  static_cast<float>(y) * tileHeight + tileHeight };
-			const vec2s rightTop    = { static_cast<float>(x) * tileWidth + tileWidth,  static_cast<float>(y) * tileHeight };
-			const vec2s leftTop     = { static_cast<float>(x) * tileWidth,              static_cast<float>(y) * tileHeight };
+				const vec2s leftBottom  = { static_cast<float>(x) * tileWidth,              static_cast<float>(y) * tileHeight + tileHeight };
+				const vec2s rightBootom = { static_cast<float>(x) * tileWidth + tileWidth,  static_cast<float>(y) * tileHeight + tileHeight };
+				const vec2s rightTop    = { static_cast<float>(x) * tileWidth + tileWidth,  static_cast<float>(y) * tileHeight };
+				const vec2s leftTop     = { static_cast<float>(x) * tileWidth,              static_cast<float>(y) * tileHeight };
 
-			const uint32_t index = static_cast<uint32_t>(m_vertices.size());
+				const uint32_t index = static_cast<uint32_t>(m_vertices.size());
 
-			m_vertices.push_back({ leftBottom.x,  leftBottom.y,  left,  bottom });
-			m_vertices.push_back({ rightBootom.x, rightBootom.y, right, bottom });
-			m_vertices.push_back({ rightTop.x,    rightTop.y,    right, top    });
-			m_vertices.push_back({ leftTop.x,     leftTop.y,     left,  top    });
+				m_vertices.push_back({ leftBottom.x,  leftBottom.y,  left,  bottom });
+				m_vertices.push_back({ rightBootom.x, rightBootom.y, right, bottom });
+				m_vertices.push_back({ rightTop.x,    rightTop.y,    right, top    });
+				m_vertices.push_back({ leftTop.x,     leftTop.y,     left,  top    });
 
-			m_indices.push_back(index);
-			m_indices.push_back(index + 1);
-			m_indices.push_back(index + 2);
+				m_indices.push_back(index);
+				m_indices.push_back(index + 1);
+				m_indices.push_back(index + 2);
 
-			m_indices.push_back(index);
-			m_indices.push_back(index + 2);
-			m_indices.push_back(index + 3);
-		}
+				m_indices.push_back(index);
+				m_indices.push_back(index + 2);
+				m_indices.push_back(index + 3);
+			}
+			}
 	}
 }
 
@@ -439,6 +435,36 @@ void TiledMapLoader::loadStructures(const Tileset& tileset, std::span<const int>
 			}
 		}
 	}
+}
+
+
+void parse_csv(const void* node, std::vector<int>& result) noexcept
+{
+    const auto dataNode = static_cast<const rapidxml::xml_node<char>*>(node);
+    std::string csv(dataNode->value(), dataNode->value_size());
+
+	const auto commaCount = std::ranges::count_if(csv, [](const char c) { return c == ','; });
+    result.reserve(commaCount + 1);
+
+    const char* begin = csv.data();
+    const char* end = begin + csv.size();
+
+    while (begin < end) 
+    {
+        while (begin < end && *begin == ' ') ++begin;
+
+        int value = 0;
+        auto [p, ec] = std::from_chars(begin, end, value);
+
+        if (ec == std::errc()) 
+        {
+            result.push_back(value);
+            begin = p;
+        }
+        else ++begin;
+
+        while (begin < end && (*begin == ',' || *begin == ' ')) ++begin;
+    }
 }
 
 
