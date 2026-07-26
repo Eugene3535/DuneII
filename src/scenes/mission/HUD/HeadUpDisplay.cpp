@@ -6,7 +6,8 @@
 #include "graphics/texture/Texture2D.hpp"
 #include "graphics/vao/VertexBufferLayout.hpp"
 #include "scenes/mission/tilemap/Tilemap.hpp"
-#include "application/game/Game.hpp"
+#include "app/window/WindowData.hpp"
+#include "app/game/Game.hpp"
 #include "scenes/mission/HUD/construction/ConstructionMenu.hpp"
 #include "scenes/mission/HUD/HeadUpDisplay.hpp"
 
@@ -120,6 +121,8 @@ void HeadUpDisplay::draw(const mat4s& projection) const noexcept
     mat4s modelView;
     mat4s result;
 
+    auto view = m_game->windowData.view;
+
     if (m_selectionFrame.lastSelectedEntity != entt::null)
     {
         glUseProgram(m_cursor.program);
@@ -132,7 +135,7 @@ void HeadUpDisplay::draw(const mat4s& projection) const noexcept
 
         modelView = m_menu.getTransform().getMatrix();
         result = glms_mul(currentWorldMatrix, modelView);
-        m_game->updateUniformBuffer(result);
+        view->updateUniformBuffer(result);
         m_previewIcons.draw();
 
         auto& registry = m_tilemap.getRegistry();
@@ -152,7 +155,7 @@ void HeadUpDisplay::draw(const mat4s& projection) const noexcept
 
         modelView = m_cursor.transform.getMatrix();
         result = glms_mul(currentWorldMatrix, modelView);
-        m_game->updateUniformBuffer(result);
+        view->updateUniformBuffer(result);
 
         m_sprites.bind(true);
         glBindTextureUnit(0, m_cursor.texture);

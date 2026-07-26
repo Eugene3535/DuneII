@@ -9,8 +9,9 @@
 #include "graphics/texture/Texture2D.hpp"
 #include "graphics/vao/VertexBufferLayout.hpp"
 #include "graphics/geometry/GeometryGenerator.hpp"
+#include "app/window/WindowData.hpp"
+#include "app/game/Game.hpp"
 #include "scenes/mission/tilemap/Tilemap.hpp"
-#include "application/game/Game.hpp"
 #include "scenes/mission/HUD/construction/ConstructionMenu.hpp"
 
 
@@ -341,8 +342,9 @@ void ConstructionMenu::draw(const mat4s& projection) const noexcept
     mat4s currentWorldMatrix = projection;
     mat4s modelView = getTransform().getMatrix();
     mat4s result;
+    auto view = m_game->windowData.view;
     glm_mul(currentWorldMatrix.raw, modelView.raw, result.raw);
-    m_game->updateUniformBuffer(result);
+    view->updateUniformBuffer(result);
 
     drawFrames();
     drawPreviews();

@@ -19,7 +19,7 @@ public:
         NotSelected = 3
     };
 
-    ConstructionMenu(class Game* game, class TileMap& tilemap) noexcept;
+    ConstructionMenu(struct Game* game, class TileMap& tilemap) noexcept;
     ~ConstructionMenu();
 
     void init(uint32_t texture)                                               noexcept;

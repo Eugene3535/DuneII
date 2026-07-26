@@ -11,7 +11,8 @@
 #include "files/TiledMapLoader.hpp"
 #include "graphics/vao/VertexBufferLayout.hpp"
 #include "graphics/texture/Texture2D.hpp"
-#include "application/game/Game.hpp"
+#include "app/window/WindowData.hpp"
+#include "app/game/Game.hpp"
 #include "scenes/mission/tilemap/Tilemap.hpp"
 
 
@@ -305,7 +306,7 @@ void TileMap::draw(const mat4s& projection) const noexcept
     mat4s uniformMatrix = projection;
     mat4s modelView     = getMatrix();
     mat4s result        = glms_mul(uniformMatrix, modelView);
-    m_game->updateUniformBuffer(result);
+    m_game->windowData.view->updateUniformBuffer(result);
 
 //  Landscape
 	glUseProgram(m_landscape.program);

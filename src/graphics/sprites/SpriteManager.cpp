@@ -24,6 +24,9 @@ SpriteManager::~SpriteManager()
 
 void SpriteManager::createSprite(const std::string& name, uint32_t texture) noexcept
 {
+	if (m_vao || m_vbo)
+		return;
+
 	if(auto it = m_animations.find(name); it == m_animations.end())
 	{
 		GLint width;
@@ -39,6 +42,9 @@ void SpriteManager::createSprite(const std::string& name, uint32_t texture) noex
 
 void SpriteManager::createSprite(const std::string& name, uint32_t texture, const ivec4s& frame) noexcept
 {
+	if (m_vao || m_vbo)
+		return;
+
 	if(auto it = m_animations.find(name); it == m_animations.end())
 	{
 		const GLuint id = m_sprites.size();
@@ -57,6 +63,9 @@ void SpriteManager::createSprite(const std::string& name, uint32_t texture, cons
 
 void SpriteManager::createLinearAnimaton(const std::string& name, uint32_t texture, int duration) noexcept
 {
+	if (m_vao || m_vbo)
+		return;
+
 	if(auto it = m_animations.find(name); it == m_animations.end())
 	{
 		const GLuint id = m_sprites.size();
@@ -82,6 +91,9 @@ void SpriteManager::createLinearAnimaton(const std::string& name, uint32_t textu
 
 void SpriteManager::createGridAnimaton(const std::string& name, uint32_t texture, int columns, int rows) noexcept
 {
+	if (m_vao || m_vbo)
+		return;
+
 	if(auto it = m_animations.find(name); it == m_animations.end())
 	{
 		const GLuint id = m_sprites.size();
@@ -112,6 +124,9 @@ void SpriteManager::createGridAnimaton(const std::string& name, uint32_t texture
 
 void SpriteManager::createCustomAnimaton(const std::string& name, uint32_t texture, std::span<const ivec4s> frames) noexcept
 {
+	if (m_vao || m_vbo)
+		return;
+
 	if(auto it = m_animations.find(name); it == m_animations.end())
 	{
 		const GLuint id = m_sprites.size();
@@ -131,6 +146,9 @@ void SpriteManager::createCustomAnimaton(const std::string& name, uint32_t textu
 
 void SpriteManager::loadSpriteSheet(const std::filesystem::path& filePath, uint32_t texture) noexcept
 {
+	if (m_vao || m_vbo)
+		return;
+
 	auto document = std::make_unique<rapidxml::xml_document<char>>();
 	rapidxml::file<char> xmlFile(filePath.string().c_str());
 	document->parse<0>(xmlFile.data());
@@ -225,8 +243,8 @@ void SpriteManager::pushVerticesOnGPU() noexcept
 	if (m_vertices.empty())
 		return;
 
-	glDeleteBuffers(1, &m_vbo);
-	glDeleteVertexArrays(1, &m_vao);
+	if (m_vao || m_vbo)
+		return;
 
 	glCreateBuffers(1, &m_vbo);
 	glNamedBufferData(m_vbo, 0, nullptr, GL_STATIC_DRAW);

@@ -4,7 +4,8 @@
 #include <GLFW/glfw3.h>
 
 #include "files/FileProvider.hpp"
-#include "application/game/Game.hpp"
+#include "app/window/WindowData.hpp"
+#include "app/game/Game.hpp"
 #include "scenes/mission/Mission.hpp"
 
 
@@ -71,7 +72,6 @@ void Mission::draw(const mat4s& projection) noexcept
 
 void Mission::resize(int width, int height) noexcept
 {
-    Scene::resize(width, height);
     m_hud.resize(width, height);
 }
 
@@ -85,8 +85,8 @@ void Mission::createSystems() noexcept
             return;
 
         const auto game     = mission->m_game;
-        const auto cursor   = mission->m_cursor;
-        const auto viewSize = mission->m_size;
+        const auto cursor   = game->windowData.cursor;
+        const auto viewSize = game->windowData.view->getSize();
         const auto mapSize  = glms_ivec2_mul(mission->m_mapLoader.getMapSize(), mission->m_mapLoader.getTileSize());
 
         const bool isNearTheLeftEdge   = (cursor.x > 0 && cursor.x < SCREEN_MARGIN);
@@ -121,8 +121,8 @@ void Mission::createSystems() noexcept
 //  HUD
     m_systems.emplace_back([](Mission* mission, float dt)
     {
-        const int button = mission->m_mouse.button;
-        const int action = mission->m_mouse.action;
+        const int button = mission->m_game->windowData.mouse.button;
+        const int action = mission->m_game->windowData.mouse.action;
         const bool isPressed = (action != GLFW_RELEASE);
 
         const bool isMouseButtonLeftPressed  = ( (button == GLFW_MOUSE_BUTTON_LEFT) && isPressed );
@@ -134,7 +134,7 @@ void Mission::createSystems() noexcept
         if (isMouseButtonRightPressed)
             mission->m_hud.cancelSelection();
 
-        mission->m_hud.update(dt, mission->m_cursor);
+        mission->m_hud.update(dt, mission->m_game->windowData.cursor);
     });
 
 
@@ -149,8 +149,9 @@ void Mission::createSystems() noexcept
 
         menu.update(dt);
 
-        const int key = mission->m_keyboard.key;
-        const int action = mission->m_keyboard.action;
+        const auto& data     = mission->m_game->windowData;
+        const int key        = data.keyboard.key;
+        const int action     = data.keyboard.action;
         const bool isPressed = (action != GLFW_RELEASE);
 
         if ((key == GLFW_KEY_W) && isPressed)

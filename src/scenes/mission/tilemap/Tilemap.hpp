@@ -14,7 +14,7 @@ class TileMap final:
     public Transform2D
 {
 public:
-    TileMap(class Game* game, entt::registry& registry) noexcept;
+    TileMap(struct Game* game, entt::registry& registry) noexcept;
     ~TileMap();
 
     bool createFromLoader(const class TiledMapLoader& loader) noexcept;

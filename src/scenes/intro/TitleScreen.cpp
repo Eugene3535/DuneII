@@ -7,7 +7,8 @@
 
 #include "files/FileProvider.hpp"
 #include "graphics/texture/Texture2D.hpp"
-#include "application/game/Game.hpp"
+#include "app/window/WindowData.hpp"
+#include "app/game/Game.hpp"
 #include "scenes/intro/TitleScreen.hpp"
 
 
@@ -148,17 +149,15 @@ void TitleScreen::update(float dt) noexcept
     if (!m_isLoaded)
         return;
 
-
-
-
     if (!m_isPresented)
         return;
-    
-    const bool isMouseButtonPressed = ( (m_mouse.button == GLFW_MOUSE_BUTTON_LEFT) && (m_mouse.action == GLFW_PRESS) );
 
-    m_settingsButton->update(m_cursor, isMouseButtonPressed);
-    m_playButton->update(m_cursor, isMouseButtonPressed);
-    m_exitButton->update(m_cursor, isMouseButtonPressed);
+    auto& data = m_game->windowData;
+    const bool isMouseButtonPressed = ( (data.mouse.button == GLFW_MOUSE_BUTTON_LEFT) && (data.mouse.action == GLFW_PRESS) );
+
+    m_settingsButton->update(data.cursor, isMouseButtonPressed);
+    m_playButton->update(data.cursor, isMouseButtonPressed);
+    m_exitButton->update(data.cursor, isMouseButtonPressed);
 
     if(m_playButton->isSelected())
         m_game->switchScene(this, Scene::PICK_HOUSE);
@@ -177,9 +176,11 @@ void TitleScreen::draw(const mat4s& projection) noexcept
     glUseProgram(m_spriteProgram);
     m_sprites.bind(true);
 
+    auto view = m_game->windowData.view;
+
     model = m_spaceTransform.getMatrix();
     modelView = glms_mul(MVP, model);
-    m_game->updateUniformBuffer(modelView);
+    view->updateUniformBuffer(modelView);
 
     glBindTextureUnit(0, m_space.texture);
     glDrawArrays(GL_TRIANGLE_FAN, m_space.frame, 4);
@@ -187,7 +188,7 @@ void TitleScreen::draw(const mat4s& projection) noexcept
 
     model = m_planetTransform.getMatrix();
     modelView = glms_mul(MVP, model);
-    m_game->updateUniformBuffer(modelView);
+    view->updateUniformBuffer(modelView);
 
     glBindTextureUnit(0, m_planet.texture);
     glDrawArrays(GL_TRIANGLE_FAN, m_planet.frame, 4);
@@ -200,17 +201,17 @@ void TitleScreen::draw(const mat4s& projection) noexcept
 
         model = m_playButton->getMatrix();
         modelView = glms_mul(MVP, model);
-        m_game->updateUniformBuffer(modelView);
+        view->updateUniformBuffer(modelView);
         m_playButton->draw();
 
         model = m_exitButton->getMatrix();
         modelView = glms_mul(MVP, model);
-        m_game->updateUniformBuffer(modelView);
+        view->updateUniformBuffer(modelView);
         m_exitButton->draw();
 
         model = m_settingsButton->getMatrix();
         modelView = glms_mul(MVP, model);
-        m_game->updateUniformBuffer(modelView);
+        view->updateUniformBuffer(modelView);
         m_settingsButton->draw();
     }
 
@@ -221,8 +222,6 @@ void TitleScreen::draw(const mat4s& projection) noexcept
 
 void TitleScreen::resize(int width, int height) noexcept
 {
-    Scene::resize(width, height);
-
     if (!m_isLoaded)
         return;
         

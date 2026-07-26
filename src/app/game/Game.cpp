@@ -5,13 +5,11 @@
 #include "scenes/intro/TitleScreen.hpp"
 #include "scenes/pick_house/PickHouse.hpp"
 #include "scenes/mission/Mission.hpp"
-#include "application/window/WindowData.hpp"
-#include "application/game/Game.hpp"
+#include "app/game/Game.hpp"
 
 
 
-Game::Game(WindowData& data) noexcept:
-    m_windowData(data),
+Game::Game() noexcept:
     m_nextSceneType(Scene::NONE),
     m_isSceneNeedToBeChanged(false)
 {
@@ -23,8 +21,6 @@ bool Game::initialize() noexcept
 {
     if (m_currentScene)
         return true;
-
-    glClearColor(0.f, 0.f, 0.f, 1.f);
 
     if (m_currentScene = load<TitleScreen>({}); !m_currentScene)
         return false;
@@ -64,8 +60,6 @@ void Game::update(float dt) noexcept
             {
                 if (auto missionScene = load<Mission>("Atreides-8.tmx"))
                     m_currentScene = missionScene;
-
-                // glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
             }
             break;
 
@@ -85,7 +79,7 @@ void Game::draw() noexcept
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    auto projection = m_windowData.viewport.getProjectionMatrix();
+    auto projection = windowData.view->getProjectionMatrix();
 
     if (m_currentScene)
         m_currentScene->draw(projection);
@@ -128,12 +122,6 @@ void Game::switchScene(const Scene* requester, Scene::Type nextScene) noexcept
             m_isSceneNeedToBeChanged = false;
         break;
     }
-}
-
-
-void Game::updateUniformBuffer(const mat4s& modelViewProjection) const noexcept
-{
-    m_windowData.viewport.updateUniformBuffer(modelViewProjection);
 }
 
 
@@ -198,7 +186,8 @@ void Game::updateData() noexcept
 {
     if (m_currentScene)
     {
-        m_windowData.scene = m_currentScene.get();
-        m_currentScene->resize(m_windowData.size.x, m_windowData.size.y);
+        windowData.scene = m_currentScene.get();
+        const auto size = windowData.view->getSize();
+        m_currentScene->resize(size.x, size.y);
     }
 }

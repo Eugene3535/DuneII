@@ -8,7 +8,8 @@
 #include "graphics/texture/Texture2D.hpp"
 #include "graphics/vao/VertexBufferLayout.hpp"
 #include "graphics/geometry/GeometryGenerator.hpp"
-#include "application/game/Game.hpp"
+#include "app/window/WindowData.hpp"
+#include "app/game/Game.hpp"
 #include "scenes/pick_house/PickHouse.hpp"
 
 
@@ -163,8 +164,10 @@ void PickHouse::update(float dt) noexcept
 
     m_timer += dt;
 
-    const int key = m_keyboard.key;
-    const int action = m_keyboard.action;
+    const auto& data = m_game->windowData;
+
+    const int key = data.keyboard.key;
+    const int action = data.keyboard.action;
     const bool isPressed = (action != GLFW_RELEASE);
 
     if (m_timer > SWITCH_HOUSE_OUTLINE_DELAY)
@@ -203,7 +206,8 @@ void PickHouse::update(float dt) noexcept
     if (!m_outlineNeedUpdate)
         return;
     
-    vec2s size = { static_cast<float>(m_size.x), static_cast<float>(m_size.y) };
+    const auto viewSize = m_game->windowData.view->getSize();
+    const vec2s size = { static_cast<float>(viewSize.x), static_cast<float>(viewSize.y) };
 
     float dx = size.x / m_background.sprite.width;
     float dy = size.y / m_background.sprite.height;
@@ -241,10 +245,12 @@ void PickHouse::draw(const mat4s& projection) noexcept
     mat4s modelView;
     mat4s result;
 
+    auto view = m_game->windowData.view;
+
 //  Draw background
     modelView = m_background.transform.getMatrix();
     result = glms_mul(MVP, modelView);
-    m_game->updateUniformBuffer(result);
+    view->updateUniformBuffer(result);
 
     glUseProgram(m_background.program);
     glBindVertexArray(m_background.vertexArrayObject);
@@ -255,7 +261,7 @@ void PickHouse::draw(const mat4s& projection) noexcept
 //  Draw outline
     modelView = m_outline.transform.getMatrix();
     result = glms_mul(MVP, modelView);
-    m_game->updateUniformBuffer(result);
+    view->updateUniformBuffer(result);
 
     glUseProgram(m_outline.program);
     glBindVertexArray(m_outline.vertexArrayObject);
@@ -266,8 +272,6 @@ void PickHouse::draw(const mat4s& projection) noexcept
 
 void PickHouse::resize(int width, int height) noexcept
 {
-    Scene::resize(width, height);
-
     vec2s size = { static_cast<float>(width), static_cast<float>(height) };
     setSpriteSizeInPixels(m_background.sprite, size, m_background.transform);
 

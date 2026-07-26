@@ -6,34 +6,32 @@
 
 #include <cglm/struct/vec2.h>
 
-#include "graphics/shaders/ShaderProgram.hpp"
-#include "scenes/Scene.hpp"
 #include "common/info/GameInfo.hpp"
+#include "graphics/shaders/ShaderProgram.hpp"
+#include "app/window/WindowData.hpp"
+#include "scenes/Scene.hpp"
 
 
-class Game final
+struct Game final
 {
-public:
-    Game(struct WindowData& data) noexcept;
+    Game() noexcept;
 
     bool initialize()     noexcept;
     void update(float dt) noexcept;
     void draw()           noexcept;
 
     void switchScene(const Scene* requester, Scene::Type nextScene) noexcept;
-    void updateUniformBuffer(const mat4s& modelViewProjection) const noexcept;
 
-    uint32_t      getShaderProgram(const std::string& name) const noexcept;
+    uint32_t getShaderProgram(const std::string& name) const noexcept;
 
     const GameInfo* getInfo() const noexcept;
-    
-private:
+
     void updateData() noexcept;
 
     template<class T>
     std::shared_ptr<T> load(std::string_view info) noexcept;
 
-    WindowData& m_windowData;
+    WindowData windowData;
 
     std::unordered_map<Scene::Type, std::shared_ptr<Scene>> m_scenes;
     std::shared_ptr<Scene>                                  m_currentScene;
@@ -45,4 +43,4 @@ private:
     GameInfo m_gameInfo;
 };
 
-#include "application/game/Game.inl"
+#include "app/game/Game.inl"

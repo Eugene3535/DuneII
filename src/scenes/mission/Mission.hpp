@@ -11,7 +11,7 @@ class Mission:
     public Scene
 {
 public:
-    explicit Mission(class Game* game) noexcept;
+    explicit Mission(struct Game* game) noexcept;
     ~Mission();
 
     bool load(std::string_view info)   noexcept override;

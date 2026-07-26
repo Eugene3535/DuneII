@@ -7,44 +7,34 @@ extern "C"
 }
 #endif
 
-#include "application/window/WindowData.hpp"
-#include "application/window/MainWindow.hpp"
-
-#include "application/game/Game.hpp"
+#include "app/window/WindowData.hpp"
+#include "app/window/MainWindow.hpp"
+#include "app/context/Context.hpp"
+#include "app/loop/MainLoop.hpp"
+#include "app/game/Game.hpp"
 
 
 int main()
 {
-    WindowData windowData;
-    windowData.title = "Dune II: The Battle For Arrakis";
-    windowData.size = { 1200, 900 };
+    Game game;
+    MainWindow window(game.windowData);
 
-    MainWindow window;
-
-    if (!window.open(windowData))
+    if (!window.open("Dune II: The Battle For Arrakis", 1200, 900))
         return 1;
 
-    Game game(windowData);
+
+    Context context;
+
+	if (!context.load(game))
+		return false;
 
     if (!game.initialize())
         return 1;
-    
-    float deltaTime = 0.f;
-	float lastFrame = 0.f;
-    
-	while (window.isOpen())
-	{
-		window.pollEvents();
 
-		const float currentFrame = window.getElapsedTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
+    MainLoop loop(window);
+    loop(game);
 
-		game.update(deltaTime);
-		game.draw();
-
-		window.display();
-	}
+    context.save(game);
 
     return 0;
 }

@@ -4,7 +4,7 @@
 
 #include "graphics/texture/Texture2D.hpp"
 #include "graphics/vao/VertexBufferLayout.hpp"
-#include "application/game/Game.hpp"
+#include "app/game/Game.hpp"
 #include "scenes/mission/HUD/previews/EntityPreview.hpp"
 
 

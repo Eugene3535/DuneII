@@ -11,7 +11,7 @@ class TitleScreen:
     public Scene
 {
 public:
-    explicit TitleScreen(class Game* game) noexcept;
+    explicit TitleScreen(struct Game* game) noexcept;
     ~TitleScreen();
 
     bool load(std::string_view info)   noexcept override;

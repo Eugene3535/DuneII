@@ -8,6 +8,7 @@
 OrthoMatrix::OrthoMatrix() noexcept:
     m_projection(glms_mat4_identity()),
     m_uniformBuffer(0),
+    m_size{0, 0},
     m_flipVertically(true)
 {
 
@@ -40,6 +41,8 @@ void OrthoMatrix::resize(int32_t width, int32_t height) noexcept
     m_projection = m_flipVertically ? 
         glms_ortho(0.f, static_cast<float>(width), static_cast<float>(height), 0.f, -1.f, 1.f) :
         glms_ortho(0.f, static_cast<float>(width), 0.f, static_cast<float>(height), -1.f, 1.f);
+
+    m_size = { width, height };
 }
 
 
@@ -60,6 +63,12 @@ void OrthoMatrix::flipVertically(bool flip) noexcept
 const mat4s& OrthoMatrix::getProjectionMatrix() const noexcept
 {
     return m_projection;
+}
+
+
+const ivec2s& OrthoMatrix::getSize() const noexcept
+{
+    return m_size;
 }
 
 

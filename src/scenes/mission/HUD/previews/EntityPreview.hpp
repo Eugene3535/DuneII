@@ -11,7 +11,7 @@
 class EntityPreview
 {
 public:
-    EntityPreview(class Game* game) noexcept;
+    EntityPreview(struct Game* game) noexcept;
     ~EntityPreview();
 
     bool loadFromTexture(const struct Texture2D& texture) noexcept;

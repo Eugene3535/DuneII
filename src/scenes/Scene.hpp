@@ -20,17 +20,13 @@ public:
         MISSION
     };
 
-	Scene(class Game* game, const Type type) noexcept;
+	Scene(struct Game* game, const Type type) noexcept;
 	virtual ~Scene();
     
-    virtual bool load(std::string_view info)   noexcept;
-    virtual void update(float dt)              noexcept;
-    virtual void draw(const mat4s& projection) noexcept;
-    virtual void resize(int width, int height) noexcept;
-
-    void setCursor(float x, float y) noexcept;
-    void setMouse(int button, int action, int mods) noexcept;
-    void setKeyboard(int key, int scancode, int action, int mods) noexcept;
+    virtual bool load(std::string_view info)   noexcept = 0;
+    virtual void update(float dt)              noexcept = 0;
+    virtual void draw(const mat4s& projection) noexcept = 0;
+    virtual void resize(int width, int height) noexcept = 0;
 
     bool isLoaded() const noexcept;
     Type getType()  const noexcept;
@@ -40,24 +36,6 @@ protected:
 
     class Game* m_game;
     bool        m_isLoaded;
-
-    ivec2s m_size;
-    vec2s m_cursor;
-
-    struct
-    {
-        int button;
-        int action;
-        int mods;
-    } m_mouse;
-
-    struct
-    {
-        int key;
-        int scancode;
-        int action;
-        int mods;
-    } m_keyboard;
 
 private:
     const Type m_type;

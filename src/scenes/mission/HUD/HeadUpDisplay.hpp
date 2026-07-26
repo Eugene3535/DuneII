@@ -10,7 +10,7 @@
 class HeadUpDisplay final
 {
 public:
-    HeadUpDisplay(class Game* game, class TileMap& tilemap, class ConstructionMenu& menu) noexcept;
+    HeadUpDisplay(struct Game* game, class TileMap& tilemap, class ConstructionMenu& menu) noexcept;
     ~HeadUpDisplay();
 
     bool init()                              noexcept;

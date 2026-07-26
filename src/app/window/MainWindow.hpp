@@ -1,14 +1,18 @@
 #pragma once
 
-#include <cglm/struct/vec2.h>
+#include <memory>
+
+#include <cglm/struct/ivec2.h>
+
+
 
 class MainWindow final
 {
 public:
-	MainWindow() noexcept;
+	MainWindow(struct WindowData& data) noexcept;
 	~MainWindow();
 
-	bool open(struct WindowData& data) noexcept;
+	bool open(const char* title, int width, int height) noexcept;
     void close() const noexcept;
 
     void pollEvents() const noexcept;
@@ -17,11 +21,17 @@ public:
     float getElapsedTime() const noexcept;
     ivec2s getSize() const noexcept;
 
+    static bool isKeyPressed(int key) noexcept;
+
     bool isOpen() const noexcept;
 
 private:
 	bool createGLFWWindow(const char* title, int width, int height) noexcept;
-	void initCallbacks(struct WindowData& data) noexcept;
+    void initializeDebug() noexcept;
+	void initCallbacks() noexcept;
 
+    struct WindowData& m_windowData;
 	struct GLFWwindow* m_glfwWindow;
+
+    std::unique_ptr<class OrthoMatrix> m_camera;
 };

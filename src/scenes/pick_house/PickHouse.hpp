@@ -9,7 +9,7 @@ class PickHouse:
     public Scene
 {
 public:
-    explicit PickHouse(class Game* game) noexcept;
+    explicit PickHouse(struct Game* game) noexcept;
     ~PickHouse();
 
     bool load(std::string_view info)   noexcept override;
