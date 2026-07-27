@@ -23,7 +23,6 @@ public:
     ~ConstructionMenu();
 
     void init(uint32_t texture)                                               noexcept;
-    void update(float dt)                                                     noexcept;
     void showEntityMenu(EntityIcon mainIcon, std::span<EntityIcon> menuIcons) noexcept;
     void updateSelection(char keyCode, bool isForced = false)                 noexcept;
     void hide()                                                               noexcept;
@@ -97,7 +96,6 @@ private:
             uint32_t count;
             int32_t row;
             int32_t column;
-            float moveFrameDelayTimer;
         } selectionFrame;
 
     } m_userElements;

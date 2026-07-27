@@ -33,6 +33,8 @@ struct Game final
 
     WindowData windowData;
 
+    uint32_t frameCounter;
+
     std::unordered_map<Scene::Type, std::shared_ptr<Scene>> m_scenes;
     std::shared_ptr<Scene>                                  m_currentScene;
     Scene::Type                                             m_nextSceneType;

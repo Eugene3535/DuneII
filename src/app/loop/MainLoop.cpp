@@ -30,6 +30,8 @@ void MainLoop::operator()(Game& game) noexcept
 		game.update(deltaTime);
 		game.draw();
 
+		game.frameCounter++;
+
 		m_window.display();
 	}
 }

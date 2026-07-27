@@ -79,12 +79,6 @@ void ConstructionMenu::init(uint32_t texture) noexcept
 }
 
 
-void ConstructionMenu::update(float dt) noexcept
-{
-    m_userElements.selectionFrame.moveFrameDelayTimer += dt;
-}
-
-
 void ConstructionMenu::showEntityMenu(EntityIcon mainIcon, std::span<EntityIcon> menuIcons) noexcept
 {
     if(mainIcon >= EntityIcon::MAX)
@@ -159,11 +153,6 @@ void ConstructionMenu::showEntityMenu(EntityIcon mainIcon, std::span<EntityIcon>
 
 void ConstructionMenu::updateSelection(char keyCode, bool isForced) noexcept
 {
-    if (m_userElements.selectionFrame.moveFrameDelayTimer < MOVE_FRAME_DELAY_TIME)
-        return;
-
-    m_userElements.selectionFrame.moveFrameDelayTimer = 0;
-
     const int32_t oldRow = m_userElements.selectionFrame.row;
     const int32_t oldColumn = m_userElements.selectionFrame.column;
 

@@ -23,10 +23,8 @@ Mission::Mission(Game* game) noexcept:
 
 }
 
-Mission::~Mission()
-{
 
-}
+Mission::~Mission() = default;
 
 
 bool Mission::load(std::string_view info) noexcept
@@ -53,8 +51,14 @@ bool Mission::load(std::string_view info) noexcept
 
 void Mission::update(float dt) noexcept
 {
-    for(auto system : m_systems)
-        system(this, dt);
+    const auto frame = m_game->frameCounter;
+
+    for(auto& system : m_systems)
+        if ((frame % system.frequency) == 0)
+            system.execute(this, dt);
+
+    if (!m_menu.isShown()) [[likely]]
+        m_hud.update(dt, m_game->windowData.cursor);
 }
 
 
@@ -78,8 +82,9 @@ void Mission::resize(int width, int height) noexcept
 
 void Mission::createSystems() noexcept
 {
-//  Viewport
-    m_systems.emplace_back([](Mission* mission, float dt)
+//  Map navigation
+    auto& mapNavigation = m_systems.emplace_back();
+    mapNavigation.execute = [](Mission* mission, float dt) -> void
     {
         if (mission->m_menu.isShown())
             return;
@@ -115,11 +120,12 @@ void Mission::createSystems() noexcept
         if (scenePosition.y < (viewSize.y - mapSize.y)) scenePosition.y = viewSize.y - mapSize.y;
 
         mission->m_tilemap.setPosition(scenePosition);
-    });
-
+    };
 
 //  HUD
-    m_systems.emplace_back([](Mission* mission, float dt)
+    auto& hudController = m_systems.emplace_back();
+    hudController.frequency = 8;
+    hudController.execute = [](Mission* mission, float dt) -> void
     {
         const int button = mission->m_game->windowData.mouse.button;
         const int action = mission->m_game->windowData.mouse.action;
@@ -133,21 +139,16 @@ void Mission::createSystems() noexcept
 
         if (isMouseButtonRightPressed)
             mission->m_hud.cancelSelection();
-
-        mission->m_hud.update(dt, mission->m_game->windowData.cursor);
-    });
+    };
 
 
 //  Construction menu
-    m_systems.emplace_back([](Mission* mission, float dt)
+    auto& constructionMenu = m_systems.emplace_back();
+    constructionMenu.frequency = 12;
+    constructionMenu.execute = [](Mission* mission, float dt) -> void
     {   
         auto& menu = mission->m_menu;
         auto game = mission->m_game;
-
-        if (!menu.isShown())
-            return;
-
-        menu.update(dt);
 
         const auto& data     = mission->m_game->windowData;
         const int key        = data.keyboard.key;
@@ -200,10 +201,11 @@ void Mission::createSystems() noexcept
                 menu.hide();
             }
         }
-    });
+    };
 
 //  Under construction
-    m_systems.emplace_back([](Mission* mission, float dt)
+    auto& construction = m_systems.emplace_back();
+    construction.execute = [](Mission* mission, float dt) -> void
     {
         auto view = mission->m_registry.view<StructureInfo>();
 
@@ -217,7 +219,7 @@ void Mission::createSystems() noexcept
                     component.isUnderConstruction = false;
             }
         });
-    });
+    };
 
     m_isLoaded = true;
 }

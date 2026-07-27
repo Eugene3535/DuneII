@@ -10,6 +10,7 @@
 
 
 Game::Game() noexcept:
+    frameCounter(0),
     m_nextSceneType(Scene::NONE),
     m_isSceneNeedToBeChanged(false)
 {

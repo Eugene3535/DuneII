@@ -26,7 +26,6 @@ HeadUpDisplay::HeadUpDisplay(Game* game,  TileMap& tilemap, ConstructionMenu& me
 {
     m_cursor.texture = 0;
     m_cursor.program = 0;
-    m_cursor.timer = 0;
 
     m_selectionFrame.vertexBufferObject = 0;
     m_selectionFrame.vertexArrayObject = 0;
@@ -104,7 +103,6 @@ bool HeadUpDisplay::init() noexcept
 
 void HeadUpDisplay::update(float dt, vec2s cursor) noexcept
 {
-    m_cursor.timer += dt;
     m_selectionFrame.blinkTimer += dt;
 
     if(m_selectionFrame.blinkTimer > BLINK_LOOP_TIME)
@@ -214,39 +212,34 @@ void HeadUpDisplay::runSelection() noexcept
     }
     else
     {
-        if(m_cursor.timer > BLINK_LOOP_TIME)
+        if(StructureInfo* info = registry.try_get<StructureInfo>(entity))
         {
-            if(StructureInfo* info = registry.try_get<StructureInfo>(entity))
+            const auto mainPreviewIcon = convert_building_type_to_preview_icon(info->type);
+
+            if(mainPreviewIcon != EntityIcon::Empty_Cell)
             {
-                const auto mainPreviewIcon = convert_building_type_to_preview_icon(info->type);
+                const bool hasConstructionPreviews = ((info->type == StructureInfo::Type::Vehicle)          ||
+                                                        (info->type == StructureInfo::Type::HighTech)         ||
+                                                        (info->type == StructureInfo::Type::ConstructionYard) ||
+                                                        (info->type == StructureInfo::Type::Barracks)         ||
+                                                        (info->type == StructureInfo::Type::Starport));
 
-                if(mainPreviewIcon != EntityIcon::Empty_Cell)
+                std::span<EntityIcon> previews;
+
+                if(hasConstructionPreviews)
                 {
-                    const bool hasConstructionPreviews = ((info->type == StructureInfo::Type::Vehicle)          ||
-                                                          (info->type == StructureInfo::Type::HighTech)         ||
-                                                          (info->type == StructureInfo::Type::ConstructionYard) ||
-                                                          (info->type == StructureInfo::Type::Barracks)         ||
-                                                          (info->type == StructureInfo::Type::Starport));
+                    std::vector<EntityIcon>* previewArray = registry.try_get<std::vector<EntityIcon>>(entity);
 
-                    std::span<EntityIcon> previews;
-
-                    if(hasConstructionPreviews)
-                    {
-                        std::vector<EntityIcon>* previewArray = registry.try_get<std::vector<EntityIcon>>(entity);
-
-                        if(previewArray)
-                            previews = std::span(*previewArray);
-                    }
-
-                    m_menu.showEntityMenu(mainPreviewIcon, previews);
+                    if(previewArray)
+                        previews = std::span(*previewArray);
                 }
+
+                m_menu.showEntityMenu(mainPreviewIcon, previews);
             }
         }
 
         return;
     }
-
-    m_cursor.timer = 0;
 
     if (StructureInfo* component = registry.try_get<StructureInfo>(entity))
     {

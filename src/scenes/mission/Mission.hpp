@@ -22,12 +22,18 @@ public:
 private:
     void createSystems() noexcept;
 
+    struct System
+    {
+        void (*execute)(Mission*, float) = nullptr;
+        uint32_t frequency = 1;
+        bool isEnabled = true;
+    };
+    std::vector<System> m_systems;
+
     TiledMapLoader   m_mapLoader;
     TileMap          m_tilemap;
     entt::registry   m_registry;
 
     ConstructionMenu m_menu;
     HeadUpDisplay    m_hud;
-
-    std::vector<void(*)(Mission*, float)> m_systems;
 };

@@ -47,7 +47,6 @@ private:
         Transform2D transform;
         uint32_t    texture;
         uint32_t    program;
-        float       timer;
         vec2s       position;
     } m_cursor;
 
