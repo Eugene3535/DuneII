@@ -11,8 +11,7 @@
 
 Game::Game() noexcept:
     frameCounter(0),
-    m_nextSceneType(Scene::NONE),
-    m_isSceneNeedToBeChanged(false)
+    nextSceneType(Scene::UNSELECTED)
 {
 
 }
@@ -20,10 +19,10 @@ Game::Game() noexcept:
 
 bool Game::initialize() noexcept
 {
-    if (m_currentScene)
+    if (currentScene)
         return true;
 
-    if (m_currentScene = load<TitleScreen>({}); !m_currentScene)
+    if (currentScene = load<TitleScreen>({}); !currentScene)
         return false;
 
     updateData();
@@ -34,33 +33,33 @@ bool Game::initialize() noexcept
 
 void Game::update(float dt) noexcept
 {
-    if (!m_currentScene)
+    if (!currentScene)
         return;
 
-    m_currentScene->update(dt);
+    currentScene->update(dt);
 
-    if (m_isSceneNeedToBeChanged) [[unlikely]]
+    if (nextSceneType != Scene::UNSELECTED) [[unlikely]]
     {
-        switch (m_nextSceneType)
+        switch (nextSceneType)
         {
             case Scene::Type::MAIN_MENU:
             {
                 if (auto titleScene = load<TitleScreen>({}))
-                    m_currentScene = titleScene;
+                    currentScene = titleScene;
             }
             break;
 
             case Scene::Type::PICK_HOUSE:
             {
                 if (auto pickHouseScene = load<PickHouse>({}))
-                    m_currentScene = pickHouseScene;
+                    currentScene = pickHouseScene;
             }
             break;
 
             case Scene::Type::MISSION:
             {
                 if (auto missionScene = load<Mission>("Atreides-8.tmx"))
-                    m_currentScene = missionScene;
+                    currentScene = missionScene;
             }
             break;
 
@@ -70,8 +69,7 @@ void Game::update(float dt) noexcept
 
         updateData();
 
-        m_isSceneNeedToBeChanged = false;
-        m_nextSceneType = Scene::NONE;
+        nextSceneType = Scene::UNSELECTED;
     }
 }
 
@@ -82,53 +80,14 @@ void Game::draw() noexcept
 
     auto projection = windowData.view->getProjectionMatrix();
 
-    if (m_currentScene)
-        m_currentScene->draw(projection);
-}
-
-
-void Game::switchScene(const Scene* requester, Scene::Type nextScene) noexcept
-{
-    if (!requester)
-        return;
-
-    switch (nextScene)
-    {
-        case Scene::MAIN_MENU:
-            if (requester->getType() == Scene::MISSION)
-            {
-                m_nextSceneType = nextScene;
-                m_isSceneNeedToBeChanged = true;
-            }
-        break;
-
-        case Scene::PICK_HOUSE:
-            if(requester->getType() == Scene::MAIN_MENU)
-            {
-                m_nextSceneType = nextScene;
-                m_isSceneNeedToBeChanged = true;
-            }
-        break;
-
-        case Scene::MISSION:
-            if(requester->getType() == Scene::PICK_HOUSE)
-            {
-                m_nextSceneType = nextScene;
-                m_isSceneNeedToBeChanged = true;
-            }
-        break;
-
-        default:
-            m_nextSceneType = Scene::NONE;
-            m_isSceneNeedToBeChanged = false;
-        break;
-    }
+    if (currentScene)
+        currentScene->draw(projection);
 }
 
 
 uint32_t Game::getShaderProgram(const std::string& name) const noexcept
 {
-    if(auto it = m_shaderPrograms.find(name); it != m_shaderPrograms.end())
+    if(auto it = shaderPrograms.find(name); it != shaderPrograms.end())
         return it->second.getHandle();
 
     size_t index = 0;
@@ -165,7 +124,7 @@ uint32_t Game::getShaderProgram(const std::string& name) const noexcept
         {
             if(ShaderProgram program; program.link(shaders))
             {
-                auto it = m_shaderPrograms.emplace(name, std::move(program));
+                auto it = shaderPrograms.emplace(name, std::move(program));
 
                 if(it.second)
                     return it.first->second.getHandle();
@@ -177,18 +136,12 @@ uint32_t Game::getShaderProgram(const std::string& name) const noexcept
 }
 
 
-const GameInfo* Game::getInfo() const noexcept
-{
-    return &m_gameInfo;
-}
-
-
 void Game::updateData() noexcept
 {
-    if (m_currentScene)
+    if (currentScene)
     {
-        windowData.scene = m_currentScene.get();
+        windowData.scene = currentScene.get();
         const auto size = windowData.view->getSize();
-        m_currentScene->resize(size.x, size.y);
+        currentScene->resize(size.x, size.y);
     }
 }

@@ -14,7 +14,7 @@ class Scene
 public:
     enum Type : uint32_t
     {
-        NONE = 0,
+        UNSELECTED = 0,
         MAIN_MENU,
         PICK_HOUSE,
         MISSION

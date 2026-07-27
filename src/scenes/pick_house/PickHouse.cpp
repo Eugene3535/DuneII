@@ -201,7 +201,7 @@ void PickHouse::update(float dt) noexcept
     }
 
     if ((key == GLFW_KEY_ENTER) && isPressed)
-        m_game->switchScene(this, Scene::MISSION);
+        m_game->nextSceneType = Scene::MISSION;
 
     if (!m_outlineNeedUpdate)
         return;

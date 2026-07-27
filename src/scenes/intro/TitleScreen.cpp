@@ -160,7 +160,7 @@ void TitleScreen::update(float dt) noexcept
     m_exitButton->update(data.cursor, isMouseButtonPressed);
 
     if(m_playButton->isSelected())
-        m_game->switchScene(this, Scene::PICK_HOUSE);
+        m_game->nextSceneType = Scene::PICK_HOUSE;
 }
 
 

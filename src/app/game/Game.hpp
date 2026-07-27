@@ -20,12 +20,8 @@ struct Game final
     void update(float dt) noexcept;
     void draw()           noexcept;
 
-    void switchScene(const Scene* requester, Scene::Type nextScene) noexcept;
 
     uint32_t getShaderProgram(const std::string& name) const noexcept;
-
-    const GameInfo* getInfo() const noexcept;
-
     void updateData() noexcept;
 
     template<class T>
@@ -35,14 +31,13 @@ struct Game final
 
     uint32_t frameCounter;
 
-    std::unordered_map<Scene::Type, std::shared_ptr<Scene>> m_scenes;
-    std::shared_ptr<Scene>                                  m_currentScene;
-    Scene::Type                                             m_nextSceneType;
-    bool                                                    m_isSceneNeedToBeChanged;
+    std::unordered_map<Scene::Type, std::shared_ptr<Scene>> scenes;
+    std::shared_ptr<Scene>                                  currentScene;
+    Scene::Type                                             nextSceneType;
 
-    mutable std::unordered_map<std::string, ShaderProgram> m_shaderPrograms;
+    mutable std::unordered_map<std::string, ShaderProgram> shaderPrograms;
 
-    GameInfo m_gameInfo;
+    GameInfo gameInfo;
 };
 
 #include "app/game/Game.inl"

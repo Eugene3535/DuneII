@@ -7,12 +7,12 @@ std::shared_ptr<T> Game::load(std::string_view info) noexcept
 
     auto scene = std::make_shared<T>(this);
 
-    if (auto it = m_scenes.find(scene->getType()); it != m_scenes.end())
+    if (auto it = scenes.find(scene->getType()); it != scenes.end())
         return std::static_pointer_cast<T>(it->second);
 
     if (scene->load(info))
     {
-        m_scenes[scene->getType()] = scene;
+        scenes[scene->getType()] = scene;
 
         return scene;
     }

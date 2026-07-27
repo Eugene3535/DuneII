@@ -248,8 +248,8 @@ bool TileMap::putStructure(const HouseType owner, const StructureInfo::Type type
 
 	if(hasConstructionPreviews)
 	{
-		const GameInfo* info = m_game->getInfo();
-		auto previews = info->getPreviewIconList(owner, type, 8);
+		const GameInfo& info = m_game->gameInfo;
+		auto previews = info.getPreviewIconList(owner, type, 8);
 
 		if (!previews.empty())
 			m_registry.emplace<std::vector<EntityIcon>>(entity, previews);
