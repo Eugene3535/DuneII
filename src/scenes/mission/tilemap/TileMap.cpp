@@ -13,7 +13,7 @@
 #include "graphics/texture/Texture2D.hpp"
 #include "app/window/WindowData.hpp"
 #include "app/game/Game.hpp"
-#include "scenes/mission/tilemap/Tilemap.hpp"
+#include "scenes/mission/tilemap/TileMap.hpp"
 
 
 #define STRUCTURE_LIMIT_ON_MAP 512

@@ -5,7 +5,7 @@
 #include "files/FileProvider.hpp"
 #include "graphics/texture/Texture2D.hpp"
 #include "graphics/vao/VertexBufferLayout.hpp"
-#include "scenes/mission/tilemap/Tilemap.hpp"
+#include "scenes/mission/tilemap/TileMap.hpp"
 #include "app/window/WindowData.hpp"
 #include "app/game/Game.hpp"
 #include "scenes/mission/HUD/construction/ConstructionMenu.hpp"

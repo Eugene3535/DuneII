@@ -11,7 +11,7 @@
 #include "graphics/geometry/GeometryGenerator.hpp"
 #include "app/window/WindowData.hpp"
 #include "app/game/Game.hpp"
-#include "scenes/mission/tilemap/Tilemap.hpp"
+#include "scenes/mission/tilemap/TileMap.hpp"
 #include "scenes/mission/HUD/construction/ConstructionMenu.hpp"
 
 

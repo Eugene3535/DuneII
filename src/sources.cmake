@@ -44,8 +44,8 @@ set(SCENE_SRC_FILES
 	src/scenes/pick_house/PickHouse.hpp
 	src/scenes/mission/data/Structures.hpp
 	src/scenes/mission/data/Units.hpp
-	src/scenes/mission/tilemap/Tilemap.cpp
-	src/scenes/mission/tilemap/Tilemap.hpp
+	src/scenes/mission/tilemap/TileMap.cpp
+	src/scenes/mission/tilemap/TileMap.hpp
 	src/scenes/mission/HUD/construction/ConstructionMenu.cpp
 	src/scenes/mission/HUD/construction/ConstructionMenu.hpp
 	src/scenes/mission/HUD/previews/EntityPreview.cpp
