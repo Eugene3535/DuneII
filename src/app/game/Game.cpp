@@ -1,3 +1,5 @@
+#include <string_view>
+
 #include <glad/glad.h>
 
 #include "files/FileProvider.hpp"
@@ -9,21 +11,14 @@
 
 
 
-Game::Game() noexcept:
-    frameCounter(0),
-    nextSceneType(Scene::UNSELECTED)
-{
-
-}
-
-
 bool Game::initialize() noexcept
 {
-    if (currentScene)
-        return true;
+    auto titleScreen = std::make_shared<TitleScreen>(this);
 
-    if (currentScene = load<TitleScreen>({}); !currentScene)
+    if (!titleScreen->load({}))
         return false;
+
+    scenes.push(titleScreen);
 
     updateData();
 
@@ -33,44 +28,8 @@ bool Game::initialize() noexcept
 
 void Game::update(float dt) noexcept
 {
-    if (!currentScene)
-        return;
-
-    currentScene->update(dt);
-
-    if (nextSceneType != Scene::UNSELECTED) [[unlikely]]
-    {
-        switch (nextSceneType)
-        {
-            case Scene::Type::MAIN_MENU:
-            {
-                if (auto titleScene = load<TitleScreen>({}))
-                    currentScene = titleScene;
-            }
-            break;
-
-            case Scene::Type::PICK_HOUSE:
-            {
-                if (auto pickHouseScene = load<PickHouse>({}))
-                    currentScene = pickHouseScene;
-            }
-            break;
-
-            case Scene::Type::MISSION:
-            {
-                if (auto missionScene = load<Mission>("Atreides-8.tmx"))
-                    currentScene = missionScene;
-            }
-            break;
-
-            default:
-                break;
-        }
-
-        updateData();
-
-        nextSceneType = Scene::UNSELECTED;
-    }
+    if (auto currentScene = scenes.get(); currentScene)
+        currentScene->update(dt);
 }
 
 
@@ -80,7 +39,7 @@ void Game::draw() noexcept
 
     auto projection = windowData.view->getProjectionMatrix();
 
-    if (currentScene)
+    if (auto currentScene = scenes.get(); currentScene)
         currentScene->draw(projection);
 }
 
@@ -138,9 +97,9 @@ uint32_t Game::getShaderProgram(const std::string& name) const noexcept
 
 void Game::updateData() noexcept
 {
-    if (currentScene)
+    if (auto currentScene = scenes.get(); currentScene)
     {
-        windowData.scene = currentScene.get();
+        windowData.scene = currentScene;
         const auto size = windowData.view->getSize();
         currentScene->resize(size.x, size.y);
     }

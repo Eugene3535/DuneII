@@ -9,6 +9,7 @@
 #include "graphics/texture/Texture2D.hpp"
 #include "app/window/WindowData.hpp"
 #include "app/game/Game.hpp"
+#include "scenes/pick_house/PickHouse.hpp"
 #include "scenes/intro/TitleScreen.hpp"
 
 
@@ -160,7 +161,15 @@ void TitleScreen::update(float dt) noexcept
     m_exitButton->update(data.cursor, isMouseButtonPressed);
 
     if(m_playButton->isSelected())
-        m_game->nextSceneType = Scene::PICK_HOUSE;
+    {
+        auto nextScene = std::make_shared<PickHouse>(m_game);
+
+        if (nextScene->load({}))
+        {
+            m_game->scenes.push(nextScene);
+            m_game->updateData();
+        }
+    }
 }
 
 

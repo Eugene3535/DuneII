@@ -10,6 +10,7 @@
 #include "graphics/geometry/GeometryGenerator.hpp"
 #include "app/window/WindowData.hpp"
 #include "app/game/Game.hpp"
+#include "scenes/mission/Mission.hpp"
 #include "scenes/pick_house/PickHouse.hpp"
 
 
@@ -201,7 +202,17 @@ void PickHouse::update(float dt) noexcept
     }
 
     if ((key == GLFW_KEY_ENTER) && isPressed)
-        m_game->nextSceneType = Scene::MISSION;
+    {
+        auto nextScene = std::make_shared<Mission>(m_game);
+
+        if (nextScene->load("Atreides-8.tmx"))
+        {
+            m_game->scenes.push(nextScene);
+            m_game->updateData();
+
+            return;
+        }
+    }
 
     if (!m_outlineNeedUpdate)
         return;

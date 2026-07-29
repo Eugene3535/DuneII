@@ -48,6 +48,7 @@ private:
         uint32_t    texture;
         uint32_t    program;
         vec2s       position;
+        float       timer;
     } m_cursor;
 
     struct

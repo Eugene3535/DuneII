@@ -54,7 +54,7 @@ void Mission::update(float dt) noexcept
     const auto frame = m_game->frameCounter;
 
     for(auto& system : m_systems)
-        if ((frame % system.frequency) == 0)
+        if ( system.isEnabled && ((frame % system.frequency) == 0) )
             system.execute(this, dt);
 
     if (!m_menu.isShown()) [[likely]]
@@ -124,7 +124,7 @@ void Mission::createSystems() noexcept
 
 //  HUD
     auto& hudController = m_systems.emplace_back();
-    hudController.frequency = 8;
+    hudController.frequency = 1;
     hudController.execute = [](Mission* mission, float dt) -> void
     {
         const int button = mission->m_game->windowData.mouse.button;
