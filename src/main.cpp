@@ -7,6 +7,7 @@ extern "C"
 }
 #endif
 
+#include "files/FileProvider.hpp"
 #include "app/window/WindowData.hpp"
 #include "app/window/MainWindow.hpp"
 #include "app/context/Context.hpp"
@@ -14,14 +15,15 @@ extern "C"
 #include "app/game/Game.hpp"
 
 
-int main()
+int main(int argc, char* argv[])
 {
+    FileProvider provider(argv[0]);
+
     Game game;
     MainWindow window(game.windowData);
 
     if (!window.open("Dune II: The Battle For Arrakis", 1200, 900))
         return 1;
-
 
     Context context;
 

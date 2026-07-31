@@ -1,9 +1,30 @@
+#include <cassert>
+#include <system_error>
+
 #include "files/FileProvider.hpp"
+
+
+static FileProvider* s_instance;
+
+
+FileProvider::FileProvider(const char* argv) noexcept
+{
+    assert(s_instance == nullptr);
+    s_instance = this;
+
+    std::error_code ec;
+    std::filesystem::path exePath = std::filesystem::canonical(argv, ec);
+
+    if (!ec)
+        m_exeDir = exePath.parent_path();
+    else
+        m_exeDir = std::filesystem::current_path();
+}
 
 
 std::filesystem::path FileProvider::findPathToFile(const std::string& filename) noexcept
 {
-    std::filesystem::path resFolder = std::filesystem::current_path() / "res";
+    std::filesystem::path resFolder = s_instance->m_exeDir / "res";
 
     if(std::filesystem::exists(resFolder))
     {
@@ -36,7 +57,7 @@ std::vector<std::filesystem::path> FileProvider::findShaders(std::string_view fi
                                                 : lastSlash + 1 + lastDot));
     };
 
-    std::filesystem::path shaderFolder = std::filesystem::current_path() / "res/shaders";
+    std::filesystem::path shaderFolder = s_instance->m_exeDir  / "res" / "shaders";
     std::vector<std::filesystem::path> shaders;
 
     if(std::filesystem::exists(shaderFolder))
