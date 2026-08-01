@@ -65,8 +65,8 @@ void ConstructionMenu::init(uint32_t texture) noexcept
     memset(&m_previewCells, 0, sizeof(m_previewCells));
     memset(&m_userElements, 0, sizeof(m_userElements));
 
-    m_frames.program = m_game->getShaderProgram("color_outline");
-    m_previewCells.program = m_game->getShaderProgram("sprite");
+    m_frames.program = m_game->glResources.getProgram("color_outline");
+    m_previewCells.program = m_game->glResources.getProgram("sprite");
     assert(m_frames.program && m_previewCells.program);
 
     m_previewCells.texture = texture;

@@ -54,7 +54,6 @@ void SceneQueue::pop(Scene* scene) noexcept
         else if (scene == m_scenes.front().get())
         {
             m_scenes.pop_back();
-            m_current = m_scenes.front().get();
         }
     }
     else

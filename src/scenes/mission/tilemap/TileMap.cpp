@@ -365,7 +365,7 @@ bool TileMap::createGraphicsResources(std::span<const vec4s> vertices, std::span
     if (!landscapeTexture.loadFromFile(FileProvider::findPathToFile(LANDSCAPE_PNG)))
         return false;
 
-    if (m_landscape.program = m_game->getShaderProgram("tilemap"); m_landscape.program == 0)
+    if (m_landscape.program = m_game->glResources.getProgram("sprite"); m_landscape.program == 0)
         return false;
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_landscape.indexBufferObject);

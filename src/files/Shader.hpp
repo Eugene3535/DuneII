@@ -9,9 +9,9 @@ class Shader final
 public:
     Shader() noexcept;
     Shader(const Shader&) noexcept = delete;
-    Shader(Shader&&) noexcept = delete;
+    Shader(Shader&& other) noexcept;
     Shader& operator = (const Shader&) noexcept = delete;
-    Shader& operator = (Shader&&) noexcept = delete;
+    Shader& operator = (Shader&& other) noexcept;
     ~Shader() noexcept;
 
     GLuint loadFromFile(const std::filesystem::path& filepath, GLenum shaderType) noexcept;

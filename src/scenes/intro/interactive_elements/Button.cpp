@@ -1,5 +1,3 @@
-#include <cassert>
-
 #include <glad/glad.h>
 #include <cglm/call/vec2.h>
 #include <cglm/call/aabb2d.h>
@@ -27,7 +25,7 @@ Button::Button(const Sprite2D& sprite, const int32_t uniformLocation) noexcept:
 
 void Button::update(vec2s mousePosition, bool isClicked) noexcept
 {
-    if(m_boundsNeedUpdate)
+    if (m_boundsNeedUpdate) [[unlikely]]
     {
         vec2s position = getPosition();
         vec2s scale = getScale();
@@ -59,8 +57,6 @@ void Button::update(vec2s mousePosition, bool isClicked) noexcept
 
 void Button::draw() noexcept
 {
-    assert(m_uniform != -1);
-
     glUniform4fv(m_uniform, 1, m_currentColor);
     glBindTextureUnit(0, m_sprite.texture);
     glDrawArrays(GL_TRIANGLE_FAN, m_sprite.frame, 4);
@@ -70,9 +66,6 @@ void Button::draw() noexcept
 
 void Button::resize(int width, int height) noexcept
 {
-    assert(m_sprite.width > 0);
-    assert(m_sprite.height > 0);
-
     float dx = static_cast<float>(width) / m_sprite.width;
     float dy = static_cast<float>(height) / m_sprite.height;
     setScale(dx, dy);

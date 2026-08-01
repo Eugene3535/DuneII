@@ -33,8 +33,8 @@ EntityPreview::~EntityPreview()
 bool EntityPreview::loadFromTexture(const Texture2D& texture) noexcept
 {
 //  Shader program
-    m_defaultProgram = m_game->getShaderProgram("sprite");
-    m_progressProgram = m_game->getShaderProgram("entity_view");
+    m_defaultProgram = m_game->glResources.getProgram("sprite");
+    m_progressProgram = m_game->glResources.getProgram("entity_view");
 
     if ( ! (m_defaultProgram && m_progressProgram) )
         return false;

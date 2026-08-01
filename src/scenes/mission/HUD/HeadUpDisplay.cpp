@@ -46,8 +46,8 @@ HeadUpDisplay::~HeadUpDisplay()
 
 bool HeadUpDisplay::init() noexcept
 {
-    m_cursor.program = m_game->getShaderProgram("selection");
-    m_tilemapProgram = m_game->getShaderProgram("tilemap");
+    m_cursor.program = m_game->glResources.getProgram("selection");
+    m_tilemapProgram = m_game->glResources.getProgram("sprite");
 
     if (!(m_cursor.program && m_tilemapProgram))
         return false;

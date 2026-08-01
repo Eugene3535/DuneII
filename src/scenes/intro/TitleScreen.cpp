@@ -6,6 +6,7 @@
 #include "cglm/struct/affine-mat.h"
 
 #include "files/FileProvider.hpp"
+#include "graphics/resources/GlResourceManager.hpp"
 #include "graphics/texture/Texture2D.hpp"
 #include "app/window/WindowData.hpp"
 #include "app/game/Game.hpp"
@@ -53,16 +54,8 @@ TitleScreen::TitleScreen(Game* game) noexcept:
 
 TitleScreen::~TitleScreen()
 {
-    if(m_playButton)
-        m_playButton->~Button();
-
-    if(m_exitButton)
-        m_exitButton->~Button();
-
-    if(m_settingsButton)
-        m_settingsButton->~Button();
-
-    glDeleteTextures(static_cast<GLsizei>(m_textures.size()), m_textures.data());
+    auto& resHolder = m_game->glResources;
+    resHolder.destroyHandles(GlResourceManager::GLTexture2D, m_textures);
 }
 
 
@@ -70,8 +63,14 @@ bool TitleScreen::load(std::string_view info) noexcept
 {
     if (m_isLoaded)
         return true;
-    
-    glCreateTextures(GL_TEXTURE_2D, static_cast<GLsizei>(m_textures.size()), m_textures.data());
+
+    auto& resHolder = m_game->glResources;
+    auto textures = resHolder.getHandles(GlResourceManager::GLTexture2D, 5);
+
+    if (textures.empty())
+        return false;
+
+    std::copy(textures.begin(), textures.end(), m_textures.begin());
 
 //  Textures
     Texture2D spaceTexture(m_textures[0]);
@@ -97,10 +96,10 @@ bool TitleScreen::load(std::string_view info) noexcept
 
 //  Shaders
     {
-        if (m_spriteProgram = m_game->getShaderProgram("sprite"); m_spriteProgram == 0)
+        if (m_spriteProgram = m_game->glResources.getProgram("sprite"); m_spriteProgram == 0)
             return false;
 
-        if (m_buttonSpriteProgram = m_game->getShaderProgram("color_sprite"); m_buttonSpriteProgram == 0)
+        if (m_buttonSpriteProgram = m_game->glResources.getProgram("color_sprite"); m_buttonSpriteProgram == 0)
             return false;
     }
     
@@ -175,7 +174,7 @@ void TitleScreen::update(float dt) noexcept
 
 void TitleScreen::draw(const mat4s& projection) noexcept
 {
-    if(!m_isLoaded)
+    if (!m_isLoaded)
         return;
         
     mat4s MVP = projection;
@@ -204,7 +203,7 @@ void TitleScreen::draw(const mat4s& projection) noexcept
     glBindTextureUnit(0, 0);
 
 //  Draw buttons
-    if(m_isPresented)
+    if (m_isPresented)
     {
         glUseProgram(m_buttonSpriteProgram);
 

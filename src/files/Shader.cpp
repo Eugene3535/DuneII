@@ -14,6 +14,27 @@ Shader::Shader() noexcept:
 }
 
 
+Shader::Shader(Shader&& other) noexcept:
+    m_handle(other.m_handle),
+    m_type(other.m_type)
+{
+    other.m_handle = 0;
+}
+
+
+Shader& Shader::operator = (Shader&& other) noexcept
+{
+    if (this != &other)
+    {
+        m_handle = other.m_handle;
+        m_type = other.m_type;
+        other.m_handle = 0;
+    }
+
+    return *this;
+}
+
+
 Shader::~Shader() noexcept
 {
     glDeleteShader(m_handle);

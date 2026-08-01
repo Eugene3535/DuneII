@@ -7,8 +7,5 @@ public:
     ~Context();
 
     bool load(struct Game& game) noexcept;
-    void save(struct Game& game) noexcept; // on close
-
-private:
-
+    void save(struct Game& game) noexcept;
 };

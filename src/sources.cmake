@@ -19,12 +19,12 @@ set(GRAPHICS_SRC_FILES
 	src/graphics/texture/Texture2D.hpp
 	src/graphics/vao/VertexBufferLayout.cpp
 	src/graphics/vao/VertexBufferLayout.hpp
-	src/graphics/shaders/ShaderProgram.cpp
-	src/graphics/shaders/ShaderProgram.hpp
 	src/graphics/transform/Transform2D.cpp
 	src/graphics/transform/Transform2D.hpp
 	src/graphics/camera/OrthoMatrix.cpp
 	src/graphics/camera/OrthoMatrix.hpp
+	src/graphics/resources/GlResourceManager.cpp
+	src/graphics/resources/GlResourceManager.hpp
 	src/graphics/sprites/SpriteManager.cpp
 	src/graphics/sprites/SpriteManager.hpp
 	src/graphics/geometry/GeometryGenerator.cpp
@@ -98,13 +98,11 @@ set(DUNEII_SRC_FILES
 set(SHADER_FILES
 	${PROJECT_SOURCE_DIR}/src/shaders/color_outline.vert
 	${PROJECT_SOURCE_DIR}/src/shaders/color_outline.frag
-	${PROJECT_SOURCE_DIR}/src/shaders/color_sprite.vert
 	${PROJECT_SOURCE_DIR}/src/shaders/color_sprite.frag
+	${PROJECT_SOURCE_DIR}/src/shaders/selection.vert
+	${PROJECT_SOURCE_DIR}/src/shaders/selection.frag
 	${PROJECT_SOURCE_DIR}/src/shaders/sprite.vert
 	${PROJECT_SOURCE_DIR}/src/shaders/sprite.frag
-	${PROJECT_SOURCE_DIR}/src/shaders/tilemap.vert
-	${PROJECT_SOURCE_DIR}/src/shaders/tilemap.frag
-	${PROJECT_SOURCE_DIR}/src/shaders/entity_view.vert
 	${PROJECT_SOURCE_DIR}/src/shaders/entity_view.frag
 )
 

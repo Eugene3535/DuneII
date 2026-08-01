@@ -72,10 +72,10 @@ bool PickHouse::load(std::string_view info) noexcept
 
 //  Shaders
     {
-        if(m_background.program = m_game->getShaderProgram("sprite"); m_background.program == 0)
+        if(m_background.program = m_game->glResources.getProgram("sprite"); m_background.program == 0)
             return false;
 
-        if(m_outline.program = m_game->getShaderProgram("color_outline"); m_outline.program == 0)
+        if(m_outline.program = m_game->glResources.getProgram("color_outline"); m_outline.program == 0)
             return false;
     }
 
