@@ -30,9 +30,6 @@ int main(int argc, char* argv[])
 	if (!context.load(game))
 		return false;
 
-    if (!game.initialize())
-        return 1;
-
     MainLoop loop(window);
     loop(game);
 

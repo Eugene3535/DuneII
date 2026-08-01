@@ -161,11 +161,11 @@ void TitleScreen::update(float dt) noexcept
 
     if(m_playButton->isSelected())
     {
-        auto nextScene = std::make_shared<PickHouse>(m_game);
+        std::unique_ptr<Scene> nextScene = std::make_unique<PickHouse>(m_game);
 
         if (nextScene->load({}))
         {
-            m_game->scenes.push(nextScene);
+            m_game->scenes->push(nextScene);
             m_game->updateData();
         }
     }

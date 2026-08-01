@@ -203,11 +203,11 @@ void PickHouse::update(float dt) noexcept
 
     if ((key == GLFW_KEY_ENTER) && isPressed)
     {
-        auto nextScene = std::make_shared<Mission>(m_game);
+        std::unique_ptr<Scene> nextScene = std::make_unique<Mission>(m_game);
 
         if (nextScene->load("Atreides-8.tmx"))
         {
-            m_game->scenes.push(nextScene);
+            m_game->scenes->push(nextScene);
             m_game->updateData();
 
             return;
