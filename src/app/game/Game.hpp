@@ -4,19 +4,14 @@
 #include "graphics/resources/GlResourceManager.hpp"
 #include "app/window/WindowData.hpp"
 #include "scenes/Scene.hpp"
-#include "scenes/SceneQueue.hpp"
+#include "scenes/SceneManager.hpp"
 
 
 struct Game final
 {
-
-    void updateData() noexcept;
-
-    std::unique_ptr<SceneQueue> scenes;
-    Scene* scene;
-
-    GlResourceManager glResources;
     WindowData windowData;
+    GlResourceManager glResources;
+    SceneManager* sceneManager;
 
     uint32_t frameCounter = 0;
 

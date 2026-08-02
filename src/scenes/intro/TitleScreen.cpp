@@ -164,10 +164,7 @@ void TitleScreen::update(float dt) noexcept
         std::unique_ptr<Scene> nextScene = std::make_unique<PickHouse>(m_game);
 
         if (nextScene->load({}))
-        {
-            m_game->scenes->push(nextScene);
-            m_game->updateData();
-        }
+            m_game->sceneManager->push(nextScene);
     }
 }
 

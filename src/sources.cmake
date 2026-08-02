@@ -36,8 +36,8 @@ set(GRAPHICS_SRC_FILES
 set(SCENE_SRC_FILES
 	src/scenes/Scene.cpp
 	src/scenes/Scene.hpp
-	src/scenes/SceneQueue.cpp
-	src/scenes/SceneQueue.hpp
+	src/scenes/SceneManager.cpp
+	src/scenes/SceneManager.hpp
 	src/scenes/intro/interactive_elements/Button.cpp
 	src/scenes/intro/interactive_elements/Button.hpp
 	src/scenes/intro/TitleScreen.cpp
@@ -89,7 +89,6 @@ set(DUNEII_SRC_FILES
 	src/app/context/Context.hpp
 	src/app/loop/MainLoop.cpp
 	src/app/loop/MainLoop.hpp
-	src/app/game/Game.cpp
 	src/app/game/Game.hpp
 	src/main.cpp
 )

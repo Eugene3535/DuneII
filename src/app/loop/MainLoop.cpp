@@ -22,15 +22,16 @@ void MainLoop::operator()(Game& game) noexcept
     float deltaTime = 0.f;
 	float lastFrame = 0.f;
 
-	game.scenes = std::make_unique<SceneQueue>(&game.scene);
+	Scene* scene { nullptr };
+	SceneManager sceneManager(&scene, &game.windowData);
+	game.sceneManager = &sceneManager;
 
 	std::unique_ptr<Scene> titleScreen = std::make_unique<TitleScreen>(&game);
 
     if (!titleScreen->load({}))
         return;
 
-    game.scenes->push(titleScreen);
-	game.updateData();
+    sceneManager.push(titleScreen);
 
     while (m_window.isOpen())
 	{
@@ -40,11 +41,11 @@ void MainLoop::operator()(Game& game) noexcept
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		game.scene->update(deltaTime);
+		scene->update(deltaTime);
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		auto projection = game.windowData.view->getProjectionMatrix();
-		game.scene->draw(projection);
+		scene->draw(projection);
 
 		game.frameCounter++;
 

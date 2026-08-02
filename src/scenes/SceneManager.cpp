@@ -1,19 +1,21 @@
+#include "app/window/WindowData.hpp"
 #include "scenes/Scene.hpp"
-#include "scenes/SceneQueue.hpp"
+#include "scenes/SceneManager.hpp"
 
 
 
-SceneQueue::SceneQueue(Scene** scene) noexcept:
-    m_current(scene)
+SceneManager::SceneManager(Scene** scene, WindowData* data) noexcept:
+    m_current(scene),
+    m_windowData(data)
 {
 
 }
 
 
-SceneQueue::~SceneQueue() = default;
+SceneManager::~SceneManager() = default;
 
 
-void SceneQueue::push(std::unique_ptr<Scene>& scene) noexcept
+void SceneManager::push(std::unique_ptr<Scene>& scene) noexcept
 {
     if (!scene)
         return;
@@ -22,6 +24,7 @@ void SceneQueue::push(std::unique_ptr<Scene>& scene) noexcept
     { 
         m_scenes.push_back(std::move(scene));
         (*m_current) = m_scenes.back().get();
+        updateScene();
 
         return;
     }
@@ -33,10 +36,11 @@ void SceneQueue::push(std::unique_ptr<Scene>& scene) noexcept
     }
 
     (*m_current) = m_scenes.back().get();
+    updateScene();
 }
 
 
-void SceneQueue::pop(Scene* scene) noexcept
+void SceneManager::pop(Scene* scene) noexcept
 {
     if (m_scenes.size() > 1)
     {
@@ -48,5 +52,15 @@ void SceneQueue::pop(Scene* scene) noexcept
         {
             m_scenes.pop_back();
         }
+
+        updateScene();
     }
+}
+
+
+void SceneManager::updateScene() noexcept
+{
+    m_windowData->scene = *m_current;
+    const auto size = m_windowData->view->getSize();
+    m_windowData->scene->resize(size.x, size.y);
 }

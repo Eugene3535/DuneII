@@ -24,7 +24,6 @@ struct WindowData
         int mods;
     } keyboard;
 
-    OrthoMatrix* view;
-
-    void* scene = nullptr;
+    OrthoMatrix* view = nullptr;
+    class Scene* scene = nullptr;
 };

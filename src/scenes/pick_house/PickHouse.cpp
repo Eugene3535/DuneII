@@ -207,8 +207,7 @@ void PickHouse::update(float dt) noexcept
 
         if (nextScene->load("Atreides-8.tmx"))
         {
-            m_game->scenes->push(nextScene);
-            m_game->updateData();
+            m_game->sceneManager->push(nextScene);
 
             return;
         }

@@ -195,7 +195,7 @@ void MainWindow::initCallbacks() noexcept
 			data->view->resize(width, height);
 
 			if (data->scene)
-				static_cast<Scene*>(data->scene)->resize(width, height);
+				data->scene->resize(width, height);
 		}
 	});
 
