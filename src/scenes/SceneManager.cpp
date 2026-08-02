@@ -29,9 +29,14 @@ void SceneManager::push(std::unique_ptr<Scene>& scene) noexcept
         return;
     }
 
-    if ((*m_current) == m_scenes.back().get())
+    if ((*m_current) == m_scenes.back().get()) // just do step forward
     {
         m_scenes.pop_front();
+        m_scenes.push_back(std::move(scene));
+    }
+    else if (scene != m_scenes.back()) // remove second scene and go to new scene
+    {
+        m_scenes.pop_back();
         m_scenes.push_back(std::move(scene));
     }
 
