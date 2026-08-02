@@ -43,15 +43,10 @@ public:
 	std::optional<Sprite2D>   getSprite(const std::string& name) const noexcept;
 	std::span<const Sprite2D> getAnimation(const std::string& name) const noexcept;
 
-	void bind(bool toBind) const noexcept;
-
-	void pushVerticesOnGPU() noexcept;
+	void pushVerticesOnGPU(const uint32_t vertexBuffer) noexcept;
 
 private:
 	void addSprite(const uint32_t texture, const ivec4s frame, const vec2s ratio) noexcept;
-
-	uint32_t m_vao;
-	uint32_t m_vbo;
 
 	std::unordered_map<std::string, sprite_range> m_animations;
 	std::vector<Sprite2D> m_sprites;

@@ -7,6 +7,7 @@
 
 #include "files/FileProvider.hpp"
 #include "graphics/resources/GlResourceManager.hpp"
+#include "graphics/vao/VertexBufferLayout.hpp"
 #include "graphics/texture/Texture2D.hpp"
 #include "app/window/WindowData.hpp"
 #include "app/game/Game.hpp"
@@ -41,6 +42,8 @@ static bool is_intro_active_phase_end;
 
 TitleScreen::TitleScreen(Game* game) noexcept:
     Scene(game, Scene::MAIN_MENU),
+    m_vertexBufferObject(0),
+    m_vertexArrayObject(0),
     m_spriteProgram(0),
     m_buttonSpriteProgram(0),
     m_playButton(nullptr),
@@ -54,8 +57,13 @@ TitleScreen::TitleScreen(Game* game) noexcept:
 
 TitleScreen::~TitleScreen()
 {
-    auto& resHolder = m_game->glResources;
-    resHolder.destroyHandles(GlResourceManager::GLTexture2D, m_textures);
+    std::array<uint32_t, 1> vertexArrays = { m_vertexArrayObject  };
+    std::array<uint32_t, 1> buffers      = { m_vertexBufferObject };
+
+    auto& glResources = m_game->glResources;
+    glResources.destroyHandles(GlResourceManager::GLVertexArray, vertexArrays);
+    glResources.destroyHandles(GlResourceManager::GLBuffer, buffers);
+    glResources.destroyHandles(GlResourceManager::GLTexture2D, m_textures);
 }
 
 
@@ -64,8 +72,10 @@ bool TitleScreen::load(std::string_view info) noexcept
     if (m_isLoaded)
         return true;
 
-    auto& resHolder = m_game->glResources;
-    auto textures = resHolder.getHandles(GlResourceManager::GLTexture2D, 5);
+    auto& glResources = m_game->glResources;
+    auto textures     = glResources.getHandles(GlResourceManager::GLTexture2D, 5);
+    auto buffers      = glResources.getHandles(GlResourceManager::GLBuffer, 1);
+    auto vertexArrays = glResources.getHandles(GlResourceManager::GLVertexArray, 1);
 
     if (textures.empty())
         return false;
@@ -104,12 +114,19 @@ bool TitleScreen::load(std::string_view info) noexcept
     }
     
 //  Sprites
+    m_vertexBufferObject = buffers[0];
+    m_vertexArrayObject = vertexArrays[0];
+
     m_sprites.createSprite("space", spaceTexture.getHandle());
     m_sprites.createSprite("planet", planetTexture.getHandle());
     m_sprites.createSprite("play", playTexture.getHandle());
     m_sprites.createSprite("exit", exitTexture.getHandle());
     m_sprites.createSprite("settings", settingsTexture.getHandle());
-    m_sprites.pushVerticesOnGPU();
+    m_sprites.pushVerticesOnGPU(m_vertexBufferObject);
+
+    const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
+	VertexBufferLayout layout(attributes);
+	layout.createVertexInputState(m_vertexArrayObject, m_vertexBufferObject);
 
     if (auto spaceSprite = m_sprites.getSprite("space"); spaceSprite.has_value())
         m_space = spaceSprite.value();
@@ -179,7 +196,7 @@ void TitleScreen::draw(const mat4s& projection) noexcept
     mat4s model;
 
     glUseProgram(m_spriteProgram);
-    m_sprites.bind(true);
+    glBindVertexArray(m_vertexArrayObject);
 
     auto view = m_game->windowData.view;
 

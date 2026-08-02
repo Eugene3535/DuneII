@@ -41,6 +41,8 @@ private:
     Sprite2D      m_releasedCursor;
     Sprite2D      m_capturedCursor;
     Sprite2D      m_currentCursor;
+    uint32_t      m_spriteVertexBufferObject;
+    uint32_t      m_spriteVertexArrayObject;
 
     struct
     {

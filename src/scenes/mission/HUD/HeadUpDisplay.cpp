@@ -20,9 +20,11 @@ HeadUpDisplay::HeadUpDisplay(Game* game,  TileMap& tilemap, ConstructionMenu& me
     m_game(game),
     m_tilemap(tilemap),
     m_menu(menu),
+    m_previewIcons(game),
     m_tilemapProgram(0),
     m_previewTexture(0),
-    m_previewIcons(game)
+    m_spriteVertexBufferObject(0),
+    m_spriteVertexArrayObject(0)
 {
     m_cursor.texture = 0;
     m_cursor.program = 0;
@@ -37,10 +39,14 @@ HeadUpDisplay::HeadUpDisplay(Game* game,  TileMap& tilemap, ConstructionMenu& me
 
 HeadUpDisplay::~HeadUpDisplay()
 {
-    glDeleteTextures(1, &m_cursor.texture);
-    glDeleteTextures(1, &m_previewTexture);
-    glDeleteVertexArrays(1, &m_selectionFrame.vertexArrayObject);
-    glDeleteBuffers(1, &m_selectionFrame.vertexBufferObject);
+    std::array<uint32_t, 2> vertexArrays = { m_selectionFrame.vertexArrayObject, m_spriteVertexArrayObject   };
+    std::array<uint32_t, 2> buffers      = { m_selectionFrame.vertexBufferObject, m_spriteVertexBufferObject };
+    std::array<uint32_t, 2> textures     = { m_cursor.texture, m_previewTexture                              };
+
+    auto& glResources = m_game->glResources;
+    glResources.destroyHandles(GlResourceManager::GLVertexArray, vertexArrays);
+    glResources.destroyHandles(GlResourceManager::GLBuffer, buffers);
+    glResources.destroyHandles(GlResourceManager::GLTexture2D, textures);
 }
 
 
@@ -52,14 +58,25 @@ bool HeadUpDisplay::init() noexcept
     if (!(m_cursor.program && m_tilemapProgram))
         return false;
 
-    glCreateTextures(GL_TEXTURE_2D, 1, &m_cursor.texture);
+    auto& glResources       = m_game->glResources;
+    auto textureHandles     = glResources.getHandles(GlResourceManager::GLTexture2D, 2);
+    auto bufferHandles      = glResources.getHandles(GlResourceManager::GLBuffer, 2);
+    auto vertexArrayHandles = glResources.getHandles(GlResourceManager::GLVertexArray, 2);
+
+    m_cursor.texture = textureHandles[0];
     Texture2D crosshairTexture(m_cursor.texture);
 
     if (!crosshairTexture.loadFromFile(FileProvider::findPathToFile(CROSSHAIRS_TILESHEET_PNG)))
         return false;
 
     m_sprites.loadSpriteSheet(FileProvider::findPathToFile(CURSOR_FRAME_XML), m_cursor.texture);
-    m_sprites.pushVerticesOnGPU();
+    m_spriteVertexBufferObject = bufferHandles[0];
+    m_spriteVertexArrayObject = vertexArrayHandles[0];
+    m_sprites.pushVerticesOnGPU(m_spriteVertexBufferObject);
+    const std::array<VertexBufferLayout::Attribute, 1> spriteAttributes{ VertexBufferLayout::Attribute::Float4 };
+	VertexBufferLayout spriteLayout(spriteAttributes);
+	spriteLayout.createVertexInputState(m_spriteVertexBufferObject, m_spriteVertexBufferObject);
+
     auto crosshairReleased = m_sprites.getSprite("Released");
     auto crosshairCaptured = m_sprites.getSprite("Captured");
 
@@ -74,16 +91,16 @@ bool HeadUpDisplay::init() noexcept
     m_currentCursor = m_releasedCursor;
 
 //  Selection frame
-    glCreateBuffers(1, &m_selectionFrame.vertexBufferObject);
+    m_selectionFrame.vertexBufferObject = bufferHandles[1];
 	glNamedBufferData(m_selectionFrame.vertexBufferObject, sizeof(float) << 5, nullptr, GL_DYNAMIC_DRAW);
 
-	glGenVertexArrays(1, &m_selectionFrame.vertexArrayObject);
+	m_selectionFrame.vertexArrayObject = vertexArrayHandles[1];
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float2 };
     VertexBufferLayout layout(attributes);
 	layout.createVertexInputState(m_selectionFrame.vertexArrayObject, m_selectionFrame.vertexBufferObject);
 
 //  Entity preview
-    glCreateTextures(GL_TEXTURE_2D, 1, &m_previewTexture);
+    m_previewTexture = textureHandles[1];
     Texture2D previewTexture(m_previewTexture);
 
     if (!previewTexture.loadFromFile(FileProvider::findPathToFile(PREVIEWS_PNG)))
@@ -157,10 +174,11 @@ void HeadUpDisplay::draw(const mat4s& projection) const noexcept
         result = glms_mul(currentWorldMatrix, modelView);
         view->updateUniformBuffer(result);
 
-        m_sprites.bind(true);
+        glBindVertexArray(m_spriteVertexArrayObject);
         glBindTextureUnit(0, m_cursor.texture);
         glDrawArrays(GL_TRIANGLE_FAN, m_currentCursor.frame, 4);
         glBindTextureUnit(0, 0);
+        glBindVertexArray(0);
     }
 }
 

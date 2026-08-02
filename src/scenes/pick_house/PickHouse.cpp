@@ -42,23 +42,31 @@ PickHouse::PickHouse(Game* game) noexcept:
 
 PickHouse::~PickHouse()
 {
-    glDeleteTextures(1, &m_background.sprite.texture);
-    glDeleteVertexArrays(2, m_vertexArrayObjects);
-    glDeleteBuffers(1, &m_vertexBufferObject);
+    std::array<uint32_t, 2> vertexArrays = { m_background.vertexArrayObject, m_outline.vertexArrayObject };
+    std::array<uint32_t, 1> buffers = { m_vertexBufferObject };
+    std::array<uint32_t, 1> textures = { m_background.sprite.texture };
+
+    auto& glResources = m_game->glResources;
+    glResources.destroyHandles(GlResourceManager::GLVertexArray, vertexArrays);
+    glResources.destroyHandles(GlResourceManager::GLBuffer, buffers);
+    glResources.destroyHandles(GlResourceManager::GLTexture2D, textures);
 }
 
 
 bool PickHouse::load(std::string_view info) noexcept
 {
-    if(m_isLoaded)
+    if (m_isLoaded)
         return true;
 
-    glCreateTextures(GL_TEXTURE_2D, 1, &m_background.sprite.texture);
-    glGenVertexArrays(2, m_vertexArrayObjects);
-    glCreateBuffers(1, &m_vertexBufferObject);
+    auto& glResources = m_game->glResources;
+    auto textures = glResources.getHandles(GlResourceManager::GLTexture2D, 1);
+    auto buffers = glResources.getHandles(GlResourceManager::GLBuffer, 1);
+    auto vertexArrays = glResources.getHandles(GlResourceManager::GLVertexArray, 2);
 
-    m_background.vertexArrayObject = m_vertexArrayObjects[0];
-    m_outline.vertexArrayObject = m_vertexArrayObjects[1];
+    m_background.sprite.texture = textures[0];
+    m_vertexBufferObject = buffers[0];
+    m_background.vertexArrayObject = vertexArrays[0];
+    m_outline.vertexArrayObject = vertexArrays[1];
 
 //  Textures
     Texture2D houseTexture(m_background.sprite.texture);

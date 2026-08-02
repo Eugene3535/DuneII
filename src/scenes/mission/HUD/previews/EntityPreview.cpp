@@ -24,9 +24,12 @@ EntityPreview::EntityPreview(Game* game) noexcept:
 
 EntityPreview::~EntityPreview()
 {
-    glDeleteTextures(1, &m_texture);
-    glDeleteVertexArrays(1, &m_vertexArrayObject);
-    glDeleteBuffers(1, &m_vertexBufferObject);
+    std::array<uint32_t, 1> vertexArrays = { m_vertexArrayObject  };
+    std::array<uint32_t, 1> buffers      = { m_vertexBufferObject };
+
+    auto& glResources = m_game->glResources;
+    glResources.destroyHandles(GlResourceManager::GLVertexArray, vertexArrays);
+    glResources.destroyHandles(GlResourceManager::GLBuffer, buffers);
 }
 
 
@@ -110,10 +113,14 @@ void EntityPreview::createIcons(const ivec2s position, const ivec2s size) noexce
         x,     y + offset + h, texCoords[3].x, texCoords[3].y
     };
 
-    glCreateBuffers(1, &m_vertexBufferObject);
+    auto& glResources       = m_game->glResources;
+    auto bufferHandles      = glResources.getHandles(GlResourceManager::GLBuffer, 1);
+    auto vertexArrayHandles = glResources.getHandles(GlResourceManager::GLVertexArray, 1);
+
+    m_vertexBufferObject = bufferHandles[0];
     glNamedBufferData(m_vertexBufferObject, std::span<const float>(vertices).size_bytes(), vertices.data(), GL_DYNAMIC_DRAW);
 
-    glGenVertexArrays(1, &m_vertexArrayObject);
+    m_vertexArrayObject = vertexArrayHandles[0];
     const std::array<VertexBufferLayout::Attribute, 1> attributes { VertexBufferLayout::Attribute::Float4 };
     VertexBufferLayout layout(attributes);
     layout.createVertexInputState(m_vertexArrayObject, m_vertexBufferObject);

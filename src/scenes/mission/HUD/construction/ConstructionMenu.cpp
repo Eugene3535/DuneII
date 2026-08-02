@@ -45,17 +45,32 @@ ConstructionMenu::ConstructionMenu(Game* game, TileMap& tilemap) noexcept:
 
 ConstructionMenu::~ConstructionMenu()
 {
-    glDeleteTextures(3, m_userElements.textures);
+    std::array<uint32_t, 4> vertexArrays = 
+    { 
+        m_userElements.vertexArrayObject,
+        m_userElements.selectionFrame.vertexArrayObject,
+        m_previewCells.vertexArrayObject,
+        m_frames.vertexArrayObject
+    };
 
-    glDeleteVertexArrays(1, &m_userElements.vertexArrayObject);
-	glDeleteBuffers(1, &m_userElements.vertexBufferObject);
-    glDeleteBuffers(1, &m_userElements.selectionFrame.vertexArrayObject);
+    std::array<uint32_t, 3> buffers = 
+    { 
+        m_userElements.vertexBufferObject,
+        m_previewCells.vertexBufferObject,
+        m_frames.vertexBufferObject
+    };
 
-    glDeleteVertexArrays(1, &m_previewCells.vertexArrayObject);
-	glDeleteBuffers(1, &m_previewCells.vertexBufferObject);
+    std::array<uint32_t, 3> textures = 
+    { 
+        m_userElements.textures[0],
+        m_userElements.textures[1],
+        m_userElements.textures[2],
+    };
 
-    glDeleteVertexArrays(1, &m_frames.vertexArrayObject);
-	glDeleteBuffers(1, &m_frames.vertexBufferObject);
+    auto& glResources = m_game->glResources;
+    glResources.destroyHandles(GlResourceManager::GLVertexArray, vertexArrays);
+    glResources.destroyHandles(GlResourceManager::GLBuffer, buffers);
+    glResources.destroyHandles(GlResourceManager::GLTexture2D, textures);
 }
 
 
@@ -437,10 +452,14 @@ void ConstructionMenu::createFrames() noexcept
     createRectangle({580.f, 650.f, 300.f, 50.f}, m_frames.entityWidgetParams[2].background, m_frames.entityWidgetParams[2].outline);
 
 //  Unload to GPU
-    glCreateBuffers(1, &m_frames.vertexBufferObject);
+    auto& glResources       = m_game->glResources;
+    auto bufferHandles      = glResources.getHandles(GlResourceManager::GLBuffer, 1);
+    auto vertexArrayHandles = glResources.getHandles(GlResourceManager::GLVertexArray, 1);
+
+    m_frames.vertexBufferObject = bufferHandles[0];
     glNamedBufferData(m_frames.vertexBufferObject, buffer.size() * sizeof(float), buffer.data(), GL_DYNAMIC_DRAW);
 
-    glGenVertexArrays(1, &m_frames.vertexArrayObject);
+    m_frames.vertexArrayObject = vertexArrayHandles[0];
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float2 };
     VertexBufferLayout layout(attributes);
     layout.createVertexInputState(m_frames.vertexArrayObject, m_frames.vertexBufferObject);
@@ -522,10 +541,14 @@ void ConstructionMenu::createPreviews() noexcept
     vertices.push_back({ 1100.f, 100.f, texCoords[2].x, texCoords[2].y });
     vertices.push_back({ 950.f,  100.f, texCoords[3].x, texCoords[3].y });
 
-    glCreateBuffers(1, &m_previewCells.vertexBufferObject);
+    auto& glResources       = m_game->glResources;
+    auto bufferHandles      = glResources.getHandles(GlResourceManager::GLBuffer, 1);
+    auto vertexArrayHandles = glResources.getHandles(GlResourceManager::GLVertexArray, 1);
+
+    m_previewCells.vertexBufferObject = bufferHandles[0];
     glNamedBufferData(m_previewCells.vertexBufferObject, vertices.size() * sizeof(vec4s), vertices.data(), GL_DYNAMIC_DRAW);
 
-    glGenVertexArrays(1, &m_previewCells.vertexArrayObject);
+    m_previewCells.vertexArrayObject = vertexArrayHandles[0];
     const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
     VertexBufferLayout layout(attributes);
     layout.createVertexInputState(m_previewCells.vertexArrayObject, m_previewCells.vertexBufferObject);
@@ -534,7 +557,11 @@ void ConstructionMenu::createPreviews() noexcept
 
 void ConstructionMenu::createUserElements() noexcept
 {
-    glCreateTextures(GL_TEXTURE_2D, 3, m_userElements.textures);
+    auto& glResources   = m_game->glResources;
+    auto textureHandles = glResources.getHandles(GlResourceManager::GLTexture2D, 3);
+    m_userElements.textures[0] = textureHandles[0];
+    m_userElements.textures[1] = textureHandles[1];
+    m_userElements.textures[2] = textureHandles[2];
 
     uint32_t currentTexture = 0;
 
@@ -627,18 +654,21 @@ void ConstructionMenu::createUserElements() noexcept
     }
 
 //  Unload to GPU
-    glCreateBuffers(1, &m_userElements.vertexBufferObject);
+    auto bufferHandles      = glResources.getHandles(GlResourceManager::GLBuffer, 1);
+    auto vertexArrayHandles = glResources.getHandles(GlResourceManager::GLVertexArray, 2);
+
+    m_userElements.vertexBufferObject = bufferHandles[0];
     glNamedBufferData(m_userElements.vertexBufferObject, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
 
     {// Vertex array object for buttons
-        glGenVertexArrays(1, &m_userElements.vertexArrayObject);
+        m_userElements.vertexArrayObject = vertexArrayHandles[0];
         const std::array<VertexBufferLayout::Attribute, 1> attributes = { VertexBufferLayout::Attribute::Float4 };
         VertexBufferLayout layout(attributes);
         layout.createVertexInputState(m_userElements.vertexArrayObject, m_userElements.vertexBufferObject);
     }
 
     {// Vertex array object for selection frame
-        glGenVertexArrays(1, &m_userElements.selectionFrame.vertexArrayObject);
+        m_userElements.selectionFrame.vertexArrayObject = vertexArrayHandles[1];
         const std::array<VertexBufferLayout::Attribute, 1> attributes = { VertexBufferLayout::Attribute::Float2 };
         VertexBufferLayout layout(attributes);
         layout.createVertexInputState(m_userElements.selectionFrame.vertexArrayObject, m_userElements.vertexBufferObject);

@@ -22,6 +22,9 @@ public:
 private:
     std::array<GLuint, 5> m_textures;
 
+    GLuint m_vertexBufferObject;
+    GLuint m_vertexArrayObject;
+
     GLuint m_spriteProgram;
     GLuint m_buttonSpriteProgram;
 

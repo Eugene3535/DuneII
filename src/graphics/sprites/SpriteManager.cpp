@@ -1,32 +1,17 @@
 #include <array>
 
+#include <glad/glad.h>
 #include "RapidXML/rapidxml_utils.hpp"
 
-#include "graphics/vao/VertexBufferLayout.hpp"
-#include "graphics/texture/Texture2D.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
 
 
-SpriteManager::SpriteManager() noexcept:
-	m_vbo(0),
-	m_vao(0)
-{
-
-}
-
-
-SpriteManager::~SpriteManager()
-{
-	glDeleteBuffers(1, &m_vbo);
-	glDeleteVertexArrays(1, &m_vao);
-}
+SpriteManager::SpriteManager() noexcept = default;
+SpriteManager::~SpriteManager() = default;
 
 
 void SpriteManager::createSprite(const std::string& name, uint32_t texture) noexcept
 {
-	if (m_vao || m_vbo)
-		return;
-
 	if(auto it = m_animations.find(name); it == m_animations.end())
 	{
 		GLint width;
@@ -42,9 +27,6 @@ void SpriteManager::createSprite(const std::string& name, uint32_t texture) noex
 
 void SpriteManager::createSprite(const std::string& name, uint32_t texture, const ivec4s& frame) noexcept
 {
-	if (m_vao || m_vbo)
-		return;
-
 	if(auto it = m_animations.find(name); it == m_animations.end())
 	{
 		const GLuint id = m_sprites.size();
@@ -63,9 +45,6 @@ void SpriteManager::createSprite(const std::string& name, uint32_t texture, cons
 
 void SpriteManager::createLinearAnimaton(const std::string& name, uint32_t texture, int duration) noexcept
 {
-	if (m_vao || m_vbo)
-		return;
-
 	if(auto it = m_animations.find(name); it == m_animations.end())
 	{
 		const GLuint id = m_sprites.size();
@@ -91,9 +70,6 @@ void SpriteManager::createLinearAnimaton(const std::string& name, uint32_t textu
 
 void SpriteManager::createGridAnimaton(const std::string& name, uint32_t texture, int columns, int rows) noexcept
 {
-	if (m_vao || m_vbo)
-		return;
-
 	if(auto it = m_animations.find(name); it == m_animations.end())
 	{
 		const GLuint id = m_sprites.size();
@@ -124,9 +100,6 @@ void SpriteManager::createGridAnimaton(const std::string& name, uint32_t texture
 
 void SpriteManager::createCustomAnimaton(const std::string& name, uint32_t texture, std::span<const ivec4s> frames) noexcept
 {
-	if (m_vao || m_vbo)
-		return;
-
 	if(auto it = m_animations.find(name); it == m_animations.end())
 	{
 		const GLuint id = m_sprites.size();
@@ -146,9 +119,6 @@ void SpriteManager::createCustomAnimaton(const std::string& name, uint32_t textu
 
 void SpriteManager::loadSpriteSheet(const std::filesystem::path& filePath, uint32_t texture) noexcept
 {
-	if (m_vao || m_vbo)
-		return;
-
 	auto document = std::make_unique<rapidxml::xml_document<char>>();
 	rapidxml::file<char> xmlFile(filePath.string().c_str());
 	document->parse<0>(xmlFile.data());
@@ -232,31 +202,17 @@ std::span<const Sprite2D> SpriteManager::getAnimation(const std::string& name) c
 }
 
 
-void SpriteManager::bind(bool toBind) const noexcept
-{
-	glBindVertexArray(toBind ? m_vao : 0);
-}
-
-
-void SpriteManager::pushVerticesOnGPU() noexcept
+void SpriteManager::pushVerticesOnGPU(const uint32_t vertexBuffer) noexcept
 {
 	if (m_vertices.empty())
 		return;
 
-	if (m_vao || m_vbo)
-		return;
-
-	glCreateBuffers(1, &m_vbo);
-	glNamedBufferData(m_vbo, 0, nullptr, GL_STATIC_DRAW);
-
-	glGenVertexArrays(1, &m_vao);
-    const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
-	VertexBufferLayout layout(attributes);
-	layout.createVertexInputState(m_vao, m_vbo);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(float), static_cast<const void*>(m_vertices.data()), GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glNamedBufferStorage(
+		vertexBuffer,
+		std::span<float>(m_vertices).size_bytes(),
+		static_cast<const void*>(m_vertices.data()),
+		0
+	);
 
 	std::vector<float>().swap(m_vertices);
 }
