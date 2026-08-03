@@ -248,8 +248,6 @@ void ConstructionMenu::updateSelection(char keyCode, bool isForced) noexcept
 
         auto outlineVertices = generator.createOutline(4, [&newFrameVertices](size_t index) -> vec2s
         {
-            const float offset = 160.f;
-
             switch (index)
             {
                 case 0: return newFrameVertices[0];

@@ -169,9 +169,6 @@ bool TiledMapLoader::loadLayers(const void* rootNode) noexcept
 			  layerNode != nullptr;
 			  layerNode = layerNode->next_sibling("layer"))
 	{
-		auto attrName = layerNode->first_attribute("name");
-		std::string name = attrName ? std::string(attrName->value(), attrName->value_size()) : std::string();
-
 		auto dataNode = layerNode->first_node("data");
 
 		if (!dataNode)

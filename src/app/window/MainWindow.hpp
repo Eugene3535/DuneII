@@ -9,7 +9,7 @@
 class MainWindow final
 {
 public:
-	MainWindow(struct WindowData& data) noexcept;
+	explicit MainWindow(struct WindowData& data) noexcept;
 	~MainWindow();
 
 	bool open(const char* title, int width, int height) noexcept;

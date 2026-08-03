@@ -19,7 +19,6 @@ MainLoop::~MainLoop() = default;
 
 void MainLoop::operator()(Game& game) noexcept
 {
-    float deltaTime = 0.f;
 	float lastFrame = 0.f;
 
 	Scene* scene { nullptr };
@@ -38,7 +37,7 @@ void MainLoop::operator()(Game& game) noexcept
 		m_window.pollEvents();
 
 		const float currentFrame = m_window.getElapsedTime();
-		deltaTime = currentFrame - lastFrame;
+		const float deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
 		scene->update(deltaTime);
