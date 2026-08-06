@@ -23,7 +23,7 @@
 
 
 PickHouse::PickHouse(Game* game) noexcept:
-    Scene(game, Scene::PICK_HOUSE),
+    Scene(game),
     m_vertexBufferObject(0),
     m_vertexArrayObjects{0, 0},
     m_selectedHouse(HouseType::Atreides),

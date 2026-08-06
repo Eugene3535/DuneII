@@ -41,7 +41,7 @@ static bool is_intro_active_phase_end;
 
 
 TitleScreen::TitleScreen(Game* game) noexcept:
-    Scene(game, Scene::MAIN_MENU),
+    Scene(game),
     m_vertexBufferObject(0),
     m_vertexArrayObject(0),
     m_spriteProgram(0),

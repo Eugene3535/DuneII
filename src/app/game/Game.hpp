@@ -9,6 +9,13 @@
 
 struct Game final
 {
+    enum State : uint32_t
+    {
+        MAIN_MENU,
+        PICK_HOUSE,
+        MISSION
+    };
+
     WindowData windowData;
     GlResourceManager glResources;
     SceneManager* sceneManager;

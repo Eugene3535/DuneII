@@ -15,7 +15,7 @@
 
 
 Mission::Mission(Game* game) noexcept:
-    Scene(game, Scene::MISSION),
+    Scene(game),
     m_tilemap(game, m_registry),
     m_menu(game, m_tilemap),
     m_hud(game, m_tilemap, m_menu)

@@ -12,15 +12,7 @@
 class Scene
 {
 public:
-    enum Type : uint32_t
-    {
-        UNSELECTED = 0,
-        MAIN_MENU,
-        PICK_HOUSE,
-        MISSION
-    };
-
-	Scene(struct Game* game, const Type type) noexcept;
+	Scene(struct Game* game) noexcept;
 	virtual ~Scene();
     
     virtual bool load(std::string_view info)   noexcept = 0;
@@ -29,14 +21,10 @@ public:
     virtual void resize(int width, int height) noexcept = 0;
 
     bool isLoaded() const noexcept;
-    Type getType()  const noexcept;
 
 protected:
     void setSpriteSizeInPixels(const struct Sprite2D& sprite, const vec2s newSize, Transform2D& transform) noexcept;
 
     class Game* m_game;
     bool        m_isLoaded;
-
-private:
-    const Type m_type;
 };
