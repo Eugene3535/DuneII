@@ -21,7 +21,7 @@ void SceneManager::push(std::unique_ptr<Scene>& scene) noexcept
         return;
 
     if (m_scenes.size() < 2)
-    { 
+    {
         m_scenes.push_back(std::move(scene));
         (*m_current) = m_scenes.back().get();
         updateScene();
@@ -29,14 +29,17 @@ void SceneManager::push(std::unique_ptr<Scene>& scene) noexcept
         return;
     }
 
-    if ((*m_current) == m_scenes.back().get()) // just do step forward
+    if ((*m_current) == m_scenes.front().get())
+    {
+        if (m_scenes.back() != scene)
+        {
+            m_scenes.pop_back();
+            m_scenes.push_back(std::move(scene));
+        }
+    }
+    else
     {
         m_scenes.pop_front();
-        m_scenes.push_back(std::move(scene));
-    }
-    else if (scene != m_scenes.back()) // remove second scene and go to new scene
-    {
-        m_scenes.pop_back();
         m_scenes.push_back(std::move(scene));
     }
 
@@ -45,15 +48,15 @@ void SceneManager::push(std::unique_ptr<Scene>& scene) noexcept
 }
 
 
-void SceneManager::pop(Scene* scene) noexcept
+void SceneManager::pop() noexcept
 {
     if (m_scenes.size() > 1)
     {
-        if (scene == m_scenes.back().get())
+        if ((*m_current) == m_scenes.back().get())
         {
             (*m_current) = m_scenes.front().get();
         }
-        else if (scene == m_scenes.front().get())
+        else if ((*m_current) == m_scenes.front().get())
         {
             m_scenes.pop_back();
         }

@@ -11,7 +11,7 @@ public:
     ~SceneManager();
 
     void push(std::unique_ptr<class Scene>& scene) noexcept;
-    void pop(class Scene* scene) noexcept;
+    void pop() noexcept;
 
 private:
     void updateScene() noexcept;

@@ -32,7 +32,18 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 set(CGLM_USE_TESTS OFF CACHE BOOL "Enable tests" FORCE)
 
-include(src/sources.cmake)
+file(GLOB_RECURSE DUNEII_SRC_FILES CONFIGURE_DEPENDS
+	${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp
+)
+
+file(GLOB SHADER_FILES
+	${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/*.vert
+	${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/*.frag
+	${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/*.geom
+	${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/*.comp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/*.tess
+)
 
 add_executable(${PROJECT_NAME} ${DUNEII_SRC_FILES})
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/glfw glfw)
@@ -42,6 +53,7 @@ add_subdirectory(${EXTERNAL_SOURCE_DIR}/entt entt)
 add_subdirectory(${EXTERNAL_SOURCE_DIR}/magic_enum magic_enum)
 
 target_sources(${PROJECT_NAME} PRIVATE ${SHADER_FILES})
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" FILES ${DUNEII_SRC_FILES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE
 	${PROJECT_SOURCE_DIR}/src
