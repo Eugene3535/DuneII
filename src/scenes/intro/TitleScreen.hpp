@@ -3,7 +3,7 @@
 #include <array>
 #include <memory>
 
-#include "scenes/intro/interactive_elements/Button.hpp"
+#include "scenes/intro/buttons/Button.hpp"
 #include "scenes/Scene.hpp"
 
 

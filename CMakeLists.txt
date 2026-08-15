@@ -26,11 +26,23 @@ else()
 	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 endif()
 
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
-set(CGLM_USE_TESTS OFF CACHE BOOL "Enable tests" FORCE)
+if(WIN32)
+	if(MSVC)
+		list(APPEND CMAKE_PREFIX_PATH "${EXTERNAL_SOURCE_DIR}/install/msvc")
+	elseif(MINGW)
+		list(APPEND CMAKE_PREFIX_PATH "${EXTERNAL_SOURCE_DIR}/install/mingw")
+	endif()
+endif()
+
+if(LINUX)
+	list(APPEND CMAKE_PREFIX_PATH "${EXTERNAL_SOURCE_DIR}/install/linux")
+endif()
+
+find_package(glfw3 CONFIG REQUIRED)
+find_package(glad CONFIG REQUIRED)
+find_package(cglm CONFIG REQUIRED)
+find_package(entt CONFIG REQUIRED)
+find_package(magic_enum CONFIG REQUIRED)
 
 file(GLOB_RECURSE DUNEII_SRC_FILES CONFIGURE_DEPENDS
 	${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
@@ -46,11 +58,6 @@ file(GLOB SHADER_FILES
 )
 
 add_executable(${PROJECT_NAME} ${DUNEII_SRC_FILES})
-add_subdirectory(${EXTERNAL_SOURCE_DIR}/glfw glfw)
-add_subdirectory(${EXTERNAL_SOURCE_DIR}/glad/core glad)
-add_subdirectory(${EXTERNAL_SOURCE_DIR}/cglm cglm)
-add_subdirectory(${EXTERNAL_SOURCE_DIR}/entt entt)
-add_subdirectory(${EXTERNAL_SOURCE_DIR}/magic_enum magic_enum)
 
 target_sources(${PROJECT_NAME} PRIVATE ${SHADER_FILES})
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" FILES ${DUNEII_SRC_FILES})
@@ -63,8 +70,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	glfw
-	glad
-	cglm
+	glad::glad
+	cglm::cglm
 	EnTT::EnTT
 	magic_enum::magic_enum
 )
@@ -81,13 +88,6 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 if(MSVC)
 	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${DUNEII_ALL_FILES})
 	set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
-
-	set_target_properties(${PROJECT_NAME} PROPERTIES
-		VS_DEBUGGER_WORKING_DIRECTORY_DEBUG          "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug"
-		VS_DEBUGGER_WORKING_DIRECTORY_RELEASE        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release"
-		VS_DEBUGGER_WORKING_DIRECTORY_RELWITHDEBINFO "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/RelWithDebInfo"
-		VS_DEBUGGER_WORKING_DIRECTORY_MINSIZEREL     "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MinSizeRel"
-	)
 endif()
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
@@ -95,3 +95,25 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "${CMAKE_SOURCE_DIR}/src/shaders" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/res/shaders"
 	VERBATIM
 )
+
+if(WIN32)
+	if(MSVC)
+		set(EXTERNAL_BIN_DIR "${EXTERNAL_SOURCE_DIR}/install/msvc/bin")
+
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EXTERNAL_BIN_DIR}/cglm-0$<$<CONFIG:Debug>:d>.dll" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/cglm-0$<$<CONFIG:Debug>:d>.dll"
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EXTERNAL_BIN_DIR}/glad$<$<CONFIG:Debug>:d>.dll"   "$<TARGET_FILE_DIR:${PROJECT_NAME}>/glad$<$<CONFIG:Debug>:d>.dll"
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EXTERNAL_BIN_DIR}/glfw3$<$<CONFIG:Debug>:d>.dll"  "$<TARGET_FILE_DIR:${PROJECT_NAME}>/glfw3$<$<CONFIG:Debug>:d>.dll"
+			VERBATIM
+		)
+	elseif(MINGW)
+		set(EXTERNAL_BIN_DIR "${EXTERNAL_SOURCE_DIR}/install/mingw/bin")
+
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EXTERNAL_BIN_DIR}/libcglm-0$<$<CONFIG:Debug>:d>.dll" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/libcglm-0$<$<CONFIG:Debug>:d>.dll"
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EXTERNAL_BIN_DIR}/libglad$<$<CONFIG:Debug>:d>.dll"   "$<TARGET_FILE_DIR:${PROJECT_NAME}>/libglad$<$<CONFIG:Debug>:d>.dll"
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EXTERNAL_BIN_DIR}/glfw3$<$<CONFIG:Debug>:d>.dll"     "$<TARGET_FILE_DIR:${PROJECT_NAME}>/glfw3$<$<CONFIG:Debug>:d>.dll"
+			VERBATIM
+		)
+	endif()
+endif()

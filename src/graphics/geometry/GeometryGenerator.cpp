@@ -19,10 +19,10 @@ std::vector<float> GeometryGenerator::createOutline(size_t pointCount, const std
     if (pointCount < 3)
         return {};
 
-    if(thickness < 1.f)
+    if (thickness < 1.f)
         return {};
 
-    vertices.resize(pointCount + 2); // + 2 for center and repeated first poin
+    vertices.resize(pointCount + 2); // + 2 for center and repeated first point
 
     for (size_t i = 0; i < pointCount; ++i)
         vertices[i + 1] = getPoint(i);

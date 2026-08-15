@@ -2,7 +2,7 @@
 #include <cglm/call/vec2.h>
 #include <cglm/call/aabb2d.h>
 
-#include "scenes/intro/interactive_elements/Button.hpp"
+#include "scenes/intro/buttons/Button.hpp"
 
 
 static constexpr float normal_color[]       = { 150.f / 255.f, 150.f / 255.f, 150.f / 255.f, 150.f / 255.f };
@@ -47,10 +47,10 @@ void Button::update(vec2s mousePosition, bool isClicked) noexcept
     m_currentColor = normal_color;
     const bool isUnderCursor = glmc_aabb2d_point(m_bounds, mousePosition.raw);
 
-    if(isUnderCursor)
+    if (isUnderCursor)
         m_currentColor = isClicked ? is_clicked_color : under_cursor_color;
 
-    if(isClicked && isUnderCursor)
+    if (isClicked && isUnderCursor)
         m_isSelected = true;
 }
 
