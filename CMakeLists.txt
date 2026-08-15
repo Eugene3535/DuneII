@@ -61,6 +61,7 @@ add_executable(${PROJECT_NAME} ${DUNEII_SRC_FILES})
 
 target_sources(${PROJECT_NAME} PRIVATE ${SHADER_FILES})
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" FILES ${DUNEII_SRC_FILES})
+source_group("shaders" FILES ${SHADER_FILES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE
 	${PROJECT_SOURCE_DIR}/src
@@ -86,7 +87,6 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG> CGLM
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
 if(MSVC)
-	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${DUNEII_ALL_FILES})
 	set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 endif()
 
