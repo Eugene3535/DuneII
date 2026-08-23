@@ -53,8 +53,6 @@ file(GLOB SHADER_FILES
 	${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/*.vert
 	${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/*.frag
 	${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/*.geom
-	${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/*.comp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/*.tess
 )
 
 add_executable(${PROJECT_NAME} ${DUNEII_SRC_FILES})
