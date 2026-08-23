@@ -1,15 +1,17 @@
 #pragma once
 
-#include <cstdint>
 #include <vector>
 
-#include "scenes/mission/data/Structures.hpp"
+#include <cglm/struct/ivec2.h>
+
+#include "scenes/mission/info/StructureInfo.hpp"
 
 
-class GameInfo
+namespace GameInfo
 {
-public:
-    GameInfo() noexcept;
+    StructureInfo::Type getStructureType(int tileNum) noexcept;
+    ivec2s getStructureSizeInTiles(StructureInfo::Type type) noexcept;
+    char convertTileNumToChar(int32_t index) noexcept;
 
-    std::vector<EntityIcon> getPreviewIconList(HouseType house, StructureInfo::Type building, uint32_t mission) const noexcept;
-};
+    std::vector<EntityIcon> getPreviewIconList(HouseType house, StructureInfo::Type building, uint32_t mission) noexcept;
+}

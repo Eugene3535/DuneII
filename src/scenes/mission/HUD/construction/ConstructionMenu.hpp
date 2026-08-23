@@ -19,7 +19,7 @@ public:
         NotSelected = 3
     };
 
-    ConstructionMenu(struct Game* game, class TileMap& tilemap) noexcept;
+    ConstructionMenu(struct Game* game, class Level& level) noexcept;
     ~ConstructionMenu();
 
     void init(uint32_t texture)                                               noexcept;
@@ -44,9 +44,9 @@ private:
     void drawPreviews()     const noexcept;
     void drawUserElements() const noexcept;
 
-    class Game*    m_game;
-    class TileMap& m_tilemap;
-    Transform2D    m_transform;
+    struct Game* m_game;
+    class Level& m_level;
+    Transform2D  m_transform;
 
     struct Widget
     {

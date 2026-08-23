@@ -16,9 +16,9 @@
 
 Mission::Mission(Game* game) noexcept:
     Scene(game),
-    m_tilemap(game, m_registry),
-    m_menu(game, m_tilemap),
-    m_hud(game, m_tilemap, m_menu)
+    m_level(game, m_registry),
+    m_menu(game, m_level),
+    m_hud(game, m_level, m_menu)
 {
 
 }
@@ -37,9 +37,9 @@ bool Mission::load(std::string_view info) noexcept
 
     m_menu.init(m_hud.getTexture());
 
-    if(m_mapLoader.loadFromFile(FileProvider::findPathToFile(std::string(info))))
+    if(m_tilemap.loadFromFile(FileProvider::findPathToFile(std::string(info))))
     {
-        if(!m_tilemap.createFromLoader(m_mapLoader))
+        if(!m_level.loadFromTileMap(m_tilemap))
             return false;
     }
 
@@ -64,7 +64,7 @@ void Mission::update(float dt) noexcept
 
 void Mission::draw(const mat4s& projection) noexcept
 {
-    m_tilemap.draw(projection);
+    m_level.draw(projection);
 
     if (!m_menu.isShown())
         m_hud.draw(projection);
@@ -92,7 +92,7 @@ void Mission::createSystems() noexcept
         const auto game     = mission->m_game;
         const auto cursor   = game->windowData.cursor;
         const auto viewSize = game->windowData.view->getSize();
-        const auto mapSize  = glms_ivec2_mul(mission->m_mapLoader.getMapSize(), mission->m_mapLoader.getTileSize());
+        const auto mapSize  = glms_ivec2_mul(mission->m_tilemap.getMapSize(), mission->m_tilemap.getTileSize());
 
         const bool isNearTheLeftEdge   = (cursor.x > 0 && cursor.x < SCREEN_MARGIN);
         const bool isNearTheTopEdge    = (cursor.y > 0 && cursor.y < SCREEN_MARGIN);
@@ -100,7 +100,7 @@ void Mission::createSystems() noexcept
         const bool isNearTheBottomEdge = (cursor.y > (viewSize.y - SCREEN_MARGIN) && cursor.y < viewSize.y);
 
         const float velocity = dt * CAMERA_VELOCITY;
-        vec2s scenePosition = mission->m_tilemap.getPosition();
+        vec2s scenePosition = mission->m_level.getPosition();
 
         if (isNearTheLeftEdge)
             scenePosition.x += velocity;
@@ -119,7 +119,7 @@ void Mission::createSystems() noexcept
         if (scenePosition.x < (viewSize.x - mapSize.x)) scenePosition.x = viewSize.x - mapSize.x;
         if (scenePosition.y < (viewSize.y - mapSize.y)) scenePosition.y = viewSize.y - mapSize.y;
 
-        mission->m_tilemap.setPosition(scenePosition);
+        mission->m_level.setPosition(scenePosition);
     };
 
 //  HUD

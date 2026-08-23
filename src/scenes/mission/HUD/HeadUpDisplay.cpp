@@ -5,7 +5,7 @@
 #include "files/FileProvider.hpp"
 #include "graphics/texture/Texture2D.hpp"
 #include "graphics/vao/VertexBufferLayout.hpp"
-#include "scenes/mission/tilemap/TileMap.hpp"
+#include "scenes/mission/level/Level.hpp"
 #include "app/window/WindowData.hpp"
 #include "app/game/Game.hpp"
 #include "scenes/mission/HUD/construction/ConstructionMenu.hpp"
@@ -16,9 +16,9 @@
 #define BLINK_LOOP_TIME 0.25f
 
 
-HeadUpDisplay::HeadUpDisplay(Game* game,  TileMap& tilemap, ConstructionMenu& menu) noexcept:
+HeadUpDisplay::HeadUpDisplay(Game* game, Level& level, ConstructionMenu& menu) noexcept:
     m_game(game),
-    m_tilemap(tilemap),
+    m_level(level),
     m_menu(menu),
     m_previewIcons(game),
     m_tilemapProgram(0),
@@ -155,7 +155,7 @@ void HeadUpDisplay::draw(const mat4s& projection) const noexcept
         view->updateUniformBuffer(result);
         m_previewIcons.draw();
 
-        auto& registry = m_tilemap.getRegistry();
+        auto& registry = m_level.getRegistry();
 
         if (StructureInfo* component = registry.try_get<StructureInfo>(m_selectionFrame.lastSelectedEntity))
         {
@@ -189,10 +189,10 @@ void HeadUpDisplay::runSelection() noexcept
         return;
 
     vec2s cursorPosition = m_cursor.position;
-    vec2s scenePosition  = glms_vec2_negate(m_tilemap.getPosition());
+    vec2s scenePosition  = glms_vec2_negate(m_level.getPosition());
     vec2s worldCoords    = glms_vec2_add(scenePosition, cursorPosition);
 
-    const auto entity = m_tilemap.getEntityUnderCursor(worldCoords);
+    const auto entity = m_level.getEntityUnderCursor(worldCoords);
 
     if(entity == entt::null)
     {
@@ -224,7 +224,7 @@ void HeadUpDisplay::runSelection() noexcept
         }
     };
 
-    auto& registry = m_tilemap.getRegistry();
+    auto& registry = m_level.getRegistry();
 
     if(m_selectionFrame.lastSelectedEntity != entity)
     {

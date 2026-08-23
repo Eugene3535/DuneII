@@ -10,7 +10,7 @@
 #include <cglm/struct/ivec4.h>
 
 
-class TiledMapLoader
+class TileMap
 {
 public:
 	struct Object
@@ -28,7 +28,7 @@ public:
 		std::vector<Property> properties;
 	};
 
-	TiledMapLoader() noexcept;
+	TileMap() noexcept;
 
 	bool loadFromFile(const std::filesystem::path& filePath) noexcept;
 	bool loadFromSQLiteDb(const std::filesystem::path& filePath) noexcept;

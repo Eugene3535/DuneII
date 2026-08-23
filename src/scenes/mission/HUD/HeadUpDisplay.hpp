@@ -10,7 +10,7 @@
 class HeadUpDisplay final
 {
 public:
-    HeadUpDisplay(struct Game* game, class TileMap& tilemap, class ConstructionMenu& menu) noexcept;
+    HeadUpDisplay(struct Game* game, class Level& level, class ConstructionMenu& menu) noexcept;
     ~HeadUpDisplay();
 
     bool init()                              noexcept;
@@ -29,8 +29,8 @@ public:
     uint32_t getTexture() const noexcept;
 
 private:
-    class Game*             m_game;
-    const class TileMap&    m_tilemap;
+    struct Game*            m_game;
+    const class Level&      m_level;
     class ConstructionMenu& m_menu;
     EntityPreview           m_previewIcons;
 

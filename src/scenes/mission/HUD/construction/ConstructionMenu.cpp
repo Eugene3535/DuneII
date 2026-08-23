@@ -11,7 +11,7 @@
 #include "graphics/geometry/GeometryGenerator.hpp"
 #include "app/window/WindowData.hpp"
 #include "app/game/Game.hpp"
-#include "scenes/mission/tilemap/TileMap.hpp"
+#include "scenes/mission/level/Level.hpp"
 #include "scenes/mission/HUD/construction/ConstructionMenu.hpp"
 
 
@@ -33,9 +33,9 @@ namespace
 }
 
 
-ConstructionMenu::ConstructionMenu(Game* game, TileMap& tilemap) noexcept:
+ConstructionMenu::ConstructionMenu(Game* game, Level& level) noexcept:
     m_game(game),
-    m_tilemap(tilemap),
+    m_level(level),
     m_transform(),
     m_isShown(false)
 {

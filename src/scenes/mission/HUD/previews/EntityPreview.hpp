@@ -26,7 +26,7 @@ public:
 private:
     const vec2s* getTexCoords(EntityIcon icon) const noexcept;
 
-    class Game* m_game;
+    struct Game* m_game;
 
     uint32_t m_texture;
     uint32_t m_defaultProgram;

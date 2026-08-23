@@ -25,6 +25,6 @@ public:
 protected:
     void setSpriteSizeInPixels(const struct Sprite2D& sprite, const vec2s newSize, Transform2D& transform) noexcept;
 
-    class Game* m_game;
-    bool        m_isLoaded;
+    struct Game* m_game;
+    bool         m_isLoaded;
 };

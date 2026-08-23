@@ -1,7 +1,7 @@
 #pragma once
 
-#include "files/TiledMapLoader.hpp"
-#include "scenes/mission/tilemap/TileMap.hpp"
+#include "files/TileMap.hpp"
+#include "scenes/mission/level/Level.hpp"
 #include "scenes/mission/HUD/HeadUpDisplay.hpp"
 #include "scenes/mission/HUD/construction/ConstructionMenu.hpp"
 #include "scenes/Scene.hpp"
@@ -30,9 +30,9 @@ private:
     };
     std::vector<System> m_systems;
 
-    TiledMapLoader   m_mapLoader;
-    TileMap          m_tilemap;
-    entt::registry   m_registry;
+    TileMap        m_tilemap;
+    Level          m_level;
+    entt::registry m_registry;
 
     ConstructionMenu m_menu;
     HeadUpDisplay    m_hud;

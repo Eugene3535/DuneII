@@ -7,17 +7,17 @@
 #include <entt/entity/registry.hpp>
 
 #include "graphics/transform/Transform2D.hpp"
-#include "scenes/mission/data/Structures.hpp"
+#include "scenes/mission/info/StructureInfo.hpp"
 
 
-class TileMap final:
+class Level final:
     public Transform2D
 {
 public:
-    TileMap(struct Game* game, entt::registry& registry) noexcept;
-    ~TileMap();
+    Level(struct Game* game, entt::registry& registry) noexcept;
+    ~Level();
 
-    bool createFromLoader(const class TiledMapLoader& loader) noexcept;
+    bool loadFromTileMap(const class TileMap& loader) noexcept;
     bool putStructure(const HouseType owner, const StructureInfo::Type type, const ivec2s cell) noexcept; // cell must be presented it tiles
 
     void draw(const mat4s& projection) const noexcept;
@@ -32,7 +32,7 @@ private:
     void createGraphicsForEntity(const entt::entity entity) noexcept;
     void updateWall(int32_t origin, int32_t level)          noexcept;
 
-    class Game*     m_game;
+    struct Game*    m_game;
     entt::registry& m_registry;
 
     std::string               m_tileMask;

@@ -21,6 +21,4 @@ struct Game final
     SceneManager* sceneManager;
 
     uint32_t frameCounter = 0;
-
-    GameInfo gameInfo;
 };
