@@ -30,9 +30,8 @@ private:
     };
     std::vector<System> m_systems;
 
-    TileMap        m_tilemap;
-    Level          m_level;
-    entt::registry m_registry;
+    TileMap m_tilemap;
+    Level   m_level;
 
     ConstructionMenu m_menu;
     HeadUpDisplay    m_hud;

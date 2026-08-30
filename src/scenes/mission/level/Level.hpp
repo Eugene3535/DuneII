@@ -4,7 +4,7 @@
 #include <span>
 #include <string>
 
-#include <entt/entity/registry.hpp>
+#include <entt/entity/fwd.hpp>
 
 #include "graphics/transform/Transform2D.hpp"
 #include "scenes/mission/info/StructureInfo.hpp"
@@ -14,7 +14,7 @@ class Level final:
     public Transform2D
 {
 public:
-    Level(struct Game* game, entt::registry& registry) noexcept;
+    Level(struct Game* game) noexcept;
     ~Level();
 
     bool loadFromTileMap(const class TileMap& loader) noexcept;
@@ -22,8 +22,7 @@ public:
 
     void draw(const mat4s& projection) const noexcept;
 
-    entt::entity    getEntityUnderCursor(const vec2s point) const noexcept;
-    entt::registry& getRegistry()                           const noexcept;
+    entt::entity getEntityUnderCursor(const vec2s point) const noexcept;
 
 private:
     bool createGraphicsResources(std::span<const vec4s> vertices, std::span<const uint32_t> indices) noexcept;
@@ -32,8 +31,7 @@ private:
     void createGraphicsForEntity(const entt::entity entity) noexcept;
     void updateWall(int32_t origin, int32_t level)          noexcept;
 
-    struct Game*    m_game;
-    entt::registry& m_registry;
+    struct Game* m_game;
 
     std::string               m_tileMask;
     std::vector<entt::entity> m_structureMask;

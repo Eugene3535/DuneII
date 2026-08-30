@@ -155,7 +155,7 @@ void HeadUpDisplay::draw(const mat4s& projection) const noexcept
         view->updateUniformBuffer(result);
         m_previewIcons.draw();
 
-        auto& registry = m_level.getRegistry();
+        auto& registry = m_game->registry;
 
         if (StructureInfo* component = registry.try_get<StructureInfo>(m_selectionFrame.lastSelectedEntity))
         {
@@ -224,21 +224,21 @@ void HeadUpDisplay::runSelection() noexcept
         }
     };
 
-    auto& registry = m_level.getRegistry();
+    auto& registry = m_game->registry;
 
-    if(m_selectionFrame.lastSelectedEntity != entity)
+    if (m_selectionFrame.lastSelectedEntity != entity)
     {
         m_selectionFrame.lastSelectedEntity = entity;
     }
     else
     {
-        if(m_cursor.timer > BLINK_LOOP_TIME)
+        if (m_cursor.timer > BLINK_LOOP_TIME)
         {
-            if(StructureInfo* info = registry.try_get<StructureInfo>(entity))
+            if (StructureInfo* info = registry.try_get<StructureInfo>(entity))
             {
                 const auto mainPreviewIcon = convert_building_type_to_preview_icon(info->type);
 
-                if(mainPreviewIcon != EntityIcon::Empty_Cell)
+                if (mainPreviewIcon != EntityIcon::Empty_Cell)
                 {
                     const bool hasConstructionPreviews = ((info->type == StructureInfo::Type::Vehicle)          ||
                                                             (info->type == StructureInfo::Type::HighTech)         ||
@@ -248,7 +248,7 @@ void HeadUpDisplay::runSelection() noexcept
 
                     std::span<EntityIcon> previews;
 
-                    if(hasConstructionPreviews)
+                    if (hasConstructionPreviews)
                     {
                         std::vector<EntityIcon>* previewArray = registry.try_get<std::vector<EntityIcon>>(entity);
 

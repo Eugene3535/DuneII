@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include <entt/entity/registry.hpp>
+
 #include "common/info/GameInfo.hpp"
 #include "common/tasks/TaskManager.hpp"
 #include "common/tasks/TaskData.hpp"
@@ -26,6 +28,8 @@ struct Game final
     SceneManager* sceneManager;
 
     uint32_t frameCounter = 0;
+
+    entt::registry registry;
 
     TaskManager taskManager;
     std::vector<std::pair<void*, uint32_t(*)(void*, float)>> tasks;

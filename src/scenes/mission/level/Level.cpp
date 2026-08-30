@@ -44,10 +44,9 @@ static ivec4s       get_bounds_of(const StructureInfo::Type type, const ivec2s c
 static int32_t      get_armor_of(const StructureInfo::Type type)                                            noexcept;
 
 
-Level::Level(Game* game, entt::registry& registry) noexcept:
+Level::Level(Game* game) noexcept:
 	Transform2D(),
 	m_game(game),
-    m_registry(registry),
 	m_textureSize(glms_ivec2_zero()),
 	m_mapSize(glms_ivec2_zero()),
 	m_tileSize(glms_ivec2_zero())
@@ -170,7 +169,7 @@ bool Level::loadFromTileMap(const TileMap& loader) noexcept
 
 bool Level::putStructure(const HouseType owner, const StructureInfo::Type type, const ivec2s cell) noexcept
 {
-	if(auto size = m_registry.storage<StructureInfo>().size(); size >= STRUCTURE_LIMIT_ON_MAP)
+	if(auto size = m_game->registry.storage<StructureInfo>().size(); size >= STRUCTURE_LIMIT_ON_MAP)
 		return false;
 
 	if(type >= StructureInfo::Type::Max)
@@ -231,10 +230,10 @@ bool Level::putStructure(const HouseType owner, const StructureInfo::Type type, 
         }
     }
 
-	const auto entity = m_registry.create();
-	m_registry.emplace<ivec4s>(entity, bounds);
+	const auto entity = m_game->registry.create();
+	m_game->registry.emplace<ivec4s>(entity, bounds);
 
-	auto& structure = m_registry.emplace<StructureInfo>(entity);
+	auto& structure = m_game->registry.emplace<StructureInfo>(entity);
 	structure.owner = owner;
 	structure.type = type;
 	structure.armor = structure.maxArmor = get_armor_of(type);
@@ -251,7 +250,7 @@ bool Level::putStructure(const HouseType owner, const StructureInfo::Type type, 
 		auto previews = GameInfo::getPreviewIconList(owner, type, 8);
 
 		if (!previews.empty())
-			m_registry.emplace<std::vector<EntityIcon>>(entity, previews);
+			m_game->registry.emplace<std::vector<EntityIcon>>(entity, previews);
 
 		// m_registry.emplace<Component::Construction>(entity); TODO: optinization
 	}
@@ -318,7 +317,7 @@ void Level::draw(const mat4s& projection) const noexcept
 	glBindTextureUnit(0, m_buildings.texture);
 	glBindVertexArray(m_buildings.vertexArrayObject);
 
-	auto view = m_registry.view<const StructureInfo>();
+	auto view = m_game->registry.view<const StructureInfo>();
 
 	view.each([](const StructureInfo& building)
 	{
@@ -341,24 +340,23 @@ entt::entity Level::getEntityUnderCursor(const vec2s point) const noexcept
 }
 
 
-entt::registry& Level::getRegistry() const noexcept
-{
-	return m_registry;
-}
-
-
 bool Level::createGraphicsResources(std::span<const vec4s> vertices, std::span<const uint32_t> indices) noexcept
 {
 	memset(&m_landscape, 0, sizeof(m_landscape));
     memset(&m_buildings, 0, sizeof(m_buildings));
 
-//  Landscape
-	glCreateBuffers(1, &m_landscape.vertexBufferObject);
-    glNamedBufferData(m_landscape.vertexBufferObject, static_cast<GLsizeiptr>(vertices.size_bytes()), vertices.data(), GL_DYNAMIC_DRAW);
-	glGenBuffers(1, &m_landscape.indexBufferObject);
-	glCreateTextures(GL_TEXTURE_2D, 1, &m_landscape.texture);
-    glGenVertexArrays(1, &m_landscape.vertexArrayObject);
+	auto& glResources = m_game->glResources;
+    auto textures = glResources.getHandles(GlResourceManager::GLTexture2D, 2);
+    auto buffers = glResources.getHandles(GlResourceManager::GLBuffer, 3);
+    auto vertexArrays = glResources.getHandles(GlResourceManager::GLVertexArray, 2);
 
+	m_landscape.texture = textures[0];
+	m_landscape.vertexBufferObject = buffers[0];
+	m_landscape.indexBufferObject = buffers[1];
+	m_landscape.vertexArrayObject = vertexArrays[0];
+
+//  Landscape
+    glNamedBufferData(m_landscape.vertexBufferObject, static_cast<GLsizeiptr>(vertices.size_bytes()), vertices.data(), GL_DYNAMIC_DRAW);
     Texture2D landscapeTexture(m_landscape.texture);
 
     if (!landscapeTexture.loadFromFile(FileProvider::findPathToFile(LANDSCAPE_PNG)))
@@ -383,7 +381,10 @@ bool Level::createGraphicsResources(std::span<const vec4s> vertices, std::span<c
 	m_landscape.count = indices.size();
 
 //  Buildings
-	glCreateBuffers(1, &m_buildings.vertexBufferObject);
+	m_buildings.texture = textures[1];
+	m_buildings.vertexBufferObject = buffers[2];
+	m_buildings.vertexArrayObject = vertexArrays[1];
+
 
 	glNamedBufferStorage(
 		m_buildings.vertexBufferObject,
@@ -405,13 +406,11 @@ bool Level::createGraphicsResources(std::span<const vec4s> vertices, std::span<c
 		GL_MAP_UNSYNCHRONIZED_BIT
 	);
 
-	glGenVertexArrays(1, &m_buildings.vertexArrayObject);
 	layout.createVertexInputState(m_buildings.vertexArrayObject, m_buildings.vertexBufferObject);
 
-	glCreateTextures(GL_TEXTURE_2D, 1, &m_buildings.texture);
 	Texture2D buildingTexture(m_buildings.texture);
 
-	if(!buildingTexture.loadFromFile(FileProvider::findPathToFile(STRUCTURES_PNG)))
+	if (!buildingTexture.loadFromFile(FileProvider::findPathToFile(STRUCTURES_PNG)))
 		return false;
 
 	return true;
@@ -419,34 +418,37 @@ bool Level::createGraphicsResources(std::span<const vec4s> vertices, std::span<c
 
 
 void Level::cleanupGraphicsResources() noexcept
-{
+{	
 	GLint mapped;
 	glGetNamedBufferParameteriv(m_buildings.vertexBufferObject, GL_BUFFER_MAPPED, &mapped);
 
 	if (mapped == GL_TRUE)
 		glUnmapNamedBuffer(m_buildings.vertexBufferObject);
 
-	GLuint textures[]            = { m_landscape.texture, m_buildings.texture                                                      };
-	GLuint vertexArrayObjects[]  = { m_landscape.vertexArrayObject, m_buildings.vertexArrayObject                                  };
-	GLuint vertexBufferObjects[] = { m_landscape.vertexBufferObject, m_landscape.indexBufferObject, m_buildings.vertexBufferObject };
+	std::array<uint32_t, 2> vertexArrays = { m_landscape.vertexArrayObject, m_buildings.vertexArrayObject };
+    std::array<uint32_t, 3> buffers      = { m_landscape.vertexBufferObject, m_landscape.indexBufferObject, m_buildings.vertexBufferObject  };
+	std::array<uint32_t, 2> textures     = { m_landscape.texture, m_buildings.texture };
 
-	glDeleteVertexArrays(std::size(vertexArrayObjects), vertexArrayObjects);
-	glDeleteBuffers(std::size(vertexBufferObjects), vertexBufferObjects);
-	glDeleteTextures(std::size(textures), textures);
+    auto& glResources = m_game->glResources;
+    glResources.destroyHandles(GlResourceManager::GLVertexArray, vertexArrays);
+    glResources.destroyHandles(GlResourceManager::GLBuffer, buffers);
+    glResources.destroyHandles(GlResourceManager::GLTexture2D, textures);
 }
 
 
 void Level::createGraphicsForEntity(const entt::entity entity) noexcept
 {
-	if(m_buildings.mappedStorage)
-	{
-		const uint32_t index = m_registry.storage<StructureInfo>().size() - 1;
+	auto& registry = m_game->registry;
 
-		auto& building = m_registry.get<StructureInfo>(entity);
+	if (m_buildings.mappedStorage)
+	{
+		const uint32_t index = registry.storage<StructureInfo>().size() - 1;
+
+		auto& building = registry.get<StructureInfo>(entity);
 		building.stride = index;
 		building.frame = (index << 2);
 
-		const auto bounds = m_registry.get<ivec4s>(entity);
+		const auto bounds = registry.get<ivec4s>(entity);
 		const vec4s texCoords = get_texcoords_of_structure(building.type, m_textureSize.x, m_textureSize.y);
 
 		const float vertices[] =
@@ -486,7 +488,7 @@ void Level::updateWall(int32_t origin, int32_t level) noexcept
 
 		if(m_buildings.mappedStorage)
 		{
-			const auto& building = m_registry.get<StructureInfo>(entity);
+			const auto& building = m_game->registry.get<StructureInfo>(entity);
 
 			float* bytes = static_cast<float*>(m_buildings.mappedStorage);
 			bytes += building.stride * 16; // TODO: fix magic num
@@ -514,17 +516,17 @@ void Level::updateWall(int32_t origin, int32_t level) noexcept
 
 WallCellType compute_wall_type(bool left, bool top, bool right, bool bottom) noexcept
 {
-    if(!left && !top && !right && !bottom) return WallCellType::DOT;
-    if((left || right) && !top && !bottom) return WallCellType::LEFT_RIGHT;
-    if(!left && !right && (top || bottom)) return WallCellType::BOTTOM_TOP;
-    if(top && right && !left && !bottom)   return WallCellType::TOP_RIGHT;
-    if(!left && !top && right && bottom)   return WallCellType::RIGHT_BOTTOM;
-    if(left && bottom && !top && !right)   return WallCellType::BOTTOM_LEFT;
-    if(left && top && !right && !bottom)   return WallCellType::LEFT_TOP;
-    if(!left && top && right && bottom)    return WallCellType::TOP_RIGHT_BOTTOM;
-    if(left && right && bottom && !top)    return WallCellType::RIGHT_BOTTOM_LEFT;
-    if(left && top && bottom && !right)    return WallCellType::BOTTOM_LEFT_TOP;
-    if(left && top && right && !bottom)    return WallCellType::LEFT_TOP_RIGHT;
+    if (!left && !top && !right && !bottom) return WallCellType::DOT;
+    if ((left || right) && !top && !bottom) return WallCellType::LEFT_RIGHT;
+    if (!left && !right && (top || bottom)) return WallCellType::BOTTOM_TOP;
+    if (top && right && !left && !bottom)   return WallCellType::TOP_RIGHT;
+    if (!left && !top && right && bottom)   return WallCellType::RIGHT_BOTTOM;
+    if (left && bottom && !top && !right)   return WallCellType::BOTTOM_LEFT;
+    if (left && top && !right && !bottom)   return WallCellType::LEFT_TOP;
+    if (!left && top && right && bottom)    return WallCellType::TOP_RIGHT_BOTTOM;
+    if (left && right && bottom && !top)    return WallCellType::RIGHT_BOTTOM_LEFT;
+    if (left && top && bottom && !right)    return WallCellType::BOTTOM_LEFT_TOP;
+    if (left && top && right && !bottom)    return WallCellType::LEFT_TOP_RIGHT;
 
     return WallCellType::CROSS;
 }
