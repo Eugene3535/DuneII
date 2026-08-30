@@ -17,7 +17,7 @@
 Mission::Mission(Game* game) noexcept:
     Scene(game),
     m_level(game),
-    m_menu(game, m_level),
+    m_menu(game),
     m_hud(game, m_level, m_menu)
 {
 

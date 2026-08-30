@@ -33,9 +33,8 @@ namespace
 }
 
 
-ConstructionMenu::ConstructionMenu(Game* game, Level& level) noexcept:
+ConstructionMenu::ConstructionMenu(Game* game) noexcept:
     m_game(game),
-    m_level(level),
     m_transform(),
     m_isShown(false)
 {
