@@ -158,7 +158,7 @@ void HeadUpDisplay::draw(const mat4s& projection) const noexcept
 
         auto& registry = m_game->registry;
 
-        if (StructureInfo* component = registry.try_get<StructureInfo>(m_selectionFrame.lastSelectedEntity))
+        if (auto* component = registry.try_get<ConstructionInfo>(m_selectionFrame.lastSelectedEntity))
         {
             if (component->isUnderConstruction)
             {
@@ -267,7 +267,7 @@ void HeadUpDisplay::runSelection() noexcept
 
     m_cursor.timer = 0;
 
-    if (StructureInfo* component = registry.try_get<StructureInfo>(entity))
+    if (auto* component = registry.try_get<StructureInfo>(entity))
     {
         bool isSelectable = ((component->type != StructureInfo::Type::Slab_1x1) &&
                              (component->type != StructureInfo::Type::Slab_2x2) &&
@@ -281,8 +281,8 @@ void HeadUpDisplay::runSelection() noexcept
             if (entityIcon != EntityIcon::Empty_Cell)
                 m_previewIcons.setPreviewIcon(entityIcon);
 
-            if (component->isUnderConstruction)
-                m_previewIcons.setConstructionIcon(component->icon);
+            if (component->construction && component->construction->isUnderConstruction)
+                m_previewIcons.setConstructionIcon(component->construction->icon);
             
             const auto bounds = registry.get<ivec4s>(entity);
             glBindBuffer(GL_ARRAY_BUFFER, m_selectionFrame.vertexBufferObject);

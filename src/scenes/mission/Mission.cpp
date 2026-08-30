@@ -188,7 +188,7 @@ void Mission::createSystems() noexcept
                 auto entity = mission->m_hud.getLastSelectedEntity();
                 assert(entity != entt::null);
 
-                auto component = mission->m_game->registry.try_get<StructureInfo>(entity);
+                auto component = mission->m_game->registry.try_get<ConstructionInfo>(entity);
                 assert(component);
 
                 component->icon = selectedPreview;
@@ -207,9 +207,9 @@ void Mission::createSystems() noexcept
     auto& construction = m_systems.emplace_back();
     construction.execute = [](Mission* mission, float dt) -> void
     {
-        auto view = mission->m_game->registry.view<StructureInfo>();
+        auto view = mission->m_game->registry.view<ConstructionInfo>();
 
-        view.each([mission, dt](StructureInfo& component) 
+        view.each([mission, dt](ConstructionInfo& component) 
         {
             if (component.isUnderConstruction)
             {

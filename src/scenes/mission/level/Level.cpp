@@ -76,9 +76,6 @@ bool Level::loadFromTileMap(const TileMap& loader) noexcept
 
 	auto objects = loader.getObjects();
 
-	if(objects.empty())
-		return false;
-
 	struct Base
 	{
 		vec2 aabb[2];
@@ -89,11 +86,11 @@ bool Level::loadFromTileMap(const TileMap& loader) noexcept
 	{
 		Base base = {.exists = false};
 
-		for(const auto& object : objects)
+		for (const auto& object : objects)
 		{
-			if(object.name == "Base")
+			if (object.name == "Base")
 			{
-				auto found = std::find_if(object.properties.begin(), object.properties.end(), [houseName](const TileMap::Object::Property& property)
+				auto found = std::find_if (object.properties.begin(), object.properties.end(), [houseName](const TileMap::Object::Property& property)
 				{
 					if (const auto value = std::get_if<int>(&property.value))
 					{
@@ -103,7 +100,7 @@ bool Level::loadFromTileMap(const TileMap& loader) noexcept
 					return false;
 				});
 
-				if(found != object.properties.end())
+				if (found != object.properties.end())
 				{
 					base.aabb[0][0] = object.coords.x;
 					base.aabb[0][1] = object.coords.y;
@@ -142,20 +139,20 @@ bool Level::loadFromTileMap(const TileMap& loader) noexcept
 			objectAABB[1][0] = (object.coords.x + object.size.x) * m_tileSize.x;
 			objectAABB[1][1] = (object.coords.y + object.size.y) * m_tileSize.y;
 
-			if(harkonnenBase.exists && glmc_aabb2d_aabb(harkonnenBase.aabb, objectAABB))
+			if (harkonnenBase.exists && glmc_aabb2d_aabb(harkonnenBase.aabb, objectAABB))
 			{
 				owner = HouseType::Harkonnen;
 			}
-			else if(ordosBase.exists && glmc_aabb2d_aabb(ordosBase.aabb, objectAABB))
+			else if (ordosBase.exists && glmc_aabb2d_aabb(ordosBase.aabb, objectAABB))
 			{
 				owner = HouseType::Ordos;
 			}
-			else if(atreidesBase.exists && glmc_aabb2d_aabb(atreidesBase.aabb, objectAABB))
+			else if (atreidesBase.exists && glmc_aabb2d_aabb(atreidesBase.aabb, objectAABB))
 			{
 				owner = HouseType::Atreides;
 			}
 
-			if(owner != HouseType::INVALID)
+			if (owner != HouseType::INVALID)
 			{
 				const auto type = get_structure_enum(object.name);
 				putStructure(owner, type, object.coords);
@@ -169,10 +166,10 @@ bool Level::loadFromTileMap(const TileMap& loader) noexcept
 
 bool Level::putStructure(const HouseType owner, const StructureInfo::Type type, const ivec2s cell) noexcept
 {
-	if(auto size = m_game->registry.storage<StructureInfo>().size(); size >= STRUCTURE_LIMIT_ON_MAP)
+	if (auto size = m_game->registry.storage<StructureInfo>().size(); size >= STRUCTURE_LIMIT_ON_MAP)
 		return false;
 
-	if(type >= StructureInfo::Type::Max)
+	if (type >= StructureInfo::Type::Max)
         return false;
 
     auto bounds = get_bounds_of(type, cell, m_tileSize);
@@ -181,15 +178,15 @@ bool Level::putStructure(const HouseType owner, const StructureInfo::Type type, 
         const int32_t mapWidth  = m_mapSize.x * m_tileSize.x;
         const int32_t mapHeight = m_mapSize.y * m_tileSize.y;
 
-        if(bounds.x < 0)         return false;
-        if(bounds.y < 0)         return false;
-        if(bounds.z > mapWidth)  return false;
-        if(bounds.w > mapHeight) return false;
+        if (bounds.x < 0)         return false;
+        if (bounds.y < 0)         return false;
+        if (bounds.z > mapWidth)  return false;
+        if (bounds.w > mapHeight) return false;
     }
 
     const int32_t origin = cell.y * m_mapSize.x + cell.x;
 
-	if(m_structureMask[static_cast<size_t>(origin)] != entt::null)
+	if (m_structureMask[static_cast<size_t>(origin)] != entt::null)
 		return false;
 
     {// We check that the building will fit completely on the rocky soil.
@@ -223,7 +220,7 @@ bool Level::putStructure(const HouseType owner, const StructureInfo::Type type, 
         for (int32_t i = 0; i < size.y; ++i)
         {
             for (int32_t j = 0; j < size.x; ++j)
-                if(m_tileMask[offset + j] != 'R')
+                if (m_tileMask[offset + j] != 'R')
                     return false;
 
             offset += m_mapSize.x;
@@ -245,14 +242,15 @@ bool Level::putStructure(const HouseType owner, const StructureInfo::Type type, 
 									      (type == StructureInfo::Type::Barracks)         ||
 										  (type == StructureInfo::Type::Starport));
 
-	if(hasConstructionPreviews)
+	if (hasConstructionPreviews)
 	{
 		auto previews = GameInfo::getPreviewIconList(owner, type, 8);
 
 		if (!previews.empty())
 			m_game->registry.emplace<std::vector<EntityIcon>>(entity, previews);
 
-		// m_registry.emplace<Component::Construction>(entity); TODO: optinization
+		auto& constructionInfo = m_game->registry.emplace<ConstructionInfo>(entity);
+		structure.construction = &constructionInfo;
 	}
 
 	auto setup_tiles_on_mask = [this, origin, entity](int32_t width, int32_t height, char symbol = 'B') -> void
@@ -271,7 +269,7 @@ bool Level::putStructure(const HouseType owner, const StructureInfo::Type type, 
 		}
 	};
 
-	switch(type)
+	switch (type)
 	{
 		case StructureInfo::Type::Slab_1x1:         setup_tiles_on_mask(1, 1, 'C'); break;
 		case StructureInfo::Type::Palace:           setup_tiles_on_mask(3, 3);      break;
@@ -292,7 +290,7 @@ bool Level::putStructure(const HouseType owner, const StructureInfo::Type type, 
 		default: break;
 	}
 
-	if(type == StructureInfo::Type::Wall)
+	if (type == StructureInfo::Type::Wall)
 		updateWall(origin, 2);
 
 	return true;
@@ -333,7 +331,7 @@ entt::entity Level::getEntityUnderCursor(const vec2s point) const noexcept
 	const ivec2s tile = { static_cast<int>(point.x) / m_tileSize.x, static_cast<int>(point.y) / m_tileSize.y };
 	const int32_t origin = tile.y * m_mapSize.x + tile.x;
 
-	if(m_structureMask[static_cast<size_t>(origin)] != entt::null)
+	if (m_structureMask[static_cast<size_t>(origin)] != entt::null)
 		return m_structureMask[static_cast<size_t>(origin)];
 
 	return entt::null;
@@ -468,7 +466,7 @@ void Level::createGraphicsForEntity(const entt::entity entity) noexcept
 
 void Level::updateWall(int32_t origin, int32_t level) noexcept
 {
-    if(level > 0)
+    if (level > 0)
 	{
 		int32_t left   = origin - 1;
 		int32_t top    = origin - m_mapSize.x;
@@ -486,7 +484,7 @@ void Level::updateWall(int32_t origin, int32_t level) noexcept
 		const auto texCoords = get_texcoords_of_custom_wall(compute_wall_type(a, b, c, d), m_textureSize);
 		const auto entity = m_structureMask[static_cast<size_t>(origin)];
 
-		if(m_structures.mappedStorage)
+		if (m_structures.mappedStorage)
 		{
 			const auto& building = m_game->registry.get<StructureInfo>(entity);
 

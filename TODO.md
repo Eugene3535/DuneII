@@ -2,8 +2,9 @@
 - [ ] Class MusicBox with automatic control of soundtrack parameters
 - [ ] Mentat intro scene
 - [x] shader optimization (remove dublicates)
-- [ ] texture optimization (remove dublicates)
+- [x] texture optimization (remove dublicates)
 - [ ] Collect the remaining TMX maps
-- [ ] Move input data into WindowData
+- [x] Move input data into WindowData
 - [ ] AssetManager
-- [ ] Use class Game just as a struct
+- [x] Use class Game just as a struct
+- [ ] Tilemap optimization

@@ -6,6 +6,16 @@
 
 // More info is available here
 // https://gamicus.fandom.com/wiki/List_of_structures_in_Dune_II
+
+struct ConstructionInfo
+{
+    //StructureInfo::Type type;
+    EntityIcon icon;
+    float duration;
+    float progress;
+    bool isUnderConstruction;
+};
+
 struct StructureInfo
 {
     enum class Type : int32_t
@@ -39,9 +49,5 @@ struct StructureInfo
     int32_t armor;
     int32_t maxArmor;
 
- // construction mode
-    EntityIcon icon;
-    float duration;
-    float progress;
-    bool isUnderConstruction;
+    ConstructionInfo* construction { nullptr };
 };

@@ -8,13 +8,10 @@ uint32_t construct(void* taskData, float deltaTime) noexcept
 {
     auto* data = static_cast<Construction*>(taskData);
 
-    data->countdown -= data->duration * deltaTime;
-    (*data->progress) = data->countdown;
+    (*data->progress) -= data->duration * deltaTime;
 
-    if (data->countdown < 1.f)
+    if ((*data->progress) < 1.f)
     {
-        (*data->progress) = 0;
-
         return sizeof(Construction);
     }
 

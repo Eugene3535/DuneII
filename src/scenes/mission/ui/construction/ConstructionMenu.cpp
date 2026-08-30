@@ -566,7 +566,7 @@ void ConstructionMenu::createUserElements() noexcept
     {
         Texture2D texture(m_menuElements.textures[currentTexture++]);
 
-        if(!texture.loadFromFile(FileProvider::findPathToFile(textureName)))
+        if (!texture.loadFromFile(FileProvider::findPathToFile(textureName)))
             return;
     }
 
