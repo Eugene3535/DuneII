@@ -409,14 +409,14 @@ const Transform2D& ConstructionMenu::getTransform() const noexcept
 
 void ConstructionMenu::createFrames() noexcept
 {
-    if(const GLint uniformColor = glGetUniformLocation(m_frames.program, "outlineColor"); uniformColor != -1)
+    if (const GLint uniformColor = glGetUniformLocation(m_frames.program, "outlineColor"); uniformColor != -1)
         m_frames.uniformColor = uniformColor;
 
     std::vector<float> buffer;
     const float thickness = 5.f;
     const float radius = 10.f;
 
-    auto createRectangle = [&buffer, thickness, radius](vec4s bounds, uint32_t& background, uint32_t& outline) -> void
+    auto create_rectangle = [&buffer, thickness, radius](vec4s bounds, uint32_t& background, uint32_t& outline) -> void
     {
         GeometryGenerator generator;
         auto rectVertices = generator.createRectWithRoundedEdges(bounds.x, bounds.y, bounds.z, bounds.w, radius);
@@ -435,18 +435,18 @@ void ConstructionMenu::createFrames() noexcept
     };
 
 //  Background
-    createRectangle({0.f, 0.f, DEFAULT_MENU_WIDTH, DEFAULT_MENU_HEIGHT}, m_frames.rootWidget.background, m_frames.rootWidget.outline);
+    create_rectangle({0.f, 0.f, DEFAULT_MENU_WIDTH, DEFAULT_MENU_HEIGHT}, m_frames.rootWidget.background, m_frames.rootWidget.outline);
 
 //  Entity presentation widget
-    createRectangle({580.f, 100.f, 300.f, 200.f}, m_frames.entityWidget.background, m_frames.entityWidget.outline);
+    create_rectangle({580.f, 100.f, 300.f, 200.f}, m_frames.entityWidget.background, m_frames.entityWidget.outline);
 
 //  Entity widget label
-    createRectangle({580.f, 315.f, 300.f, 50.f}, m_frames.entityWidgetLabel.background, m_frames.entityWidgetLabel.outline);
+    create_rectangle({580.f, 315.f, 300.f, 50.f}, m_frames.entityWidgetLabel.background, m_frames.entityWidgetLabel.outline);
 
 //  Entity property labels
-    createRectangle({580.f, 450.f, 300.f, 50.f}, m_frames.entityWidgetParams[0].background, m_frames.entityWidgetParams[0].outline);
-    createRectangle({580.f, 550.f, 300.f, 50.f}, m_frames.entityWidgetParams[1].background, m_frames.entityWidgetParams[1].outline);
-    createRectangle({580.f, 650.f, 300.f, 50.f}, m_frames.entityWidgetParams[2].background, m_frames.entityWidgetParams[2].outline);
+    create_rectangle({580.f, 450.f, 300.f, 50.f}, m_frames.entityWidgetParams[0].background, m_frames.entityWidgetParams[0].outline);
+    create_rectangle({580.f, 550.f, 300.f, 50.f}, m_frames.entityWidgetParams[1].background, m_frames.entityWidgetParams[1].outline);
+    create_rectangle({580.f, 650.f, 300.f, 50.f}, m_frames.entityWidgetParams[2].background, m_frames.entityWidgetParams[2].outline);
 
 //  Unload to GPU
     auto& glResources       = m_game->glResources;
@@ -470,7 +470,7 @@ void ConstructionMenu::createPreviews() noexcept
 	glGetTextureLevelParameteriv(m_previewCells.texture, 0, GL_TEXTURE_HEIGHT, &texHeight);
 
     const int32_t columns      = 6; // The number of tiles in the texture horizontally
-    const int32_t rows         = 7;    // and vertically
+    const int32_t rows         = 7; // and vertically
     const int32_t spriteWidth  = texWidth / columns;
     const int32_t spriteHeight = texHeight / rows;
     const vec2s   ratio        = { 1.f / texWidth, 1.f / texHeight };

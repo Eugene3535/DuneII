@@ -1,6 +1,6 @@
 #pragma once
 
-enum class HouseType : uint32_t
+enum class HouseType : uint8_t
 {
     Atreides = 0,
     Ordos,
@@ -13,7 +13,7 @@ enum class HouseType : uint32_t
 };
 
 
-enum class EntityIcon : uint32_t
+enum class EntityIcon : uint8_t
 {
 	WOR = 0,
 	Wind_Trap,

@@ -17,7 +17,7 @@ struct ConstructionInfo
 
 struct StructureInfo
 {
-    enum class Type : int32_t
+    enum class Type : uint8_t
     {
         Slab_1x1 = 0,
         Slab_2x2,
