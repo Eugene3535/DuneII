@@ -53,7 +53,7 @@ GLuint Shader::loadFromFile(const std::filesystem::path& filepath, GLenum shader
                          (shaderType == GL_GEOMETRY_SHADER)        ||
                          (shaderType == GL_FRAGMENT_SHADER);
 
-    if(type_is_valid)
+    if (type_is_valid)
     {
         m_type = shaderType;
         std::string source;
@@ -68,7 +68,7 @@ GLuint Shader::loadFromFile(const std::filesystem::path& filepath, GLenum shader
             fclose(f);
         }
 
-        if(!source.empty())
+        if (!source.empty())
         {
             uint32_t shader = glCreateShader(shaderType);
             const char* c_str = source.c_str();
@@ -83,7 +83,7 @@ GLuint Shader::loadFromFile(const std::filesystem::path& filepath, GLenum shader
             {
                 char info_log[1024]{};
                 glGetShaderInfoLog(shader, sizeof(info_log), nullptr, info_log);
-                printf("Error: shader compilation error\n%s\n ------------------------------------------------------- \n", info_log);
+                printf("Shader compilation status: error\n%s\n ------------------------------------------------------- \n", info_log);
             }
             else
             {

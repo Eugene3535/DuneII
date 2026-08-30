@@ -4,7 +4,7 @@
 
 #include "graphics/transform/Transform2D.hpp"
 #include "graphics/sprites/SpriteManager.hpp"
-#include "scenes/mission/HUD/previews/EntityPreview.hpp"
+#include "scenes/mission/ui/previews/EntityPreview.hpp"
 
 
 class HeadUpDisplay final

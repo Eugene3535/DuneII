@@ -21,21 +21,11 @@ private:
     uint32_t m_vertexBufferObject;
     uint32_t m_vertexArrayObjects[2];
 
-    struct
-    {
-        uint32_t    vertexArrayObject;
-        Sprite2D    sprite;
-        uint32_t    program;
-        Transform2D transform;
-    } m_background;
-    
-    struct
-    {
-        uint32_t    vertexArrayObject;
-        uint32_t    program;
-        uint32_t    count;
-        Transform2D transform;
-    } m_outline;
+    Background m_background;
+    Transform2D m_backgroundTransform;
+
+    Outline m_outline;
+    Transform2D m_outlineTransform;
 
     HouseType m_selectedHouse;
     float m_timer;

@@ -71,8 +71,8 @@ bool Level::loadFromTileMap(const TileMap& loader) noexcept
 	m_tileMask = loader.getTileMask();
 	m_structureMask.resize(m_mapSize.x * m_mapSize.y, entt::null);
 
-	glGetTextureLevelParameteriv(m_buildings.texture, 0, GL_TEXTURE_WIDTH, &m_textureSize.x);
-	glGetTextureLevelParameteriv(m_buildings.texture, 0, GL_TEXTURE_HEIGHT, &m_textureSize.y);
+	glGetTextureLevelParameteriv(m_structures.texture, 0, GL_TEXTURE_WIDTH, &m_textureSize.x);
+	glGetTextureLevelParameteriv(m_structures.texture, 0, GL_TEXTURE_HEIGHT, &m_textureSize.y);
 
 	auto objects = loader.getObjects();
 
@@ -310,12 +310,12 @@ void Level::draw(const mat4s& projection) const noexcept
 	glUseProgram(m_landscape.program);
 	glBindTextureUnit(0, m_landscape.texture);
 	glBindVertexArray(m_landscape.vertexArrayObject);
-	glDrawElements(GL_TRIANGLES, m_landscape.count, GL_UNSIGNED_INT, nullptr);
+	glDrawElements(GL_TRIANGLES, m_landscape.indexCount, GL_UNSIGNED_INT, nullptr);
 	glBindTextureUnit(0, 0);
 
 //  Structures
-	glBindTextureUnit(0, m_buildings.texture);
-	glBindVertexArray(m_buildings.vertexArrayObject);
+	glBindTextureUnit(0, m_structures.texture);
+	glBindVertexArray(m_structures.vertexArrayObject);
 
 	auto view = m_game->registry.view<const StructureInfo>();
 
@@ -343,7 +343,7 @@ entt::entity Level::getEntityUnderCursor(const vec2s point) const noexcept
 bool Level::createGraphicsResources(std::span<const vec4s> vertices, std::span<const uint32_t> indices) noexcept
 {
 	memset(&m_landscape, 0, sizeof(m_landscape));
-    memset(&m_buildings, 0, sizeof(m_buildings));
+    memset(&m_structures, 0, sizeof(m_structures));
 
 	auto& glResources = m_game->glResources;
     auto textures = glResources.getHandles(GlResourceManager::GLTexture2D, 2);
@@ -378,16 +378,16 @@ bool Level::createGraphicsResources(std::span<const vec4s> vertices, std::span<c
 	glBindVertexArray(0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	m_landscape.count = indices.size();
+	m_landscape.indexCount = indices.size();
 
 //  Buildings
-	m_buildings.texture = textures[1];
-	m_buildings.vertexBufferObject = buffers[2];
-	m_buildings.vertexArrayObject = vertexArrays[1];
+	m_structures.texture = textures[1];
+	m_structures.vertexBufferObject = buffers[2];
+	m_structures.vertexArrayObject = vertexArrays[1];
 
 
 	glNamedBufferStorage(
-		m_buildings.vertexBufferObject,
+		m_structures.vertexBufferObject,
 		STRUCTURE_LIMIT_ON_MAP * sizeof(vec4s) * 4,
 		nullptr,
 		GL_DYNAMIC_STORAGE_BIT |
@@ -396,8 +396,8 @@ bool Level::createGraphicsResources(std::span<const vec4s> vertices, std::span<c
 		GL_MAP_COHERENT_BIT
 	);
 
-	m_buildings.mappedStorage = glMapNamedBufferRange(
-		m_buildings.vertexBufferObject,
+	m_structures.mappedStorage = glMapNamedBufferRange(
+		m_structures.vertexBufferObject,
 		0,
 		STRUCTURE_LIMIT_ON_MAP * sizeof(vec4s) * 4,
 		GL_MAP_WRITE_BIT |
@@ -406,9 +406,9 @@ bool Level::createGraphicsResources(std::span<const vec4s> vertices, std::span<c
 		GL_MAP_UNSYNCHRONIZED_BIT
 	);
 
-	layout.createVertexInputState(m_buildings.vertexArrayObject, m_buildings.vertexBufferObject);
+	layout.createVertexInputState(m_structures.vertexArrayObject, m_structures.vertexBufferObject);
 
-	Texture2D buildingTexture(m_buildings.texture);
+	Texture2D buildingTexture(m_structures.texture);
 
 	if (!buildingTexture.loadFromFile(FileProvider::findPathToFile(STRUCTURES_PNG)))
 		return false;
@@ -420,14 +420,14 @@ bool Level::createGraphicsResources(std::span<const vec4s> vertices, std::span<c
 void Level::cleanupGraphicsResources() noexcept
 {	
 	GLint mapped;
-	glGetNamedBufferParameteriv(m_buildings.vertexBufferObject, GL_BUFFER_MAPPED, &mapped);
+	glGetNamedBufferParameteriv(m_structures.vertexBufferObject, GL_BUFFER_MAPPED, &mapped);
 
 	if (mapped == GL_TRUE)
-		glUnmapNamedBuffer(m_buildings.vertexBufferObject);
+		glUnmapNamedBuffer(m_structures.vertexBufferObject);
 
-	std::array<uint32_t, 2> vertexArrays = { m_landscape.vertexArrayObject, m_buildings.vertexArrayObject };
-    std::array<uint32_t, 3> buffers      = { m_landscape.vertexBufferObject, m_landscape.indexBufferObject, m_buildings.vertexBufferObject  };
-	std::array<uint32_t, 2> textures     = { m_landscape.texture, m_buildings.texture };
+	std::array<uint32_t, 2> vertexArrays = { m_landscape.vertexArrayObject, m_structures.vertexArrayObject };
+    std::array<uint32_t, 3> buffers      = { m_landscape.vertexBufferObject, m_landscape.indexBufferObject, m_structures.vertexBufferObject  };
+	std::array<uint32_t, 2> textures     = { m_landscape.texture, m_structures.texture };
 
     auto& glResources = m_game->glResources;
     glResources.destroyHandles(GlResourceManager::GLVertexArray, vertexArrays);
@@ -440,7 +440,7 @@ void Level::createGraphicsForEntity(const entt::entity entity) noexcept
 {
 	auto& registry = m_game->registry;
 
-	if (m_buildings.mappedStorage)
+	if (m_structures.mappedStorage)
 	{
 		const uint32_t index = registry.storage<StructureInfo>().size() - 1;
 
@@ -459,7 +459,7 @@ void Level::createGraphicsForEntity(const entt::entity entity) noexcept
 			static_cast<float>(bounds.x), static_cast<float>(bounds.w), texCoords.x, texCoords.w
 		};
 
-		float* bytes = static_cast<float*>(m_buildings.mappedStorage);
+		float* bytes = static_cast<float*>(m_structures.mappedStorage);
 		bytes += index * std::size(vertices);
 		memcpy(bytes, vertices, sizeof(vertices));
 	}
@@ -486,11 +486,11 @@ void Level::updateWall(int32_t origin, int32_t level) noexcept
 		const auto texCoords = get_texcoords_of_custom_wall(compute_wall_type(a, b, c, d), m_textureSize);
 		const auto entity = m_structureMask[static_cast<size_t>(origin)];
 
-		if(m_buildings.mappedStorage)
+		if(m_structures.mappedStorage)
 		{
 			const auto& building = m_game->registry.get<StructureInfo>(entity);
 
-			float* bytes = static_cast<float*>(m_buildings.mappedStorage);
+			float* bytes = static_cast<float*>(m_structures.mappedStorage);
 			bytes += building.stride * 16; // TODO: fix magic num
 
 			bytes[2] = texCoords.x;

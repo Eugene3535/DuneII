@@ -9,15 +9,7 @@
 
 #include <cglm/struct/ivec4.h>
 
-
-struct Sprite2D
-{
-	uint32_t texture;
-	uint32_t frame;
-	uint32_t width;
-	uint32_t height;
-};
-
+#include "graphics/geometry/GraphicsData.hpp"
 
 class SpriteManager final
 {

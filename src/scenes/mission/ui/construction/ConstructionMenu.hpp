@@ -3,7 +3,7 @@
 #include <vector>
 #include <span>
 
-#include "common/Enums.hpp"
+
 #include "graphics/sprites/SpriteManager.hpp"
 #include "graphics/transform/Transform2D.hpp"
 
@@ -47,57 +47,9 @@ private:
     struct Game* m_game;
     Transform2D  m_transform;
 
-    struct Widget
-    {
-        uint32_t background;
-        uint32_t outline;
-    };
-
-    struct
-    {
-        uint32_t vertexBufferObject;
-        uint32_t vertexArrayObject;
-        uint32_t program;
-        int32_t  uniformColor;
-
-        Widget rootWidget;
-        Widget entityWidget;
-        Widget entityWidgetLabel;
-        Widget entityWidgetParams[3];
-    } m_frames;
-
-    struct
-    {
-        uint32_t program;
-        uint32_t texture;
-        uint32_t vertexBufferObject;
-        uint32_t vertexArrayObject;
-        uint32_t cellCount;
-        uint32_t cellWidth;
-        uint32_t cellHeight;
-    } m_previewCells;
-
-    struct 
-    {        
-        uint32_t program;
-        uint32_t textures[3];
-        uint32_t vertexBufferObject;
-        uint32_t vertexArrayObject;
-        Sprite2D buttonExit;
-        Sprite2D buttonRepair;
-        Sprite2D buttonStop;
-        EntityIcon lastSelectedPreview;
-        
-        struct
-        {
-            uint32_t vertexArrayObject;
-            uint32_t program;
-            uint32_t count;
-            int32_t row;
-            int32_t column;
-        } selectionFrame;
-
-    } m_userElements;
+    ConstructionMenuFrames       m_frames;
+    ConstructionMenuPreviewCells m_previewCells;
+    ConstructionMenuElements     m_menuElements;
     
     std::vector<vec2s> m_textureGrid;
     std::vector<EntityIcon> m_previews;

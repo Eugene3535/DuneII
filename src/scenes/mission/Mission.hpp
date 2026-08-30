@@ -2,8 +2,8 @@
 
 #include "files/TileMap.hpp"
 #include "scenes/mission/level/Level.hpp"
-#include "scenes/mission/HUD/HeadUpDisplay.hpp"
-#include "scenes/mission/HUD/construction/ConstructionMenu.hpp"
+#include "scenes/mission/ui/HeadUpDisplay.hpp"
+#include "scenes/mission/ui/construction/ConstructionMenu.hpp"
 #include "scenes/Scene.hpp"
 
 

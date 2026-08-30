@@ -7,6 +7,7 @@
 #include <entt/entity/fwd.hpp>
 
 #include "graphics/transform/Transform2D.hpp"
+#include "graphics/geometry/GraphicsData.hpp"
 #include "scenes/mission/info/StructureInfo.hpp"
 
 
@@ -36,23 +37,8 @@ private:
     std::string               m_tileMask;
     std::vector<entt::entity> m_structureMask;
 
-    struct
-	{
-		uint32_t texture;
-		uint32_t vertexArrayObject;
-		uint32_t vertexBufferObject;
-        uint32_t indexBufferObject;
-		uint32_t count; // indices
-		uint32_t program;
-	} m_landscape;
-
-    struct
-	{
-        uint32_t texture;
-        uint32_t vertexBufferObject;
-        uint32_t vertexArrayObject;
-        void*    mappedStorage;
-	} m_buildings;
+    Landscape m_landscape;
+    StructureStorage m_structures;
 
     ivec2s m_textureSize;
     ivec2s m_mapSize;

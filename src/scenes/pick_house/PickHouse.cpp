@@ -249,7 +249,7 @@ void PickHouse::update(float dt) noexcept
             break;
     }
 
-    m_outline.transform.setPosition(outlinePositionX, OUTLINE_POSITION_Y * dy);
+    m_outlineTransform.setPosition(outlinePositionX, OUTLINE_POSITION_Y * dy);
     m_outlineNeedUpdate = false;
 }
 
@@ -266,7 +266,7 @@ void PickHouse::draw(const mat4s& projection) noexcept
     auto view = m_game->windowData.view;
 
 //  Draw background
-    modelView = m_background.transform.getMatrix();
+    modelView = m_backgroundTransform.getMatrix();
     result = glms_mul(MVP, modelView);
     view->updateUniformBuffer(result);
 
@@ -277,7 +277,7 @@ void PickHouse::draw(const mat4s& projection) noexcept
     glBindTextureUnit(0, 0);
 
 //  Draw outline
-    modelView = m_outline.transform.getMatrix();
+    modelView = m_outlineTransform.getMatrix();
     result = glms_mul(MVP, modelView);
     view->updateUniformBuffer(result);
 
@@ -291,7 +291,7 @@ void PickHouse::draw(const mat4s& projection) noexcept
 void PickHouse::resize(int width, int height) noexcept
 {
     vec2s size = { static_cast<float>(width), static_cast<float>(height) };
-    setSpriteSizeInPixels(m_background.sprite, size, m_background.transform);
+    setSpriteSizeInPixels(m_background.sprite, size, m_backgroundTransform);
 
     float dx = size.x / m_background.sprite.width;
     float dy = size.y / m_background.sprite.height;
@@ -315,6 +315,6 @@ void PickHouse::resize(int width, int height) noexcept
             break;
     }
 
-    m_outline.transform.setPosition(outlinePositionX, OUTLINE_POSITION_Y * dy);
-    m_outline.transform.setScale(dx, dy);
+    m_outlineTransform.setPosition(outlinePositionX, OUTLINE_POSITION_Y * dy);
+    m_outlineTransform.setScale(dx, dy);
 }

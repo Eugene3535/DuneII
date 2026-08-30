@@ -12,7 +12,7 @@
 #include "app/window/WindowData.hpp"
 #include "app/game/Game.hpp"
 #include "scenes/mission/level/Level.hpp"
-#include "scenes/mission/HUD/construction/ConstructionMenu.hpp"
+#include "scenes/mission/ui/construction/ConstructionMenu.hpp"
 
 
 #define PREVIEW_ICON_COLUMNS 3
@@ -46,24 +46,24 @@ ConstructionMenu::~ConstructionMenu()
 {
     std::array<uint32_t, 4> vertexArrays = 
     { 
-        m_userElements.vertexArrayObject,
-        m_userElements.selectionFrame.vertexArrayObject,
+        m_menuElements.vertexArrayObject,
+        m_menuElements.selectionFrame.vertexArrayObject,
         m_previewCells.vertexArrayObject,
         m_frames.vertexArrayObject
     };
 
     std::array<uint32_t, 3> buffers = 
     { 
-        m_userElements.vertexBufferObject,
+        m_menuElements.vertexBufferObject,
         m_previewCells.vertexBufferObject,
         m_frames.vertexBufferObject
     };
 
     std::array<uint32_t, 3> textures = 
     { 
-        m_userElements.textures[0],
-        m_userElements.textures[1],
-        m_userElements.textures[2],
+        m_menuElements.textures[0],
+        m_menuElements.textures[1],
+        m_menuElements.textures[2],
     };
 
     auto& glResources = m_game->glResources;
@@ -77,7 +77,7 @@ void ConstructionMenu::init(uint32_t texture) noexcept
 {
     memset(&m_frames, 0, sizeof(m_frames));
     memset(&m_previewCells, 0, sizeof(m_previewCells));
-    memset(&m_userElements, 0, sizeof(m_userElements));
+    memset(&m_menuElements, 0, sizeof(m_menuElements));
 
     m_frames.program = m_game->glResources.getProgram("color_outline");
     m_previewCells.program = m_game->glResources.getProgram("sprite");
@@ -125,7 +125,7 @@ void ConstructionMenu::showEntityMenu(EntityIcon mainIcon, std::span<EntityIcon>
     {
         // Main preview
         setup_tex_coords(data, mainIcon, (previewCount << 2));
-        m_userElements.lastSelectedPreview = mainIcon;
+        m_menuElements.lastSelectedPreview = mainIcon;
 
         // Others previews (if exists)
         if(!menuIcons.empty())
@@ -159,36 +159,36 @@ void ConstructionMenu::showEntityMenu(EntityIcon mainIcon, std::span<EntityIcon>
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 //  Reset selection frame to start position
-    m_userElements.selectionFrame.row = 0;
-    m_userElements.selectionFrame.column = 0;
+    m_menuElements.selectionFrame.row = 0;
+    m_menuElements.selectionFrame.column = 0;
     updateSelection('A', true);
 }
 
 
 void ConstructionMenu::updateSelection(char keyCode, bool isForced) noexcept
 {
-    const int32_t oldRow = m_userElements.selectionFrame.row;
-    const int32_t oldColumn = m_userElements.selectionFrame.column;
+    const int32_t oldRow = m_menuElements.selectionFrame.row;
+    const int32_t oldColumn = m_menuElements.selectionFrame.column;
 
     switch (keyCode)
     {
-        case 'W': m_userElements.selectionFrame.row--;    break;
-        case 'A': m_userElements.selectionFrame.column--; break;
-        case 'S': m_userElements.selectionFrame.row++;    break;
-        case 'D': m_userElements.selectionFrame.column++; break;
+        case 'W': m_menuElements.selectionFrame.row--;    break;
+        case 'A': m_menuElements.selectionFrame.column--; break;
+        case 'S': m_menuElements.selectionFrame.row++;    break;
+        case 'D': m_menuElements.selectionFrame.column++; break;
 
         default:
             break;
     }
 
     bool needUpdateOutline = // We check that the position of the frame has not changed, and that the frame is located within the grid.
-        ((oldRow + oldColumn) != (m_userElements.selectionFrame.row + m_userElements.selectionFrame.column)) &&
-        ((m_userElements.selectionFrame.row > -1) && (m_userElements.selectionFrame.row <= PREVIEW_ICON_ROWS)) &&
-        ((m_userElements.selectionFrame.column > -1) && (m_userElements.selectionFrame.column < PREVIEW_ICON_COLUMNS));
+        ((oldRow + oldColumn) != (m_menuElements.selectionFrame.row + m_menuElements.selectionFrame.column)) &&
+        ((m_menuElements.selectionFrame.row > -1) && (m_menuElements.selectionFrame.row <= PREVIEW_ICON_ROWS)) &&
+        ((m_menuElements.selectionFrame.column > -1) && (m_menuElements.selectionFrame.column < PREVIEW_ICON_COLUMNS));
 
 //  Returning to the grid limits
-    m_userElements.selectionFrame.row    = std::clamp(m_userElements.selectionFrame.row,    0, PREVIEW_ICON_ROWS);
-    m_userElements.selectionFrame.column = std::clamp(m_userElements.selectionFrame.column, 0, PREVIEW_ICON_COLUMNS - 1);
+    m_menuElements.selectionFrame.row    = std::clamp(m_menuElements.selectionFrame.row,    0, PREVIEW_ICON_ROWS);
+    m_menuElements.selectionFrame.column = std::clamp(m_menuElements.selectionFrame.column, 0, PREVIEW_ICON_COLUMNS - 1);
 
     if ( (!needUpdateOutline) && (!isForced) )
         return;
@@ -221,8 +221,8 @@ void ConstructionMenu::updateSelection(char keyCode, bool isForced) noexcept
 
     auto switch_preview_outline = [this](void* data) -> void
     {
-        const int32_t column = m_userElements.selectionFrame.column;
-        const int32_t row = m_userElements.selectionFrame.row - 1;
+        const int32_t column = m_menuElements.selectionFrame.column;
+        const int32_t row = m_menuElements.selectionFrame.row - 1;
 
         constexpr vec2s startPos = { 50.f, 100.f  };
         constexpr vec2s cellSize = { 150.f, 100.f };
@@ -283,17 +283,17 @@ void ConstructionMenu::updateSelection(char keyCode, bool isForced) noexcept
     };
 
 //  Update outline
-    glBindBuffer(GL_ARRAY_BUFFER, m_userElements.vertexBufferObject);
+    glBindBuffer(GL_ARRAY_BUFFER, m_menuElements.vertexBufferObject);
 
     if(void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
     {
-        if (m_userElements.selectionFrame.row)
+        if (m_menuElements.selectionFrame.row)
         {
             switch_preview_outline(data);
         }
         else
         {
-            switch_button_outline(data, m_userElements.selectionFrame.column);
+            switch_button_outline(data, m_menuElements.selectionFrame.column);
         }
 
         glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -304,13 +304,13 @@ void ConstructionMenu::updateSelection(char keyCode, bool isForced) noexcept
 
     if(void* data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY))
     {
-        if (m_userElements.selectionFrame.row)
+        if (m_menuElements.selectionFrame.row)
         {    
             const auto selectedPreview = getSelectedPreview();
 
             if (selectedPreview == EntityIcon::Empty_Cell)
             {
-                setup_main_icon(data, m_userElements.lastSelectedPreview);
+                setup_main_icon(data, m_menuElements.lastSelectedPreview);
             }
             else if (selectedPreview != EntityIcon::INVALID)
             {
@@ -319,7 +319,7 @@ void ConstructionMenu::updateSelection(char keyCode, bool isForced) noexcept
         }
         else
         {
-            setup_main_icon(data, m_userElements.lastSelectedPreview);
+            setup_main_icon(data, m_menuElements.lastSelectedPreview);
         }
 
         glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -367,8 +367,8 @@ EntityIcon ConstructionMenu::getSelectedPreview() const noexcept
 {
     if (m_isShown)
     {
-        const int32_t row = m_userElements.selectionFrame.row;
-        const int32_t column = m_userElements.selectionFrame.column;
+        const int32_t row = m_menuElements.selectionFrame.row;
+        const int32_t column = m_menuElements.selectionFrame.column;
 
         if (row)
         {
@@ -385,8 +385,8 @@ EntityIcon ConstructionMenu::getSelectedPreview() const noexcept
 
 ConstructionMenu::ButtonType ConstructionMenu::getSelectedButton() const noexcept
 {
-    const int32_t row = m_userElements.selectionFrame.row;
-    const int32_t column = m_userElements.selectionFrame.column;
+    const int32_t row = m_menuElements.selectionFrame.row;
+    const int32_t column = m_menuElements.selectionFrame.column;
     
     if(row == 0) // first line
         return static_cast<ButtonType>(column);
@@ -556,15 +556,15 @@ void ConstructionMenu::createUserElements() noexcept
 {
     auto& glResources   = m_game->glResources;
     auto textureHandles = glResources.getHandles(GlResourceManager::GLTexture2D, 3);
-    m_userElements.textures[0] = textureHandles[0];
-    m_userElements.textures[1] = textureHandles[1];
-    m_userElements.textures[2] = textureHandles[2];
+    m_menuElements.textures[0] = textureHandles[0];
+    m_menuElements.textures[1] = textureHandles[1];
+    m_menuElements.textures[2] = textureHandles[2];
 
     uint32_t currentTexture = 0;
 
     for (const auto textureName : { BUTTON_EXIT_RU_PNG, BUTTON_REPAIR_RU_PNG, BUTTON_STOP_RU_PNG })
     {
-        Texture2D texture(m_userElements.textures[currentTexture++]);
+        Texture2D texture(m_menuElements.textures[currentTexture++]);
 
         if(!texture.loadFromFile(FileProvider::findPathToFile(textureName)))
             return;
@@ -577,8 +577,8 @@ void ConstructionMenu::createUserElements() noexcept
     for (size_t i = 0; i < 3; ++i)
     {
         GLint width, height;
-        glGetTextureLevelParameteriv(m_userElements.textures[i], 0, GL_TEXTURE_WIDTH, &width);
-        glGetTextureLevelParameteriv(m_userElements.textures[i], 0, GL_TEXTURE_HEIGHT, &height);
+        glGetTextureLevelParameteriv(m_menuElements.textures[i], 0, GL_TEXTURE_WIDTH, &width);
+        glGetTextureLevelParameteriv(m_menuElements.textures[i], 0, GL_TEXTURE_HEIGHT, &height);
 
         std::array<float, 16> quad;
 
@@ -617,11 +617,11 @@ void ConstructionMenu::createUserElements() noexcept
         quad[15] = bottom;
 
 //  Assign sprite
-        Sprite2D* button = &m_userElements.buttonExit;
-        if(i == 1) button = &m_userElements.buttonRepair;
-        if(i == 2) button = &m_userElements.buttonStop;
+        Sprite2D* button = &m_menuElements.buttonExit;
+        if(i == 1) button = &m_menuElements.buttonRepair;
+        if(i == 2) button = &m_menuElements.buttonStop;
 
-        button->texture = m_userElements.textures[i];
+        button->texture = m_menuElements.textures[i];
         button->frame   = (i << 2);
         button->width   = width;
         button->height  = height;
@@ -647,32 +647,32 @@ void ConstructionMenu::createUserElements() noexcept
         }, thickness);
 
         vertices.insert(vertices.end(), outlineVertices.begin(), outlineVertices.end());
-        m_userElements.selectionFrame.count = (outlineVertices.size() >> 1);
+        m_menuElements.selectionFrame.count = (outlineVertices.size() >> 1);
     }
 
 //  Unload to GPU
     auto bufferHandles      = glResources.getHandles(GlResourceManager::GLBuffer, 1);
     auto vertexArrayHandles = glResources.getHandles(GlResourceManager::GLVertexArray, 2);
 
-    m_userElements.vertexBufferObject = bufferHandles[0];
-    glNamedBufferData(m_userElements.vertexBufferObject, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
+    m_menuElements.vertexBufferObject = bufferHandles[0];
+    glNamedBufferData(m_menuElements.vertexBufferObject, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
 
     {// Vertex array object for buttons
-        m_userElements.vertexArrayObject = vertexArrayHandles[0];
+        m_menuElements.vertexArrayObject = vertexArrayHandles[0];
         const std::array<VertexBufferLayout::Attribute, 1> attributes = { VertexBufferLayout::Attribute::Float4 };
         VertexBufferLayout layout(attributes);
-        layout.createVertexInputState(m_userElements.vertexArrayObject, m_userElements.vertexBufferObject);
+        layout.createVertexInputState(m_menuElements.vertexArrayObject, m_menuElements.vertexBufferObject);
     }
 
     {// Vertex array object for selection frame
-        m_userElements.selectionFrame.vertexArrayObject = vertexArrayHandles[1];
+        m_menuElements.selectionFrame.vertexArrayObject = vertexArrayHandles[1];
         const std::array<VertexBufferLayout::Attribute, 1> attributes = { VertexBufferLayout::Attribute::Float2 };
         VertexBufferLayout layout(attributes);
-        layout.createVertexInputState(m_userElements.selectionFrame.vertexArrayObject, m_userElements.vertexBufferObject);
+        layout.createVertexInputState(m_menuElements.selectionFrame.vertexArrayObject, m_menuElements.vertexBufferObject);
     }
 
-    m_userElements.program = m_previewCells.program;
-    m_userElements.selectionFrame.program = m_frames.program;
+    m_menuElements.program = m_previewCells.program;
+    m_menuElements.selectionFrame.program = m_frames.program;
 }
 
 
@@ -728,24 +728,24 @@ void ConstructionMenu::drawPreviews() const noexcept
 void ConstructionMenu::drawUserElements() const noexcept
 {
 //  Draw buttons
-    glBindVertexArray(m_userElements.vertexArrayObject);
+    glBindVertexArray(m_menuElements.vertexArrayObject);
 
-    glBindTextureUnit(0, m_userElements.buttonExit.texture);
-    glDrawArrays(GL_TRIANGLE_FAN, m_userElements.buttonExit.frame, 4);
+    glBindTextureUnit(0, m_menuElements.buttonExit.texture);
+    glDrawArrays(GL_TRIANGLE_FAN, m_menuElements.buttonExit.frame, 4);
 
-    glBindTextureUnit(0, m_userElements.buttonRepair.texture);
-    glDrawArrays(GL_TRIANGLE_FAN, m_userElements.buttonRepair.frame, 4);
+    glBindTextureUnit(0, m_menuElements.buttonRepair.texture);
+    glDrawArrays(GL_TRIANGLE_FAN, m_menuElements.buttonRepair.frame, 4);
 
-    glBindTextureUnit(0, m_userElements.buttonStop.texture);
-    glDrawArrays(GL_TRIANGLE_FAN, m_userElements.buttonStop.frame, 4);
+    glBindTextureUnit(0, m_menuElements.buttonStop.texture);
+    glDrawArrays(GL_TRIANGLE_FAN, m_menuElements.buttonStop.frame, 4);
 
     glBindTextureUnit(0, 0);
 
 //  Draw selection frame
-    glUseProgram(m_userElements.selectionFrame.program);
+    glUseProgram(m_menuElements.selectionFrame.program);
     glUniform4fv(m_frames.uniformColor, 1, selection_frame_color);
 
-    glBindVertexArray(m_userElements.selectionFrame.vertexArrayObject);
-    glDrawArrays(GL_TRIANGLE_STRIP, 24, m_userElements.selectionFrame.count); // Recalculating the offset: 2 float per vertex in outline VAO !!!
+    glBindVertexArray(m_menuElements.selectionFrame.vertexArrayObject);
+    glDrawArrays(GL_TRIANGLE_STRIP, 24, m_menuElements.selectionFrame.count); // Recalculating the offset: 2 float per vertex in outline VAO !!!
     glBindVertexArray(0);
 }

@@ -5,7 +5,7 @@
 #include "graphics/texture/Texture2D.hpp"
 #include "graphics/vao/VertexBufferLayout.hpp"
 #include "app/game/Game.hpp"
-#include "scenes/mission/HUD/previews/EntityPreview.hpp"
+#include "scenes/mission/ui/previews/EntityPreview.hpp"
 
 
 EntityPreview::EntityPreview(Game* game) noexcept:

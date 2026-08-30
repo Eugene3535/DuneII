@@ -8,8 +8,9 @@
 #include "scenes/mission/level/Level.hpp"
 #include "app/window/WindowData.hpp"
 #include "app/game/Game.hpp"
-#include "scenes/mission/HUD/construction/ConstructionMenu.hpp"
-#include "scenes/mission/HUD/HeadUpDisplay.hpp"
+#include "scenes/mission/ui/construction/ConstructionMenu.hpp"
+#include "scenes/mission/ui/HeadUpDisplay.hpp"
+
 
 // The flicker period of the selection frame
 #define BLINK_PERIOD 0.125f
