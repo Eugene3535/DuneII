@@ -53,10 +53,6 @@ void Mission::update(float dt) noexcept
 {
     const auto frame = m_game->frameCounter;
 
-    for(auto& system : m_systems)
-        if ( system.isEnabled && ((frame % system.frequency) == 0) )
-            system.execute(this, dt);
-
     if (!m_menu.isShown()) [[likely]]
         m_hud.update(dt, m_game->windowData.cursor);
 }
@@ -83,11 +79,12 @@ void Mission::resize(int width, int height) noexcept
 void Mission::createSystems() noexcept
 {
 //  Map navigation
-    auto& mapNavigation = m_systems.emplace_back();
-    mapNavigation.execute = [](Mission* mission, float dt) -> void
+    auto mapNavigation = [](void* ptr, float dt) -> uint32_t
     {
+        Mission* mission = static_cast<Mission*>(ptr);
+
         if (mission->m_menu.isShown())
-            return;
+            return 0;
 
         const auto game     = mission->m_game;
         const auto cursor   = game->windowData.cursor;
@@ -120,13 +117,15 @@ void Mission::createSystems() noexcept
         if (scenePosition.y < (viewSize.y - mapSize.y)) scenePosition.y = viewSize.y - mapSize.y;
 
         mission->m_level.setPosition(scenePosition);
+
+        return 0;
     };
 
 //  HUD
-    auto& hudController = m_systems.emplace_back();
-    hudController.frequency = 1;
-    hudController.execute = [](Mission* mission, float dt) -> void
+    auto hudController = [](void* ptr, float dt) -> uint32_t
     {
+        Mission* mission = static_cast<Mission*>(ptr);
+
         const int button = mission->m_game->windowData.mouse.button;
         const int action = mission->m_game->windowData.mouse.action;
         const bool isPressed = (action != GLFW_RELEASE);
@@ -139,21 +138,26 @@ void Mission::createSystems() noexcept
 
         if (isMouseButtonRightPressed)
             mission->m_hud.cancelSelection();
+
+        return 0;
     };
 
 
 //  Construction menu
-    auto& constructionMenu = m_systems.emplace_back();
-    constructionMenu.frequency = 12;
-    constructionMenu.execute = [](Mission* mission, float dt) -> void
+    auto constructionMenu = [](void* ptr, float dt) -> uint32_t
     {   
+        Mission* mission = static_cast<Mission*>(ptr);
+
         auto& menu = mission->m_menu;
         auto game = mission->m_game;
+
+        static float delay;
+        delay += dt;
 
         const auto& data     = mission->m_game->windowData;
         const int key        = data.keyboard.key;
         const int action     = data.keyboard.action;
-        const bool isPressed = (action != GLFW_RELEASE);
+        const bool isPressed = ( (action != GLFW_RELEASE) && (delay > 0.25f) );
 
         if ((key == GLFW_KEY_W) && isPressed)
         {
@@ -178,7 +182,7 @@ void Mission::createSystems() noexcept
             {
                 menu.hide();
 
-                return;
+                return 0;
             }
 
             const auto selectedPreview = menu.getSelectedPreview();
@@ -201,12 +205,17 @@ void Mission::createSystems() noexcept
                 menu.hide();
             }
         }
+
+        if (isPressed)
+            delay = 0;
+
+        return 0;
     };
 
 //  Under construction
-    auto& construction = m_systems.emplace_back();
-    construction.execute = [](Mission* mission, float dt) -> void
+    auto construction = [](void* ptr, float dt) -> uint32_t
     {
+        Mission* mission = static_cast<Mission*>(ptr);
         auto view = mission->m_game->registry.view<ConstructionInfo>();
 
         view.each([mission, dt](ConstructionInfo& component) 
@@ -219,7 +228,14 @@ void Mission::createSystems() noexcept
                     component.isUnderConstruction = false;
             }
         });
+
+        return 0;
     };
+
+    m_game->tasks.emplace_back(this, mapNavigation);
+    m_game->tasks.emplace_back(this, hudController);
+    m_game->tasks.emplace_back(this, constructionMenu);
+    m_game->tasks.emplace_back(this, construction);
 
     m_isLoaded = true;
 }

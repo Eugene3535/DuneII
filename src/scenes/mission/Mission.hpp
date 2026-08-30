@@ -22,14 +22,6 @@ public:
 private:
     void createSystems() noexcept;
 
-    struct System
-    {
-        void (*execute)(Mission*, float) = nullptr;
-        uint32_t frequency = 1;
-        bool isEnabled = true;
-    };
-    std::vector<System> m_systems;
-
     TileMap m_tilemap;
     Level   m_level;
 

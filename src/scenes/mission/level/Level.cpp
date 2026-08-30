@@ -248,7 +248,6 @@ bool Level::putStructure(const HouseType owner, const StructureInfo::Type type, 
 
 		if (!previews.empty())
 		{
-			//m_game->registry.emplace<std::vector<EntityIcon>>(entity, previews);
 			auto& constructionInfo = m_game->registry.emplace<ConstructionInfo>(entity);
 			constructionInfo.previewIcons.swap(previews);
 		}
