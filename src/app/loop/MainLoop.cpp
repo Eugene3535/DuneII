@@ -24,13 +24,16 @@ void MainLoop::operator()(Game& game) noexcept
 	Scene* scene { nullptr };
 	SceneManager sceneManager(&scene, &game.windowData);
 	game.sceneManager = &sceneManager;
+	{
+		std::unique_ptr<Scene> titleScreen = std::make_unique<TitleScreen>(&game);
 
-	std::unique_ptr<Scene> titleScreen = std::make_unique<TitleScreen>(&game);
+		if (!titleScreen->load({}))
+			return;
 
-    if (!titleScreen->load({}))
-        return;
+		sceneManager.push(titleScreen);
+	}
 
-    sceneManager.push(titleScreen);
+	auto& tasks = game.tasks;
 
     while (m_window.isOpen())
 	{
@@ -39,6 +42,19 @@ void MainLoop::operator()(Game& game) noexcept
 		const float currentFrame = m_window.getElapsedTime();
 		const float deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+
+		for (size_t i = 0; i < tasks.size(); ++i)
+		{
+			auto [data, func] = tasks[i];
+			auto result = func(data, deltaTime);
+
+			if (result)
+			{
+				game.taskManager.release(data, result);
+				std::swap(tasks[i], tasks.back());
+				tasks.pop_back();
+			}
+		}
 
 		scene->update(deltaTime);
 

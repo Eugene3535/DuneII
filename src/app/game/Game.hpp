@@ -1,6 +1,11 @@
 #pragma once
 
+#include <utility>
+
 #include "common/info/GameInfo.hpp"
+#include "common/tasks/TaskManager.hpp"
+#include "common/tasks/TaskData.hpp"
+#include "common/tasks/Task.hpp"
 #include "graphics/resources/GlResourceManager.hpp"
 #include "app/window/WindowData.hpp"
 #include "scenes/Scene.hpp"
@@ -21,4 +26,7 @@ struct Game final
     SceneManager* sceneManager;
 
     uint32_t frameCounter = 0;
+
+    TaskManager taskManager;
+    std::vector<std::pair<void*, uint32_t(*)(void*, float)>> tasks;
 };

@@ -1,12 +1,12 @@
-#include "common/action/ActionData.hpp"
-#include "common/action/Action.hpp"
+#include "common/tasks/TaskData.hpp"
+#include "common/tasks/Task.hpp"
 
 
-BEGIN_NAMESPACE_ACTION
+BEGIN_NAMESPACE_TASK
 
-size_t construct(void* actionData, float deltaTime) noexcept
+uint32_t construct(void* taskData, float deltaTime) noexcept
 {
-    auto* data = static_cast<Construction*>(actionData);
+    auto* data = static_cast<Construction*>(taskData);
 
     data->countdown -= data->duration * deltaTime;
     (*data->progress) = data->countdown;

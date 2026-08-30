@@ -4,7 +4,7 @@
 
 #include "common/Defines.hpp"
 
-BEGIN_NAMESPACE_ACTION
+BEGIN_NAMESPACE_TASK
     
 struct Construction
 {
