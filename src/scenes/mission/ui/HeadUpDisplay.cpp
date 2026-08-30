@@ -162,7 +162,7 @@ void HeadUpDisplay::draw(const mat4s& projection) const noexcept
         {
             if (component->isUnderConstruction)
             {
-                m_previewIcons.draw(component->icon, component->progress);
+                m_previewIcons.draw(component->mainIcon, component->progress);
             }
         }
     }
@@ -241,22 +241,11 @@ void HeadUpDisplay::runSelection() noexcept
 
                 if (mainPreviewIcon != EntityIcon::Empty_Cell)
                 {
-                    const bool hasConstructionPreviews = ((info->type == StructureInfo::Type::Vehicle)          ||
-                                                            (info->type == StructureInfo::Type::HighTech)         ||
-                                                            (info->type == StructureInfo::Type::ConstructionYard) ||
-                                                            (info->type == StructureInfo::Type::Barracks)         ||
-                                                            (info->type == StructureInfo::Type::Starport));
-
                     std::span<EntityIcon> previews;
 
-                    if (hasConstructionPreviews)
-                    {
-                        std::vector<EntityIcon>* previewArray = registry.try_get<std::vector<EntityIcon>>(entity);
-
-                        if(previewArray)
-                            previews = std::span(*previewArray);
-                    }
-
+                    if (auto* construction = registry.try_get<ConstructionInfo>(entity))
+                        previews = std::span<EntityIcon>(construction->previewIcons);
+                    
                     m_menu.showEntityMenu(mainPreviewIcon, previews);
                 }
             }
@@ -281,8 +270,9 @@ void HeadUpDisplay::runSelection() noexcept
             if (entityIcon != EntityIcon::Empty_Cell)
                 m_previewIcons.setPreviewIcon(entityIcon);
 
-            if (component->construction && component->construction->isUnderConstruction)
-                m_previewIcons.setConstructionIcon(component->construction->icon);
+            if (auto* construction = registry.try_get<ConstructionInfo>(entity))
+                if (construction->isUnderConstruction)
+                    m_previewIcons.setConstructionIcon(construction->mainIcon);
             
             const auto bounds = registry.get<ivec4s>(entity);
             glBindBuffer(GL_ARRAY_BUFFER, m_selectionFrame.vertexBufferObject);

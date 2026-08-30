@@ -191,7 +191,7 @@ void Mission::createSystems() noexcept
                 auto component = mission->m_game->registry.try_get<ConstructionInfo>(entity);
                 assert(component);
 
-                component->icon = selectedPreview;
+                component->mainIcon = selectedPreview;
                 component->duration = 10; // 10 seconds for example
                 component->progress = 100;
                 component->isUnderConstruction = true;

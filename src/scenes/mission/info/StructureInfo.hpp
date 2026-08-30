@@ -9,7 +9,8 @@
 
 struct ConstructionInfo
 {
-    EntityIcon icon;
+    EntityIcon mainIcon;
+    std::vector<EntityIcon> previewIcons;
     float duration;
     float progress;
     bool isUnderConstruction;
@@ -47,6 +48,4 @@ struct StructureInfo
     int32_t cost;
     int32_t armor;
     int32_t maxArmor;
-
-    ConstructionInfo* construction { nullptr };
 };

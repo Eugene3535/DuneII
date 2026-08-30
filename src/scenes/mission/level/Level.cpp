@@ -247,10 +247,11 @@ bool Level::putStructure(const HouseType owner, const StructureInfo::Type type, 
 		auto previews = GameInfo::getPreviewIconList(owner, type, 8);
 
 		if (!previews.empty())
-			m_game->registry.emplace<std::vector<EntityIcon>>(entity, previews);
-
-		auto& constructionInfo = m_game->registry.emplace<ConstructionInfo>(entity);
-		structure.construction = &constructionInfo;
+		{
+			//m_game->registry.emplace<std::vector<EntityIcon>>(entity, previews);
+			auto& constructionInfo = m_game->registry.emplace<ConstructionInfo>(entity);
+			constructionInfo.previewIcons.swap(previews);
+		}
 	}
 
 	auto setup_tiles_on_mask = [this, origin, entity](int32_t width, int32_t height, char symbol = 'B') -> void
