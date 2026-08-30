@@ -9,7 +9,6 @@
 
 struct ConstructionInfo
 {
-    //StructureInfo::Type type;
     EntityIcon icon;
     float duration;
     float progress;

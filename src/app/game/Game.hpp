@@ -6,8 +6,6 @@
 
 #include "common/info/GameInfo.hpp"
 #include "common/tasks/TaskManager.hpp"
-#include "common/tasks/TaskData.hpp"
-#include "common/tasks/Task.hpp"
 #include "graphics/resources/GlResourceManager.hpp"
 #include "app/window/WindowData.hpp"
 #include "scenes/Scene.hpp"
