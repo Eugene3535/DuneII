@@ -1,18 +1,19 @@
-#include "common/tasks/TaskManager.hpp"
+#include "common/tasks/TaskDataHolder.hpp"
 
-#define TASK_POOL_SIZE 1024
+#define TASK_DATA_POOL_SIZE 1024
 
-TaskManager::TaskManager() noexcept:
+
+TaskDataHolder::TaskDataHolder() noexcept:
     m_stride(0)
 {
-    m_memoryPool.resize(TASK_POOL_SIZE);
+    m_memoryPool.resize(TASK_DATA_POOL_SIZE);
 }
 
 
-TaskManager::~TaskManager() = default;
+TaskDataHolder::~TaskDataHolder() = default;
 
 
-void* TaskManager::allocate(uint32_t size) noexcept
+void* TaskDataHolder::allocate(uint32_t size) noexcept
 {
     auto& freeTaskData = m_freeTaskDataList[size];
 
@@ -36,8 +37,11 @@ void* TaskManager::allocate(uint32_t size) noexcept
 }
 
 
-void TaskManager::release(void* data, uint32_t size) noexcept
+void TaskDataHolder::release(void* data, uint32_t size) noexcept
 {
+    if (size < 2) // ignoring cases with 0 and 1
+        return;
+
     auto& freeTaskData = m_freeTaskDataList[size];
     freeTaskData.push_back(data);
 }

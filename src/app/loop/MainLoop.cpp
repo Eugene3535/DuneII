@@ -50,7 +50,7 @@ void MainLoop::operator()(Game& game) noexcept
 
 			if (result)
 			{
-				game.taskManager.release(data, result);
+				game.taskData.release(data, result);
 				std::swap(tasks[i], tasks.back());
 				tasks.pop_back();
 			}

@@ -5,11 +5,11 @@
 #include <unordered_map>
 
 
-class TaskManager
+class TaskDataHolder
 {
 public:
-    TaskManager() noexcept;
-    ~TaskManager();
+    TaskDataHolder() noexcept;
+    ~TaskDataHolder();
 
     void* allocate(uint32_t size) noexcept;
     void release(void* taskData, uint32_t size) noexcept;

@@ -5,7 +5,7 @@
 #include <entt/entity/registry.hpp>
 
 #include "common/info/GameInfo.hpp"
-#include "common/tasks/TaskManager.hpp"
+#include "common/tasks/TaskDataHolder.hpp"
 #include "graphics/resources/GlResourceManager.hpp"
 #include "app/window/WindowData.hpp"
 #include "scenes/Scene.hpp"
@@ -29,6 +29,6 @@ struct Game final
 
     entt::registry registry;
 
-    TaskManager taskManager;
+    TaskDataHolder taskData;
     std::vector<std::pair<void*, uint32_t(*)(void*, float)>> tasks;
 };
