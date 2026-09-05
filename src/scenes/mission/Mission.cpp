@@ -146,10 +146,13 @@ void Mission::createSystems() noexcept
 //  Construction menu
     auto constructionMenu = [](void* ptr, float dt) -> uint32_t
     {   
-        Mission* mission = static_cast<Mission*>(ptr);
+        auto* mission = static_cast<Mission*>(ptr);
 
         auto& menu = mission->m_menu;
-        auto game = mission->m_game;
+        auto* game = mission->m_game;
+
+        if (!menu.isShown())
+            return 0;
 
         static float delay;
         delay += dt;
@@ -201,7 +204,6 @@ void Mission::createSystems() noexcept
                 component->isUnderConstruction = true;
 
                 mission->m_hud.forceUpdateConstructionIcon(selectedPreview);
-
                 menu.hide();
             }
         }
@@ -215,7 +217,7 @@ void Mission::createSystems() noexcept
 //  Under construction
     auto construction = [](void* ptr, float dt) -> uint32_t
     {
-        Mission* mission = static_cast<Mission*>(ptr);
+        auto* mission = static_cast<Mission*>(ptr);
         auto view = mission->m_game->registry.view<ConstructionInfo>();
 
         view.each([mission, dt](ConstructionInfo& component) 
