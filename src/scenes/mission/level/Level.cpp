@@ -309,7 +309,6 @@ void Level::draw(const mat4s& projection) const noexcept
 	glBindTextureUnit(0, m_landscape.texture);
 	glBindVertexArray(m_landscape.vertexArrayObject);
 	glDrawElements(GL_TRIANGLES, m_landscape.indexCount, GL_UNSIGNED_INT, nullptr);
-	glBindTextureUnit(0, 0);
 
 //  Structures
 	glBindTextureUnit(0, m_structures.texture);
