@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <functional>
 
 #include <cglm/struct/vec2.h>
 
