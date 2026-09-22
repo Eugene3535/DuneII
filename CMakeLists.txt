@@ -28,9 +28,17 @@ endif()
 
 if(WIN32)
 	if(MSVC)
-		list(APPEND CMAKE_PREFIX_PATH "${EXTERNAL_SOURCE_DIR}/install/msvc")
+		list(APPEND CMAKE_PREFIX_PATH "${EXTERNAL_SOURCE_DIR}/install/msvc/glfw3")
+		list(APPEND CMAKE_PREFIX_PATH "${EXTERNAL_SOURCE_DIR}/install/msvc/glad")
+		list(APPEND CMAKE_PREFIX_PATH "${EXTERNAL_SOURCE_DIR}/install/msvc/cglm")
+		list(APPEND CMAKE_PREFIX_PATH "${EXTERNAL_SOURCE_DIR}/install/msvc/entt")
+		list(APPEND CMAKE_PREFIX_PATH "${EXTERNAL_SOURCE_DIR}/install/msvc/magic_enum")
 	elseif(MINGW)
-		list(APPEND CMAKE_PREFIX_PATH "${EXTERNAL_SOURCE_DIR}/install/mingw")
+		list(APPEND CMAKE_PREFIX_PATH "${EXTERNAL_SOURCE_DIR}/install/mingw/glfw3")
+		list(APPEND CMAKE_PREFIX_PATH "${EXTERNAL_SOURCE_DIR}/install/mingw/glad")
+		list(APPEND CMAKE_PREFIX_PATH "${EXTERNAL_SOURCE_DIR}/install/mingw/cglm")
+		list(APPEND CMAKE_PREFIX_PATH "${EXTERNAL_SOURCE_DIR}/install/mingw/entt")
+		list(APPEND CMAKE_PREFIX_PATH "${EXTERNAL_SOURCE_DIR}/install/mingw/magic_enum")
 	endif()
 endif()
 
@@ -96,21 +104,21 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 
 if(WIN32)
 	if(MSVC)
-		set(EXTERNAL_BIN_DIR "${EXTERNAL_SOURCE_DIR}/install/msvc/bin")
+		set(EXTERNAL_BIN_DIR "${EXTERNAL_SOURCE_DIR}/install/msvc")
 
 		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EXTERNAL_BIN_DIR}/cglm-0$<$<CONFIG:Debug>:d>.dll" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/cglm-0$<$<CONFIG:Debug>:d>.dll"
-			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EXTERNAL_BIN_DIR}/glad$<$<CONFIG:Debug>:d>.dll"   "$<TARGET_FILE_DIR:${PROJECT_NAME}>/glad$<$<CONFIG:Debug>:d>.dll"
-			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EXTERNAL_BIN_DIR}/glfw3$<$<CONFIG:Debug>:d>.dll"  "$<TARGET_FILE_DIR:${PROJECT_NAME}>/glfw3$<$<CONFIG:Debug>:d>.dll"
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EXTERNAL_BIN_DIR}/cglm/bin/cglm-0$<$<CONFIG:Debug>:d>.dll" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/cglm-0$<$<CONFIG:Debug>:d>.dll"
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EXTERNAL_BIN_DIR}/glad/bin/glad$<$<CONFIG:Debug>:d>.dll"   "$<TARGET_FILE_DIR:${PROJECT_NAME}>/glad$<$<CONFIG:Debug>:d>.dll"
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EXTERNAL_BIN_DIR}/glfw3/bin/glfw3$<$<CONFIG:Debug>:d>.dll" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/glfw3$<$<CONFIG:Debug>:d>.dll"
 			VERBATIM
 		)
 	elseif(MINGW)
-		set(EXTERNAL_BIN_DIR "${EXTERNAL_SOURCE_DIR}/install/mingw/bin")
+		set(EXTERNAL_BIN_DIR "${EXTERNAL_SOURCE_DIR}/install/mingw")
 
 		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EXTERNAL_BIN_DIR}/libcglm-0$<$<CONFIG:Debug>:d>.dll" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/libcglm-0$<$<CONFIG:Debug>:d>.dll"
-			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EXTERNAL_BIN_DIR}/libglad$<$<CONFIG:Debug>:d>.dll"   "$<TARGET_FILE_DIR:${PROJECT_NAME}>/libglad$<$<CONFIG:Debug>:d>.dll"
-			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EXTERNAL_BIN_DIR}/glfw3$<$<CONFIG:Debug>:d>.dll"     "$<TARGET_FILE_DIR:${PROJECT_NAME}>/glfw3$<$<CONFIG:Debug>:d>.dll"
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EXTERNAL_BIN_DIR}/cglm/bin/libcglm-0$<$<CONFIG:Debug>:d>.dll" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/libcglm-0$<$<CONFIG:Debug>:d>.dll"
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EXTERNAL_BIN_DIR}/glad/bin/libglad$<$<CONFIG:Debug>:d>.dll"   "$<TARGET_FILE_DIR:${PROJECT_NAME}>/libglad$<$<CONFIG:Debug>:d>.dll"
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EXTERNAL_BIN_DIR}/glfw3/bin/glfw3$<$<CONFIG:Debug>:d>.dll"    "$<TARGET_FILE_DIR:${PROJECT_NAME}>/glfw3$<$<CONFIG:Debug>:d>.dll"
 			VERBATIM
 		)
 	endif()

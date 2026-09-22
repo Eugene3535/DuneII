@@ -362,18 +362,12 @@ bool Level::createGraphicsResources(std::span<const vec4s> vertices, std::span<c
     if (m_landscape.program = m_game->glResources.getProgram("sprite"); m_landscape.program == 0)
         return false;
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_landscape.indexBufferObject);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(indices.size_bytes()), indices.data(), GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
+	glNamedBufferStorage(m_landscape.indexBufferObject, static_cast<GLsizeiptr>(indices.size_bytes()), indices.data(), 0);
+	
 	const std::array<VertexBufferLayout::Attribute, 1> attributes{ VertexBufferLayout::Attribute::Float4 };
 	VertexBufferLayout layout(attributes);
 	layout.createVertexInputState(m_landscape.vertexArrayObject, m_landscape.vertexBufferObject);
-
-	glBindVertexArray(m_landscape.vertexArrayObject);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_landscape.indexBufferObject);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glVertexArrayElementBuffer(m_landscape.vertexArrayObject, m_landscape.indexBufferObject);
 
 	m_landscape.indexCount = indices.size();
 
