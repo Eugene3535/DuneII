@@ -48,9 +48,7 @@ void OrthoMatrix::resize(int32_t width, int32_t height) noexcept
 
 void OrthoMatrix::updateUniformBuffer(const mat4s& modelViewProjection) const noexcept
 {
-    glBindBuffer(GL_UNIFORM_BUFFER, m_uniformBuffer);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mat4s), static_cast<const void*>(modelViewProjection.raw));
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    glNamedBufferSubData(m_uniformBuffer, 0, sizeof(mat4s), static_cast<const void*>(modelViewProjection.raw));
 }
 
 
